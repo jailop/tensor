@@ -59,6 +59,18 @@ auto L = std::get<Matrix<float>>(L_var);
 // A = L * L^T (L is lower triangular)
 ```
 
+### LU Decomposition
+
+```cpp
+auto A = Matrix<float>::randn({4, 4});
+auto lu_var = lu(A);
+auto [L, U, P] = std::get<std::tuple<Matrix<float>, Matrix<float>, std::vector<int>>>(lu_var);
+// PA = LU
+// L: lower triangular with unit diagonal
+// U: upper triangular
+// P: permutation indices
+```
+
 ### Eigenvalue Decomposition
 
 ```cpp
@@ -91,11 +103,37 @@ auto det_var = determinant(A);
 float det = std::get<float>(det_var);
 ```
 
+### Matrix Rank
+
+```cpp
+auto A = Matrix<float>::randn({5, 3});
+auto rank_var = matrix_rank(A);
+int rank = std::get<int>(rank_var);
+```
+
+### Pseudo-Inverse
+
+```cpp
+// Moore-Penrose pseudo-inverse (uses SVD)
+auto A = Matrix<float>::randn({5, 3});
+auto A_pinv_var = pinverse(A);
+auto A_pinv = std::get<Matrix<float>>(A_pinv_var);
+```
+
 ### Transpose
 
 ```cpp
 auto A = Matrix<float>::randn({3, 4});
 auto At = A.transpose();  // 4x3
+```
+
+### Kronecker Product
+
+```cpp
+auto A = Matrix<float>::randn({2, 3});
+auto B = Matrix<float>::randn({4, 5});
+auto C_var = kronecker_product(A, B);
+auto C = std::get<Matrix<float>>(C_var);  // 8x15
 ```
 
 ## Specialized Types
@@ -135,20 +173,67 @@ float l2_norm = v.norm(2);  // Euclidean norm
 float inf_norm = v.norm(INFINITY);
 ```
 
+## Linear System Solvers
+
+### Direct Solvers
+
+```cpp
+// Solve Ax = b using different methods
+auto A = Matrix<float>::randn({100, 100});
+auto b = Vector<float>::randn({100});
+
+// LU decomposition (general matrices)
+auto x_lu_var = solve_lu(A, b);
+auto x_lu = std::get<Vector<float>>(x_lu_var);
+
+// QR decomposition (more stable for ill-conditioned systems)
+auto x_qr_var = solve_qr(A, b);
+auto x_qr = std::get<Vector<float>>(x_qr_var);
+
+// Cholesky (for symmetric positive definite matrices - faster)
+auto A_spd = Matrix<float>::eye({100, 100}) + Matrix<float>::ones({100, 100}) * 0.1f;
+auto x_chol_var = solve_cholesky(A_spd, b);
+auto x_chol = std::get<Vector<float>>(x_chol_var);
+```
+
+### Least Squares
+
+```cpp
+// Solve overdetermined systems (more equations than unknowns)
+auto A = Matrix<float>::randn({200, 50});  // 200 equations, 50 unknowns
+auto b = Vector<float>::randn({200});
+
+// QR-based least squares
+auto x_qr_var = lstsq_qr(A, b);
+auto x_qr = std::get<Vector<float>>(x_qr_var);
+
+// SVD-based least squares (more robust, handles rank-deficient matrices)
+auto x_svd_var = lstsq_svd(A, b);
+auto x_svd = std::get<Vector<float>>(x_svd_var);
+
+// Verify solution minimizes ||Ax - b||²
+auto residual_var = matmul(A, x_svd.unsqueeze(1)) - b.unsqueeze(1);
+auto residual = std::get<Matrix<float>>(residual_var);
+float error = residual.norm(2);
+```
+
 ## Practical Examples
 
 ### Linear System Solving
 
 ```cpp
-// Solve Ax = b
-auto A = Matrix<float>::randn({100, 100});
-auto b = Vector<float>::randn({100});
+// Example: Solve a system of linear equations
+auto A = Matrix<float>::from_array({
+    1.0f, 2.0f, 3.0f,
+    2.0f, 5.0f, 3.0f,
+    1.0f, 0.0f, 8.0f
+}, {3, 3});
 
-// Using QR decomposition
-auto qr_var = qr(A);
-auto [Q, R] = std::get<std::pair<Matrix<float>, Matrix<float>>>(qr_var);
-auto Qt_b_var = matmul(Q.transpose(), b.unsqueeze(1));
-// Solve R * x = Q^T * b (back substitution)
+auto b = Vector<float>::from_array({14.0f, 18.0f, 20.0f}, {3});
+
+auto x_var = solve_lu(A, b);
+auto x = std::get<Vector<float>>(x_var);
+// Solution: x ≈ [1, 2, 3]
 ```
 
 ### PCA (Principal Component Analysis)
@@ -157,8 +242,9 @@ auto Qt_b_var = matmul(Q.transpose(), b.unsqueeze(1));
 auto X = Matrix<float>::randn({1000, 50});  // 1000 samples, 50 features
 
 // Center the data
-auto mean = X.mean(0);
-auto X_centered = X - mean;
+auto mean_var = X.mean(0);
+auto mean = std::get<Vector<float>>(mean_var);
+auto X_centered = X - mean.unsqueeze(0);
 
 // Compute covariance matrix
 auto cov_var = covariance_matrix(X_centered);
@@ -167,11 +253,39 @@ auto cov = std::get<Matrix<float>>(cov_var);
 // Get eigenvalues/eigenvectors
 auto eigvals_var = eigenvalues(cov);
 auto eigvecs_var = eigenvectors(cov);
+auto eigvals = std::get<Vector<float>>(eigvals_var);
+auto eigvecs = std::get<Matrix<float>>(eigvecs_var);
 
 // Project to k principal components
 int k = 10;
-auto proj_matrix = eigvecs_var.leftCols(k);
-auto X_reduced = matmul(X_centered, proj_matrix);
+auto proj_matrix = eigvecs.leftCols(k);
+auto X_reduced_var = matmul(X_centered, proj_matrix);
+auto X_reduced = std::get<Matrix<float>>(X_reduced_var);
+```
+
+### Ridge Regression (Regularized Least Squares)
+
+```cpp
+// Solve (A^T A + λI)x = A^T b
+auto A = Matrix<float>::randn({100, 20});
+auto b = Vector<float>::randn({100});
+float lambda = 0.1f;
+
+// Form normal equations
+auto At_var = A.transpose();
+auto At = std::get<Matrix<float>>(At_var);
+auto AtA_var = matmul(At, A);
+auto AtA = std::get<Matrix<float>>(AtA_var);
+auto Atb_var = matmul(At, b.unsqueeze(1));
+auto Atb = std::get<Vector<float>>(Atb_var).squeeze();
+
+// Add regularization
+auto I = Matrix<float>::eye({20, 20});
+auto AtA_reg = AtA + I * lambda;
+
+// Solve using Cholesky (AtA_reg is SPD)
+auto x_var = solve_cholesky(AtA_reg, Atb);
+auto x = std::get<Vector<float>>(x_var);
 ```
 
 ---

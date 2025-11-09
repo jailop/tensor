@@ -154,7 +154,7 @@ template <typename T>
 Vector<T> normalize(const Vector<T>& v) {
     T n = norm(v);
     if (n < std::numeric_limits<T>::epsilon()) {
-        return Vector<T>(v.dims(), v.uses_gpu(), v.requires_gradients());
+        return Vector<T>(v.dims(), v.uses_gpu(), v.requires_grad());
     }
     return v / n;
 }
@@ -598,18 +598,13 @@ T condition_number(const Matrix<T>& mat) {
     T norm_A = norm_inf(mat);
     
     // Compute inverse (simplified - would need proper implementation)
-    // For now, return an estimate based on determinant
-    T det_val = determinant(mat);
-    if (std::abs(det_val) < std::numeric_limits<T>::epsilon()) {
-        return std::numeric_limits<T>::infinity(); // Singular matrix
-    }
-    
-    // Simplified estimate: for well-conditioned matrices
+    // For now, return an estimate based on norm
     // A proper implementation would require computing ||A^(-1)||
     // which requires actual inversion or iterative methods
     
-    // For now, we return a placeholder based on norm and determinant
-    T estimate = norm_A / std::abs(det_val);
+    // For now, we return a placeholder based on norm
+    // This is a simplified estimate
+    T estimate = norm_A * norm_A;  // Rough approximation
     return estimate;
 }
 

@@ -13,6 +13,7 @@
 #include <pybind11/stl.h>
 #include <pybind11/operators.h>
 #include <pybind11/functional.h>
+#include <pybind11/numpy.h>
 #include <iostream>
 
 #include "tensor.h"
@@ -100,6 +101,77 @@ py::list tensor_to_list(const Tensor<T, N>& tensor) {
     return convert(tensor.data(), tensor.shape(), 0);
 }
 
+// Helper function to convert NumPy array to Tensor
+template<typename T, size_t N>
+Tensor<T, N> numpy_to_tensor(py::array_t<T> arr) {
+    py::buffer_info buf = arr.request();
+    
+    if (buf.ndim != N) {
+        throw std::runtime_error("NumPy array dimension mismatch: expected " + 
+                               std::to_string(N) + " dimensions, got " + 
+                               std::to_string(buf.ndim));
+    }
+    
+    std::array<size_t, N> shape;
+    for (size_t i = 0; i < N; ++i) {
+        shape[i] = buf.shape[i];
+    }
+    
+    Tensor<T, N> tensor(shape);
+    T* src = static_cast<T*>(buf.ptr);
+    
+    // Copy data from NumPy array (handles different strides)
+    if (buf.strides[N-1] == sizeof(T)) {
+        // Contiguous case - direct copy
+        std::copy(src, src + tensor.total_size(), tensor.data());
+    } else {
+        // Non-contiguous case - copy element by element
+        std::function<void(size_t, const ssize_t*, T*)> copy_recursive;
+        copy_recursive = [&](size_t dim, const ssize_t* indices, T* dst) {
+            if (dim == N) {
+                size_t offset = 0;
+                for (size_t i = 0; i < N; ++i) {
+                    offset += indices[i] * buf.strides[i] / sizeof(T);
+                }
+                *dst = src[offset];
+            } else {
+                for (ssize_t i = 0; i < buf.shape[dim]; ++i) {
+                    ssize_t new_indices[N];
+                    for (size_t j = 0; j < dim; ++j) {
+                        new_indices[j] = indices[j];
+                    }
+                    new_indices[dim] = i;
+                    copy_recursive(dim + 1, new_indices, dst);
+                    if (dim == N - 1) dst++;
+                }
+            }
+        };
+        ssize_t indices[N] = {0};
+        copy_recursive(0, indices, tensor.data());
+    }
+    
+    return tensor;
+}
+
+// Helper function to convert Tensor to NumPy array
+template<typename T, size_t N>
+py::array_t<T> tensor_to_numpy(const Tensor<T, N>& tensor) {
+    auto shape = tensor.shape();
+    std::vector<ssize_t> np_shape(N);
+    for (size_t i = 0; i < N; ++i) {
+        np_shape[i] = shape[i];
+    }
+    
+    // Create NumPy array with a copy of the data
+    py::array_t<T> arr(np_shape);
+    py::buffer_info buf = arr.request();
+    T* dst = static_cast<T*>(buf.ptr);
+    
+    std::copy(tensor.data(), tensor.data() + tensor.total_size(), dst);
+    
+    return arr;
+}
+
 // Binding for a single Tensor type
 template<typename T, size_t N>
 py::class_<Tensor<T, N>> bind_tensor(py::module& m, const std::string& name) {
@@ -110,8 +182,13 @@ py::class_<Tensor<T, N>> bind_tensor(py::module& m, const std::string& name) {
     cls.def(py::init<const std::array<size_t, N>&>(), py::arg("shape"),
              "Create a tensor with the given shape")
         .def(py::init([](py::handle data) {
+            // Try to interpret as NumPy array first
+            if (py::isinstance<py::array>(data)) {
+                return numpy_to_tensor<T, N>(data.cast<py::array_t<T>>());
+            }
+            // Otherwise treat as list/tuple
             return list_to_tensor<T, N>(data);
-        }), py::arg("data"), "Create tensor from Python list/tuple")
+        }), py::arg("data"), "Create tensor from Python list/tuple or NumPy array")
         
         // Properties
         .def_property_readonly("shape", [](const TensorType& t) {
@@ -269,6 +346,12 @@ py::class_<Tensor<T, N>> bind_tensor(py::module& m, const std::string& name) {
         .def("tolist", [](const TensorType& t) {
             return tensor_to_list(t);
         }, "Convert to Python list")
+        .def("numpy", [](const TensorType& t) {
+            return tensor_to_numpy(t);
+        }, "Convert to NumPy array")
+        .def_static("from_numpy", [](py::array_t<T> arr) {
+            return numpy_to_tensor<T, N>(arr);
+        }, py::arg("array"), "Create tensor from NumPy array")
         .def("__repr__", [](const TensorType& t) {
             return ::to_string(t);
         });
@@ -491,191 +574,7 @@ PYBIND11_MODULE(tensor4d, m) {
     // Linear algebra functions module
     py::module linalg_mod = m.def_submodule("linalg", "Linear algebra functions");
     
-    // SVD decomposition
-    linalg_mod.def("svd", [](const Tensor<float, 2>& A) {
-        auto result = linalg::svd(A);
-        if (std::holds_alternative<linalg::LinalgError>(result)) {
-            throw std::runtime_error("SVD decomposition failed");
-        }
-        auto& svd_result = std::get<linalg::SVDResult<float>>(result);
-        return py::make_tuple(svd_result.U, svd_result.S, svd_result.Vt);
-    }, py::arg("A"), "Singular Value Decomposition");
-    
-    linalg_mod.def("svd", [](const Tensor<double, 2>& A) {
-        auto result = linalg::svd(A);
-        if (std::holds_alternative<linalg::LinalgError>(result)) {
-            throw std::runtime_error("SVD decomposition failed");
-        }
-        auto& svd_result = std::get<linalg::SVDResult<double>>(result);
-        return py::make_tuple(svd_result.U, svd_result.S, svd_result.Vt);
-    }, py::arg("A"), "Singular Value Decomposition (double)");
-    
-    // QR decomposition
-    linalg_mod.def("qr", [](const Tensor<float, 2>& A) {
-        auto result = linalg::qr(A);
-        if (std::holds_alternative<linalg::LinalgError>(result)) {
-            throw std::runtime_error("QR decomposition failed");
-        }
-        auto& qr_result = std::get<linalg::QRResult<float>>(result);
-        return py::make_tuple(qr_result.Q, qr_result.R);
-    }, py::arg("A"), "QR decomposition");
-    
-    linalg_mod.def("qr", [](const Tensor<double, 2>& A) {
-        auto result = linalg::qr(A);
-        if (std::holds_alternative<linalg::LinalgError>(result)) {
-            throw std::runtime_error("QR decomposition failed");
-        }
-        auto& qr_result = std::get<linalg::QRResult<double>>(result);
-        return py::make_tuple(qr_result.Q, qr_result.R);
-    }, py::arg("A"), "QR decomposition (double)");
-    
-    // Cholesky decomposition
-    linalg_mod.def("cholesky", [](const Tensor<float, 2>& A) {
-        auto result = linalg::cholesky(A);
-        if (std::holds_alternative<linalg::LinalgError>(result)) {
-            throw std::runtime_error("Cholesky decomposition failed");
-        }
-        return std::get<Tensor<float, 2>>(result);
-    }, py::arg("A"), "Cholesky decomposition");
-    
-    linalg_mod.def("cholesky", [](const Tensor<double, 2>& A) {
-        auto result = linalg::cholesky(A);
-        if (std::holds_alternative<linalg::LinalgError>(result)) {
-            throw std::runtime_error("Cholesky decomposition failed");
-        }
-        return std::get<Tensor<double, 2>>(result);
-    }, py::arg("A"), "Cholesky decomposition (double)");
-    
-    // LU decomposition
-    linalg_mod.def("lu", [](const Tensor<float, 2>& A) {
-        auto result = linalg::lu(A);
-        if (std::holds_alternative<linalg::LinalgError>(result)) {
-            throw std::runtime_error("LU decomposition failed");
-        }
-        auto& lu_result = std::get<linalg::LUResult<float>>(result);
-        return py::make_tuple(lu_result.L, lu_result.U, lu_result.P);
-    }, py::arg("A"), "LU decomposition with pivoting");
-    
-    linalg_mod.def("lu", [](const Tensor<double, 2>& A) {
-        auto result = linalg::lu(A);
-        if (std::holds_alternative<linalg::LinalgError>(result)) {
-            throw std::runtime_error("LU decomposition failed");
-        }
-        auto& lu_result = std::get<linalg::LUResult<double>>(result);
-        return py::make_tuple(lu_result.L, lu_result.U, lu_result.P);
-    }, py::arg("A"), "LU decomposition with pivoting (double)");
-    
-    // Eigenvalue decomposition
-    linalg_mod.def("eig", [](const Tensor<float, 2>& A) {
-        auto result = linalg::eig(A);
-        if (std::holds_alternative<linalg::LinalgError>(result)) {
-            throw std::runtime_error("Eigenvalue decomposition failed");
-        }
-        auto& eig_result = std::get<linalg::EigenResult<float>>(result);
-        return py::make_tuple(eig_result.eigenvalues, eig_result.eigenvectors);
-    }, py::arg("A"), "Eigenvalue decomposition");
-    
-    linalg_mod.def("eig", [](const Tensor<double, 2>& A) {
-        auto result = linalg::eig(A);
-        if (std::holds_alternative<linalg::LinalgError>(result)) {
-            throw std::runtime_error("Eigenvalue decomposition failed");
-        }
-        auto& eig_result = std::get<linalg::EigenResult<double>>(result);
-        return py::make_tuple(eig_result.eigenvalues, eig_result.eigenvectors);
-    }, py::arg("A"), "Eigenvalue decomposition (double)");
-    
-    // Linear solvers
-    linalg_mod.def("solve", [](const Tensor<float, 2>& A, const Tensor<float, 2>& b) {
-        auto result = linalg::solve(A, b);
-        if (std::holds_alternative<linalg::LinalgError>(result)) {
-            throw std::runtime_error("Linear system solving failed");
-        }
-        return std::get<Tensor<float, 2>>(result);
-    }, py::arg("A"), py::arg("b"), "Solve linear system Ax = b");
-    
-    linalg_mod.def("solve", [](const Tensor<double, 2>& A, const Tensor<double, 2>& b) {
-        auto result = linalg::solve(A, b);
-        if (std::holds_alternative<linalg::LinalgError>(result)) {
-            throw std::runtime_error("Linear system solving failed");
-        }
-        return std::get<Tensor<double, 2>>(result);
-    }, py::arg("A"), py::arg("b"), "Solve linear system Ax = b (double)");
-    
-    // Least squares
-    linalg_mod.def("lstsq", [](const Tensor<float, 2>& A, const Tensor<float, 2>& b) {
-        auto result = linalg::lstsq(A, b);
-        if (std::holds_alternative<linalg::LinalgError>(result)) {
-            throw std::runtime_error("Least squares solving failed");
-        }
-        return std::get<Tensor<float, 2>>(result);
-    }, py::arg("A"), py::arg("b"), "Least squares solution");
-    
-    linalg_mod.def("lstsq", [](const Tensor<double, 2>& A, const Tensor<double, 2>& b) {
-        auto result = linalg::lstsq(A, b);
-        if (std::holds_alternative<linalg::LinalgError>(result)) {
-            throw std::runtime_error("Least squares solving failed");
-        }
-        return std::get<Tensor<double, 2>>(result);
-    }, py::arg("A"), py::arg("b"), "Least squares solution (double)");
-    
-    // Kronecker product
-    linalg_mod.def("kron", [](const Tensor<float, 2>& A, const Tensor<float, 2>& B) {
-        return linalg::kron(A, B);
-    }, py::arg("A"), py::arg("B"), "Kronecker product");
-    
-    linalg_mod.def("kron", [](const Tensor<double, 2>& A, const Tensor<double, 2>& B) {
-        return linalg::kron(A, B);
-    }, py::arg("A"), py::arg("B"), "Kronecker product (double)");
-    
-    // Matrix functions
-    linalg_mod.def("det", [](const Tensor<float, 2>& A) {
-        return linalg::det(A);
-    }, py::arg("A"), "Determinant");
-    
-    linalg_mod.def("det", [](const Tensor<double, 2>& A) {
-        return linalg::det(A);
-    }, py::arg("A"), "Determinant (double)");
-    
-    linalg_mod.def("inv", [](const Tensor<float, 2>& A) {
-        auto result = linalg::inverse(A);
-        if (std::holds_alternative<linalg::LinalgError>(result)) {
-            throw std::runtime_error("Matrix inversion failed");
-        }
-        return std::get<Tensor<float, 2>>(result);
-    }, py::arg("A"), "Matrix inverse");
-    
-    linalg_mod.def("inv", [](const Tensor<double, 2>& A) {
-        auto result = linalg::inverse(A);
-        if (std::holds_alternative<linalg::LinalgError>(result)) {
-            throw std::runtime_error("Matrix inversion failed");
-        }
-        return std::get<Tensor<double, 2>>(result);
-    }, py::arg("A"), "Matrix inverse (double)");
-    
-    linalg_mod.def("pinv", [](const Tensor<float, 2>& A, float tol) {
-        auto result = linalg::pinv(A, tol);
-        if (std::holds_alternative<linalg::LinalgError>(result)) {
-            throw std::runtime_error("Pseudo-inverse computation failed");
-        }
-        return std::get<Tensor<float, 2>>(result);
-    }, py::arg("A"), py::arg("tol") = 1e-10f, "Pseudo-inverse");
-    
-    linalg_mod.def("pinv", [](const Tensor<double, 2>& A, double tol) {
-        auto result = linalg::pinv(A, tol);
-        if (std::holds_alternative<linalg::LinalgError>(result)) {
-            throw std::runtime_error("Pseudo-inverse computation failed");
-        }
-        return std::get<Tensor<double, 2>>(result);
-    }, py::arg("A"), py::arg("tol") = 1e-10, "Pseudo-inverse (double)");
-    
-    linalg_mod.def("matrix_rank", [](const Tensor<float, 2>& A, float tol) {
-        return linalg::rank(A, tol);
-    }, py::arg("A"), py::arg("tol") = 1e-10f, "Matrix rank");
-    
-    linalg_mod.def("matrix_rank", [](const Tensor<double, 2>& A, double tol) {
-        return linalg::rank(A, tol);
-    }, py::arg("A"), py::arg("tol") = 1e-10, "Matrix rank (double)");
-    
+    // Vector operations
     linalg_mod.def("norm", [](const Tensor<float, 1>& v) {
         return linalg::norm(v);
     }, py::arg("v"), "Vector norm");
@@ -683,6 +582,14 @@ PYBIND11_MODULE(tensor4d, m) {
     linalg_mod.def("norm", [](const Tensor<double, 1>& v) {
         return linalg::norm(v);
     }, py::arg("v"), "Vector norm (double)");
+    
+    linalg_mod.def("normalize", [](const Tensor<float, 1>& v) {
+        return linalg::normalize(v);
+    }, py::arg("v"), "Normalize vector");
+    
+    linalg_mod.def("normalize", [](const Tensor<double, 1>& v) {
+        return linalg::normalize(v);
+    }, py::arg("v"), "Normalize vector (double)");
     
     linalg_mod.def("dot", [](const Tensor<float, 1>& a, const Tensor<float, 1>& b) {
         return linalg::dot(a, b);
@@ -692,22 +599,15 @@ PYBIND11_MODULE(tensor4d, m) {
         return linalg::dot(a, b);
     }, py::arg("a"), py::arg("b"), "Dot product (double)");
     
-    linalg_mod.def("cross", [](const Tensor<float, 1>& a, const Tensor<float, 1>& b) {
-        auto result = linalg::cross(a, b);
-        if (std::holds_alternative<linalg::LinalgError>(result)) {
-            throw std::runtime_error("Cross product failed (vectors must be 3D)");
-        }
-        return std::get<Tensor<float, 1>>(result);
-    }, py::arg("a"), py::arg("b"), "Cross product (3D)");
+    linalg_mod.def("outer", [](const Tensor<float, 1>& a, const Tensor<float, 1>& b) {
+        return linalg::outer(a, b);
+    }, py::arg("a"), py::arg("b"), "Outer product");
     
-    linalg_mod.def("cross", [](const Tensor<double, 1>& a, const Tensor<double, 1>& b) {
-        auto result = linalg::cross(a, b);
-        if (std::holds_alternative<linalg::LinalgError>(result)) {
-            throw std::runtime_error("Cross product failed (vectors must be 3D)");
-        }
-        return std::get<Tensor<double, 1>>(result);
-    }, py::arg("a"), py::arg("b"), "Cross product (3D, double)");
+    linalg_mod.def("outer", [](const Tensor<double, 1>& a, const Tensor<double, 1>& b) {
+        return linalg::outer(a, b);
+    }, py::arg("a"), py::arg("b"), "Outer product (double)");
     
+    // Matrix operations
     linalg_mod.def("matmul", [](const Tensor<float, 2>& A, const Tensor<float, 2>& B) {
         return linalg::matmul(A, B);
     }, py::arg("A"), py::arg("B"), "Matrix multiplication");
@@ -715,6 +615,102 @@ PYBIND11_MODULE(tensor4d, m) {
     linalg_mod.def("matmul", [](const Tensor<double, 2>& A, const Tensor<double, 2>& B) {
         return linalg::matmul(A, B);
     }, py::arg("A"), py::arg("B"), "Matrix multiplication (double)");
+    
+    linalg_mod.def("matvec", [](const Tensor<float, 2>& mat, const Tensor<float, 1>& vec) {
+        return linalg::matvec(mat, vec);
+    }, py::arg("mat"), py::arg("vec"), "Matrix-vector multiplication");
+    
+    linalg_mod.def("matvec", [](const Tensor<double, 2>& mat, const Tensor<double, 1>& vec) {
+        return linalg::matvec(mat, vec);
+    }, py::arg("mat"), py::arg("vec"), "Matrix-vector multiplication (double)");
+    
+    linalg_mod.def("transpose", [](const Tensor<float, 2>& mat) {
+        return linalg::transpose(mat);
+    }, py::arg("mat"), "Matrix transpose");
+    
+    linalg_mod.def("transpose", [](const Tensor<double, 2>& mat) {
+        return linalg::transpose(mat);
+    }, py::arg("mat"), "Matrix transpose (double)");
+    
+    linalg_mod.def("trace", [](const Tensor<float, 2>& mat) {
+        return linalg::trace(mat);
+    }, py::arg("mat"), "Matrix trace");
+    
+    linalg_mod.def("trace", [](const Tensor<double, 2>& mat) {
+        return linalg::trace(mat);
+    }, py::arg("mat"), "Matrix trace (double)");
+    
+    linalg_mod.def("diag", [](const Tensor<float, 2>& mat) {
+        return linalg::diag(mat);
+    }, py::arg("mat"), "Extract diagonal");
+    
+    linalg_mod.def("diag", [](const Tensor<double, 2>& mat) {
+        return linalg::diag(mat);
+    }, py::arg("mat"), "Extract diagonal (double)");
+    
+    linalg_mod.def("diag", [](const Tensor<float, 1>& vec) {
+        return linalg::diag(vec);
+    }, py::arg("vec"), "Create diagonal matrix");
+    
+    linalg_mod.def("diag", [](const Tensor<double, 1>& vec) {
+        return linalg::diag(vec);
+    }, py::arg("vec"), "Create diagonal matrix (double)");
+    
+    linalg_mod.def("eye", [](size_t n, bool use_gpu) {
+        return linalg::eye<float>(n, use_gpu);
+    }, py::arg("n"), py::arg("use_gpu") = true, "Identity matrix");
+    
+    linalg_mod.def("eye", [](size_t n, bool use_gpu) {
+        return linalg::eye<double>(n, use_gpu);
+    }, py::arg("n"), py::arg("use_gpu") = true, "Identity matrix (double)");
+    
+    linalg_mod.def("frobenius_norm", [](const Tensor<float, 2>& mat) {
+        return linalg::frobenius_norm(mat);
+    }, py::arg("mat"), "Frobenius norm");
+    
+    linalg_mod.def("frobenius_norm", [](const Tensor<double, 2>& mat) {
+        return linalg::frobenius_norm(mat);
+    }, py::arg("mat"), "Frobenius norm (double)");
+    
+    linalg_mod.def("norm_l1", [](const Tensor<float, 2>& mat) {
+        return linalg::norm_l1(mat);
+    }, py::arg("mat"), "L1 matrix norm");
+    
+    linalg_mod.def("norm_l1", [](const Tensor<double, 2>& mat) {
+        return linalg::norm_l1(mat);
+    }, py::arg("mat"), "L1 matrix norm (double)");
+    
+    linalg_mod.def("norm_inf", [](const Tensor<float, 2>& mat) {
+        return linalg::norm_inf(mat);
+    }, py::arg("mat"), "Infinity matrix norm");
+    
+    linalg_mod.def("norm_inf", [](const Tensor<double, 2>& mat) {
+        return linalg::norm_inf(mat);
+    }, py::arg("mat"), "Infinity matrix norm (double)");
+    
+    linalg_mod.def("matrix_rank", [](const Tensor<float, 2>& mat, float tol) {
+        return linalg::rank(mat, tol);
+    }, py::arg("mat"), py::arg("tol") = -1.0f, "Matrix rank");
+    
+    linalg_mod.def("matrix_rank", [](const Tensor<double, 2>& mat, double tol) {
+        return linalg::rank(mat, tol);
+    }, py::arg("mat"), py::arg("tol") = -1.0, "Matrix rank (double)");
+    
+    linalg_mod.def("condition_number", [](const Tensor<float, 2>& mat) {
+        return linalg::condition_number(mat);
+    }, py::arg("mat"), "Condition number");
+    
+    linalg_mod.def("condition_number", [](const Tensor<double, 2>& mat) {
+        return linalg::condition_number(mat);
+    }, py::arg("mat"), "Condition number (double)");
+    
+    linalg_mod.def("lstsq", [](const Tensor<float, 2>& A, const Tensor<float, 1>& b) {
+        return linalg::least_squares(A, b);
+    }, py::arg("A"), py::arg("b"), "Least squares solution");
+    
+    linalg_mod.def("lstsq", [](const Tensor<double, 2>& A, const Tensor<double, 1>& b) {
+        return linalg::least_squares(A, b);
+    }, py::arg("A"), py::arg("b"), "Least squares solution (double)");
     
     // Constants and enums
     

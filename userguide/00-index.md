@@ -90,6 +90,18 @@
     - Type aliases
     - Backend configuration
 
+17. [Python Integration](17-python-integration.md)
+    - Building Python bindings
+    - Using tensors from Python
+    - NumPy interoperability
+    - Training workflows in Python
+
+18. [C Interface](18-c-interface.md)
+    - Using the library from C
+    - Opaque handles and error codes
+    - Memory management in C
+    - Complete C examples
+
 ## Library Overview
 
 This is a modern C++ tensor library designed for machine learning and scientific computing. Key features include:
@@ -100,16 +112,18 @@ This is a modern C++ tensor library designed for machine learning and scientific
 - **CPU optimization** via BLAS (USE_BLAS)
 - **Automatic backend selection**: GPU → BLAS → CPU
 - **NumPy-like API** for easy adoption
-- **Comprehensive linear algebra** operations
+- **Comprehensive linear algebra** operations (BLAS/LAPACK-backed)
 - **Performance optimizations**: memory pooling, multi-threading, mixed precision, lazy evaluation
-- **Machine learning tools**: loss functions, optimizers
-- **Rich statistical functions** and I/O operations
+- **Machine learning tools**: loss functions, optimizers (SGD, Adam, AdamW, RMSprop)
+- **Rich statistical functions** and I/O operations (including .npy format)
+- **Python bindings** with zero-copy NumPy interoperability
 
 ## Version Information
 
-- **Current Version**: 1.4.1
+- **Current Version**: 1.4.2
 - **Status**: Production Ready
 - **Test Coverage**: 411 tests, 100% passing
+- **Python Bindings**: Available via pybind11
 
 ## Quick Links
 

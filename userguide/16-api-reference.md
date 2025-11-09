@@ -4,7 +4,9 @@
 
 ### Creation Functions
 - `zeros()`, `ones()`, `full()`, `eye()`
-- `randn()`, `uniform()`, `normal()`
+- `randn()`, `rand()`, `uniform()`, `normal()`
+- `randint()`, `randperm()`, `choice()`
+- `exponential()`, `gamma()`, `beta()`, `chi_square()`, `cauchy()`, `multinomial()`
 - `arange()`, `linspace()`, `logspace()`
 - `from_array()`
 
@@ -32,9 +34,13 @@
 
 ### Linear Algebra
 - `matmul()`, `dot()`, `cross()`
-- `transpose()`, `inverse()`, `determinant()`
-- `svd()`, `qr()`, `cholesky()`
+- `transpose()`, `inverse()`, `determinant()`, `matrix_rank()`
+- `svd()`, `qr()`, `cholesky()`, `lu()`
 - `eigenvalues()`, `eigenvectors()`
+- `solve_lu()`, `solve_qr()`, `solve_cholesky()`
+- `lstsq_qr()`, `lstsq_svd()`, `pinverse()`
+- `kronecker_product()`
+- `covariance_matrix()`, `pearson_correlation()`, `spearman_correlation()`
 
 ### Indexing
 - `take()`, `put()`
@@ -48,7 +54,9 @@
 - `topRows()`, `bottomRows()`, `leftCols()`, `rightCols()`
 
 ### I/O
-- `save_tensor()`, `load_tensor()`
+- `save()`, `load()` (binary format)
+- `save_txt()`, `load_txt()` (text format)
+- `save_npy()`, `load_npy()` (NumPy format)
 - `print()`, `to_string()`
 
 ### Normalization
@@ -104,4 +112,4 @@ Runtime checks:
 
 ---
 
-**Previous**: [← Best Practices](15-best-practices.md) | **Up**: [Index ↑](00-index.md)
+**Previous**: [← Best Practices](15-best-practices.md) | **Next**: [Python Integration →](17-python-integration.md) | **Up**: [Index ↑](00-index.md)

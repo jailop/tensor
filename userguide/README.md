@@ -4,7 +4,7 @@ Welcome to the comprehensive user guide for the Tensor Library!
 
 ## Structure
 
-This guide is organized into 17 sections, each focusing on a specific aspect of the library:
+This guide is organized into 18 sections, each focusing on a specific aspect of the library:
 
 | Section | Title | Description |
 |---------|-------|-------------|
@@ -25,6 +25,8 @@ This guide is organized into 17 sections, each focusing on a specific aspect of 
 | [14](14-stacking-concatenation.md) | **Stacking and Concatenation** | Stack, concatenate, split, chunk |
 | [15](15-best-practices.md) | **Best Practices** | Error handling, memory, performance, patterns |
 | [16](16-api-reference.md) | **API Reference** | Quick reference for all functions |
+| [17](17-python-integration.md) | **Python Integration** | Python bindings and NumPy interop |
+| [18](18-c-interface.md) | **C Interface** | Using the library from C code |
 
 ## How to Use This Guide
 
@@ -43,6 +45,7 @@ Focus on these sections:
 2. [Automatic Differentiation](06-autograd.md) - Understanding gradients
 3. [Machine Learning Features](07-machine-learning.md) - Loss functions and optimizers
 4. [Performance Optimization](10-performance-optimization.md) - GPU acceleration
+5. [Python Integration](17-python-integration.md) - Using from Python
 
 ### For Scientists/Engineers
 
@@ -51,6 +54,7 @@ These sections are most relevant:
 2. [Mathematical Operations](04-mathematical-operations.md) - Statistical functions
 3. [I/O Operations](09-io-operations.md) - Data import/export
 4. [Normalization and Views](11-normalization-views.md) - Data preprocessing
+5. [C Interface](18-c-interface.md) - Using from legacy C code
 
 ### As a Reference
 
@@ -139,22 +143,33 @@ for (int epoch = 0; epoch < 10; epoch++) {
 
 ### Linear Algebra
 ✅ Matrix multiplication, decompositions  
-✅ SVD, QR, Cholesky, Eigenvalues  
-✅ Matrix inverse, determinant  
+✅ SVD, QR, Cholesky, LU, Eigenvalues  
+✅ Linear solvers (LU, QR, Cholesky)
+✅ Least squares (QR, SVD)
+✅ Matrix inverse, determinant, rank, pseudo-inverse
+✅ Kronecker product, covariance
 ✅ Specialized Matrix and Vector types  
 
 ### Data Operations
 ✅ Advanced indexing and slicing  
 ✅ Broadcasting  
-✅ I/O (save/load, NumPy format)  
+✅ I/O (save/load, NumPy .npy format)  
 ✅ Sorting, searching, stacking  
+✅ Normalization functions (L1, L2, Z-score, Min-Max)
+✅ Statistical operations (correlation, covariance, quantiles)
+
+### Language Bindings
+✅ C++ native API
+✅ Python bindings via pybind11 (zero-copy NumPy interop)
+✅ C interface for legacy code integration  
 
 ## Version Information
 
-- **Current Version**: 1.4.1
+- **Current Version**: 1.4.2
 - **Status**: Production Ready
 - **Test Coverage**: 411 tests, 100% passing
 - **Lines of Code**: ~20,000+
+- **Python Bindings**: Available (pybind11)
 
 ## Contributing
 

@@ -47,6 +47,7 @@ make test
 | `BUILD_SHARED_LIBS` | ON | Build shared library (.so) |
 | `BUILD_TESTS` | ON | Build test suite |
 | `BUILD_DOCS` | ON | Generate Doxygen documentation |
+| `BUILD_PYTHON_BINDINGS` | OFF | Build Python bindings (pybind11) |
 
 ### Linking Against the Library
 

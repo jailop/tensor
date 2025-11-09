@@ -2,15 +2,45 @@
 
 ## Backend Selection
 
-The library automatically selects the best backend:
-1. **GPU** (if available) - CUDA acceleration
-2. **BLAS** (if available) - Optimized CPU operations
-3. **CPU** - Fallback implementation
+The library automatically selects the best backend at runtime:
 
-Configure at compile time:
+1. **GPU** (if compiled with `USE_GPU` and CUDA available) - Highest performance
+2. **BLAS/LAPACK** (if compiled with `USE_BLAS` and library available) - Optimized CPU
+3. **CPU** - Pure C++ fallback implementation
+
+### Compile-Time Configuration
+
 ```bash
+# Enable all backends
 cmake -DUSE_GPU=ON -DUSE_BLAS=ON ..
+make -j$(nproc)
+
+# GPU only
+cmake -DUSE_GPU=ON ..
+
+# BLAS only
+cmake -DUSE_BLAS=ON ..
 ```
+
+### Runtime Detection
+
+```cpp
+// The library automatically detects and uses the best backend
+auto A = Matrix<float>::randn({1000, 1000});
+auto B = Matrix<float>::randn({1000, 1000});
+
+// This will use GPU if available, else BLAS, else CPU
+auto C_var = matmul(A, B);
+```
+
+### Backend Priority
+
+For different operations:
+- **Linear algebra** (matmul, SVD, QR, etc.): GPU → BLAS → CPU
+- **Element-wise ops** (add, mul, exp, etc.): GPU → CPU (BLAS not typically used)
+- **Reductions** (sum, mean, etc.): GPU → CPU
+
+No code changes required - backend selection is automatic!
 
 ## Memory Pooling
 

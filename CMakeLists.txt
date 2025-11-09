@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(tensor4d LANGUAGES CXX)
+project(tensor4d LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -264,6 +264,69 @@ endif()
 if(BLAS_FOUND)
   target_link_libraries(backend_demo ${BLAS_LIBRARIES})
 endif()
+
+# ============================================
+# C Interface Library
+# ============================================
+
+# Build C interface shared library
+add_library(tensor_c SHARED
+  src/tensor_c.cpp
+  ${GPU_SOURCES}
+)
+
+target_include_directories(tensor_c PUBLIC
+  ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+target_link_libraries(tensor_c
+  PRIVATE tensor4d_static
+  PUBLIC Threads::Threads
+)
+
+# Link TBB if found
+if(TBB_FOUND)
+  target_link_libraries(tensor_c PUBLIC TBB::tbb)
+endif()
+
+# Link BLAS if found
+if(BLAS_FOUND)
+  target_link_libraries(tensor_c PUBLIC ${BLAS_LIBRARIES})
+endif()
+
+# Link LAPACK if found
+if(LAPACK_FOUND)
+  target_link_libraries(tensor_c PUBLIC ${LAPACK_LIBRARIES})
+endif()
+
+set_target_properties(tensor_c PROPERTIES
+  VERSION 1.0.0
+  SOVERSION 1
+  POSITION_INDEPENDENT_CODE ON
+)
+
+# Install C library and header
+install(TARGETS tensor_c
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)
+
+install(FILES include/tensor_c.h
+  DESTINATION include/tensor4d
+)
+
+message(STATUS "Building C interface library: libtensor_c.so")
+
+# C example program
+add_executable(c_example c_example.c)
+target_link_libraries(c_example tensor_c)
+
+# C test program
+add_executable(tensor_c_test tests/tensor_c_test.c)
+target_link_libraries(tensor_c_test tensor_c)
+
+# Add C test to CTest
+add_test(NAME TensorCTest COMMAND tensor_c_test)
 
 # Tensor I/O demo executable
 add_executable(
