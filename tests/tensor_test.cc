@@ -2876,6 +2876,307 @@ TEST_F(TensorTest, QuantileInvalidRange) {
     ASSERT_TRUE(std::holds_alternative<TensorError>(result2));
 }
 
+// ==================== PHASE 1 TESTS: Enhanced Operations & Utilities ====================
+
+TEST_F(TensorTest, ComparisonGreaterThan) {
+    TensorIndices<1> shape = {5};
+    Tensor<float, 1> a(shape, false, false);
+    Tensor<float, 1> b(shape, false, false);
+    
+    for (size_t i = 0; i < 5; ++i) {
+        a[{i}] = static_cast<float>(i);
+        b[{i}] = 2.0f;
+    }
+    
+    auto result = a > b;
+    
+    EXPECT_FLOAT_EQ((result[{0}]), 0.0f);
+    EXPECT_FLOAT_EQ((result[{1}]), 0.0f);
+    EXPECT_FLOAT_EQ((result[{2}]), 0.0f);
+    EXPECT_FLOAT_EQ((result[{3}]), 1.0f);
+    EXPECT_FLOAT_EQ((result[{4}]), 1.0f);
+}
+
+TEST_F(TensorTest, ComparisonGreaterThanScalar) {
+    TensorIndices<1> shape = {5};
+    Tensor<float, 1> a(shape, false, false);
+    
+    for (size_t i = 0; i < 5; ++i) {
+        a[{i}] = static_cast<float>(i);
+    }
+    
+    auto result = a > 2.0f;
+    
+    EXPECT_FLOAT_EQ((result[{0}]), 0.0f);
+    EXPECT_FLOAT_EQ((result[{1}]), 0.0f);
+    EXPECT_FLOAT_EQ((result[{2}]), 0.0f);
+    EXPECT_FLOAT_EQ((result[{3}]), 1.0f);
+    EXPECT_FLOAT_EQ((result[{4}]), 1.0f);
+}
+
+TEST_F(TensorTest, ComparisonLessThan) {
+    TensorIndices<1> shape = {5};
+    Tensor<float, 1> a(shape, false, false);
+    Tensor<float, 1> b(shape, false, false);
+    
+    for (size_t i = 0; i < 5; ++i) {
+        a[{i}] = static_cast<float>(i);
+        b[{i}] = 2.0f;
+    }
+    
+    auto result = a < b;
+    
+    EXPECT_FLOAT_EQ((result[{0}]), 1.0f);
+    EXPECT_FLOAT_EQ((result[{1}]), 1.0f);
+    EXPECT_FLOAT_EQ((result[{2}]), 0.0f);
+    EXPECT_FLOAT_EQ((result[{3}]), 0.0f);
+    EXPECT_FLOAT_EQ((result[{4}]), 0.0f);
+}
+
+TEST_F(TensorTest, ComparisonLessEqual) {
+    TensorIndices<1> shape = {5};
+    Tensor<float, 1> a(shape, false, false);
+    
+    for (size_t i = 0; i < 5; ++i) {
+        a[{i}] = static_cast<float>(i);
+    }
+    
+    auto result = a <= 2.0f;
+    
+    EXPECT_FLOAT_EQ((result[{0}]), 1.0f);
+    EXPECT_FLOAT_EQ((result[{1}]), 1.0f);
+    EXPECT_FLOAT_EQ((result[{2}]), 1.0f);
+    EXPECT_FLOAT_EQ((result[{3}]), 0.0f);
+    EXPECT_FLOAT_EQ((result[{4}]), 0.0f);
+}
+
+TEST_F(TensorTest, ComparisonGreaterEqual) {
+    TensorIndices<1> shape = {5};
+    Tensor<float, 1> a(shape, false, false);
+    
+    for (size_t i = 0; i < 5; ++i) {
+        a[{i}] = static_cast<float>(i);
+    }
+    
+    auto result = a >= 2.0f;
+    
+    EXPECT_FLOAT_EQ((result[{0}]), 0.0f);
+    EXPECT_FLOAT_EQ((result[{1}]), 0.0f);
+    EXPECT_FLOAT_EQ((result[{2}]), 1.0f);
+    EXPECT_FLOAT_EQ((result[{3}]), 1.0f);
+    EXPECT_FLOAT_EQ((result[{4}]), 1.0f);
+}
+
+TEST_F(TensorTest, ComparisonEquality) {
+    TensorIndices<1> shape = {5};
+    Tensor<float, 1> a(shape, false, false);
+    Tensor<float, 1> b(shape, false, false);
+    
+    for (size_t i = 0; i < 5; ++i) {
+        a[{i}] = static_cast<float>(i);
+        b[{i}] = (i % 2 == 0) ? static_cast<float>(i) : static_cast<float>(i + 1);
+    }
+    
+    auto result = a.eq(b);
+    
+    EXPECT_FLOAT_EQ((result[{0}]), 1.0f);
+    EXPECT_FLOAT_EQ((result[{1}]), 0.0f);
+    EXPECT_FLOAT_EQ((result[{2}]), 1.0f);
+    EXPECT_FLOAT_EQ((result[{3}]), 0.0f);
+    EXPECT_FLOAT_EQ((result[{4}]), 1.0f);
+}
+
+TEST_F(TensorTest, ComparisonInequality) {
+    TensorIndices<1> shape = {5};
+    Tensor<float, 1> a(shape, false, false);
+    Tensor<float, 1> b(shape, false, false);
+    
+    for (size_t i = 0; i < 5; ++i) {
+        a[{i}] = static_cast<float>(i);
+        b[{i}] = (i % 2 == 0) ? static_cast<float>(i) : static_cast<float>(i + 1);
+    }
+    
+    auto result = a.ne(b);
+    
+    EXPECT_FLOAT_EQ((result[{0}]), 0.0f);
+    EXPECT_FLOAT_EQ((result[{1}]), 1.0f);
+    EXPECT_FLOAT_EQ((result[{2}]), 0.0f);
+    EXPECT_FLOAT_EQ((result[{3}]), 1.0f);
+    EXPECT_FLOAT_EQ((result[{4}]), 0.0f);
+}
+
+TEST_F(TensorTest, ClipValues) {
+    TensorIndices<1> shape = {5};
+    Tensor<float, 1> a(shape, false, false);
+    
+    for (size_t i = 0; i < 5; ++i) {
+        a[{i}] = static_cast<float>(i);
+    }
+    
+    auto result = a.clip(1.0f, 3.0f);
+    
+    EXPECT_FLOAT_EQ((result[{0}]), 1.0f);
+    EXPECT_FLOAT_EQ((result[{1}]), 1.0f);
+    EXPECT_FLOAT_EQ((result[{2}]), 2.0f);
+    EXPECT_FLOAT_EQ((result[{3}]), 3.0f);
+    EXPECT_FLOAT_EQ((result[{4}]), 3.0f);
+}
+
+TEST_F(TensorTest, ClipWithGradient) {
+    TensorIndices<1> shape = {3};
+    Tensor<float, 1> x(shape, false, true);
+    
+    x[{0}] = 0.5f;
+    x[{1}] = 2.0f;
+    x[{2}] = 4.0f;
+    
+    auto y = x.clip(1.0f, 3.0f);
+    
+    // Create a gradient tensor
+    Tensor<float, 1> grad_out(shape, false, false);
+    grad_out.fill(1.0f);
+    
+    y.backward(&grad_out);
+    
+    // Gradient should be 0 for clipped values, 1 for values in range
+    EXPECT_FLOAT_EQ(((*x.grad())[{0}]), 0.0f);  // Clipped to 1
+    EXPECT_FLOAT_EQ(((*x.grad())[{1}]), 1.0f);  // In range
+    EXPECT_FLOAT_EQ(((*x.grad())[{2}]), 0.0f);  // Clipped to 3
+}
+
+TEST_F(TensorTest, MaskedFill) {
+    TensorIndices<1> shape = {5};
+    Tensor<float, 1> a(shape, false, false);
+    Tensor<float, 1> mask(shape, false, false);
+    
+    for (size_t i = 0; i < 5; ++i) {
+        a[{i}] = static_cast<float>(i);
+        mask[{i}] = (i % 2 == 0) ? 1.0f : 0.0f;
+    }
+    
+    auto result = a.masked_fill(mask, -1.0f);
+    
+    EXPECT_FLOAT_EQ((result[{0}]), -1.0f);
+    EXPECT_FLOAT_EQ((result[{1}]), 1.0f);
+    EXPECT_FLOAT_EQ((result[{2}]), -1.0f);
+    EXPECT_FLOAT_EQ((result[{3}]), 3.0f);
+    EXPECT_FLOAT_EQ((result[{4}]), -1.0f);
+}
+
+TEST_F(TensorTest, MaskedSelect) {
+    TensorIndices<1> shape = {5};
+    Tensor<float, 1> a(shape, false, false);
+    Tensor<float, 1> mask(shape, false, false);
+    
+    for (size_t i = 0; i < 5; ++i) {
+        a[{i}] = static_cast<float>(i);
+        mask[{i}] = (i % 2 == 0) ? 1.0f : 0.0f;
+    }
+    
+    auto result = a.masked_select(mask);
+    
+    EXPECT_EQ(result.dims()[0], 3);
+    EXPECT_FLOAT_EQ((result[{0}]), 0.0f);
+    EXPECT_FLOAT_EQ((result[{1}]), 2.0f);
+    EXPECT_FLOAT_EQ((result[{2}]), 4.0f);
+}
+
+TEST_F(TensorTest, UniformDistribution) {
+    TensorIndices<1> shape = {100};
+    Tensor<float, 1> a(shape, false, false);
+    
+    a.uniform(0.0f, 1.0f);
+    
+    // Check that all values are in range [0, 1)
+    bool all_in_range = true;
+    for (size_t i = 0; i < 100; ++i) {
+        if (a[{i}] < 0.0f || a[{i}] >= 1.0f) {
+            all_in_range = false;
+            break;
+        }
+    }
+    
+    EXPECT_TRUE(all_in_range);
+}
+
+TEST_F(TensorTest, BernoulliDistribution) {
+    TensorIndices<1> shape = {100};
+    Tensor<float, 1> a(shape, false, false);
+    
+    a.bernoulli(0.5f);
+    
+    // Check that all values are either 0 or 1
+    bool all_binary = true;
+    for (size_t i = 0; i < 100; ++i) {
+        if (a[{i}] != 0.0f && a[{i}] != 1.0f) {
+            all_binary = false;
+            break;
+        }
+    }
+    
+    EXPECT_TRUE(all_binary);
+}
+
+TEST_F(TensorTest, StackTensors) {
+    TensorIndices<2> shape = {2, 3};
+    Tensor<float, 2> a(shape, false, false);
+    Tensor<float, 2> b(shape, false, false);
+    
+    a.fill(1.0f);
+    b.fill(2.0f);
+    
+    std::vector<Tensor<float, 2>> tensors = {a, b};
+    auto stacked = Tensor<float, 2>::stack(tensors, 0);
+    
+    EXPECT_EQ(stacked.dims()[0], 2);
+    EXPECT_EQ(stacked.dims()[1], 2);
+    EXPECT_EQ(stacked.dims()[2], 3);
+    
+    // Check values
+    EXPECT_FLOAT_EQ((stacked[{0, 0, 0}]), 1.0f);
+    EXPECT_FLOAT_EQ((stacked[{1, 0, 0}]), 2.0f);
+}
+
+TEST_F(TensorTest, VStack) {
+    TensorIndices<2> shape1 = {2, 3};
+    TensorIndices<2> shape2 = {3, 3};
+    
+    Tensor<float, 2> a(shape1, false, false);
+    Tensor<float, 2> b(shape2, false, false);
+    
+    a.fill(1.0f);
+    b.fill(2.0f);
+    
+    std::vector<Tensor<float, 2>> tensors = {a, b};
+    auto vstacked = Tensor<float, 2>::vstack(tensors);
+    
+    EXPECT_EQ(vstacked.dims()[0], 5);
+    EXPECT_EQ(vstacked.dims()[1], 3);
+    
+    EXPECT_FLOAT_EQ((vstacked[{0, 0}]), 1.0f);
+    EXPECT_FLOAT_EQ((vstacked[{2, 0}]), 2.0f);
+}
+
+TEST_F(TensorTest, HStack) {
+    TensorIndices<2> shape1 = {3, 2};
+    TensorIndices<2> shape2 = {3, 3};
+    
+    Tensor<float, 2> a(shape1, false, false);
+    Tensor<float, 2> b(shape2, false, false);
+    
+    a.fill(1.0f);
+    b.fill(2.0f);
+    
+    std::vector<Tensor<float, 2>> tensors = {a, b};
+    auto hstacked = Tensor<float, 2>::hstack(tensors);
+    
+    EXPECT_EQ(hstacked.dims()[0], 3);
+    EXPECT_EQ(hstacked.dims()[1], 5);
+    
+    EXPECT_FLOAT_EQ((hstacked[{0, 0}]), 1.0f);
+    EXPECT_FLOAT_EQ((hstacked[{0, 2}]), 2.0f);
+}
+
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();

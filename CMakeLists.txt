@@ -57,10 +57,13 @@ if(USE_CUDA)
   set_source_files_properties(${GPU_SOURCES} PROPERTIES LANGUAGE CUDA)
 endif()
 
+# Collect all test files
+file(GLOB TEST_SOURCES "tests/*.cc")
+
 # Test executables
 add_executable(
   tensor_test
-  tests/tensor_test.cc
+  ${TEST_SOURCES}
   ${GPU_SOURCES}
 )
 
@@ -70,23 +73,11 @@ target_link_libraries(
   Threads::Threads
 )
 
-# Linear algebra test executable
-add_executable(
-  linalg_test
-  tests/linalg_test.cc
-  ${GPU_SOURCES}
-)
 
-target_link_libraries(
-  linalg_test
-  GTest::gtest_main
-  Threads::Threads
-)
 
 # Link TBB if found (required for GCC/Clang parallel execution)
 if(TBB_FOUND)
   target_link_libraries(tensor_test TBB::tbb)
-  target_link_libraries(linalg_test TBB::tbb)
   message(STATUS "TBB found - parallel execution fully enabled")
 else()
   message(WARNING "TBB not found - parallel execution may not work on some compilers")
@@ -95,12 +86,10 @@ endif()
 # Link BLAS if found
 if(BLAS_FOUND)
   target_link_libraries(tensor_test ${BLAS_LIBRARIES})
-  target_link_libraries(linalg_test ${BLAS_LIBRARIES})
 endif()
 
 include(GoogleTest)
 gtest_discover_tests(tensor_test)
-gtest_discover_tests(linalg_test)
 
 # Performance benchmark executable
 add_executable(
@@ -144,6 +133,50 @@ endif()
 # Link BLAS to demo if found
 if(BLAS_FOUND)
   target_link_libraries(gpu_blas_demo ${BLAS_LIBRARIES})
+endif()
+
+# Backend demo executable
+add_executable(
+  backend_demo
+  backend_demo.cc
+  ${GPU_SOURCES}
+)
+
+target_link_libraries(
+  backend_demo
+  Threads::Threads
+)
+
+# Link TBB to backend demo if found
+if(TBB_FOUND)
+  target_link_libraries(backend_demo TBB::tbb)
+endif()
+
+# Link BLAS to backend demo if found
+if(BLAS_FOUND)
+  target_link_libraries(backend_demo ${BLAS_LIBRARIES})
+endif()
+
+# Tensor I/O demo executable
+add_executable(
+  tensor_io_demo
+  tensor_io_demo.cc
+  ${GPU_SOURCES}
+)
+
+target_link_libraries(
+  tensor_io_demo
+  Threads::Threads
+)
+
+# Link TBB to tensor_io_demo if found
+if(TBB_FOUND)
+  target_link_libraries(tensor_io_demo TBB::tbb)
+endif()
+
+# Link BLAS to tensor_io_demo if found
+if(BLAS_FOUND)
+  target_link_libraries(tensor_io_demo ${BLAS_LIBRARIES})
 endif()
 
 # Add custom target to run performance tests

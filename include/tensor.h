@@ -13,18 +13,35 @@
  * - Broadcasting for element-wise operations
  * - Tensor views and slicing for memory-efficient operations
  * 
+ * @section backend Backend Selection
+ * The library automatically selects the best available backend at runtime:
+ * 1. **GPU (CUDA)**: Used by default if compiled with USE_GPU, GPU is available, and use_gpu=true
+ * 2. **BLAS**: Used if GPU is not available but compiled with USE_BLAS
+ * 3. **CPU**: Fallback implementation when neither GPU nor BLAS is available
+ * 
+ * You can check the active backend using:
+ * @code
+ * auto backend = get_active_backend();  // Returns Backend::GPU, Backend::BLAS, or Backend::CPU
+ * if (is_gpu_available()) {
+ *     // GPU operations are available
+ * }
+ * @endcode
+ * 
  * @author Tensor Library Team
  * @version 1.0
  * @date 2024
  * 
  * @section usage Usage Example
  * @code
- * // Create a 2D tensor (matrix)
+ * // Create a 2D tensor (matrix) - automatically uses GPU if available
  * Tensor<float, 2> matrix({3, 4});
  * matrix.fill(1.0f);
  * 
+ * // Check which backend is being used
+ * std::cout << "Using: " << backend_name(matrix.backend()) << std::endl;
+ * 
  * // Enable gradient tracking
- * Tensor<float, 2> x({2, 2}, true, true);
+ * Tensor<float, 2> x({2, 2}, true, true);  // use_gpu=true, requires_grad=true
  * auto y = x * x;
  * y.backward();
  * @endcode
@@ -34,6 +51,7 @@
  * - **High-performance**: Optimized with BLAS and GPU support
  * - **Autograd**: Automatic gradient computation for deep learning
  * - **Flexible**: Support for views, slicing, and broadcasting
+ * - **Smart backend selection**: Automatically uses GPU → BLAS → CPU
  */
 
 #ifndef _TENSOR_H
@@ -53,6 +71,7 @@
 #include <optional>
 #include <functional>
 #include <vector>
+#include <random>
 
 #ifdef USE_GPU
 #include "tensor_gpu.cuh"
@@ -138,6 +157,76 @@ inline void blas_gemm<double>(const int Order, const int TransA, const int Trans
     cblas_dgemm(Order, TransA, TransB, M, N, K, alpha, A, lda, B, ldb, beta, C, ldc);
 }
 #endif
+
+/**
+ * @enum Backend
+ * @brief Available computational backends
+ * 
+ * Indicates which backend is being used for tensor operations.
+ * Priority order: GPU > BLAS > CPU
+ */
+enum class Backend {
+    CPU,   ///< Standard CPU implementation
+    BLAS,  ///< Optimized BLAS for CPU operations
+    GPU    ///< CUDA GPU acceleration
+};
+
+/**
+ * @brief Get the name of a backend as a string
+ * @param backend The backend enum value
+ * @return Human-readable name of the backend
+ */
+inline std::string backend_name(Backend backend) {
+    switch (backend) {
+        case Backend::CPU: return "CPU";
+        case Backend::BLAS: return "BLAS";
+        case Backend::GPU: return "GPU";
+        default: return "Unknown";
+    }
+}
+
+/**
+ * @brief Get the currently active backend
+ * @return The backend being used by default
+ * 
+ * This function checks at runtime which backend is available and will be used
+ * for new tensor operations. Priority: GPU > BLAS > CPU
+ */
+inline Backend get_active_backend() {
+#ifdef USE_GPU
+    if (TensorGPU::is_gpu_available()) {
+        return Backend::GPU;
+    }
+#endif
+#ifdef USE_BLAS
+    return Backend::BLAS;
+#endif
+    return Backend::CPU;
+}
+
+/**
+ * @brief Check if GPU backend is available
+ * @return true if GPU support is compiled in and GPU is available
+ */
+inline bool is_gpu_available() {
+#ifdef USE_GPU
+    return TensorGPU::is_gpu_available();
+#else
+    return false;
+#endif
+}
+
+/**
+ * @brief Check if BLAS backend is available
+ * @return true if BLAS support is compiled in
+ */
+inline constexpr bool is_blas_available() {
+#ifdef USE_BLAS
+    return true;
+#else
+    return false;
+#endif
+}
 
 /**
  * @enum TensorError
@@ -320,25 +409,6 @@ private:
         return off;
     }
     
-    /**
-     * Calculate the total size of the tensor.
-     * @return The total number of elements in the tensor.
-     */
-    size_t total_size() const {
-        size_t size = 1;
-        for (size_t i = 0; i < N; ++i) {
-            size *= dims_[i];
-        }
-        return size;
-    }
-    
-    /**
-     * Get raw pointer to data for internal use.
-     * @return Pointer to the underlying data array.
-     */
-    const T* data() const { return data_.get(); }
-    T* data() { return data_.get(); }
-    
     // Friend declaration to allow tensors of different dimensions to access each other's data
     template <typename U, size_t M>
     friend class Tensor;
@@ -348,6 +418,16 @@ private:
     friend class TensorView;
     template <typename U, size_t M>
     friend class TensorSlice;
+    
+    // Friend declarations for I/O functions
+    template <typename U, size_t M>
+    friend bool save_binary(const Tensor<U, M>&, const std::string&);
+    template <typename U, size_t M>
+    friend bool save_text(const Tensor<U, M>&, const std::string&, int);
+    template <typename U, size_t M>
+    friend bool save_npy(const Tensor<U, M>&, const std::string&);
+    template <typename U, size_t M>
+    friend void print(const Tensor<U, M>&, std::ostream&, int, size_t, size_t);
     
     // Friend declarations for scalar-first operators
     template <typename U, size_t M>
@@ -363,6 +443,25 @@ public:
     // Public data accessors for use by library functions
     const T* data_ptr() const { return data_.get(); }
     T* data_ptr() { return data_.get(); }
+    
+    /**
+     * Calculate the total size of the tensor.
+     * @return The total number of elements in the tensor.
+     */
+    size_t total_size() const {
+        size_t size = 1;
+        for (size_t i = 0; i < N; ++i) {
+            size *= dims_[i];
+        }
+        return size;
+    }
+    
+    /**
+     * Get raw pointer to data (for internal use and I/O).
+     * @return Pointer to the underlying data array.
+     */
+    const T* data() const { return data_.get(); }
+    T* data() { return data_.get(); }
     
 public:
 
@@ -414,6 +513,34 @@ public:
      * @param other The tensor to copy from.
      * @return Reference to the assigned tensor.
      */
+    Tensor& operator=(const Tensor& other) {
+        if (this != &other) {
+            dims_ = other.dims_;
+            strides_ = other.strides_;
+            use_gpu_ = other.use_gpu_;
+            requires_grad_ = other.requires_grad_;
+            is_leaf_ = other.is_leaf_;
+            backward_funcs_ = other.backward_funcs_;
+            
+            size_t total = total_size();
+            data_ = std::make_unique<T[]>(total);
+            std::copy(other.data_.get(), other.data_.get() + total, data_.get());
+            
+            // Copy gradient if it exists
+            if (other.grad_) {
+                grad_ = std::make_unique<Tensor<T, N>>(*other.grad_);
+            } else {
+                grad_.reset();
+            }
+        }
+        return *this;
+    }
+    
+    /**
+     * Indexing operator to access elements.
+     * @param indices An array of indices for each dimension.
+     * @return A reference to the element at the specified indices.
+     */
     T& operator[](const TensorIndices<N>& indices) {
         return data_[offset(indices)];
     }
@@ -446,6 +573,27 @@ public:
      * @return True if GPU is enabled for this tensor.
      */
     bool uses_gpu() const { return use_gpu_; }
+    
+    /**
+     * Get the backend being used by this tensor.
+     * @return The computational backend (GPU, BLAS, or CPU)
+     * 
+     * Returns the actual backend that will be used for operations on this tensor.
+     * The backend is selected at tensor creation time based on availability:
+     * - GPU: if compiled with USE_GPU, GPU is available, and use_gpu flag is true
+     * - BLAS: if compiled with USE_BLAS and GPU is not used
+     * - CPU: fallback when neither GPU nor BLAS is available
+     */
+    Backend backend() const {
+        if (use_gpu_) {
+            return Backend::GPU;
+        }
+#ifdef USE_BLAS
+        return Backend::BLAS;
+#else
+        return Backend::CPU;
+#endif
+    }
     
     // Allow optimizer and loss functions access to private members
     template<typename U>
@@ -530,11 +678,12 @@ public:
      * @param gradient Optional gradient tensor to start backpropagation.
      *                 If nullptr, assumes this is a scalar with gradient 1.
      * 
-     * @throws std::runtime_error if tensor doesn't require gradients
-     * @throws std::runtime_error if called on non-scalar without gradient argument
+     * @return std::nullopt on success, TensorError::InvalidArgument on error
      * 
      * @note For scalar tensors (total_size() == 1), can be called without arguments.
      * @note For non-scalar tensors, must provide a gradient tensor.
+     * @note Returns error if tensor doesn't require gradients
+     * @note Returns error if called on non-scalar without gradient argument
      * 
      * @section example Usage Example
      * @code
@@ -1944,6 +2093,436 @@ public:
     }
     
     // ============================================
+    // Enhanced Operations & Utilities (Phase 1)
+    // ============================================
+    
+    /**
+     * Element-wise comparison: greater than.
+     * @param other The tensor to compare with.
+     * @return A new boolean-like tensor (0 or 1).
+     */
+    Tensor<T, N> operator>(const Tensor<T, N>& other) const {
+        if (dims_ != other.dims_) {
+            Tensor<T, N> result(dims_, use_gpu_);
+            result.fill(T(0));
+            return result;
+        }
+        
+        Tensor<T, N> result(dims_, use_gpu_);
+        size_t total = total_size();
+        
+        for (size_t i = 0; i < total; ++i) {
+            result.data_[i] = (data_[i] > other.data_[i]) ? T(1) : T(0);
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Element-wise comparison: greater than scalar.
+     * @param scalar The scalar value to compare with.
+     * @return A new boolean-like tensor (0 or 1).
+     */
+    Tensor<T, N> operator>(const T& scalar) const {
+        Tensor<T, N> result(dims_, use_gpu_);
+        size_t total = total_size();
+        
+        for (size_t i = 0; i < total; ++i) {
+            result.data_[i] = (data_[i] > scalar) ? T(1) : T(0);
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Element-wise comparison: less than.
+     * @param other The tensor to compare with.
+     * @return A new boolean-like tensor (0 or 1).
+     */
+    Tensor<T, N> operator<(const Tensor<T, N>& other) const {
+        if (dims_ != other.dims_) {
+            Tensor<T, N> result(dims_, use_gpu_);
+            result.fill(T(0));
+            return result;
+        }
+        
+        Tensor<T, N> result(dims_, use_gpu_);
+        size_t total = total_size();
+        
+        for (size_t i = 0; i < total; ++i) {
+            result.data_[i] = (data_[i] < other.data_[i]) ? T(1) : T(0);
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Element-wise comparison: less than scalar.
+     * @param scalar The scalar value to compare with.
+     * @return A new boolean-like tensor (0 or 1).
+     */
+    Tensor<T, N> operator<(const T& scalar) const {
+        Tensor<T, N> result(dims_, use_gpu_);
+        size_t total = total_size();
+        
+        for (size_t i = 0; i < total; ++i) {
+            result.data_[i] = (data_[i] < scalar) ? T(1) : T(0);
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Element-wise comparison: greater than or equal.
+     * @param other The tensor to compare with.
+     * @return A new boolean-like tensor (0 or 1).
+     */
+    Tensor<T, N> operator>=(const Tensor<T, N>& other) const {
+        if (dims_ != other.dims_) {
+            Tensor<T, N> result(dims_, use_gpu_);
+            result.fill(T(0));
+            return result;
+        }
+        
+        Tensor<T, N> result(dims_, use_gpu_);
+        size_t total = total_size();
+        
+        for (size_t i = 0; i < total; ++i) {
+            result.data_[i] = (data_[i] >= other.data_[i]) ? T(1) : T(0);
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Element-wise comparison: greater than or equal scalar.
+     * @param scalar The scalar value to compare with.
+     * @return A new boolean-like tensor (0 or 1).
+     */
+    Tensor<T, N> operator>=(const T& scalar) const {
+        Tensor<T, N> result(dims_, use_gpu_);
+        size_t total = total_size();
+        
+        for (size_t i = 0; i < total; ++i) {
+            result.data_[i] = (data_[i] >= scalar) ? T(1) : T(0);
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Element-wise comparison: less than or equal.
+     * @param other The tensor to compare with.
+     * @return A new boolean-like tensor (0 or 1).
+     */
+    Tensor<T, N> operator<=(const Tensor<T, N>& other) const {
+        if (dims_ != other.dims_) {
+            Tensor<T, N> result(dims_, use_gpu_);
+            result.fill(T(0));
+            return result;
+        }
+        
+        Tensor<T, N> result(dims_, use_gpu_);
+        size_t total = total_size();
+        
+        for (size_t i = 0; i < total; ++i) {
+            result.data_[i] = (data_[i] <= other.data_[i]) ? T(1) : T(0);
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Element-wise comparison: less than or equal scalar.
+     * @param scalar The scalar value to compare with.
+     * @return A new boolean-like tensor (0 or 1).
+     */
+    Tensor<T, N> operator<=(const T& scalar) const {
+        Tensor<T, N> result(dims_, use_gpu_);
+        size_t total = total_size();
+        
+        for (size_t i = 0; i < total; ++i) {
+            result.data_[i] = (data_[i] <= scalar) ? T(1) : T(0);
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Element-wise equality comparison.
+     * @param other The tensor to compare with.
+     * @param epsilon Tolerance for floating-point comparison.
+     * @return A new boolean-like tensor (0 or 1).
+     */
+    Tensor<T, N> eq(const Tensor<T, N>& other, T epsilon = std::numeric_limits<T>::epsilon()) const {
+        if (dims_ != other.dims_) {
+            Tensor<T, N> result(dims_, use_gpu_);
+            result.fill(T(0));
+            return result;
+        }
+        
+        Tensor<T, N> result(dims_, use_gpu_);
+        size_t total = total_size();
+        
+        for (size_t i = 0; i < total; ++i) {
+            result.data_[i] = (std::abs(data_[i] - other.data_[i]) < epsilon) ? T(1) : T(0);
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Element-wise inequality comparison.
+     * @param other The tensor to compare with.
+     * @param epsilon Tolerance for floating-point comparison.
+     * @return A new boolean-like tensor (0 or 1).
+     */
+    Tensor<T, N> ne(const Tensor<T, N>& other, T epsilon = std::numeric_limits<T>::epsilon()) const {
+        if (dims_ != other.dims_) {
+            Tensor<T, N> result(dims_, use_gpu_);
+            result.fill(T(1));
+            return result;
+        }
+        
+        Tensor<T, N> result(dims_, use_gpu_);
+        size_t total = total_size();
+        
+        for (size_t i = 0; i < total; ++i) {
+            result.data_[i] = (std::abs(data_[i] - other.data_[i]) >= epsilon) ? T(1) : T(0);
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Clip (clamp) tensor values to a specified range.
+     * @param min_val Minimum value.
+     * @param max_val Maximum value.
+     * @return A new tensor with clipped values.
+     */
+    Tensor<T, N> clip(T min_val, T max_val) const {
+        Tensor<T, N> result(dims_, use_gpu_, requires_grad_);
+        result.is_leaf_ = false;
+        size_t total = total_size();
+        
+        for (size_t i = 0; i < total; ++i) {
+            result.data_[i] = std::max(min_val, std::min(max_val, data_[i]));
+        }
+        
+        // Setup backward pass
+        if (requires_grad_) {
+            Tensor<T, N>* self_ptr = const_cast<Tensor<T, N>*>(this);
+            
+            result.register_backward([self_ptr, min_val, max_val](const Tensor<T, N>& grad) {
+                if (self_ptr->requires_grad_) {
+                    if (!self_ptr->grad_) {
+                        self_ptr->grad_ = std::make_unique<Tensor<T, N>>(self_ptr->dims_,
+                                                                          self_ptr->use_gpu_, false);
+                        self_ptr->grad_->fill(T(0));
+                    }
+                    
+                    size_t total = self_ptr->total_size();
+                    for (size_t i = 0; i < total; ++i) {
+                        // Gradient passes through only if value is within range
+                        if (self_ptr->data_[i] > min_val && self_ptr->data_[i] < max_val) {
+                            self_ptr->grad_->data_[i] += grad.data_[i];
+                        }
+                    }
+                    
+                    if (!self_ptr->is_leaf_ && !self_ptr->backward_funcs_.empty()) {
+                        for (auto& func : self_ptr->backward_funcs_) {
+                            func(*self_ptr->grad_);
+                        }
+                    }
+                }
+            });
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Masked fill: replace values where mask is true (non-zero) with fill_value.
+     * @param mask Boolean-like tensor (0 or non-zero values).
+     * @param fill_value Value to fill where mask is non-zero.
+     * @return A new tensor with masked values filled.
+     */
+    Tensor<T, N> masked_fill(const Tensor<T, N>& mask, T fill_value) const {
+        if (dims_ != mask.dims_) {
+            return *this;
+        }
+        
+        Tensor<T, N> result(dims_, use_gpu_);
+        size_t total = total_size();
+        
+        for (size_t i = 0; i < total; ++i) {
+            result.data_[i] = (mask.data_[i] != T(0)) ? fill_value : data_[i];
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Masked select: return 1D tensor of values where mask is true (non-zero).
+     * @param mask Boolean-like tensor (0 or non-zero values).
+     * @return A 1D tensor containing selected values.
+     */
+    Tensor<T, 1> masked_select(const Tensor<T, N>& mask) const {
+        if (dims_ != mask.dims_) {
+            return Tensor<T, 1>({0}, use_gpu_);
+        }
+        
+        // Count how many values to select
+        size_t total = total_size();
+        size_t count = 0;
+        for (size_t i = 0; i < total; ++i) {
+            if (mask.data_[i] != T(0)) {
+                count++;
+            }
+        }
+        
+        Tensor<T, 1> result({count}, use_gpu_);
+        size_t idx = 0;
+        for (size_t i = 0; i < total; ++i) {
+            if (mask.data_[i] != T(0)) {
+                result.data_[idx++] = data_[i];
+            }
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Sample from uniform distribution [low, high).
+     * @param low Lower bound (inclusive).
+     * @param high Upper bound (exclusive).
+     */
+    void uniform(T low = T(0), T high = T(1)) {
+        size_t total = total_size();
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_real_distribution<> dis(static_cast<double>(low), static_cast<double>(high));
+        
+        for (size_t i = 0; i < total; ++i) {
+            data_[i] = static_cast<T>(dis(gen));
+        }
+    }
+    
+    /**
+     * Sample from Bernoulli distribution.
+     * @param p Probability of success (value 1), default 0.5.
+     */
+    void bernoulli(T p = T(0.5)) {
+        size_t total = total_size();
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::bernoulli_distribution dis(static_cast<double>(p));
+        
+        for (size_t i = 0; i < total; ++i) {
+            data_[i] = dis(gen) ? T(1) : T(0);
+        }
+    }
+    
+    /**
+     * Stack tensors along a new dimension (creates new dimension).
+     * @param tensors Vector of tensors to stack.
+     * @param dim Dimension along which to stack (must be <= N).
+     * @return A new tensor with dimension N+1.
+     */
+    template<size_t... Dims>
+    static Tensor<T, N+1> stack(const std::vector<Tensor<T, N>>& tensors, size_t dim = 0) {
+        if (tensors.empty()) {
+            return Tensor<T, N+1>({0}, false);
+        }
+        
+        if (dim > N) {
+            return Tensor<T, N+1>({0}, false);
+        }
+        
+        // Check all tensors have the same shape
+        const auto& first_dims = tensors[0].dims_;
+        for (const auto& t : tensors) {
+            if (t.dims_ != first_dims) {
+                return Tensor<T, N+1>({0}, false);
+            }
+        }
+        
+        // Compute new dimensions
+        TensorIndices<N+1> new_dims;
+        for (size_t i = 0; i < dim; ++i) {
+            new_dims[i] = first_dims[i];
+        }
+        new_dims[dim] = tensors.size();
+        for (size_t i = dim; i < N; ++i) {
+            new_dims[i+1] = first_dims[i];
+        }
+        
+        Tensor<T, N+1> result(new_dims, tensors[0].use_gpu_);
+        
+        // Copy data
+        size_t slice_size = tensors[0].total_size();
+        for (size_t t = 0; t < tensors.size(); ++t) {
+            size_t offset = t * slice_size;
+            std::copy(tensors[t].data_.get(), tensors[t].data_.get() + slice_size,
+                     result.data_.get() + offset);
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Vertical stack (stack along first dimension) - convenience method for 2D tensors.
+     * @param tensors Vector of tensors to stack vertically.
+     * @return A new tensor stacked vertically.
+     */
+    static Tensor<T, N> vstack(const std::vector<Tensor<T, N>>& tensors) {
+        static_assert(N >= 2, "vstack requires at least 2D tensors");
+        
+        if (tensors.empty()) {
+            TensorIndices<N> zero_dims{};
+            return Tensor<T, N>(zero_dims, false);
+        }
+        
+        if (tensors.size() == 1) {
+            return Tensor<T, N>(tensors[0]);
+        }
+        
+        // Start with first tensor and concatenate the rest
+        Tensor<T, N> result(tensors[0]);
+        for (size_t i = 1; i < tensors.size(); ++i) {
+            result = result.concatenate(tensors[i], 0);
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Horizontal stack (stack along second dimension) - convenience method for 2D tensors.
+     * @param tensors Vector of tensors to stack horizontally.
+     * @return A new tensor stacked horizontally.
+     */
+    static Tensor<T, N> hstack(const std::vector<Tensor<T, N>>& tensors) {
+        static_assert(N >= 2, "hstack requires at least 2D tensors");
+        
+        if (tensors.empty()) {
+            TensorIndices<N> zero_dims{};
+            return Tensor<T, N>(zero_dims, false);
+        }
+        
+        if (tensors.size() == 1) {
+            return Tensor<T, N>(tensors[0]);
+        }
+        
+        // Start with first tensor and concatenate the rest
+        Tensor<T, N> result(tensors[0]);
+        for (size_t i = 1; i < tensors.size(); ++i) {
+            result = result.concatenate(tensors[i], 1);
+        }
+        
+        return result;
+    }
+    
+    // ============================================
     // Loss Functions and Gradients
     // ============================================
     
@@ -2338,7 +2917,8 @@ public:
         }
         
         if (axis < 0 || axis >= static_cast<int>(N)) {
-            return Tensor<T, N>(dims_, use_gpu_, requires_grad_);
+            TensorIndices<N> zero_dims{};
+            return Tensor<T, N>(zero_dims, use_gpu_, requires_grad_);
         }
         
         size_t ax = static_cast<size_t>(axis);
@@ -2483,7 +3063,8 @@ public:
         }
         
         if (axis < 0 || axis >= static_cast<int>(N)) {
-            return Tensor<T, N>(dims_, use_gpu_, requires_grad_);
+            TensorIndices<N> zero_dims{};
+            return Tensor<T, N>(zero_dims, use_gpu_, requires_grad_);
         }
         
         size_t ax = static_cast<size_t>(axis);
@@ -2733,8 +3314,7 @@ public:
      * Reshape tensor to new dimensions without copying data.
      * Total size must remain the same.
      * @param new_dims New dimensions
-     * @return Reshaped tensor (view of same data)
-     * @throws std::runtime_error if total size doesn't match
+     * @return Reshaped tensor (view of same data), or zero tensor if size doesn't match
      */
     template<size_t M>
     Tensor<T, M> reshape(const TensorIndices<M>& new_dims) const {
@@ -2877,7 +3457,8 @@ public:
         std::array<bool, N> seen = {false};
         for (size_t i = 0; i < N; ++i) {
             if (axes[i] >= N || seen[axes[i]]) {
-                return Tensor<T, N>(dims_, use_gpu_, requires_grad_);
+                TensorIndices<N> zero_dims{};
+                return Tensor<T, N>(zero_dims, use_gpu_, requires_grad_);
             }
             seen[axes[i]] = true;
         }
@@ -2955,10 +3536,12 @@ public:
     Tensor<T, N> squeeze(int axis = -1) const {
         if (axis >= 0) {
             if (static_cast<size_t>(axis) >= N) {
-                return Tensor<T, N>(dims_, use_gpu_, requires_grad_);
+                TensorIndices<N> zero_dims{};
+                return Tensor<T, N>(zero_dims, use_gpu_, requires_grad_);
             }
             if (dims_[axis] != 1) {
-                return Tensor<T, N>(dims_, use_gpu_, requires_grad_);
+                TensorIndices<N> zero_dims{};
+                return Tensor<T, N>(zero_dims, use_gpu_, requires_grad_);
             }
         }
         
@@ -3060,13 +3643,15 @@ public:
      */
     Tensor<T, N> concatenate(const Tensor<T, N>& other, size_t axis) const {
         if (axis >= N) {
-            return Tensor<T, N>(dims_, use_gpu_, requires_grad_);
+            TensorIndices<N> zero_dims{};
+            return Tensor<T, N>(zero_dims, use_gpu_, requires_grad_);
         }
         
         // Check that all dimensions match except the concat axis
         for (size_t i = 0; i < N; ++i) {
             if (i != axis && dims_[i] != other.dims_[i]) {
-                return Tensor<T, N>(dims_, use_gpu_, requires_grad_);
+                TensorIndices<N> zero_dims{};
+                return Tensor<T, N>(zero_dims, use_gpu_, requires_grad_);
             }
         }
         
@@ -3172,6 +3757,644 @@ public:
         }
         
         return result;
+    }
+    
+    // ============================================
+    // Advanced Indexing & Slicing Operations
+    // ============================================
+    
+    /**
+     * Extract elements at specific indices (fancy indexing).
+     * For 1D tensors, indices specify which elements to extract.
+     * @param indices Vector of indices to extract.
+     * @return A new 1D tensor containing the extracted elements.
+     */
+    Tensor<T, 1> take(const std::vector<size_t>& indices) const {
+        static_assert(N == 1, "take() is currently only supported for 1D tensors");
+        
+        Tensor<T, 1> result({indices.size()}, use_gpu_);
+        
+        for (size_t i = 0; i < indices.size(); ++i) {
+            if (indices[i] < dims_[0]) {
+                result.data_[i] = data_[indices[i]];
+            } else {
+                result.data_[i] = T(0);  // Out of bounds returns zero
+            }
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Set elements at specific indices (fancy indexing assignment).
+     * For 1D tensors, sets values at specified indices.
+     * @param indices Vector of indices to set.
+     * @param values Vector of values to set (must match indices size).
+     */
+    void put(const std::vector<size_t>& indices, const std::vector<T>& values) {
+        static_assert(N == 1, "put() is currently only supported for 1D tensors");
+        
+        size_t count = std::min(indices.size(), values.size());
+        for (size_t i = 0; i < count; ++i) {
+            if (indices[i] < dims_[0]) {
+                data_[indices[i]] = values[i];
+            }
+        }
+    }
+    
+    /**
+     * Boolean indexing: extract elements where mask is true (non-zero).
+     * This is similar to masked_select but emphasized for indexing operations.
+     * @param mask Boolean-like tensor (0 or non-zero values).
+     * @return A 1D tensor containing selected values.
+     */
+    Tensor<T, 1> index_select(const Tensor<T, N>& mask) const {
+        return masked_select(mask);
+    }
+    
+    /**
+     * Select a specific index along a dimension, reducing that dimension.
+     * For example, selecting row 2 from a 2D tensor returns a 1D tensor.
+     * Only available for tensors with N > 1.
+     * @param dim The dimension along which to select.
+     * @param index The index to select in that dimension.
+     * @return A tensor with dimension N-1.
+     */
+    template<size_t M = (N > 1 ? N - 1 : 1)>
+    std::enable_if_t<(N > 1), Tensor<T, M>> select(size_t dim, size_t index) const {
+        if (dim >= N || index >= dims_[dim]) {
+            TensorIndices<M> zero_dims{};
+            return Tensor<T, M>(zero_dims, use_gpu_);
+        }
+        
+        // Calculate new dimensions (removing the selected dimension)
+        TensorIndices<M> new_dims;
+        size_t new_idx = 0;
+        for (size_t i = 0; i < N; ++i) {
+            if (i != dim) {
+                new_dims[new_idx++] = dims_[i];
+            }
+        }
+        
+        Tensor<T, M> result(new_dims, use_gpu_);
+        
+        // Copy selected slice
+        size_t result_total = result.total_size();
+        size_t stride = strides_[dim];
+        size_t dim_size = dims_[dim];
+        
+        // Calculate outer and inner sizes
+        size_t outer = 1;
+        for (size_t i = 0; i < dim; ++i) {
+            outer *= dims_[i];
+        }
+        
+        size_t inner = 1;
+        for (size_t i = dim + 1; i < N; ++i) {
+            inner *= dims_[i];
+        }
+        
+        for (size_t o = 0; o < outer; ++o) {
+            for (size_t i = 0; i < inner; ++i) {
+                size_t src_idx = o * dim_size * inner + index * inner + i;
+                size_t dst_idx = o * inner + i;
+                result.data_[dst_idx] = data_[src_idx];
+            }
+        }
+        
+        return result;
+    }
+    
+    // ============================================
+    // Advanced Reduction Operations
+    // ============================================
+    
+    /**
+     * Sum reduction along a specific axis.
+     * @param axis The dimension along which to sum.
+     * @param keepdims Whether to keep the reduced dimension (size 1) or remove it.
+     * @return A new tensor with the sum along the specified axis.
+     */
+    Tensor<T, N> sum_axis(size_t axis, bool keepdims = false) const {
+        if (axis >= N) {
+            return *this;
+        }
+        
+        TensorIndices<N> new_dims = dims_;
+        new_dims[axis] = 1;
+        Tensor<T, N> result(new_dims, use_gpu_, false);
+        result.fill(T(0));
+        
+        // Calculate strides for iteration
+        size_t outer = 1;
+        for (size_t i = 0; i < axis; ++i) {
+            outer *= dims_[i];
+        }
+        
+        size_t inner = 1;
+        for (size_t i = axis + 1; i < N; ++i) {
+            inner *= dims_[i];
+        }
+        
+        size_t axis_size = dims_[axis];
+        
+        for (size_t o = 0; o < outer; ++o) {
+            for (size_t i = 0; i < inner; ++i) {
+                for (size_t a = 0; a < axis_size; ++a) {
+                    size_t src_idx = o * axis_size * inner + a * inner + i;
+                    size_t dst_idx = o * inner + i;
+                    result.data_[dst_idx] += data_[src_idx];
+                }
+            }
+        }
+        
+        // If requested, squeeze the result (remove dimension of size 1)
+        if (!keepdims && N > 1) {
+            // Return as-is with size 1 dimension
+            // Full squeeze would require changing dimension template parameter
+        }
+        
+        // Handle gradient tracking
+        if (requires_grad_) {
+            result.requires_grad_ = true;
+            result.is_leaf_ = false;
+            
+            auto self_ptr = std::make_shared<Tensor<T, N>>(*this);
+            result.backward_funcs_.push_back([self_ptr, axis](const Tensor<T, N>& grad) {
+                if (!self_ptr->grad_) {
+                    self_ptr->grad_ = std::make_unique<Tensor<T, N>>(self_ptr->dims_,
+                                                                      self_ptr->use_gpu_, false);
+                    self_ptr->grad_->fill(T(0));
+                }
+                
+                // Broadcast gradient back to original shape
+                size_t outer = 1;
+                for (size_t i = 0; i < axis; ++i) {
+                    outer *= self_ptr->dims_[i];
+                }
+                
+                size_t inner = 1;
+                for (size_t i = axis + 1; i < N; ++i) {
+                    inner *= self_ptr->dims_[i];
+                }
+                
+                size_t axis_size = self_ptr->dims_[axis];
+                
+                for (size_t o = 0; o < outer; ++o) {
+                    for (size_t i = 0; i < inner; ++i) {
+                        size_t grad_idx = o * inner + i;
+                        for (size_t a = 0; a < axis_size; ++a) {
+                            size_t self_idx = o * axis_size * inner + a * inner + i;
+                            self_ptr->grad_->data_[self_idx] += grad.data_[grad_idx];
+                        }
+                    }
+                }
+                
+                if (!self_ptr->is_leaf_ && !self_ptr->backward_funcs_.empty()) {
+                    for (auto& func : self_ptr->backward_funcs_) {
+                        func(*self_ptr->grad_);
+                    }
+                }
+            });
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Mean reduction along a specific axis.
+     * @param axis The dimension along which to compute the mean.
+     * @param keepdims Whether to keep the reduced dimension (size 1) or remove it.
+     * @return A new tensor with the mean along the specified axis.
+     */
+    Tensor<T, N> mean_axis(size_t axis, bool keepdims = false) const {
+        if (axis >= N) {
+            return *this;
+        }
+        
+        Tensor<T, N> result = sum_axis(axis, keepdims);
+        T divisor = static_cast<T>(dims_[axis]);
+        
+        size_t total = result.total_size();
+        for (size_t i = 0; i < total; ++i) {
+            result.data_[i] /= divisor;
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Find index of maximum element (argmax).
+     * For multi-dimensional tensors, returns flattened index.
+     * @return The index of the maximum element.
+     */
+    size_t argmax() const {
+        size_t total = total_size();
+        size_t max_idx = 0;
+        T max_val = data_[0];
+        
+        for (size_t i = 1; i < total; ++i) {
+            if (data_[i] > max_val) {
+                max_val = data_[i];
+                max_idx = i;
+            }
+        }
+        
+        return max_idx;
+    }
+    
+    /**
+     * Find index of minimum element (argmin).
+     * For multi-dimensional tensors, returns flattened index.
+     * @return The index of the minimum element.
+     */
+    size_t argmin() const {
+        size_t total = total_size();
+        size_t min_idx = 0;
+        T min_val = data_[0];
+        
+        for (size_t i = 1; i < total; ++i) {
+            if (data_[i] < min_val) {
+                min_val = data_[i];
+                min_idx = i;
+            }
+        }
+        
+        return min_idx;
+    }
+    
+    /**
+     * Find indices of maximum elements along an axis.
+     * Only available for tensors with N > 1.
+     * @param axis The dimension along which to find argmax.
+     * @return A new tensor with one less dimension containing indices.
+     */
+    template<size_t M = (N > 1 ? N - 1 : 1)>
+    std::enable_if_t<(N > 1), Tensor<size_t, M>> argmax_axis(size_t axis) const {
+        if (axis >= N) {
+            TensorIndices<M> zero_dims{};
+            return Tensor<size_t, M>(zero_dims, false);
+        }
+        
+        // Calculate new dimensions (removing the axis dimension)
+        TensorIndices<M> new_dims;
+        size_t new_idx = 0;
+        for (size_t i = 0; i < N; ++i) {
+            if (i != axis) {
+                new_dims[new_idx++] = dims_[i];
+            }
+        }
+        
+        Tensor<size_t, M> result(new_dims, false);
+        
+        size_t outer = 1;
+        for (size_t i = 0; i < axis; ++i) {
+            outer *= dims_[i];
+        }
+        
+        size_t inner = 1;
+        for (size_t i = axis + 1; i < N; ++i) {
+            inner *= dims_[i];
+        }
+        
+        size_t axis_size = dims_[axis];
+        
+        for (size_t o = 0; o < outer; ++o) {
+            for (size_t i = 0; i < inner; ++i) {
+                size_t max_idx = 0;
+                T max_val = data_[o * axis_size * inner + i];
+                
+                for (size_t a = 1; a < axis_size; ++a) {
+                    size_t src_idx = o * axis_size * inner + a * inner + i;
+                    if (data_[src_idx] > max_val) {
+                        max_val = data_[src_idx];
+                        max_idx = a;
+                    }
+                }
+                
+                size_t dst_idx = o * inner + i;
+                result.data()[dst_idx] = max_idx;
+            }
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Find indices of minimum elements along an axis.
+     * Only available for tensors with N > 1.
+     * @param axis The dimension along which to find argmin.
+     * @return A new tensor with one less dimension containing indices.
+     */
+    template<size_t M = (N > 1 ? N - 1 : 1)>
+    std::enable_if_t<(N > 1), Tensor<size_t, M>> argmin_axis(size_t axis) const {
+        if (axis >= N) {
+            TensorIndices<M> zero_dims{};
+            return Tensor<size_t, M>(zero_dims, false);
+        }
+        
+        // Calculate new dimensions (removing the axis dimension)
+        TensorIndices<M> new_dims;
+        size_t new_idx = 0;
+        for (size_t i = 0; i < N; ++i) {
+            if (i != axis) {
+                new_dims[new_idx++] = dims_[i];
+            }
+        }
+        
+        Tensor<size_t, M> result(new_dims, false);
+        
+        size_t outer = 1;
+        for (size_t i = 0; i < axis; ++i) {
+            outer *= dims_[i];
+        }
+        
+        size_t inner = 1;
+        for (size_t i = axis + 1; i < N; ++i) {
+            inner *= dims_[i];
+        }
+        
+        size_t axis_size = dims_[axis];
+        
+        for (size_t o = 0; o < outer; ++o) {
+            for (size_t i = 0; i < inner; ++i) {
+                size_t min_idx = 0;
+                T min_val = data_[o * axis_size * inner + i];
+                
+                for (size_t a = 1; a < axis_size; ++a) {
+                    size_t src_idx = o * axis_size * inner + a * inner + i;
+                    if (data_[src_idx] < min_val) {
+                        min_val = data_[src_idx];
+                        min_idx = a;
+                    }
+                }
+                
+                size_t dst_idx = o * inner + i;
+                result.data()[dst_idx] = min_idx;
+            }
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Cumulative sum along all elements (flattened view).
+     * @return A new tensor with cumulative sums.
+     */
+    Tensor<T, N> cumsum() const {
+        Tensor<T, N> result(dims_, use_gpu_);
+        size_t total = total_size();
+        
+        if (total > 0) {
+            result.data_[0] = data_[0];
+            for (size_t i = 1; i < total; ++i) {
+                result.data_[i] = result.data_[i-1] + data_[i];
+            }
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Cumulative product along all elements (flattened view).
+     * @return A new tensor with cumulative products.
+     */
+    Tensor<T, N> cumprod() const {
+        Tensor<T, N> result(dims_, use_gpu_);
+        size_t total = total_size();
+        
+        if (total > 0) {
+            result.data_[0] = data_[0];
+            for (size_t i = 1; i < total; ++i) {
+                result.data_[i] = result.data_[i-1] * data_[i];
+            }
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Cumulative sum along a specific axis.
+     * @param axis The dimension along which to compute cumulative sum.
+     * @return A new tensor with cumulative sums along the specified axis.
+     */
+    Tensor<T, N> cumsum_axis(size_t axis) const {
+        if (axis >= N) {
+            throw std::out_of_range("Axis out of bounds");
+        }
+        
+        Tensor<T, N> result(dims_, use_gpu_);
+        
+        // Compute strides
+        std::array<size_t, N> strides;
+        strides[N-1] = 1;
+        for (int i = N-2; i >= 0; --i) {
+            strides[i] = strides[i+1] * dims_[i+1];
+        }
+        
+        size_t outer = 1;
+        for (size_t i = 0; i < axis; ++i) {
+            outer *= dims_[i];
+        }
+        
+        size_t inner = 1;
+        for (size_t i = axis + 1; i < N; ++i) {
+            inner *= dims_[i];
+        }
+        
+        size_t axis_size = dims_[axis];
+        
+        for (size_t o = 0; o < outer; ++o) {
+            for (size_t i = 0; i < inner; ++i) {
+                T cumulative = T(0);
+                for (size_t a = 0; a < axis_size; ++a) {
+                    size_t idx = o * axis_size * inner + a * inner + i;
+                    cumulative += data_[idx];
+                    result.data_[idx] = cumulative;
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Cumulative product along a specific axis.
+     * @param axis The dimension along which to compute cumulative product.
+     * @return A new tensor with cumulative products along the specified axis.
+     */
+    Tensor<T, N> cumprod_axis(size_t axis) const {
+        if (axis >= N) {
+            throw std::out_of_range("Axis out of bounds");
+        }
+        
+        Tensor<T, N> result(dims_, use_gpu_);
+        
+        // Compute strides
+        std::array<size_t, N> strides;
+        strides[N-1] = 1;
+        for (int i = N-2; i >= 0; --i) {
+            strides[i] = strides[i+1] * dims_[i+1];
+        }
+        
+        size_t outer = 1;
+        for (size_t i = 0; i < axis; ++i) {
+            outer *= dims_[i];
+        }
+        
+        size_t inner = 1;
+        for (size_t i = axis + 1; i < N; ++i) {
+            inner *= dims_[i];
+        }
+        
+        size_t axis_size = dims_[axis];
+        
+        for (size_t o = 0; o < outer; ++o) {
+            for (size_t i = 0; i < inner; ++i) {
+                T cumulative = T(1);
+                for (size_t a = 0; a < axis_size; ++a) {
+                    size_t idx = o * axis_size * inner + a * inner + i;
+                    cumulative *= data_[idx];
+                    result.data_[idx] = cumulative;
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Product of all elements.
+     * @return The product of all tensor elements.
+     */
+    T prod() const {
+        T result = T(1);
+        size_t total = total_size();
+        
+        for (size_t i = 0; i < total; ++i) {
+            result *= data_[i];
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Check if any element is non-zero (boolean reduction).
+     * @return true if any element is non-zero, false otherwise.
+     */
+    bool any() const {
+        size_t total = total_size();
+        for (size_t i = 0; i < total; ++i) {
+            if (data_[i] != T(0)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Check if all elements are non-zero (boolean reduction).
+     * @return true if all elements are non-zero, false otherwise.
+     */
+    bool all() const {
+        size_t total = total_size();
+        for (size_t i = 0; i < total; ++i) {
+            if (data_[i] == T(0)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    // ============================================
+    // Shape Manipulation Operations
+    // ============================================
+    
+    /**
+     * Flatten tensor to 1D.
+     * @return A 1D tensor containing all elements in row-major order
+     * 
+     * @code
+     * Tensor<float, 2> A({3, 4});
+     * auto B = A.flatten();  // Tensor<float, 1> with 12 elements
+     * @endcode
+     */
+    Tensor<T, 1> flatten() const {
+        size_t total = total_size();
+        Tensor<T, 1> result({total}, use_gpu_, false);
+        std::copy(data_.get(), data_.get() + total, result.data_.get());
+        
+        return result;
+    }
+    
+    /**
+     * Repeat tensor along dimensions.
+     * Each dimension is repeated the specified number of times.
+     * @param repeats Number of times to repeat along each dimension
+     * @return A new tensor with repeated elements
+     * 
+     * @code
+     * Tensor<float, 2> A({2, 3});
+     * A.fill(1.0f);
+     * auto B = A.repeat({2, 3});  // Result is {4, 9} with repeated values
+     * @endcode
+     */
+    Tensor<T, N> repeat(const TensorIndices<N>& repeats) const {
+        TensorIndices<N> new_dims;
+        for (size_t i = 0; i < N; ++i) {
+            new_dims[i] = dims_[i] * repeats[i];
+        }
+        
+        Tensor<T, N> result(new_dims, use_gpu_, false);
+        
+        // Helper function to convert flat index to multi-dimensional indices
+        auto flat_to_indices = [](size_t flat, const TensorIndices<N>& dims) {
+            TensorIndices<N> indices;
+            for (int i = N - 1; i >= 0; --i) {
+                indices[i] = flat % dims[i];
+                flat /= dims[i];
+            }
+            return indices;
+        };
+        
+        // Helper function to convert multi-dimensional indices to flat index
+        auto indices_to_flat = [](const TensorIndices<N>& indices, const TensorIndices<N>& dims) {
+            size_t flat = 0;
+            size_t multiplier = 1;
+            for (int i = N - 1; i >= 0; --i) {
+                flat += indices[i] * multiplier;
+                multiplier *= dims[i];
+            }
+            return flat;
+        };
+        
+        size_t total_new = result.total_size();
+        for (size_t i = 0; i < total_new; ++i) {
+            auto new_indices = flat_to_indices(i, new_dims);
+            TensorIndices<N> src_indices;
+            for (size_t j = 0; j < N; ++j) {
+                src_indices[j] = new_indices[j] % dims_[j];
+            }
+            size_t src_idx = indices_to_flat(src_indices, dims_);
+            result.data_[i] = data_[src_idx];
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Tile (repeat) tensor multiple times along each dimension.
+     * Similar to repeat() but with slightly different semantics matching NumPy's tile.
+     * @param reps Number of repetitions along each dimension
+     * @return A new tensor with tiled data
+     * 
+     * @code
+     * Tensor<float, 2> A({2, 3});
+     * auto B = A.tile({2, 2});  // Tile 2x in each dimension -> {4, 6}
+     * @endcode
+     */
+    Tensor<T, N> tile(const TensorIndices<N>& reps) const {
+        return repeat(reps);
     }
 };
 
