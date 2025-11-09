@@ -994,6 +994,306 @@ TensorResult<Matrix<T>> inverse(const Matrix<T>& A) {
     return A_inv;
 }
 
+// ============================================
+// QR Decomposition
+// ============================================
+
+/**
+ * @brief QR decomposition: A = QR
+ * @param A Input matrix (m x n)
+ * @return Pair of Q (m x m orthogonal) and R (m x n upper triangular), or error
+ */
+template <typename T>
+auto qr_decomp(const Matrix<T>& A) -> std::variant<std::pair<Matrix<T>, Matrix<T>>, TensorError> {
+    auto dims = A.dims();
+    size_t m = dims[0];
+    size_t n = dims[1];
+    
+#ifdef USE_LAPACK
+    if (!A.uses_gpu()) {
+        // Make a column-major copy
+        Matrix<T> A_col = transpose(A);
+        int M = static_cast<int>(m);
+        int N = static_cast<int>(n);
+        int K = std::min(M, N);
+        int LDA = M;
+        int INFO = 0;
+        
+        std::vector<T> tau(K);
+        T work_size;
+        int LWORK = -1;
+        
+        // Query workspace size
+        if constexpr (std::is_same_v<T, float>) {
+            sgeqrf_(&M, &N, A_col.data_ptr(), &LDA, tau.data(), &work_size, &LWORK, &INFO);
+        } else if constexpr (std::is_same_v<T, double>) {
+            dgeqrf_(&M, &N, A_col.data_ptr(), &LDA, tau.data(), &work_size, &LWORK, &INFO);
+        }
+        
+        LWORK = static_cast<int>(work_size);
+        std::vector<T> work(LWORK);
+        
+        // Compute QR factorization
+        if constexpr (std::is_same_v<T, float>) {
+            sgeqrf_(&M, &N, A_col.data_ptr(), &LDA, tau.data(), work.data(), &LWORK, &INFO);
+        } else if constexpr (std::is_same_v<T, double>) {
+            dgeqrf_(&M, &N, A_col.data_ptr(), &LDA, tau.data(), work.data(), &LWORK, &INFO);
+        }
+        
+        if (INFO != 0) {
+            return TensorError::LapackError;
+        }
+        
+        // Extract R (upper triangular part)
+        Matrix<T> R({m, n}, false);
+        for (size_t i = 0; i < m; ++i) {
+            for (size_t j = 0; j < n; ++j) {
+                if (i <= j) {
+                    R[{i, j}] = A_col[{j, i}];
+                } else {
+                    R[{i, j}] = T(0);
+                }
+            }
+        }
+        
+        // Generate Q
+        LWORK = -1;
+        if constexpr (std::is_same_v<T, float>) {
+            sorgqr_(&M, &M, &K, A_col.data_ptr(), &LDA, tau.data(), &work_size, &LWORK, &INFO);
+        } else if constexpr (std::is_same_v<T, double>) {
+            dorgqr_(&M, &M, &K, A_col.data_ptr(), &LDA, tau.data(), &work_size, &LWORK, &INFO);
+        }
+        
+        LWORK = static_cast<int>(work_size);
+        work.resize(LWORK);
+        
+        if constexpr (std::is_same_v<T, float>) {
+            sorgqr_(&M, &M, &K, A_col.data_ptr(), &LDA, tau.data(), work.data(), &LWORK, &INFO);
+        } else if constexpr (std::is_same_v<T, double>) {
+            dorgqr_(&M, &M, &K, A_col.data_ptr(), &LDA, tau.data(), work.data(), &LWORK, &INFO);
+        }
+        
+        if (INFO != 0) {
+            return TensorError::LapackError;
+        }
+        
+        Matrix<T> Q({m, m}, false);
+        for (size_t i = 0; i < m; ++i) {
+            for (size_t j = 0; j < m; ++j) {
+                Q[{i, j}] = A_col[{j, i}];
+            }
+        }
+        
+        return std::make_pair(Q, R);
+    }
+#endif
+    
+    return TensorError::NotImplemented;
+}
+
+// ============================================
+// Cholesky Decomposition
+// ============================================
+
+/**
+ * @brief Cholesky decomposition: A = L * L^T for symmetric positive definite matrices
+ * @param A Input symmetric positive definite matrix (n x n)
+ * @return Lower triangular matrix L, or error
+ */
+template <typename T>
+auto cholesky_decomp(const Matrix<T>& A) -> std::variant<Matrix<T>, TensorError> {
+    auto dims = A.dims();
+    if (dims[0] != dims[1]) {
+        return TensorError::NotSquare;
+    }
+    
+    size_t n = dims[0];
+    
+#ifdef USE_LAPACK
+    if (!A.uses_gpu()) {
+        // Make a column-major copy
+        Matrix<T> A_col = transpose(A);
+        int N = static_cast<int>(n);
+        int LDA = N;
+        int INFO = 0;
+        char UPLO = 'L';
+        
+        // Compute Cholesky factorization
+        if constexpr (std::is_same_v<T, float>) {
+            spotrf_(&UPLO, &N, A_col.data_ptr(), &LDA, &INFO);
+        } else if constexpr (std::is_same_v<T, double>) {
+            dpotrf_(&UPLO, &N, A_col.data_ptr(), &LDA, &INFO);
+        }
+        
+        if (INFO != 0) {
+            return TensorError::LapackError;
+        }
+        
+        // Extract lower triangular part and transpose back
+        Matrix<T> L({n, n}, false);
+        for (size_t i = 0; i < n; ++i) {
+            for (size_t j = 0; j < n; ++j) {
+                if (i >= j) {
+                    L[{i, j}] = A_col[{j, i}];
+                } else {
+                    L[{i, j}] = T(0);
+                }
+            }
+        }
+        
+        return L;
+    }
+#endif
+    
+    return TensorError::NotImplemented;
+}
+
+// ============================================
+// SVD Decomposition
+// ============================================
+
+/**
+ * @brief Singular Value Decomposition: A = U * Sigma * V^T
+ * @param A Input matrix (m x n)
+ * @return Tuple of U (m x m), singular values (min(m,n)), V^T (n x n), or error
+ */
+template <typename T>
+auto svd_decomp(const Matrix<T>& A) 
+    -> std::variant<std::tuple<Matrix<T>, Vector<T>, Matrix<T>>, TensorError> {
+    auto dims = A.dims();
+    size_t m = dims[0];
+    size_t n = dims[1];
+    size_t min_dim = std::min(m, n);
+    
+#ifdef USE_LAPACK
+    if (!A.uses_gpu()) {
+        // Make a column-major copy
+        Matrix<T> A_col = transpose(A);
+        int M = static_cast<int>(m);
+        int N = static_cast<int>(n);
+        int LDA = M;
+        int LDU = M;
+        int LDVT = N;
+        int INFO = 0;
+        char JOBU = 'A';
+        char JOBVT = 'A';
+        
+        Vector<T> S({min_dim}, false);
+        Matrix<T> U_col({m, m}, false);
+        Matrix<T> VT_col({n, n}, false);
+        
+        T work_size;
+        int LWORK = -1;
+        
+        // Query workspace size
+        if constexpr (std::is_same_v<T, float>) {
+            sgesvd_(&JOBU, &JOBVT, &M, &N, A_col.data_ptr(), &LDA,
+                    S.data_ptr(), U_col.data_ptr(), &LDU, VT_col.data_ptr(), &LDVT,
+                    &work_size, &LWORK, &INFO);
+        } else if constexpr (std::is_same_v<T, double>) {
+            dgesvd_(&JOBU, &JOBVT, &M, &N, A_col.data_ptr(), &LDA,
+                    S.data_ptr(), U_col.data_ptr(), &LDU, VT_col.data_ptr(), &LDVT,
+                    &work_size, &LWORK, &INFO);
+        }
+        
+        LWORK = static_cast<int>(work_size);
+        std::vector<T> work(LWORK);
+        
+        // Compute SVD
+        if constexpr (std::is_same_v<T, float>) {
+            sgesvd_(&JOBU, &JOBVT, &M, &N, A_col.data_ptr(), &LDA,
+                    S.data_ptr(), U_col.data_ptr(), &LDU, VT_col.data_ptr(), &LDVT,
+                    work.data(), &LWORK, &INFO);
+        } else if constexpr (std::is_same_v<T, double>) {
+            dgesvd_(&JOBU, &JOBVT, &M, &N, A_col.data_ptr(), &LDA,
+                    S.data_ptr(), U_col.data_ptr(), &LDU, VT_col.data_ptr(), &LDVT,
+                    work.data(), &LWORK, &INFO);
+        }
+        
+        if (INFO != 0) {
+            return TensorError::LapackError;
+        }
+        
+        // Transpose U and VT back to row-major
+        Matrix<T> U = transpose(U_col);
+        Matrix<T> VT = transpose(VT_col);
+        
+        return std::make_tuple(U, S, VT);
+    }
+#endif
+    
+    return TensorError::NotImplemented;
+}
+
+// ============================================
+// Eigenvalue Decomposition (Symmetric Matrices)
+// ============================================
+
+/**
+ * @brief Compute eigenvalues and eigenvectors for symmetric matrices
+ * @param A Input symmetric matrix (n x n)
+ * @return Pair of eigenvalues and eigenvector matrix (columns are eigenvectors), or error
+ */
+template <typename T>
+auto eig_decomp(const Matrix<T>& A) 
+    -> std::variant<std::pair<Vector<T>, Matrix<T>>, TensorError> {
+    auto dims = A.dims();
+    if (dims[0] != dims[1]) {
+        return TensorError::NotSquare;
+    }
+    
+    size_t n = dims[0];
+    
+#ifdef USE_LAPACK
+    if (!A.uses_gpu()) {
+        // Make a column-major copy
+        Matrix<T> A_col = transpose(A);
+        int N = static_cast<int>(n);
+        int LDA = N;
+        int INFO = 0;
+        char JOBZ = 'V';  // Compute eigenvalues and eigenvectors
+        char UPLO = 'U';  // Upper triangle of A is stored
+        
+        Vector<T> W({n}, false);  // Eigenvalues
+        
+        T work_size;
+        int LWORK = -1;
+        
+        // Query workspace size
+        if constexpr (std::is_same_v<T, float>) {
+            ssyev_(&JOBZ, &UPLO, &N, A_col.data_ptr(), &LDA, W.data_ptr(),
+                   &work_size, &LWORK, &INFO);
+        } else if constexpr (std::is_same_v<T, double>) {
+            dsyev_(&JOBZ, &UPLO, &N, A_col.data_ptr(), &LDA, W.data_ptr(),
+                   &work_size, &LWORK, &INFO);
+        }
+        
+        LWORK = static_cast<int>(work_size);
+        std::vector<T> work(LWORK);
+        
+        // Compute eigendecomposition
+        if constexpr (std::is_same_v<T, float>) {
+            ssyev_(&JOBZ, &UPLO, &N, A_col.data_ptr(), &LDA, W.data_ptr(),
+                   work.data(), &LWORK, &INFO);
+        } else if constexpr (std::is_same_v<T, double>) {
+            dsyev_(&JOBZ, &UPLO, &N, A_col.data_ptr(), &LDA, W.data_ptr(),
+                   work.data(), &LWORK, &INFO);
+        }
+        
+        if (INFO != 0) {
+            return TensorError::LapackError;
+        }
+        
+        // Transpose eigenvectors back to row-major
+        Matrix<T> V = transpose(A_col);
+        
+        return std::make_pair(W, V);
+    }
+#endif
+    
+    return TensorError::NotImplemented;
+}
+
 } // namespace linalg
 
 #endif // _LINALG_ADVANCED_H

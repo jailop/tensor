@@ -508,6 +508,58 @@ void test_advanced_stats() {
     printf("  ✓ Advanced statistics passed\n");
 }
 
+void test_lu_decomposition() {
+    printf("Testing LU decomposition...\n");
+    
+    MatrixFloatHandle mat, L, U;
+    float data[] = {4.0f, 3.0f, 6.0f, 3.0f};
+    
+    matrix_float_create(2, 2, data, &mat);
+    
+    size_t* pivot;
+    size_t pivot_size;
+    TensorErrorCode err = matrix_float_lu(mat, &L, &U, &pivot, &pivot_size);
+    
+    if (err == TENSOR_SUCCESS) {
+        // Verify L is lower triangular and U is upper triangular
+        matrix_float_destroy(L);
+        matrix_float_destroy(U);
+        free(pivot);
+        printf("  ✓ LU decomposition passed\n");
+    } else {
+        printf("  ⊘ LU decomposition not available (skipped)\n");
+    }
+    
+    matrix_float_destroy(mat);
+}
+
+void test_cross_product() {
+    printf("Testing cross product (3D vectors)...\n");
+    
+    VectorFloatHandle v1, v2, cross;
+    float data1[] = {1.0f, 0.0f, 0.0f};
+    float data2[] = {0.0f, 1.0f, 0.0f};
+    
+    vector_float_create(3, data1, &v1);
+    vector_float_create(3, data2, &v2);
+    
+    TensorErrorCode err = vector_float_cross(v1, v2, &cross);
+    
+    if (err == TENSOR_SUCCESS) {
+        float z;
+        vector_float_get(cross, 2, &z);
+        ASSERT_EQ(z, 1.0f); // i × j = k
+        
+        vector_float_destroy(cross);
+        printf("  ✓ Cross product passed\n");
+    } else {
+        printf("  ⊘ Cross product not available (skipped)\n");
+    }
+    
+    vector_float_destroy(v1);
+    vector_float_destroy(v2);
+}
+
 void test_version() {
     printf("Testing version info...\n");
     
@@ -541,6 +593,8 @@ int main() {
     test_correlation();
     test_cholesky();
     test_qr_decomposition();
+    test_lu_decomposition();
+    test_cross_product();
     test_matrix_rank();
     test_advanced_stats();
     

@@ -1254,57 +1254,137 @@ TensorErrorCode matrix_double_lu(MatrixDoubleHandle handle, MatrixDoubleHandle* 
 TensorErrorCode matrix_float_qr(MatrixFloatHandle handle, MatrixFloatHandle* out_Q, MatrixFloatHandle* out_R) {
     if (!handle || !out_Q || !out_R) return TENSOR_ERROR_NULL_POINTER;
     
-    snprintf(g_last_error, sizeof(g_last_error), "QR decomposition requires LAPACK support (not available in current build)");
-    return TENSOR_ERROR_INVALID_OPERATION;
+    TENSOR_TRY_BEGIN
+    auto* mat = static_cast<Matrixf*>(handle);
+    auto result = linalg::qr_decomp(*mat);
+    
+    if (auto* qr_data = std::get_if<std::pair<Matrixf, Matrixf>>(&result)) {
+        *out_Q = new Matrixf(qr_data->first);
+        *out_R = new Matrixf(qr_data->second);
+        return TENSOR_SUCCESS;
+    }
+    
+    return TENSOR_ERROR_COMPUTATION;
+    TENSOR_TRY_END
 }
 
 TensorErrorCode matrix_double_qr(MatrixDoubleHandle handle, MatrixDoubleHandle* out_Q, MatrixDoubleHandle* out_R) {
     if (!handle || !out_Q || !out_R) return TENSOR_ERROR_NULL_POINTER;
     
-    snprintf(g_last_error, sizeof(g_last_error), "QR decomposition requires LAPACK support (not available in current build)");
-    return TENSOR_ERROR_INVALID_OPERATION;
+    TENSOR_TRY_BEGIN
+    auto* mat = static_cast<Matrixd*>(handle);
+    auto result = linalg::qr_decomp(*mat);
+    
+    if (auto* qr_data = std::get_if<std::pair<Matrixd, Matrixd>>(&result)) {
+        *out_Q = new Matrixd(qr_data->first);
+        *out_R = new Matrixd(qr_data->second);
+        return TENSOR_SUCCESS;
+    }
+    
+    return TENSOR_ERROR_COMPUTATION;
+    TENSOR_TRY_END
 }
 
 TensorErrorCode matrix_float_cholesky(MatrixFloatHandle handle, MatrixFloatHandle* out_handle) {
     if (!handle || !out_handle) return TENSOR_ERROR_NULL_POINTER;
     
-    snprintf(g_last_error, sizeof(g_last_error), "Cholesky decomposition requires LAPACK support (not available in current build)");
-    return TENSOR_ERROR_INVALID_OPERATION;
+    TENSOR_TRY_BEGIN
+    auto* mat = static_cast<Matrixf*>(handle);
+    auto result = linalg::cholesky_decomp(*mat);
+    
+    if (std::holds_alternative<Matrixf>(result)) {
+        *out_handle = new Matrixf(std::get<Matrixf>(result));
+        return TENSOR_SUCCESS;
+    }
+    
+    return TENSOR_ERROR_COMPUTATION;
+    TENSOR_TRY_END
 }
 
 TensorErrorCode matrix_double_cholesky(MatrixDoubleHandle handle, MatrixDoubleHandle* out_handle) {
     if (!handle || !out_handle) return TENSOR_ERROR_NULL_POINTER;
     
-    snprintf(g_last_error, sizeof(g_last_error), "Cholesky decomposition requires LAPACK support (not available in current build)");
-    return TENSOR_ERROR_INVALID_OPERATION;
+    TENSOR_TRY_BEGIN
+    auto* mat = static_cast<Matrixd*>(handle);
+    auto result = linalg::cholesky_decomp(*mat);
+    
+    if (std::holds_alternative<Matrixd>(result)) {
+        *out_handle = new Matrixd(std::get<Matrixd>(result));
+        return TENSOR_SUCCESS;
+    }
+    
+    return TENSOR_ERROR_COMPUTATION;
+    TENSOR_TRY_END
 }
 
 TensorErrorCode matrix_float_svd(MatrixFloatHandle handle, MatrixFloatHandle* out_U, VectorFloatHandle* out_S, MatrixFloatHandle* out_Vt) {
     if (!handle || !out_U || !out_S || !out_Vt) return TENSOR_ERROR_NULL_POINTER;
     
-    snprintf(g_last_error, sizeof(g_last_error), "SVD requires LAPACK support (not available in current build)");
-    return TENSOR_ERROR_INVALID_OPERATION;
+    TENSOR_TRY_BEGIN
+    auto* mat = static_cast<Matrixf*>(handle);
+    auto result = linalg::svd_decomp(*mat);
+    
+    if (auto* svd_data = std::get_if<std::tuple<Matrixf, Vectorf, Matrixf>>(&result)) {
+        *out_U = new Matrixf(std::get<0>(*svd_data));
+        *out_S = new Vectorf(std::get<1>(*svd_data));
+        *out_Vt = new Matrixf(std::get<2>(*svd_data));
+        return TENSOR_SUCCESS;
+    }
+    
+    return TENSOR_ERROR_COMPUTATION;
+    TENSOR_TRY_END
 }
 
 TensorErrorCode matrix_double_svd(MatrixDoubleHandle handle, MatrixDoubleHandle* out_U, VectorDoubleHandle* out_S, MatrixDoubleHandle* out_Vt) {
     if (!handle || !out_U || !out_S || !out_Vt) return TENSOR_ERROR_NULL_POINTER;
     
-    snprintf(g_last_error, sizeof(g_last_error), "SVD requires LAPACK support (not available in current build)");
-    return TENSOR_ERROR_INVALID_OPERATION;
+    TENSOR_TRY_BEGIN
+    auto* mat = static_cast<Matrixd*>(handle);
+    auto result = linalg::svd_decomp(*mat);
+    
+    if (auto* svd_data = std::get_if<std::tuple<Matrixd, Vectord, Matrixd>>(&result)) {
+        *out_U = new Matrixd(std::get<0>(*svd_data));
+        *out_S = new Vectord(std::get<1>(*svd_data));
+        *out_Vt = new Matrixd(std::get<2>(*svd_data));
+        return TENSOR_SUCCESS;
+    }
+    
+    return TENSOR_ERROR_COMPUTATION;
+    TENSOR_TRY_END
 }
 
 TensorErrorCode matrix_float_eig(MatrixFloatHandle handle, VectorFloatHandle* out_eigenvalues, MatrixFloatHandle* out_eigenvectors) {
     if (!handle || !out_eigenvalues || !out_eigenvectors) return TENSOR_ERROR_NULL_POINTER;
     
-    snprintf(g_last_error, sizeof(g_last_error), "Eigenvalue computation requires LAPACK support (not available in current build)");
-    return TENSOR_ERROR_INVALID_OPERATION;
+    TENSOR_TRY_BEGIN
+    auto* mat = static_cast<Matrixf*>(handle);
+    auto result = linalg::eig_decomp(*mat);
+    
+    if (auto* eig_data = std::get_if<std::pair<Vectorf, Matrixf>>(&result)) {
+        *out_eigenvalues = new Vectorf(eig_data->first);
+        *out_eigenvectors = new Matrixf(eig_data->second);
+        return TENSOR_SUCCESS;
+    }
+    
+    return TENSOR_ERROR_COMPUTATION;
+    TENSOR_TRY_END
 }
 
 TensorErrorCode matrix_double_eig(MatrixDoubleHandle handle, VectorDoubleHandle* out_eigenvalues, MatrixDoubleHandle* out_eigenvectors) {
     if (!handle || !out_eigenvalues || !out_eigenvectors) return TENSOR_ERROR_NULL_POINTER;
     
-    snprintf(g_last_error, sizeof(g_last_error), "Eigenvalue computation requires LAPACK support (not available in current build)");
-    return TENSOR_ERROR_INVALID_OPERATION;
+    TENSOR_TRY_BEGIN
+    auto* mat = static_cast<Matrixd*>(handle);
+    auto result = linalg::eig_decomp(*mat);
+    
+    if (auto* eig_data = std::get_if<std::pair<Vectord, Matrixd>>(&result)) {
+        *out_eigenvalues = new Vectord(eig_data->first);
+        *out_eigenvectors = new Matrixd(eig_data->second);
+        return TENSOR_SUCCESS;
+    }
+    
+    return TENSOR_ERROR_COMPUTATION;
+    TENSOR_TRY_END
 }
 
 TensorErrorCode matrix_float_solve(MatrixFloatHandle A, VectorFloatHandle b, VectorFloatHandle* out_x) {

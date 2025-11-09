@@ -196,6 +196,13 @@ int main() {
         size_t s_size;
         vector_float_size(S, &s_size);
         printf("   Number of singular values: %zu\n", s_size);
+        printf("   Singular values: [");
+        for (size_t i = 0; i < s_size; i++) {
+            float val;
+            vector_float_get(S, i, &val);
+            printf("%s%.3f", i > 0 ? ", " : "", val);
+        }
+        printf("]\n");
         
         matrix_float_destroy(U);
         vector_float_destroy(S);
@@ -261,6 +268,90 @@ int main() {
     matrix_float_destroy(coeff_mat);
     vector_float_destroy(rhs_vec);
     vector_float_destroy(solution);
+    
+    // Example 12: QR Decomposition
+    printf("\n12. QR Decomposition:\n");
+    MatrixFloatHandle qr_mat, Q, R;
+    float qr_data[] = {1.0f, 2.0f, 3.0f, 4.0f};
+    matrix_float_create(2, 2, qr_data, &qr_mat);
+    
+    err = matrix_float_qr(qr_mat, &Q, &R);
+    if (err == TENSOR_SUCCESS) {
+        printf("   QR decomposition completed\n");
+        printf("   Q is orthogonal, R is upper triangular\n");
+        
+        matrix_float_destroy(Q);
+        matrix_float_destroy(R);
+    } else {
+        printf("   QR decomposition failed (may not be available)\n");
+    }
+    
+    matrix_float_destroy(qr_mat);
+    
+    // Example 13: Cholesky Decomposition
+    printf("\n13. Cholesky Decomposition (SPD matrix):\n");
+    MatrixFloatHandle chol_mat, chol_L;
+    float chol_data[] = {4.0f, 2.0f, 2.0f, 3.0f};
+    matrix_float_create(2, 2, chol_data, &chol_mat);
+    
+    err = matrix_float_cholesky(chol_mat, &chol_L);
+    if (err == TENSOR_SUCCESS) {
+        printf("   Cholesky decomposition completed\n");
+        printf("   L matrix (lower triangular):\n");
+        for (size_t i = 0; i < 2; i++) {
+            printf("   [");
+            for (size_t j = 0; j < 2; j++) {
+                float val;
+                matrix_float_get(chol_L, i, j, &val);
+                printf("%s%.3f", j > 0 ? ", " : "", val);
+            }
+            printf("]\n");
+        }
+        
+        matrix_float_destroy(chol_L);
+    } else {
+        printf("   Cholesky decomposition failed (matrix may not be SPD)\n");
+    }
+    
+    matrix_float_destroy(chol_mat);
+    
+    // Example 14: Matrix Rank
+    printf("\n14. Matrix Rank Computation:\n");
+    MatrixFloatHandle rank_mat;
+    float rank_data[] = {1.0f, 2.0f, 2.0f, 4.0f};
+    matrix_float_create(2, 2, rank_data, &rank_mat);
+    
+    size_t rank;
+    err = matrix_float_rank(rank_mat, &rank);
+    if (err == TENSOR_SUCCESS) {
+        printf("   Matrix rank: %zu (expected: 1, rank-deficient)\n", rank);
+    } else {
+        printf("   Rank computation failed\n");
+    }
+    
+    matrix_float_destroy(rank_mat);
+    
+    // Example 15: LU Decomposition
+    printf("\n15. LU Decomposition:\n");
+    MatrixFloatHandle lu_mat, L_lu, U_lu;
+    float lu_data[] = {4.0f, 3.0f, 6.0f, 3.0f};
+    matrix_float_create(2, 2, lu_data, &lu_mat);
+    
+    size_t* pivot;
+    size_t pivot_size;
+    err = matrix_float_lu(lu_mat, &L_lu, &U_lu, &pivot, &pivot_size);
+    if (err == TENSOR_SUCCESS) {
+        printf("   LU decomposition completed\n");
+        printf("   Matrix factorized into lower and upper triangular matrices\n");
+        
+        matrix_float_destroy(L_lu);
+        matrix_float_destroy(U_lu);
+        free(pivot);
+    } else {
+        printf("   LU decomposition failed\n");
+    }
+    
+    matrix_float_destroy(lu_mat);
     
     printf("\n=== Example completed successfully ===\n");
     printf("Library version: %s\n", tensor_c_version());

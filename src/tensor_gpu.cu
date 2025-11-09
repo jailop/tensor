@@ -4,6 +4,31 @@
 
 namespace TensorGPU {
 
+// Device-compatible limit helpers - specializations for different types
+template<typename T>
+__device__ __forceinline__ T get_lowest_value();
+
+template<>
+__device__ __forceinline__ int get_lowest_value<int>() { return -2147483648; }
+
+template<>
+__device__ __forceinline__ float get_lowest_value<float>() { return -1e30f; }
+
+template<>
+__device__ __forceinline__ double get_lowest_value<double>() { return -1e30; }
+
+template<typename T>
+__device__ __forceinline__ T get_max_value();
+
+template<>
+__device__ __forceinline__ int get_max_value<int>() { return 2147483647; }
+
+template<>
+__device__ __forceinline__ float get_max_value<float>() { return 1e30f; }
+
+template<>
+__device__ __forceinline__ double get_max_value<double>() { return 1e30; }
+
 bool is_gpu_available() {
     int device_count = 0;
     cudaError_t error = cudaGetDeviceCount(&device_count);
@@ -782,7 +807,8 @@ __global__ void max_kernel(const T* a, T* partial_max, size_t n) {
     unsigned int tid = threadIdx.x;
     unsigned int i = blockIdx.x * blockDim.x + threadIdx.x;
     
-    T val = (i < n) ? a[i] : (i == 0 ? a[0] : T(-1e30));
+    // Use device-compatible lowest value
+    T val = (i < n) ? a[i] : (i == 0 ? a[0] : get_lowest_value<T>());
     sdata[tid] = val;
     __syncthreads();
     
@@ -836,7 +862,8 @@ __global__ void min_kernel(const T* a, T* partial_min, size_t n) {
     unsigned int tid = threadIdx.x;
     unsigned int i = blockIdx.x * blockDim.x + threadIdx.x;
     
-    T val = (i < n) ? a[i] : (i == 0 ? a[0] : T(1e30));
+    // Use device-compatible max value
+    T val = (i < n) ? a[i] : (i == 0 ? a[0] : get_max_value<T>());
     sdata[tid] = val;
     __syncthreads();
     
