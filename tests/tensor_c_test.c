@@ -570,6 +570,189 @@ void test_version() {
     printf("  ✓ Version info passed\n");
 }
 
+// ============================================================================
+// Neural Network Layer Tests
+// ============================================================================
+
+void test_linear_layer() {
+    printf("Testing Linear layer...\n");
+    
+    LayerHandle layer;
+    TensorErrorCode err = layer_linear_create_float(3, 5, true, &layer);
+    ASSERT_SUCCESS(err);
+    assert(layer != NULL);
+    
+    // Create input: 2 samples, 3 features
+    MatrixFloatHandle input;
+    float input_data[] = {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f};
+    err = matrix_float_create(2, 3, input_data, &input);
+    ASSERT_SUCCESS(err);
+    
+    // Forward pass
+    MatrixFloatHandle output;
+    err = layer_linear_forward_float(layer, input, &output);
+    ASSERT_SUCCESS(err);
+    assert(output != NULL);
+    
+    // Check output shape
+    size_t rows, cols;
+    err = matrix_float_shape(output, &rows, &cols);
+    ASSERT_SUCCESS(err);
+    assert(rows == 2);  // batch size
+    assert(cols == 5);  // out_features
+    
+    // Cleanup
+    matrix_float_destroy(input);
+    matrix_float_destroy(output);
+    layer_linear_destroy(layer);
+    
+    printf("  ✓ Linear layer passed\n");
+}
+
+void test_relu_layer() {
+    printf("Testing ReLU layer...\n");
+    
+    LayerHandle layer;
+    TensorErrorCode err = layer_relu_create_float(&layer);
+    ASSERT_SUCCESS(err);
+    assert(layer != NULL);
+    
+    // Create input with negative and positive values
+    MatrixFloatHandle input;
+    float input_data[] = {-1.0f, 2.0f, -0.5f, 3.0f};
+    err = matrix_float_create(2, 2, input_data, &input);
+    ASSERT_SUCCESS(err);
+    
+    // Forward pass
+    MatrixFloatHandle output;
+    err = layer_relu_forward_float(layer, input, &output);
+    ASSERT_SUCCESS(err);
+    
+    // Check that negative values are zeroed
+    float val;
+    err = matrix_float_get(output, 0, 0, &val);
+    ASSERT_SUCCESS(err);
+    ASSERT_EQ(val, 0.0f);  // -1.0 -> 0.0
+    
+    err = matrix_float_get(output, 0, 1, &val);
+    ASSERT_SUCCESS(err);
+    ASSERT_EQ(val, 2.0f);  // 2.0 -> 2.0
+    
+    // Cleanup
+    matrix_float_destroy(input);
+    matrix_float_destroy(output);
+    layer_relu_destroy(layer);
+    
+    printf("  ✓ ReLU layer passed\n");
+}
+
+void test_sigmoid_layer() {
+    printf("Testing Sigmoid layer...\n");
+    
+    LayerHandle layer;
+    TensorErrorCode err = layer_sigmoid_create_float(&layer);
+    ASSERT_SUCCESS(err);
+    assert(layer != NULL);
+    
+    // Create input
+    MatrixFloatHandle input;
+    float input_data[] = {0.0f};
+    err = matrix_float_create(1, 1, input_data, &input);
+    ASSERT_SUCCESS(err);
+    
+    // Forward pass
+    MatrixFloatHandle output;
+    err = layer_sigmoid_forward_float(layer, input, &output);
+    ASSERT_SUCCESS(err);
+    
+    // sigmoid(0) = 0.5
+    float val;
+    err = matrix_float_get(output, 0, 0, &val);
+    ASSERT_SUCCESS(err);
+    ASSERT_EQ(val, 0.5f);
+    
+    // Cleanup
+    matrix_float_destroy(input);
+    matrix_float_destroy(output);
+    layer_sigmoid_destroy(layer);
+    
+    printf("  ✓ Sigmoid layer passed\n");
+}
+
+void test_softmax_layer() {
+    printf("Testing Softmax layer...\n");
+    
+    LayerHandle layer;
+    TensorErrorCode err = layer_softmax_create_float(&layer);
+    ASSERT_SUCCESS(err);
+    assert(layer != NULL);
+    
+    // Create input
+    MatrixFloatHandle input;
+    float input_data[] = {1.0f, 2.0f, 3.0f};
+    err = matrix_float_create(1, 3, input_data, &input);
+    ASSERT_SUCCESS(err);
+    
+    // Forward pass
+    MatrixFloatHandle output;
+    err = layer_softmax_forward_float(layer, input, &output);
+    ASSERT_SUCCESS(err);
+    
+    // Check that probabilities sum to 1
+    float sum = 0.0f;
+    for (size_t i = 0; i < 3; ++i) {
+        float val;
+        err = matrix_float_get(output, 0, i, &val);
+        ASSERT_SUCCESS(err);
+        assert(val > 0.0f && val < 1.0f);
+        sum += val;
+    }
+    ASSERT_EQ(sum, 1.0f);
+    
+    // Cleanup
+    matrix_float_destroy(input);
+    matrix_float_destroy(output);
+    layer_softmax_destroy(layer);
+    
+    printf("  ✓ Softmax layer passed\n");
+}
+
+void test_dropout_layer() {
+    printf("Testing Dropout layer...\n");
+    
+    LayerHandle layer;
+    TensorErrorCode err = layer_dropout_create_float(0.5f, &layer);
+    ASSERT_SUCCESS(err);
+    assert(layer != NULL);
+    
+    // Test inference mode (no dropout)
+    err = layer_dropout_train(layer, false);
+    ASSERT_SUCCESS(err);
+    
+    MatrixFloatHandle input;
+    float input_data[] = {1.0f, 1.0f, 1.0f, 1.0f};
+    err = matrix_float_create(2, 2, input_data, &input);
+    ASSERT_SUCCESS(err);
+    
+    // Forward pass in inference mode
+    MatrixFloatHandle output;
+    err = layer_dropout_forward_float(layer, input, &output);
+    ASSERT_SUCCESS(err);
+    
+    // In inference mode, values should be unchanged
+    float val;
+    err = matrix_float_get(output, 0, 0, &val);
+    ASSERT_SUCCESS(err);
+    ASSERT_EQ(val, 1.0f);
+    
+    // Cleanup
+    matrix_float_destroy(input);
+    matrix_float_destroy(output);
+    layer_dropout_destroy(layer);
+    
+    printf("  ✓ Dropout layer passed\n");
+}
+
 int main() {
     printf("=== Running C Interface Tests ===\n\n");
     
@@ -597,6 +780,13 @@ int main() {
     test_cross_product();
     test_matrix_rank();
     test_advanced_stats();
+    
+    // Neural Network Layer tests
+    test_linear_layer();
+    test_relu_layer();
+    test_sigmoid_layer();
+    test_softmax_layer();
+    test_dropout_layer();
     
     // Error handling and version
     test_error_handling();

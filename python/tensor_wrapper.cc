@@ -22,9 +22,11 @@
 #include "loss_functions.h"
 #include "tensor_io.h"
 #include "optimizers.h"
+#include "nn_layers.h"
 
 namespace py = pybind11;
 using namespace tensor4d;
+using namespace tensor4d::nn;
 
 // Helper function to flatten nested Python list
 template<typename T>
@@ -712,8 +714,214 @@ PYBIND11_MODULE(tensor4d, m) {
         return linalg::least_squares(A, b);
     }, py::arg("A"), py::arg("b"), "Least squares solution (double)");
     
+    // ========================================================================
+    // Neural Network Layers Module
+    // ========================================================================
+    
+    auto nn_mod = m.def_submodule("nn", "Neural network layers");
+    
+    // Linear Layer (Float)
+    py::class_<Linear<float>>(nn_mod, "Linearf")
+        .def(py::init<size_t, size_t, bool>(),
+             py::arg("in_features"),
+             py::arg("out_features"),
+             py::arg("use_bias") = true,
+             "Create a linear (fully connected) layer")
+        .def("forward", &Linear<float>::forward,
+             py::arg("input"),
+             "Forward pass through the layer")
+        .def("backward", &Linear<float>::backward,
+             py::arg("grad_output"),
+             "Backward pass (compute gradients)")
+        .def("parameters", &Linear<float>::parameters,
+             py::return_value_policy::reference_internal,
+             "Get list of trainable parameters")
+        .def("train", &Linear<float>::train,
+             py::arg("mode") = true,
+             "Set training mode")
+        .def("is_training", &Linear<float>::is_training,
+             "Check if layer is in training mode")
+        .def_property_readonly("weights", 
+             [](Linear<float>& layer) -> Matrixf& { return layer.weights(); },
+             py::return_value_policy::reference_internal,
+             "Access weights matrix")
+        .def_property_readonly("bias",
+             [](Linear<float>& layer) -> Matrixf& { return layer.bias(); },
+             py::return_value_policy::reference_internal,
+             "Access bias vector")
+        .def("__repr__", [](const Linear<float>&) {
+            return "<tensor4d.nn.Linearf>";
+        });
+    
+    // Linear Layer (Double)
+    py::class_<Linear<double>>(nn_mod, "Lineard")
+        .def(py::init<size_t, size_t, bool>(),
+             py::arg("in_features"),
+             py::arg("out_features"),
+             py::arg("use_bias") = true)
+        .def("forward", &Linear<double>::forward)
+        .def("backward", &Linear<double>::backward)
+        .def("parameters", &Linear<double>::parameters)
+        .def("train", &Linear<double>::train, py::arg("mode") = true)
+        .def("is_training", &Linear<double>::is_training);
+    
+    // ReLU Layer (Float)
+    py::class_<ReLU<float>>(nn_mod, "ReLUf")
+        .def(py::init<>(), "Create a ReLU activation layer")
+        .def("forward", &ReLU<float>::forward,
+             py::arg("input"),
+             "Apply ReLU activation")
+        .def("backward", &ReLU<float>::backward,
+             py::arg("grad_output"),
+             "Backward pass for ReLU")
+        .def("train", &ReLU<float>::train, py::arg("mode") = true)
+        .def("is_training", &ReLU<float>::is_training)
+        .def("__repr__", [](const ReLU<float>&) {
+            return "<tensor4d.nn.ReLUf>";
+        });
+    
+    // ReLU Layer (Double)
+    py::class_<ReLU<double>>(nn_mod, "ReLUd")
+        .def(py::init<>())
+        .def("forward", &ReLU<double>::forward)
+        .def("backward", &ReLU<double>::backward)
+        .def("train", &ReLU<double>::train, py::arg("mode") = true)
+        .def("is_training", &ReLU<double>::is_training);
+    
+    // Sigmoid Layer (Float)
+    py::class_<Sigmoid<float>>(nn_mod, "Sigmoidf")
+        .def(py::init<>(), "Create a Sigmoid activation layer")
+        .def("forward", &Sigmoid<float>::forward,
+             py::arg("input"),
+             "Apply Sigmoid activation")
+        .def("backward", &Sigmoid<float>::backward,
+             py::arg("grad_output"),
+             "Backward pass for Sigmoid")
+        .def("train", &Sigmoid<float>::train, py::arg("mode") = true)
+        .def("is_training", &Sigmoid<float>::is_training)
+        .def("__repr__", [](const Sigmoid<float>&) {
+            return "<tensor4d.nn.Sigmoidf>";
+        });
+    
+    // Sigmoid Layer (Double)
+    py::class_<Sigmoid<double>>(nn_mod, "Sigmoidd")
+        .def(py::init<>())
+        .def("forward", &Sigmoid<double>::forward)
+        .def("backward", &Sigmoid<double>::backward)
+        .def("train", &Sigmoid<double>::train, py::arg("mode") = true)
+        .def("is_training", &Sigmoid<double>::is_training);
+    
+    // Tanh Layer (Float)
+    py::class_<Tanh<float>>(nn_mod, "Tanhf")
+        .def(py::init<>(), "Create a Tanh activation layer")
+        .def("forward", &Tanh<float>::forward,
+             py::arg("input"),
+             "Apply Tanh activation")
+        .def("backward", &Tanh<float>::backward,
+             py::arg("grad_output"),
+             "Backward pass for Tanh")
+        .def("train", &Tanh<float>::train, py::arg("mode") = true)
+        .def("is_training", &Tanh<float>::is_training)
+        .def("__repr__", [](const Tanh<float>&) {
+            return "<tensor4d.nn.Tanhf>";
+        });
+    
+    // Tanh Layer (Double)
+    py::class_<Tanh<double>>(nn_mod, "Tanhd")
+        .def(py::init<>())
+        .def("forward", &Tanh<double>::forward)
+        .def("backward", &Tanh<double>::backward)
+        .def("train", &Tanh<double>::train, py::arg("mode") = true)
+        .def("is_training", &Tanh<double>::is_training);
+    
+    // Softmax Layer (Float)
+    py::class_<Softmax<float>>(nn_mod, "Softmaxf")
+        .def(py::init<>(), "Create a Softmax activation layer")
+        .def("forward", &Softmax<float>::forward,
+             py::arg("input"),
+             "Apply Softmax (converts to probabilities)")
+        .def("backward", &Softmax<float>::backward,
+             py::arg("grad_output"),
+             "Backward pass for Softmax")
+        .def("train", &Softmax<float>::train, py::arg("mode") = true)
+        .def("is_training", &Softmax<float>::is_training)
+        .def("__repr__", [](const Softmax<float>&) {
+            return "<tensor4d.nn.Softmaxf>";
+        });
+    
+    // Softmax Layer (Double)
+    py::class_<Softmax<double>>(nn_mod, "Softmaxd")
+        .def(py::init<>())
+        .def("forward", &Softmax<double>::forward)
+        .def("backward", &Softmax<double>::backward)
+        .def("train", &Softmax<double>::train, py::arg("mode") = true)
+        .def("is_training", &Softmax<double>::is_training);
+    
+    // Dropout Layer (Float)
+    py::class_<Dropout<float>>(nn_mod, "Dropoutf")
+        .def(py::init<float>(),
+             py::arg("p") = 0.5f,
+             "Create a Dropout layer (p = dropout probability)")
+        .def("forward", &Dropout<float>::forward,
+             py::arg("input"),
+             "Apply dropout (training) or pass-through (inference)")
+        .def("backward", &Dropout<float>::backward,
+             py::arg("grad_output"),
+             "Backward pass for Dropout")
+        .def("train", &Dropout<float>::train,
+             py::arg("mode") = true,
+             "Set training/inference mode")
+        .def("is_training", &Dropout<float>::is_training)
+        .def("__repr__", [](const Dropout<float>&) {
+            return "<tensor4d.nn.Dropoutf>";
+        });
+    
+    // Dropout Layer (Double)
+    py::class_<Dropout<double>>(nn_mod, "Dropoutd")
+        .def(py::init<double>(), py::arg("p") = 0.5)
+        .def("forward", &Dropout<double>::forward)
+        .def("backward", &Dropout<double>::backward)
+        .def("train", &Dropout<double>::train, py::arg("mode") = true)
+        .def("is_training", &Dropout<double>::is_training);
+    
+    // Batch Normalization Layer (Float)
+    py::class_<BatchNorm1d<float>>(nn_mod, "BatchNorm1df")
+        .def(py::init<size_t, float, float>(),
+             py::arg("num_features"),
+             py::arg("eps") = 1e-5f,
+             py::arg("momentum") = 0.1f,
+             "Create a Batch Normalization layer")
+        .def("forward", &BatchNorm1d<float>::forward,
+             py::arg("input"),
+             "Apply batch normalization")
+        .def("backward", &BatchNorm1d<float>::backward,
+             py::arg("grad_output"),
+             "Backward pass for Batch Normalization")
+        .def("parameters", &BatchNorm1d<float>::parameters,
+             py::return_value_policy::reference_internal,
+             "Get gamma and beta parameters")
+        .def("train", &BatchNorm1d<float>::train,
+             py::arg("mode") = true,
+             "Set training/inference mode")
+        .def("is_training", &BatchNorm1d<float>::is_training)
+        .def("__repr__", [](const BatchNorm1d<float>&) {
+            return "<tensor4d.nn.BatchNorm1df>";
+        });
+    
+    // Batch Normalization Layer (Double)
+    py::class_<BatchNorm1d<double>>(nn_mod, "BatchNorm1dd")
+        .def(py::init<size_t, double, double>(),
+             py::arg("num_features"),
+             py::arg("eps") = 1e-5,
+             py::arg("momentum") = 0.1)
+        .def("forward", &BatchNorm1d<double>::forward)
+        .def("backward", &BatchNorm1d<double>::backward)
+        .def("parameters", &BatchNorm1d<double>::parameters)
+        .def("train", &BatchNorm1d<double>::train, py::arg("mode") = true)
+        .def("is_training", &BatchNorm1d<double>::is_training);
+    
     // Constants and enums
     
     // Version info
-    m.attr("__version__") = "1.4.2";
+    m.attr("__version__") = "1.5.0";
 }

@@ -375,6 +375,69 @@ const char* tensor_c_last_error(void);
 TensorErrorCode tensor_c_set_device(TensorDevice device);
 TensorErrorCode tensor_c_get_device(TensorDevice* out_device);
 
+/* ===== Neural Network Layers ===== */
+
+/* Layer handles */
+typedef void* LayerHandle;
+
+/* Linear (Dense) Layer */
+TensorErrorCode layer_linear_create_float(size_t in_features, size_t out_features, bool use_bias, LayerHandle* out_handle);
+TensorErrorCode layer_linear_create_double(size_t in_features, size_t out_features, bool use_bias, LayerHandle* out_handle);
+TensorErrorCode layer_linear_forward_float(LayerHandle handle, MatrixFloatHandle input, MatrixFloatHandle* output);
+TensorErrorCode layer_linear_forward_double(LayerHandle handle, MatrixDoubleHandle input, MatrixDoubleHandle* output);
+TensorErrorCode layer_linear_backward_float(LayerHandle handle, MatrixFloatHandle grad_output, MatrixFloatHandle* grad_input);
+TensorErrorCode layer_linear_backward_double(LayerHandle handle, MatrixDoubleHandle grad_output, MatrixDoubleHandle* grad_input);
+TensorErrorCode layer_linear_get_weights_float(LayerHandle handle, MatrixFloatHandle* weights);
+TensorErrorCode layer_linear_get_bias_float(LayerHandle handle, MatrixFloatHandle* bias);
+TensorErrorCode layer_linear_destroy(LayerHandle handle);
+
+/* ReLU Layer */
+TensorErrorCode layer_relu_create_float(LayerHandle* out_handle);
+TensorErrorCode layer_relu_create_double(LayerHandle* out_handle);
+TensorErrorCode layer_relu_forward_float(LayerHandle handle, MatrixFloatHandle input, MatrixFloatHandle* output);
+TensorErrorCode layer_relu_forward_double(LayerHandle handle, MatrixDoubleHandle input, MatrixDoubleHandle* output);
+TensorErrorCode layer_relu_backward_float(LayerHandle handle, MatrixFloatHandle grad_output, MatrixFloatHandle* grad_input);
+TensorErrorCode layer_relu_backward_double(LayerHandle handle, MatrixDoubleHandle grad_output, MatrixDoubleHandle* grad_input);
+TensorErrorCode layer_relu_destroy(LayerHandle handle);
+
+/* Sigmoid Layer */
+TensorErrorCode layer_sigmoid_create_float(LayerHandle* out_handle);
+TensorErrorCode layer_sigmoid_create_double(LayerHandle* out_handle);
+TensorErrorCode layer_sigmoid_forward_float(LayerHandle handle, MatrixFloatHandle input, MatrixFloatHandle* output);
+TensorErrorCode layer_sigmoid_forward_double(LayerHandle handle, MatrixDoubleHandle input, MatrixDoubleHandle* output);
+TensorErrorCode layer_sigmoid_backward_float(LayerHandle handle, MatrixFloatHandle grad_output, MatrixFloatHandle* grad_input);
+TensorErrorCode layer_sigmoid_backward_double(LayerHandle handle, MatrixDoubleHandle grad_output, MatrixDoubleHandle* grad_input);
+TensorErrorCode layer_sigmoid_destroy(LayerHandle handle);
+
+/* Softmax Layer */
+TensorErrorCode layer_softmax_create_float(LayerHandle* out_handle);
+TensorErrorCode layer_softmax_create_double(LayerHandle* out_handle);
+TensorErrorCode layer_softmax_forward_float(LayerHandle handle, MatrixFloatHandle input, MatrixFloatHandle* output);
+TensorErrorCode layer_softmax_forward_double(LayerHandle handle, MatrixDoubleHandle input, MatrixDoubleHandle* output);
+TensorErrorCode layer_softmax_backward_float(LayerHandle handle, MatrixFloatHandle grad_output, MatrixFloatHandle* grad_input);
+TensorErrorCode layer_softmax_backward_double(LayerHandle handle, MatrixDoubleHandle grad_output, MatrixDoubleHandle* grad_input);
+TensorErrorCode layer_softmax_destroy(LayerHandle handle);
+
+/* Dropout Layer */
+TensorErrorCode layer_dropout_create_float(float p, LayerHandle* out_handle);
+TensorErrorCode layer_dropout_create_double(double p, LayerHandle* out_handle);
+TensorErrorCode layer_dropout_forward_float(LayerHandle handle, MatrixFloatHandle input, MatrixFloatHandle* output);
+TensorErrorCode layer_dropout_forward_double(LayerHandle handle, MatrixDoubleHandle input, MatrixDoubleHandle* output);
+TensorErrorCode layer_dropout_backward_float(LayerHandle handle, MatrixFloatHandle grad_output, MatrixFloatHandle* grad_input);
+TensorErrorCode layer_dropout_backward_double(LayerHandle handle, MatrixDoubleHandle grad_output, MatrixDoubleHandle* grad_input);
+TensorErrorCode layer_dropout_train(LayerHandle handle, bool training);
+TensorErrorCode layer_dropout_destroy(LayerHandle handle);
+
+/* Batch Normalization Layer */
+TensorErrorCode layer_batchnorm_create_float(size_t num_features, float eps, float momentum, LayerHandle* out_handle);
+TensorErrorCode layer_batchnorm_create_double(size_t num_features, double eps, double momentum, LayerHandle* out_handle);
+TensorErrorCode layer_batchnorm_forward_float(LayerHandle handle, MatrixFloatHandle input, MatrixFloatHandle* output);
+TensorErrorCode layer_batchnorm_forward_double(LayerHandle handle, MatrixDoubleHandle input, MatrixDoubleHandle* output);
+TensorErrorCode layer_batchnorm_backward_float(LayerHandle handle, MatrixFloatHandle grad_output, MatrixFloatHandle* grad_input);
+TensorErrorCode layer_batchnorm_backward_double(LayerHandle handle, MatrixDoubleHandle grad_output, MatrixDoubleHandle* grad_input);
+TensorErrorCode layer_batchnorm_train(LayerHandle handle, bool training);
+TensorErrorCode layer_batchnorm_destroy(LayerHandle handle);
+
 #ifdef __cplusplus
 }
 #endif

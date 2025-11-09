@@ -350,6 +350,28 @@ if(BLAS_FOUND)
   target_link_libraries(tensor_io_demo ${BLAS_LIBRARIES})
 endif()
 
+# Neural Network Layers demo executable
+add_executable(
+  nn_layers_demo
+  nn_layers_demo.cc
+  ${GPU_SOURCES}
+)
+
+target_link_libraries(
+  nn_layers_demo
+  Threads::Threads
+)
+
+# Link TBB to nn_layers_demo if found
+if(TBB_FOUND)
+  target_link_libraries(nn_layers_demo TBB::tbb)
+endif()
+
+# Link BLAS to nn_layers_demo if found
+if(BLAS_FOUND)
+  target_link_libraries(nn_layers_demo ${BLAS_LIBRARIES})
+endif()
+
 # Add custom target to run performance tests
 add_custom_target(run_perf
   COMMAND tensor_perf

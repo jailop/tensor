@@ -26,12 +26,12 @@ class BenchmarkResult:
     
     def __str__(self):
         return (f"{self.name:40s} | Size: {self.size:15s} | "
-                f"tensor4d: {self.tensor4d_time*10000:7.2f}±{self.tensor4d_std*10000:5.2f}ms | "
-                f"NumPy: {self.numpy_time*10000:7.2f}±{self.numpy_std*10000:5.2f}ms | "
+                f"tensor4d: {self.tensor4d_time*1000:7.2f}±{self.tensor4d_std*1000:5.2f}ms | "
+                f"NumPy: {self.numpy_time*1000:7.2f}±{self.numpy_std*1000:5.2f}ms | "
                 f"Speedup: {self.speedup:6.2f}x")
 
 
-def timer(func: Callable, iterations: int = 1000) -> Tuple[float, float]:
+def timer(func: Callable, iterations: int = 100) -> Tuple[float, float]:
     """Time a function over multiple iterations and return (mean, stddev)"""
     times = []
     for _ in range(iterations):
@@ -59,7 +59,7 @@ def create_t4d_from_numpy(np_array):
     return t.from_numpy(np_array)
 
 
-def benchmark_creation(shape: Tuple[int, ...], iterations: int = 1000) -> BenchmarkResult:
+def benchmark_creation(shape: Tuple[int, ...], iterations: int = 100) -> BenchmarkResult:
     """Benchmark tensor/array creation"""
     size_str = 'x'.join(map(str, shape))
     
@@ -79,7 +79,7 @@ def benchmark_creation(shape: Tuple[int, ...], iterations: int = 1000) -> Benchm
     return BenchmarkResult("Creation (zeros)", t4d_time, np_time, size_str, t4d_std, np_std)
 
 
-def benchmark_from_numpy(shape: Tuple[int, ...], iterations: int = 1000) -> BenchmarkResult:
+def benchmark_from_numpy(shape: Tuple[int, ...], iterations: int = 100) -> BenchmarkResult:
     """Benchmark conversion from numpy to tensor4d"""
     size_str = 'x'.join(map(str, shape))
     
@@ -95,7 +95,7 @@ def benchmark_from_numpy(shape: Tuple[int, ...], iterations: int = 1000) -> Benc
     return BenchmarkResult("From NumPy conversion", t4d_time, np_time, size_str, t4d_std, np_std)
 
 
-def benchmark_elementwise_add(shape: Tuple[int, ...], iterations: int = 1000) -> BenchmarkResult:
+def benchmark_elementwise_add(shape: Tuple[int, ...], iterations: int = 100) -> BenchmarkResult:
     """Benchmark element-wise addition"""
     size_str = 'x'.join(map(str, shape))
     
@@ -114,7 +114,7 @@ def benchmark_elementwise_add(shape: Tuple[int, ...], iterations: int = 1000) ->
     return BenchmarkResult("Element-wise Add", t4d_time, np_time, size_str, t4d_std, np_std)
 
 
-def benchmark_elementwise_mul(shape: Tuple[int, ...], iterations: int = 1000) -> BenchmarkResult:
+def benchmark_elementwise_mul(shape: Tuple[int, ...], iterations: int = 100) -> BenchmarkResult:
     """Benchmark element-wise multiplication"""
     size_str = 'x'.join(map(str, shape))
     
@@ -133,7 +133,7 @@ def benchmark_elementwise_mul(shape: Tuple[int, ...], iterations: int = 1000) ->
     return BenchmarkResult("Element-wise Mul", t4d_time, np_time, size_str, t4d_std, np_std)
 
 
-def benchmark_matmul(m: int, n: int, k: int, iterations: int = 1000) -> BenchmarkResult:
+def benchmark_matmul(m: int, n: int, k: int, iterations: int = 100) -> BenchmarkResult:
     """Benchmark matrix multiplication (m x n) @ (n x k)"""
     size_str = f"{m}x{n} @ {n}x{k}"
     
@@ -152,7 +152,7 @@ def benchmark_matmul(m: int, n: int, k: int, iterations: int = 1000) -> Benchmar
     return BenchmarkResult("Matrix Multiplication", t4d_time, np_time, size_str, t4d_std, np_std)
 
 
-def benchmark_sum(shape: Tuple[int, ...], iterations: int = 1000) -> BenchmarkResult:
+def benchmark_sum(shape: Tuple[int, ...], iterations: int = 100) -> BenchmarkResult:
     """Benchmark sum reduction"""
     size_str = 'x'.join(map(str, shape))
     
@@ -169,7 +169,7 @@ def benchmark_sum(shape: Tuple[int, ...], iterations: int = 1000) -> BenchmarkRe
     return BenchmarkResult("Sum Reduction", t4d_time, np_time, size_str, t4d_std, np_std)
 
 
-def benchmark_mean(shape: Tuple[int, ...], iterations: int = 1000) -> BenchmarkResult:
+def benchmark_mean(shape: Tuple[int, ...], iterations: int = 100) -> BenchmarkResult:
     """Benchmark mean reduction"""
     size_str = 'x'.join(map(str, shape))
     
@@ -186,7 +186,7 @@ def benchmark_mean(shape: Tuple[int, ...], iterations: int = 1000) -> BenchmarkR
     return BenchmarkResult("Mean Reduction", t4d_time, np_time, size_str, t4d_std, np_std)
 
 
-def benchmark_exp(shape: Tuple[int, ...], iterations: int = 1000) -> BenchmarkResult:
+def benchmark_exp(shape: Tuple[int, ...], iterations: int = 100) -> BenchmarkResult:
     """Benchmark exponential function"""
     size_str = 'x'.join(map(str, shape))
     
@@ -203,7 +203,7 @@ def benchmark_exp(shape: Tuple[int, ...], iterations: int = 1000) -> BenchmarkRe
     return BenchmarkResult("Exponential (exp)", t4d_time, np_time, size_str, t4d_std, np_std)
 
 
-def benchmark_transpose(shape: Tuple[int, int], iterations: int = 1000) -> BenchmarkResult:
+def benchmark_transpose(shape: Tuple[int, int], iterations: int = 100) -> BenchmarkResult:
     """Benchmark matrix transpose"""
     size_str = f"{shape[0]}x{shape[1]}"
     
@@ -221,7 +221,7 @@ def benchmark_transpose(shape: Tuple[int, int], iterations: int = 1000) -> Bench
 
 
 def benchmark_reshape(original_shape: Tuple[int, ...], new_shape: Tuple[int, ...], 
-                      iterations: int = 1000) -> BenchmarkResult:
+                      iterations: int = 100) -> BenchmarkResult:
     """Benchmark reshape operation"""
     size_str = f"{original_shape} -> {new_shape}"
     
@@ -240,16 +240,16 @@ def benchmark_reshape(original_shape: Tuple[int, ...], new_shape: Tuple[int, ...
 
 def print_header():
     """Print benchmark header"""
-    print("\n" + "="*1000)
+    print("\n" + "="*100)
     print(" " * 30 + "tensor4d vs NumPy Benchmark")
-    print("="*1000)
+    print("="*100)
     print()
 
 
 def print_section(title: str):
     """Print section header"""
     print(f"\n{title}")
-    print("-" * 1000)
+    print("-" * 100)
 
 
 def main():
@@ -260,40 +260,40 @@ def main():
     
     # Small vectors/arrays
     print_section("Small Vectors (1D)")
-    results.append(benchmark_creation((10000,)))
-    results.append(benchmark_from_numpy((10000,)))
-    results.append(benchmark_elementwise_add((10000,)))
-    results.append(benchmark_elementwise_mul((10000,)))
-    results.append(benchmark_sum((10000,)))
-    results.append(benchmark_mean((10000,)))
-    results.append(benchmark_exp((10000,)))
+    results.append(benchmark_creation((1000,)))
+    results.append(benchmark_from_numpy((1000,)))
+    results.append(benchmark_elementwise_add((1000,)))
+    results.append(benchmark_elementwise_mul((1000,)))
+    results.append(benchmark_sum((1000,)))
+    results.append(benchmark_mean((1000,)))
+    results.append(benchmark_exp((1000,)))
     
     for result in results[-7:]:
         print(result)
     
     # Medium vectors/arrays
     print_section("Medium Vectors (1D)")
-    results.append(benchmark_creation((1000000,)))
-    results.append(benchmark_from_numpy((1000000,)))
-    results.append(benchmark_elementwise_add((1000000,)))
-    results.append(benchmark_elementwise_mul((1000000,)))
-    results.append(benchmark_sum((1000000,)))
-    results.append(benchmark_mean((1000000,)))
-    results.append(benchmark_exp((1000000,)))
+    results.append(benchmark_creation((100000,)))
+    results.append(benchmark_from_numpy((100000,)))
+    results.append(benchmark_elementwise_add((100000,)))
+    results.append(benchmark_elementwise_mul((100000,)))
+    results.append(benchmark_sum((100000,)))
+    results.append(benchmark_mean((100000,)))
+    results.append(benchmark_exp((100000,)))
     
     for result in results[-7:]:
         print(result)
     
     # Small matrices
     print_section("Small Matrices (2D)")
-    results.append(benchmark_creation((1000, 1000)))
-    results.append(benchmark_from_numpy((1000, 1000)))
-    results.append(benchmark_elementwise_add((1000, 1000)))
-    results.append(benchmark_elementwise_mul((1000, 1000)))
-    results.append(benchmark_sum((1000, 1000)))
-    results.append(benchmark_mean((1000, 1000)))
-    results.append(benchmark_exp((1000, 1000)))
-    results.append(benchmark_transpose((1000, 1000)))
+    results.append(benchmark_creation((100, 100)))
+    results.append(benchmark_from_numpy((100, 100)))
+    results.append(benchmark_elementwise_add((100, 100)))
+    results.append(benchmark_elementwise_mul((100, 100)))
+    results.append(benchmark_sum((100, 100)))
+    results.append(benchmark_mean((100, 100)))
+    results.append(benchmark_exp((100, 100)))
+    results.append(benchmark_transpose((100, 100)))
     
     for result in results[-8:]:
         print(result)
@@ -316,10 +316,10 @@ def main():
     print_section("Matrix Multiplication")
     results.append(benchmark_matmul(64, 64, 64))
     results.append(benchmark_matmul(128, 128, 128))
-    results.append(benchmark_matmul(10006, 256, 256))
+    results.append(benchmark_matmul(1006, 256, 256))
     results.append(benchmark_matmul(512, 512, 512))
-    results.append(benchmark_matmul(1000, 10000, 1000))
-    results.append(benchmark_matmul(10000, 1000, 1000))
+    results.append(benchmark_matmul(100, 1000, 100))
+    results.append(benchmark_matmul(1000, 100, 100))
     
     for result in results[-6:]:
         print(result)
@@ -347,15 +347,15 @@ def main():
     slower_count = sum(1 for r in results if r.speedup < 1.0)
     
     print(f"Total benchmarks: {len(results)}")
-    print(f"tensor4d faster: {faster_count} ({1000*faster_count/len(results):.1f}%)")
-    print(f"NumPy faster: {slower_count} ({1000*slower_count/len(results):.1f}%)")
+    print(f"tensor4d faster: {faster_count} ({100*faster_count/len(results):.1f}%)")
+    print(f"NumPy faster: {slower_count} ({100*slower_count/len(results):.1f}%)")
     print(f"Average speedup: {avg_speedup:.2f}x")
     print(f"Min speedup: {min_speedup:.2f}x")
     print(f"Max speedup: {max_speedup:.2f}x")
     
-    print("\n" + "="*1000)
+    print("\n" + "="*100)
     print("Note: Speedup > 1.0 means tensor4d is faster; < 1.0 means NumPy is faster")
-    print("="*1000 + "\n")
+    print("="*100 + "\n")
 
 
 if __name__ == "__main__":
