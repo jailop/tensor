@@ -464,6 +464,9 @@ TensorErrorCode layer_linear_backward_float(LayerHandle handle, MatrixFloatHandl
 TensorErrorCode layer_linear_backward_double(LayerHandle handle, MatrixDoubleHandle grad_output, MatrixDoubleHandle* grad_input);
 TensorErrorCode layer_linear_get_weights_float(LayerHandle handle, MatrixFloatHandle* weights);
 TensorErrorCode layer_linear_get_bias_float(LayerHandle handle, MatrixFloatHandle* bias);
+TensorErrorCode layer_linear_get_grad_weights_float(LayerHandle handle, MatrixFloatHandle* grad_weights);
+TensorErrorCode layer_linear_get_grad_bias_float(LayerHandle handle, MatrixFloatHandle* grad_bias);
+TensorErrorCode layer_linear_update_weights_float(LayerHandle handle, float learning_rate);
 TensorErrorCode layer_linear_destroy(LayerHandle handle);
 
 /* ReLU Layer */

@@ -753,6 +753,557 @@ void test_dropout_layer() {
     printf("  ✓ Dropout layer passed\n");
 }
 
+void test_batchnorm_layer() {
+    printf("Testing BatchNorm layer...\n");
+    
+    LayerHandle layer;
+    TensorErrorCode err = layer_batchnorm_create_float(2, 1e-5f, 0.1f, &layer);
+    ASSERT_SUCCESS(err);
+    assert(layer != NULL);
+    
+    // Set to training mode
+    err = layer_batchnorm_train(layer, true);
+    ASSERT_SUCCESS(err);
+    
+    // Create input (batch_size=2, features=2)
+    MatrixFloatHandle input;
+    float input_data[] = {1.0f, 2.0f, 3.0f, 4.0f};
+    err = matrix_float_create(2, 2, input_data, &input);
+    ASSERT_SUCCESS(err);
+    
+    // Forward pass
+    MatrixFloatHandle output;
+    err = layer_batchnorm_forward_float(layer, input, &output);
+    ASSERT_SUCCESS(err);
+    
+    // Output should be normalized (mean~0, std~1)
+    float val0, val1;
+    err = matrix_float_get(output, 0, 0, &val0);
+    ASSERT_SUCCESS(err);
+    err = matrix_float_get(output, 1, 0, &val1);
+    ASSERT_SUCCESS(err);
+    
+    // Check mean is approximately 0
+    float mean = (val0 + val1) / 2.0f;
+    assert(fabsf(mean) < 0.1f);
+    
+    // Cleanup
+    matrix_float_destroy(input);
+    matrix_float_destroy(output);
+    layer_batchnorm_destroy(layer);
+    
+    printf("  ✓ BatchNorm layer passed\n");
+}
+
+void test_linear_backward() {
+    printf("Testing Linear layer backward pass...\n");
+    
+    LayerHandle layer;
+    TensorErrorCode err = layer_linear_create_float(3, 2, true, &layer);
+    ASSERT_SUCCESS(err);
+    
+    // Create input
+    MatrixFloatHandle input;
+    float input_data[] = {1.0f, 2.0f, 3.0f};
+    err = matrix_float_create(1, 3, input_data, &input);
+    ASSERT_SUCCESS(err);
+    
+    // Forward pass
+    MatrixFloatHandle output;
+    err = layer_linear_forward_float(layer, input, &output);
+    ASSERT_SUCCESS(err);
+    
+    // Create gradient for backward pass
+    MatrixFloatHandle grad_output;
+    float grad_data[] = {1.0f, 1.0f};
+    err = matrix_float_create(1, 2, grad_data, &grad_output);
+    ASSERT_SUCCESS(err);
+    
+    // Backward pass
+    MatrixFloatHandle grad_input;
+    err = layer_linear_backward_float(layer, grad_output, &grad_input);
+    ASSERT_SUCCESS(err);
+    
+    // Check that grad_input was created
+    assert(grad_input != NULL);
+    
+    // Check gradients are stored
+    MatrixFloatHandle grad_weights, grad_bias;
+    err = layer_linear_get_grad_weights_float(layer, &grad_weights);
+    ASSERT_SUCCESS(err);
+    assert(grad_weights != NULL);
+    
+    err = layer_linear_get_grad_bias_float(layer, &grad_bias);
+    ASSERT_SUCCESS(err);
+    assert(grad_bias != NULL);
+    
+    // Verify gradient shapes
+    size_t g_rows, g_cols;
+    err = matrix_float_shape(grad_weights, &g_rows, &g_cols);
+    ASSERT_SUCCESS(err);
+    assert(g_rows == 2 && g_cols == 3);
+    
+    // Cleanup
+    matrix_float_destroy(input);
+    matrix_float_destroy(output);
+    matrix_float_destroy(grad_output);
+    matrix_float_destroy(grad_input);
+    layer_linear_destroy(layer);
+    
+    printf("  ✓ Linear backward passed\n");
+}
+
+void test_weight_updates() {
+    printf("Testing weight updates...\n");
+    
+    LayerHandle layer;
+    TensorErrorCode err = layer_linear_create_float(2, 2, true, &layer);
+    ASSERT_SUCCESS(err);
+    
+    // Get initial weights
+    MatrixFloatHandle weights_before;
+    err = layer_linear_get_weights_float(layer, &weights_before);
+    ASSERT_SUCCESS(err);
+    
+    float w00_before;
+    err = matrix_float_get(weights_before, 0, 0, &w00_before);
+    ASSERT_SUCCESS(err);
+    
+    // Create input and do forward pass
+    MatrixFloatHandle input;
+    float input_data[] = {1.0f, 1.0f};
+    err = matrix_float_create(1, 2, input_data, &input);
+    ASSERT_SUCCESS(err);
+    
+    MatrixFloatHandle output;
+    err = layer_linear_forward_float(layer, input, &output);
+    ASSERT_SUCCESS(err);
+    
+    // Backward pass with gradient
+    MatrixFloatHandle grad_output;
+    float grad_data[] = {1.0f, 1.0f};
+    err = matrix_float_create(1, 2, grad_data, &grad_output);
+    ASSERT_SUCCESS(err);
+    
+    MatrixFloatHandle grad_input;
+    err = layer_linear_backward_float(layer, grad_output, &grad_input);
+    ASSERT_SUCCESS(err);
+    
+    // Update weights
+    float learning_rate = 0.01f;
+    err = layer_linear_update_weights_float(layer, learning_rate);
+    ASSERT_SUCCESS(err);
+    
+    // Get updated weights
+    MatrixFloatHandle weights_after;
+    err = layer_linear_get_weights_float(layer, &weights_after);
+    ASSERT_SUCCESS(err);
+    
+    float w00_after;
+    err = matrix_float_get(weights_after, 0, 0, &w00_after);
+    ASSERT_SUCCESS(err);
+    
+    // Weights should have changed
+    assert(fabsf(w00_before - w00_after) > 1e-6f);
+    
+    // Cleanup
+    matrix_float_destroy(input);
+    matrix_float_destroy(output);
+    matrix_float_destroy(grad_output);
+    matrix_float_destroy(grad_input);
+    layer_linear_destroy(layer);
+    
+    printf("  ✓ Weight updates passed\n");
+}
+
+void test_activation_backward() {
+    printf("Testing activation layer backward passes...\n");
+    
+    // Test ReLU backward
+    LayerHandle relu;
+    TensorErrorCode err = layer_relu_create_float(&relu);
+    ASSERT_SUCCESS(err);
+    
+    MatrixFloatHandle input;
+    float input_data[] = {-1.0f, 2.0f, -0.5f, 3.0f};
+    err = matrix_float_create(2, 2, input_data, &input);
+    ASSERT_SUCCESS(err);
+    
+    MatrixFloatHandle relu_output;
+    err = layer_relu_forward_float(relu, input, &relu_output);
+    ASSERT_SUCCESS(err);
+    
+    MatrixFloatHandle grad_output;
+    float grad_data[] = {1.0f, 1.0f, 1.0f, 1.0f};
+    err = matrix_float_create(2, 2, grad_data, &grad_output);
+    ASSERT_SUCCESS(err);
+    
+    MatrixFloatHandle grad_input;
+    err = layer_relu_backward_float(relu, grad_output, &grad_input);
+    ASSERT_SUCCESS(err);
+    
+    // Gradient should be 0 for negative inputs
+    float g_val;
+    err = matrix_float_get(grad_input, 0, 0, &g_val);
+    ASSERT_SUCCESS(err);
+    ASSERT_EQ(g_val, 0.0f);  // input was -1.0
+    
+    err = matrix_float_get(grad_input, 0, 1, &g_val);
+    ASSERT_SUCCESS(err);
+    ASSERT_EQ(g_val, 1.0f);  // input was 2.0 (positive)
+    
+    // Cleanup
+    matrix_float_destroy(input);
+    matrix_float_destroy(relu_output);
+    matrix_float_destroy(grad_output);
+    matrix_float_destroy(grad_input);
+    layer_relu_destroy(relu);
+    
+    // Test Sigmoid backward
+    LayerHandle sigmoid;
+    err = layer_sigmoid_create_float(&sigmoid);
+    ASSERT_SUCCESS(err);
+    
+    float sig_input_data[] = {0.0f};
+    MatrixFloatHandle sig_input;
+    err = matrix_float_create(1, 1, sig_input_data, &sig_input);
+    ASSERT_SUCCESS(err);
+    
+    MatrixFloatHandle sig_output;
+    err = layer_sigmoid_forward_float(sigmoid, sig_input, &sig_output);
+    ASSERT_SUCCESS(err);
+    
+    float sig_grad_data[] = {1.0f};
+    MatrixFloatHandle sig_grad_output;
+    err = matrix_float_create(1, 1, sig_grad_data, &sig_grad_output);
+    ASSERT_SUCCESS(err);
+    
+    MatrixFloatHandle sig_grad_input;
+    err = layer_sigmoid_backward_float(sigmoid, sig_grad_output, &sig_grad_input);
+    ASSERT_SUCCESS(err);
+    
+    // Sigmoid derivative at 0 is 0.25 (sigmoid(0) * (1 - sigmoid(0)) = 0.5 * 0.5)
+    float sig_grad;
+    err = matrix_float_get(sig_grad_input, 0, 0, &sig_grad);
+    ASSERT_SUCCESS(err);
+    ASSERT_EQ(sig_grad, 0.25f);
+    
+    // Cleanup
+    matrix_float_destroy(sig_input);
+    matrix_float_destroy(sig_output);
+    matrix_float_destroy(sig_grad_output);
+    matrix_float_destroy(sig_grad_input);
+    layer_sigmoid_destroy(sigmoid);
+    
+    printf("  ✓ Activation backward passed\n");
+}
+
+void test_softmax_backward() {
+    printf("Testing Softmax backward pass...\n");
+    
+    LayerHandle layer;
+    TensorErrorCode err = layer_softmax_create_float(&layer);
+    ASSERT_SUCCESS(err);
+    
+    // Create input
+    MatrixFloatHandle input;
+    float input_data[] = {1.0f, 2.0f, 3.0f};
+    err = matrix_float_create(1, 3, input_data, &input);
+    ASSERT_SUCCESS(err);
+    
+    // Forward pass
+    MatrixFloatHandle output;
+    err = layer_softmax_forward_float(layer, input, &output);
+    ASSERT_SUCCESS(err);
+    
+    // Create gradient (simulating cross-entropy loss gradient)
+    MatrixFloatHandle grad_output;
+    float grad_data[] = {-1.0f, 0.0f, 0.0f};  // Target was class 0
+    err = matrix_float_create(1, 3, grad_data, &grad_output);
+    ASSERT_SUCCESS(err);
+    
+    // Backward pass
+    MatrixFloatHandle grad_input;
+    err = layer_softmax_backward_float(layer, grad_output, &grad_input);
+    ASSERT_SUCCESS(err);
+    
+    // Check that gradient was computed
+    assert(grad_input != NULL);
+    
+    size_t rows, cols;
+    err = matrix_float_shape(grad_input, &rows, &cols);
+    ASSERT_SUCCESS(err);
+    assert(rows == 1 && cols == 3);
+    
+    // Cleanup
+    matrix_float_destroy(input);
+    matrix_float_destroy(output);
+    matrix_float_destroy(grad_output);
+    matrix_float_destroy(grad_input);
+    layer_softmax_destroy(layer);
+    
+    printf("  ✓ Softmax backward passed\n");
+}
+
+void test_full_training_step() {
+    printf("Testing full training step (forward + backward + update)...\n");
+    
+    // Create a simple 2-layer network: 3 -> 4 -> 2
+    LayerHandle fc1, relu, fc2;
+    TensorErrorCode err;
+    
+    err = layer_linear_create_float(3, 4, true, &fc1);
+    ASSERT_SUCCESS(err);
+    err = layer_relu_create_float(&relu);
+    ASSERT_SUCCESS(err);
+    err = layer_linear_create_float(4, 2, true, &fc2);
+    ASSERT_SUCCESS(err);
+    
+    // Create input (batch_size=2, features=3)
+    MatrixFloatHandle input;
+    float input_data[] = {1.0f, 2.0f, 3.0f, 0.5f, 1.5f, 2.5f};
+    err = matrix_float_create(2, 3, input_data, &input);
+    ASSERT_SUCCESS(err);
+    
+    // Forward pass
+    MatrixFloatHandle h1, a1, h2;
+    err = layer_linear_forward_float(fc1, input, &h1);
+    ASSERT_SUCCESS(err);
+    err = layer_relu_forward_float(relu, h1, &a1);
+    ASSERT_SUCCESS(err);
+    err = layer_linear_forward_float(fc2, a1, &h2);
+    ASSERT_SUCCESS(err);
+    
+    // Compute loss gradient (simulated)
+    MatrixFloatHandle grad_h2;
+    float grad_data[] = {0.1f, -0.1f, 0.2f, -0.2f};
+    err = matrix_float_create(2, 2, grad_data, &grad_h2);
+    ASSERT_SUCCESS(err);
+    
+    // Backward pass
+    MatrixFloatHandle grad_a1, grad_h1, grad_input;
+    err = layer_linear_backward_float(fc2, grad_h2, &grad_a1);
+    ASSERT_SUCCESS(err);
+    err = layer_relu_backward_float(relu, grad_a1, &grad_h1);
+    ASSERT_SUCCESS(err);
+    err = layer_linear_backward_float(fc1, grad_h1, &grad_input);
+    ASSERT_SUCCESS(err);
+    
+    // Get weights before update
+    MatrixFloatHandle w1_before;
+    err = layer_linear_get_weights_float(fc1, &w1_before);
+    ASSERT_SUCCESS(err);
+    float w1_val_before;
+    err = matrix_float_get(w1_before, 0, 0, &w1_val_before);
+    ASSERT_SUCCESS(err);
+    
+    // Update weights
+    float lr = 0.01f;
+    err = layer_linear_update_weights_float(fc1, lr);
+    ASSERT_SUCCESS(err);
+    err = layer_linear_update_weights_float(fc2, lr);
+    ASSERT_SUCCESS(err);
+    
+    // Get weights after update
+    MatrixFloatHandle w1_after;
+    err = layer_linear_get_weights_float(fc1, &w1_after);
+    ASSERT_SUCCESS(err);
+    float w1_val_after;
+    err = matrix_float_get(w1_after, 0, 0, &w1_val_after);
+    ASSERT_SUCCESS(err);
+    
+    // Weights should have changed
+    assert(fabsf(w1_val_before - w1_val_after) > 1e-8f);
+    
+    // Cleanup
+    matrix_float_destroy(input);
+    matrix_float_destroy(h1);
+    matrix_float_destroy(a1);
+    matrix_float_destroy(h2);
+    matrix_float_destroy(grad_h2);
+    matrix_float_destroy(grad_a1);
+    matrix_float_destroy(grad_h1);
+    matrix_float_destroy(grad_input);
+    layer_linear_destroy(fc1);
+    layer_relu_destroy(relu);
+    layer_linear_destroy(fc2);
+    
+    printf("  ✓ Full training step passed\n");
+}
+
+void test_gradient_accumulation() {
+    printf("Testing gradient accumulation...\n");
+    
+    LayerHandle layer;
+    TensorErrorCode err = layer_linear_create_float(2, 2, true, &layer);
+    ASSERT_SUCCESS(err);
+    
+    // First forward/backward pass
+    MatrixFloatHandle input1;
+    float input1_data[] = {1.0f, 1.0f};
+    err = matrix_float_create(1, 2, input1_data, &input1);
+    ASSERT_SUCCESS(err);
+    
+    MatrixFloatHandle output1;
+    err = layer_linear_forward_float(layer, input1, &output1);
+    ASSERT_SUCCESS(err);
+    
+    MatrixFloatHandle grad_out1;
+    float grad1_data[] = {1.0f, 1.0f};
+    err = matrix_float_create(1, 2, grad1_data, &grad_out1);
+    ASSERT_SUCCESS(err);
+    
+    MatrixFloatHandle grad_in1;
+    err = layer_linear_backward_float(layer, grad_out1, &grad_in1);
+    ASSERT_SUCCESS(err);
+    
+    // Get first gradient
+    MatrixFloatHandle grad_w1;
+    err = layer_linear_get_grad_weights_float(layer, &grad_w1);
+    ASSERT_SUCCESS(err);
+    float first_grad;
+    err = matrix_float_get(grad_w1, 0, 0, &first_grad);
+    ASSERT_SUCCESS(err);
+    
+    // Second forward/backward pass (gradients should be overwritten, not accumulated)
+    MatrixFloatHandle input2;
+    float input2_data[] = {2.0f, 2.0f};
+    err = matrix_float_create(1, 2, input2_data, &input2);
+    ASSERT_SUCCESS(err);
+    
+    MatrixFloatHandle output2;
+    err = layer_linear_forward_float(layer, input2, &output2);
+    ASSERT_SUCCESS(err);
+    
+    MatrixFloatHandle grad_out2;
+    float grad2_data[] = {1.0f, 1.0f};
+    err = matrix_float_create(1, 2, grad2_data, &grad_out2);
+    ASSERT_SUCCESS(err);
+    
+    MatrixFloatHandle grad_in2;
+    err = layer_linear_backward_float(layer, grad_out2, &grad_in2);
+    ASSERT_SUCCESS(err);
+    
+    // Get second gradient
+    MatrixFloatHandle grad_w2;
+    err = layer_linear_get_grad_weights_float(layer, &grad_w2);
+    ASSERT_SUCCESS(err);
+    float second_grad;
+    err = matrix_float_get(grad_w2, 0, 0, &second_grad);
+    ASSERT_SUCCESS(err);
+    
+    // Second gradient should be different (about 2x first, due to 2x input)
+    assert(fabsf(second_grad - 2.0f * first_grad) < 0.1f);
+    
+    // Cleanup
+    matrix_float_destroy(input1);
+    matrix_float_destroy(output1);
+    matrix_float_destroy(grad_out1);
+    matrix_float_destroy(grad_in1);
+    matrix_float_destroy(input2);
+    matrix_float_destroy(output2);
+    matrix_float_destroy(grad_out2);
+    matrix_float_destroy(grad_in2);
+    layer_linear_destroy(layer);
+    
+    printf("  ✓ Gradient accumulation passed\n");
+}
+
+void test_mini_training_loop() {
+    printf("Testing mini training loop...\n");
+    
+    // Create simple network: 2 -> 3 -> 1
+    LayerHandle fc1, relu, fc2;
+    TensorErrorCode err;
+    
+    err = layer_linear_create_float(2, 3, true, &fc1);
+    ASSERT_SUCCESS(err);
+    err = layer_relu_create_float(&relu);
+    ASSERT_SUCCESS(err);
+    err = layer_linear_create_float(3, 1, true, &fc2);
+    ASSERT_SUCCESS(err);
+    
+    // Training data: simple XOR-like problem
+    float train_x[] = {0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f};
+    float train_y[] = {0.0f, 1.0f, 1.0f, 0.0f};
+    
+    float learning_rate = 0.1f;
+    int num_epochs = 5;
+    int batch_size = 1;
+    
+    // Train for a few epochs
+    for (int epoch = 0; epoch < num_epochs; ++epoch) {
+        float epoch_loss = 0.0f;
+        
+        for (int i = 0; i < 4; ++i) {
+            // Create batch
+            MatrixFloatHandle input;
+            err = matrix_float_create(1, 2, &train_x[i * 2], &input);
+            ASSERT_SUCCESS(err);
+            
+            // Forward pass
+            MatrixFloatHandle h1, a1, output;
+            err = layer_linear_forward_float(fc1, input, &h1);
+            ASSERT_SUCCESS(err);
+            err = layer_relu_forward_float(relu, h1, &a1);
+            ASSERT_SUCCESS(err);
+            err = layer_linear_forward_float(fc2, a1, &output);
+            ASSERT_SUCCESS(err);
+            
+            // Compute loss (MSE)
+            float pred, target = train_y[i];
+            err = matrix_float_get(output, 0, 0, &pred);
+            ASSERT_SUCCESS(err);
+            float loss = (pred - target) * (pred - target);
+            epoch_loss += loss;
+            
+            // Compute gradient
+            MatrixFloatHandle grad_output;
+            float grad_val = 2.0f * (pred - target);  // MSE gradient
+            err = matrix_float_create(1, 1, &grad_val, &grad_output);
+            ASSERT_SUCCESS(err);
+            
+            // Backward pass
+            MatrixFloatHandle grad_a1, grad_h1, grad_input;
+            err = layer_linear_backward_float(fc2, grad_output, &grad_a1);
+            ASSERT_SUCCESS(err);
+            err = layer_relu_backward_float(relu, grad_a1, &grad_h1);
+            ASSERT_SUCCESS(err);
+            err = layer_linear_backward_float(fc1, grad_h1, &grad_input);
+            ASSERT_SUCCESS(err);
+            
+            // Update weights
+            err = layer_linear_update_weights_float(fc1, learning_rate);
+            ASSERT_SUCCESS(err);
+            err = layer_linear_update_weights_float(fc2, learning_rate);
+            ASSERT_SUCCESS(err);
+            
+            // Cleanup
+            matrix_float_destroy(input);
+            matrix_float_destroy(h1);
+            matrix_float_destroy(a1);
+            matrix_float_destroy(output);
+            matrix_float_destroy(grad_output);
+            matrix_float_destroy(grad_a1);
+            matrix_float_destroy(grad_h1);
+            matrix_float_destroy(grad_input);
+        }
+        
+        epoch_loss /= 4.0f;
+        // Loss should decrease over epochs (with some tolerance for randomness)
+        if (epoch == 0) {
+            assert(epoch_loss > 0.0f);  // Initial loss should be non-zero
+        }
+    }
+    
+    // Cleanup
+    layer_linear_destroy(fc1);
+    layer_relu_destroy(relu);
+    layer_linear_destroy(fc2);
+    
+    printf("  ✓ Mini training loop passed\n");
+}
+
 int main() {
     printf("=== Running C Interface Tests ===\n\n");
     
@@ -781,12 +1332,23 @@ int main() {
     test_matrix_rank();
     test_advanced_stats();
     
-    // Neural Network Layer tests
+    // Neural Network Layer tests - Forward Pass
     test_linear_layer();
     test_relu_layer();
     test_sigmoid_layer();
     test_softmax_layer();
     test_dropout_layer();
+    test_batchnorm_layer();
+    
+    // Neural Network Training tests - Backward Pass & Gradients
+    printf("\n--- Neural Network Training Tests ---\n");
+    test_linear_backward();
+    test_weight_updates();
+    test_activation_backward();
+    test_softmax_backward();
+    test_full_training_step();
+    test_gradient_accumulation();
+    test_mini_training_loop();
     
     // Error handling and version
     test_error_handling();

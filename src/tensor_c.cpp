@@ -2640,6 +2640,58 @@ TensorErrorCode layer_linear_get_bias_float(LayerHandle handle, MatrixFloatHandl
     TENSOR_TRY_END
 }
 
+TensorErrorCode layer_linear_get_grad_weights_float(LayerHandle handle, MatrixFloatHandle* grad_weights) {
+    if (!handle || !grad_weights) return TENSOR_ERROR_NULL_POINTER;
+    
+    TENSOR_TRY_BEGIN
+    auto* layer = static_cast<Linear<float>*>(handle);
+    *grad_weights = &(layer->grad_weights());
+    TENSOR_TRY_END
+}
+
+TensorErrorCode layer_linear_get_grad_bias_float(LayerHandle handle, MatrixFloatHandle* grad_bias) {
+    if (!handle || !grad_bias) return TENSOR_ERROR_NULL_POINTER;
+    
+    TENSOR_TRY_BEGIN
+    auto* layer = static_cast<Linear<float>*>(handle);
+    *grad_bias = &(layer->grad_bias());
+    TENSOR_TRY_END
+}
+
+TensorErrorCode layer_linear_update_weights_float(LayerHandle handle, float learning_rate) {
+    if (!handle) return TENSOR_ERROR_NULL_POINTER;
+    
+    TENSOR_TRY_BEGIN
+    auto* layer = static_cast<Linear<float>*>(handle);
+    
+    // Update weights: weights = weights - learning_rate * grad_weights
+    auto& weights = layer->weights();
+    auto& grad_weights = layer->grad_weights();
+    
+    size_t rows, cols;
+    auto w_shape = weights.shape();
+    rows = w_shape[0];
+    cols = w_shape[1];
+    
+    for (size_t i = 0; i < rows; ++i) {
+        for (size_t j = 0; j < cols; ++j) {
+            weights[{i, j}] -= learning_rate * grad_weights[{i, j}];
+        }
+    }
+    
+    // Update bias: bias = bias - learning_rate * grad_bias
+    auto& bias = layer->bias();
+    auto& grad_bias = layer->grad_bias();
+    auto b_shape = bias.shape();
+    size_t bias_cols = b_shape[1];
+    
+    for (size_t j = 0; j < bias_cols; ++j) {
+        bias[{0, j}] -= learning_rate * grad_bias[{0, j}];
+    }
+    
+    TENSOR_TRY_END
+}
+
 TensorErrorCode layer_linear_destroy(LayerHandle handle) {
     if (!handle) return TENSOR_ERROR_NULL_POINTER;
     

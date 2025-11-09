@@ -349,8 +349,78 @@ int main(int argc, char* argv[]) {
             epoch_loss += loss;
             epoch_accuracy += acc;
             
-            /* TODO: Backward pass and weight updates would go here */
-            /* This requires exposing gradient access in C API */
+            /* Backward pass - compute gradients */
+            /* Gradient of loss w.r.t. predictions (for cross-entropy + softmax) */
+            MatrixFloatHandle grad_predictions;
+            matrix_float_copy(predictions, &grad_predictions);
+            
+            /* For cross-entropy loss with softmax: grad = (predictions - targets) / batch_size */
+            size_t rows, cols;
+            matrix_float_shape(grad_predictions, &rows, &cols);
+            for (size_t i = 0; i < rows; ++i) {
+                for (size_t j = 0; j < cols; ++j) {
+                    float pred, target;
+                    matrix_float_get(grad_predictions, i, j, &pred);
+                    matrix_float_get(batch_targets, i, j, &target);
+                    /* Use actual batch size (rows), not BATCH_SIZE constant */
+                    matrix_float_set(grad_predictions, i, j, (pred - target) / (float)rows);
+                }
+            }
+            
+            /* Backpropagate through network */
+            /* Pass gradient through softmax backward */
+            MatrixFloatHandle grad_h4, grad_a3, grad_h3, grad_a2, grad_h2, grad_a1, grad_h1, grad_input;
+            
+            layer_softmax_backward_float(softmax, grad_predictions, &grad_h4);
+            layer_linear_backward_float(fc4, grad_h4, &grad_a3);
+            layer_relu_backward_float(relu3, grad_a3, &grad_h3);
+            layer_linear_backward_float(fc3, grad_h3, &grad_a2);
+            layer_relu_backward_float(relu2, grad_a2, &grad_h2);
+            layer_linear_backward_float(fc2, grad_h2, &grad_a1);
+            layer_relu_backward_float(relu1, grad_a1, &grad_h1);
+            layer_linear_backward_float(fc1, grad_h1, &grad_input);
+            
+            /* Update weights using gradient descent */
+            layer_linear_update_weights_float(fc1, LEARNING_RATE);
+            layer_linear_update_weights_float(fc2, LEARNING_RATE);
+            layer_linear_update_weights_float(fc3, LEARNING_RATE);
+            layer_linear_update_weights_float(fc4, LEARNING_RATE);
+            
+            /* Debug: Check first batch to verify learning */
+            if (epoch == 0 && batch == 0) {
+                printf("\n=== DEBUG: First Batch Analysis ===\n");
+                printf("Loss: %.6f, Accuracy: %.2f%%\n", loss, acc * 100);
+                
+                /* Check gradient magnitude */
+                MatrixFloatHandle grad_w;
+                layer_linear_get_grad_weights_float(fc4, &grad_w);
+                size_t g_rows, g_cols;
+                matrix_float_shape(grad_w, &g_rows, &g_cols);
+                float grad_sum = 0.0f, grad_max = 0.0f;
+                for (size_t i = 0; i < g_rows; ++i) {
+                    for (size_t j = 0; j < g_cols; ++j) {
+                        float g;
+                        matrix_float_get(grad_w, i, j, &g);
+                        grad_sum += fabsf(g);
+                        if (fabsf(g) > grad_max) grad_max = fabsf(g);
+                    }
+                }
+                printf("FC4 gradient: sum=%.6f, max=%.6f, avg=%.8f\n", 
+                       grad_sum, grad_max, grad_sum / (g_rows * g_cols));
+                
+                /* Check predictions stats */
+                float pred_sum = 0.0f;
+                for (size_t i = 0; i < rows; ++i) {
+                    for (size_t j = 0; j < cols; ++j) {
+                        float p;
+                        matrix_float_get(predictions, i, j, &p);
+                        pred_sum += p;
+                    }
+                }
+                printf("Predictions: avg=%.6f (should be ~0.1 for 10 classes)\n", 
+                       pred_sum / (rows * cols));
+                printf("=====================================\n\n");
+            }
             
             /* Clean up temporary tensors */
             matrix_float_destroy(batch_input);
@@ -363,6 +433,15 @@ int main(int argc, char* argv[]) {
             matrix_float_destroy(a3);
             matrix_float_destroy(h4);
             matrix_float_destroy(predictions);
+            matrix_float_destroy(grad_predictions);
+            matrix_float_destroy(grad_h4);
+            matrix_float_destroy(grad_a3);
+            matrix_float_destroy(grad_h3);
+            matrix_float_destroy(grad_a2);
+            matrix_float_destroy(grad_h2);
+            matrix_float_destroy(grad_a1);
+            matrix_float_destroy(grad_h1);
+            matrix_float_destroy(grad_input);
             
             /* Print progress every 100 batches */
             if ((batch + 1) % 100 == 0) {
@@ -475,9 +554,13 @@ int main(int argc, char* argv[]) {
     
     matrix_float_destroy(sample_input);
     
-    printf("\n=== Demo completed successfully ===\n");
-    printf("\nNote: Full training with weight updates requires gradient access in C API\n");
-    printf("This demo shows forward passes with automatic GPU acceleration.\n");
+    printf("\n=== Training and Evaluation Completed Successfully ===\n");
+    printf("\nThis demo demonstrates:\n");
+    printf("- Full neural network training with backpropagation\n");
+    printf("- Automatic gradient computation\n");
+    printf("- Weight updates using gradient descent\n");
+    printf("- GPU acceleration (when available)\n");
+    printf("- Forward and backward passes through multiple layers\n");
     
 cleanup:
     /* Clean up layers */
