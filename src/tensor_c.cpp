@@ -2485,18 +2485,65 @@ TensorErrorCode matrix_double_reshape(MatrixDoubleHandle handle, size_t new_rows
     TENSOR_TRY_END
 }
 
-TensorErrorCode tensor_c_set_device(TensorDevice device) {
-    // Device management would be implemented here
-    // For now, just accept the parameter
-    return TENSOR_SUCCESS;
+bool tensor_c_is_gpu_available(void) {
+#ifdef USE_GPU
+    return is_gpu_available();
+#else
+    return false;
+#endif
 }
 
-TensorErrorCode tensor_c_get_device(TensorDevice* out_device) {
-    if (!out_device) return TENSOR_ERROR_NULL_POINTER;
+TensorErrorCode matrix_float_get_backend(MatrixFloatHandle handle, TensorBackend* out_backend) {
+    if (!handle || !out_backend) return TENSOR_ERROR_NULL_POINTER;
     
-    // Return default CPU device for now
-    *out_device = TENSOR_DEVICE_CPU;
+    TENSOR_TRY_BEGIN
+    auto* mat = static_cast<Matrixf*>(handle);
+    Backend backend = mat->backend();
+    
+    switch(backend) {
+        case Backend::CPU:
+            *out_backend = TENSOR_BACKEND_CPU;
+            break;
+        case Backend::BLAS:
+            *out_backend = TENSOR_BACKEND_BLAS;
+            break;
+        case Backend::GPU:
+            *out_backend = TENSOR_BACKEND_GPU;
+            break;
+    }
     return TENSOR_SUCCESS;
+    TENSOR_TRY_END
+}
+
+TensorErrorCode matrix_double_get_backend(MatrixDoubleHandle handle, TensorBackend* out_backend) {
+    if (!handle || !out_backend) return TENSOR_ERROR_NULL_POINTER;
+    
+    TENSOR_TRY_BEGIN
+    auto* mat = static_cast<Matrixd*>(handle);
+    Backend backend = mat->backend();
+    
+    switch(backend) {
+        case Backend::CPU:
+            *out_backend = TENSOR_BACKEND_CPU;
+            break;
+        case Backend::BLAS:
+            *out_backend = TENSOR_BACKEND_BLAS;
+            break;
+        case Backend::GPU:
+            *out_backend = TENSOR_BACKEND_GPU;
+            break;
+    }
+    return TENSOR_SUCCESS;
+    TENSOR_TRY_END
+}
+
+const char* tensor_c_backend_name(TensorBackend backend) {
+    switch(backend) {
+        case TENSOR_BACKEND_CPU: return "CPU";
+        case TENSOR_BACKEND_BLAS: return "BLAS";
+        case TENSOR_BACKEND_GPU: return "GPU";
+        default: return "Unknown";
+    }
 }
 
 const char* tensor_c_version(void) {

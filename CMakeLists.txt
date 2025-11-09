@@ -372,6 +372,28 @@ if(BLAS_FOUND)
   target_link_libraries(nn_layers_demo ${BLAS_LIBRARIES})
 endif()
 
+# MNIST demo executable
+add_executable(
+  mnist_demo
+  mnist_demo.cc
+  ${GPU_SOURCES}
+)
+
+target_link_libraries(
+  mnist_demo
+  Threads::Threads
+)
+
+# Link TBB to mnist_demo if found
+if(TBB_FOUND)
+  target_link_libraries(mnist_demo TBB::tbb)
+endif()
+
+# Link BLAS to mnist_demo if found
+if(BLAS_FOUND)
+  target_link_libraries(mnist_demo ${BLAS_LIBRARIES})
+endif()
+
 # Add custom target to run performance tests
 add_custom_target(run_perf
   COMMAND tensor_perf

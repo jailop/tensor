@@ -15,7 +15,7 @@ This guide is organized into 18 sections, each focusing on a specific aspect of 
 | [04](04-mathematical-operations.md) | **Mathematical Operations** | Element-wise functions, reductions, statistics |
 | [05](05-linear-algebra.md) | **Linear Algebra** | Matrix operations, decompositions, specialized types |
 | [06](06-autograd.md) | **Automatic Differentiation** | Gradient tracking, computational graphs |
-| [07](07-machine-learning.md) | **Machine Learning Features** | Loss functions, optimizers, training |
+| [07](07-machine-learning.md) | **Machine Learning Features** | Neural network layers, loss functions, optimizers |
 | [08](08-advanced-indexing.md) | **Advanced Indexing** | Fancy indexing, boolean masks, conditionals |
 | [09](09-io-operations.md) | **I/O Operations** | Save/load, NumPy interop, printing |
 | [10](10-performance-optimization.md) | **Performance Optimization** | GPU, BLAS, memory pooling, multi-threading |
@@ -136,10 +136,13 @@ for (int epoch = 0; epoch < 10; epoch++) {
 ✅ Lazy evaluation  
 
 ### Machine Learning
-✅ Loss functions (MSE, Cross Entropy, etc.)  
+✅ Neural network layers (Linear, ReLU, Sigmoid, Tanh, Softmax)  
+✅ Regularization (Dropout, Batch Normalization)  
+✅ Loss functions (MSE, Cross Entropy, BCE, L1, Smooth L1)  
 ✅ Optimizers (SGD, Adam, AdamW, RMSprop)  
 ✅ Activation functions  
 ✅ Gradient tracking and backpropagation  
+✅ Complete training workflows (see MNIST example)  
 
 ### Linear Algebra
 ✅ Matrix multiplication, decompositions  
@@ -165,10 +168,10 @@ for (int epoch = 0; epoch < 10; epoch++) {
 
 ## Version Information
 
-- **Current Version**: 1.4.2
+- **Current Version**: 1.5.0
 - **Status**: Production Ready
-- **Test Coverage**: 411 tests, 100% passing
-- **Lines of Code**: ~20,000+
+- **Test Coverage**: 468 tests, 100% passing
+- **Lines of Code**: ~12,600+
 - **Python Bindings**: Available (pybind11)
 
 ## Contributing

@@ -37,9 +37,10 @@
    - Custom operations
 
 7. [Machine Learning Features](07-machine-learning.md)
-   - Loss functions
+   - Neural network layers (Linear, ReLU, Dropout, BatchNorm, Softmax)
+   - Loss functions (MSE, Cross Entropy, BCE, L1, Smooth L1)
    - Optimizers (SGD, Adam, AdamW, RMSprop)
-   - Training workflows
+   - Complete MNIST training example
 
 8. [Advanced Indexing and Slicing](08-advanced-indexing.md)
    - Fancy indexing (take/put)
@@ -120,9 +121,10 @@ This is a modern C++ tensor library designed for machine learning and scientific
 
 ## Version Information
 
-- **Current Version**: 1.4.2
+- **Current Version**: 1.5.0
 - **Status**: Production Ready
-- **Test Coverage**: 411 tests, 100% passing
+- **Test Coverage**: 468 tests, 100% passing
+- **Lines of Code**: ~12,600+
 - **Python Bindings**: Available via pybind11
 
 ## Quick Links

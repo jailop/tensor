@@ -84,6 +84,14 @@
 - `SGD`, `Adam`, `AdamW`, `RMSprop`
 - `step()`, `zero_grad()`
 
+### Neural Network Layers
+- **Base**: `Layer<T>` - Base class with forward/backward/parameters
+- **Linear**: `Linear<T>` - Fully connected layer (Dense)
+- **Activations**: `ReLU<T>`, `Sigmoid<T>`, `Tanh<T>`, `Softmax<T>`
+- **Regularization**: `Dropout<T>`, `BatchNorm1d<T>`
+- **Type Aliases**: `Linearf`, `ReLUf`, `Sigmoidf`, `Tanhf`, `Dropoutf`, `BatchNorm1df`, `Softmaxf`
+- **Methods**: `forward()`, `backward()`, `parameters()`, `train(bool)`
+
 ## Type Aliases
 
 ```cpp

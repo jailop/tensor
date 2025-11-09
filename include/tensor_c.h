@@ -8,6 +8,37 @@ extern "C" {
 #include <stddef.h>
 #include <stdbool.h>
 
+/**
+ * @file tensor_c.h
+ * @brief C API for the tensor4d library
+ * 
+ * This API provides C bindings for the tensor4d C++ library, enabling
+ * usage from C, Python (via ctypes/CFFI), and other languages.
+ * 
+ * @section backend Backend Selection
+ * The library automatically selects the best available backend:
+ * 1. **GPU (CUDA)**: Used automatically if compiled with USE_GPU and GPU is available
+ * 2. **BLAS**: Used if GPU unavailable but compiled with USE_BLAS
+ * 3. **CPU**: Fallback when neither is available
+ * 
+ * No manual backend selection is needed - tensors automatically use GPU when available.
+ * 
+ * @section usage Example Usage
+ * @code
+ * // Create a matrix
+ * MatrixFloatHandle mat;
+ * matrix_float_zeros(10, 10, &mat);
+ * 
+ * // Operations automatically use GPU if available
+ * MatrixFloatHandle result;
+ * matrix_float_add(mat, mat, &result);
+ * 
+ * // Clean up
+ * matrix_float_destroy(mat);
+ * matrix_float_destroy(result);
+ * @endcode
+ */
+
 /* Opaque handle types */
 typedef void* TensorFloatHandle;
 typedef void* TensorDoubleHandle;
@@ -29,11 +60,12 @@ typedef enum {
     TENSOR_ERROR_FILE_IO = 7
 } TensorErrorCode;
 
-/* Device types */
+/* Backend types (read-only information) */
 typedef enum {
-    TENSOR_DEVICE_CPU = 0,
-    TENSOR_DEVICE_GPU = 1
-} TensorDevice;
+    TENSOR_BACKEND_CPU = 0,
+    TENSOR_BACKEND_BLAS = 1,
+    TENSOR_BACKEND_GPU = 2
+} TensorBackend;
 
 /* ===== Vector Operations ===== */
 
@@ -371,16 +403,59 @@ const char* tensor_c_version(void);
 /* Get last error message (thread-local) */
 const char* tensor_c_last_error(void);
 
-/* Device management */
-TensorErrorCode tensor_c_set_device(TensorDevice device);
-TensorErrorCode tensor_c_get_device(TensorDevice* out_device);
+/* Backend information (read-only) */
+/**
+ * @brief Check if GPU is available
+ * @return true if GPU is available and will be used, false otherwise
+ */
+bool tensor_c_is_gpu_available(void);
+
+/**
+ * @brief Get the backend being used by a matrix
+ * @param handle Matrix handle
+ * @param out_backend Pointer to store the backend type
+ * @return Error code
+ * 
+ * Note: This is informational only. Backend selection is automatic.
+ */
+TensorErrorCode matrix_float_get_backend(MatrixFloatHandle handle, TensorBackend* out_backend);
+TensorErrorCode matrix_double_get_backend(MatrixDoubleHandle handle, TensorBackend* out_backend);
+
+/**
+ * @brief Get backend name as string
+ * @param backend Backend type
+ * @return String name of the backend ("CPU", "BLAS", or "GPU")
+ */
+const char* tensor_c_backend_name(TensorBackend backend);
 
 /* ===== Neural Network Layers ===== */
+
+/**
+ * @section nn_layers Neural Network Layers
+ * 
+ * All neural network layers automatically use GPU when available.
+ * No manual device selection is needed.
+ * 
+ * The layers support:
+ * - Automatic GPU acceleration
+ * - Fallback to BLAS or CPU when GPU unavailable
+ * - Gradient computation for backpropagation
+ */
 
 /* Layer handles */
 typedef void* LayerHandle;
 
 /* Linear (Dense) Layer */
+/**
+ * @brief Create a linear (fully connected) layer
+ * @param in_features Number of input features
+ * @param out_features Number of output features
+ * @param use_bias Whether to use bias term
+ * @param out_handle Pointer to store the created layer handle
+ * @return Error code
+ * 
+ * Note: Automatically uses GPU if available, otherwise falls back to BLAS or CPU.
+ */
 TensorErrorCode layer_linear_create_float(size_t in_features, size_t out_features, bool use_bias, LayerHandle* out_handle);
 TensorErrorCode layer_linear_create_double(size_t in_features, size_t out_features, bool use_bias, LayerHandle* out_handle);
 TensorErrorCode layer_linear_forward_float(LayerHandle handle, MatrixFloatHandle input, MatrixFloatHandle* output);

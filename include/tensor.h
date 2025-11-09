@@ -363,6 +363,11 @@ template <typename T, size_t N, size_t M>
 auto broadcast_to(const Tensor<T, N>& tensor, const TensorIndices<M>& target_shape)
     -> std::variant<Tensor<T, M>, TensorError>;
 
+template <size_t N1, size_t N2>
+bool are_broadcastable(const TensorIndices<N1>& shape1,
+                       const TensorIndices<N2>& shape2,
+                       std::string* error_msg);
+
 // Forward declarations for view functions
 template <typename T>
 Tensor<T, 1> row(const Tensor<T, 2>& matrix, size_t row_idx);
@@ -865,24 +870,115 @@ public:
      * @endcode
      */
     TensorResult<Tensor<T, N>> operator+(const Tensor<T, N>& other) const {
-        if (dims_ != other.dims_) {
+        // Check if shapes match exactly
+        if (dims_ == other.dims_) {
+            // Fast path: exact shape match
+            bool track_grad = requires_grad_ || other.requires_grad_;
+            Tensor<T, N> result(dims_, use_gpu_, track_grad);
+            result.is_leaf_ = false;
+            size_t total = total_size();
+            
+#ifdef USE_GPU
+            if (use_gpu_ && other.use_gpu_) {
+                TensorGPU::add_gpu(data_.get(), other.data_.get(), result.data_.get(), total);
+            } else
+#endif
+            {
+                for (size_t i = 0; i < total; ++i) {
+                    result.data_[i] = data_[i] + other.data_[i];
+                }
+            }
+            
+            // Setup backward pass (existing code continues below)
+            if (track_grad) {
+                Tensor<T, N>* self_ptr = const_cast<Tensor<T, N>*>(this);
+                Tensor<T, N>* other_ptr = const_cast<Tensor<T, N>*>(&other);
+                
+                result.register_backward([self_ptr, other_ptr](const Tensor<T, N>& grad) {
+                    if (self_ptr->requires_grad_) {
+                        if (!self_ptr->grad_) {
+                            self_ptr->grad_ = std::make_unique<Tensor<T, N>>(self_ptr->dims_, self_ptr->use_gpu_, false);
+                            self_ptr->grad_->fill(T(0));
+                        }
+                        size_t total = self_ptr->total_size();
+                        for (size_t i = 0; i < total; ++i) {
+                            self_ptr->grad_->data_[i] += grad.data_[i];
+                        }
+                        
+                        if (!self_ptr->is_leaf_ && !self_ptr->backward_funcs_.empty()) {
+                            for (auto& func : self_ptr->backward_funcs_) {
+                                func(*self_ptr->grad_);
+                            }
+                        }
+                    }
+                    
+                    if (other_ptr->requires_grad_) {
+                        if (!other_ptr->grad_) {
+                            other_ptr->grad_ = std::make_unique<Tensor<T, N>>(other_ptr->dims_, other_ptr->use_gpu_, false);
+                            other_ptr->grad_->fill(T(0));
+                        }
+                        size_t total = other_ptr->total_size();
+                        for (size_t i = 0; i < total; ++i) {
+                            other_ptr->grad_->data_[i] += grad.data_[i];
+                        }
+                        
+                        if (!other_ptr->is_leaf_ && !other_ptr->backward_funcs_.empty()) {
+                            for (auto& func : other_ptr->backward_funcs_) {
+                                func(*other_ptr->grad_);
+                            }
+                        }
+                    }
+                });
+            }
+            
+            return result;
+        }
+        
+        // Try broadcasting
+        std::string error_msg;
+        if (!are_broadcastable(dims_, other.dims_, &error_msg)) {
             return TensorError::DimensionMismatch;
         }
         
-        bool track_grad = requires_grad_ || other.requires_grad_;
-        Tensor<T, N> result(dims_, use_gpu_, track_grad);
-        result.is_leaf_ = false;
-        size_t total = total_size();
+        // Determine broadcast shape
+        TensorIndices<N> broadcast_shape = dims_;
+        for (size_t i = 0; i < N; ++i) {
+            broadcast_shape[i] = std::max(dims_[i], other.dims_[i]);
+        }
         
-#ifdef USE_GPU
-        if (use_gpu_ && other.use_gpu_) {
-            TensorGPU::add_gpu(data_.get(), other.data_.get(), result.data_.get(), total);
-        } else
-#endif
-        {
-            for (size_t i = 0; i < total; ++i) {
-                result.data_[i] = data_[i] + other.data_[i];
+        // Create result with broadcast shape
+        bool track_grad = requires_grad_ || other.requires_grad_;
+        Tensor<T, N> result(broadcast_shape, use_gpu_, track_grad);
+        result.is_leaf_ = false;
+        
+        // Perform broadcasted addition
+        size_t total = result.total_size();
+        for (size_t i = 0; i < total; ++i) {
+            TensorIndices<N> coords;
+            size_t idx = i;
+            for (size_t d = N; d > 0; --d) {
+                coords[d - 1] = idx % broadcast_shape[d - 1];
+                idx /= broadcast_shape[d - 1];
             }
+            
+            // Map to source indices
+            size_t self_idx = 0, other_idx = 0;
+            size_t self_stride = 1, other_stride = 1;
+            for (size_t d = N; d > 0; --d) {
+                size_t dim = d - 1;
+                size_t self_coord = (dims_[dim] == 1) ? 0 : coords[dim];
+                size_t other_coord = (other.dims_[dim] == 1) ? 0 : coords[dim];
+                
+                if (dim + 1 < N) {
+                    self_stride *= dims_[dim + 1];
+                    other_stride *= other.dims_[dim + 1];
+                }
+                
+                self_idx += self_coord * self_stride;
+                other_idx += other_coord * other_stride;
+            }
+            
+            result.data_[i] = data_[self_idx] + other.data_[other_idx];
         }
         
         // Setup backward pass
@@ -1037,22 +1133,67 @@ public:
      * @return A variant containing either a new tensor with the result or an error.
      */
     TensorResult<Tensor<T, N>> operator-(const Tensor<T, N>& other) const {
-        if (dims_ != other.dims_) {
+        // Check if shapes match exactly
+        if (dims_ == other.dims_) {
+            // Fast path: exact shape match
+            Tensor<T, N> result(dims_, use_gpu_);
+            size_t total = total_size();
+            
+#ifdef USE_GPU
+            if (use_gpu_ && other.use_gpu_) {
+                TensorGPU::sub_gpu(data_.get(), other.data_.get(), result.data_.get(), total);
+            } else
+#endif
+            {
+                for (size_t i = 0; i < total; ++i) {
+                    result.data_[i] = data_[i] - other.data_[i];
+                }
+            }
+            
+            return result;
+        }
+        
+        // Try broadcasting
+        std::string error_msg;
+        if (!are_broadcastable(dims_, other.dims_, &error_msg)) {
             return TensorError::DimensionMismatch;
         }
         
-        Tensor<T, N> result(dims_, use_gpu_);
-        size_t total = total_size();
+        // Determine broadcast shape
+        TensorIndices<N> broadcast_shape = dims_;
+        for (size_t i = 0; i < N; ++i) {
+            broadcast_shape[i] = std::max(dims_[i], other.dims_[i]);
+        }
         
-#ifdef USE_GPU
-        if (use_gpu_ && other.use_gpu_) {
-            TensorGPU::sub_gpu(data_.get(), other.data_.get(), result.data_.get(), total);
-        } else
-#endif
-        {
-            for (size_t i = 0; i < total; ++i) {
-                result.data_[i] = data_[i] - other.data_[i];
+        Tensor<T, N> result(broadcast_shape, use_gpu_);
+        size_t total = result.total_size();
+        
+        // Perform broadcasted subtraction
+        for (size_t i = 0; i < total; ++i) {
+            TensorIndices<N> coords;
+            size_t idx = i;
+            for (size_t d = N; d > 0; --d) {
+                coords[d - 1] = idx % broadcast_shape[d - 1];
+                idx /= broadcast_shape[d - 1];
             }
+            
+            size_t self_idx = 0, other_idx = 0;
+            size_t self_stride = 1, other_stride = 1;
+            for (size_t d = N; d > 0; --d) {
+                size_t dim = d - 1;
+                size_t self_coord = (dims_[dim] == 1) ? 0 : coords[dim];
+                size_t other_coord = (other.dims_[dim] == 1) ? 0 : coords[dim];
+                
+                if (dim + 1 < N) {
+                    self_stride *= dims_[dim + 1];
+                    other_stride *= other.dims_[dim + 1];
+                }
+                
+                self_idx += self_coord * self_stride;
+                other_idx += other_coord * other_stride;
+            }
+            
+            result.data_[i] = data_[self_idx] - other.data_[other_idx];
         }
         
         return result;
@@ -1134,72 +1275,115 @@ public:
      * @return A variant containing either a new tensor with the result or an error.
      */
     TensorResult<Tensor<T, N>> operator*(const Tensor<T, N>& other) const {
-        if (dims_ != other.dims_) {
+        // Check if shapes match exactly
+        if (dims_ == other.dims_) {
+            // Fast path: exact shape match  
+            bool track_grad = requires_grad_ || other.requires_grad_;
+            Tensor<T, N> result(dims_, use_gpu_, track_grad);
+            result.is_leaf_ = false;
+            size_t total = total_size();
+            
+#ifdef USE_GPU
+            if (use_gpu_ && other.use_gpu_) {
+                TensorGPU::mul_gpu(data_.get(), other.data_.get(), result.data_.get(), total);
+            } else
+#endif
+            {
+                for (size_t i = 0; i < total; ++i) {
+                    result.data_[i] = data_[i] * other.data_[i];
+                }
+            }
+            
+            // Setup backward pass (existing code continues)
+            if (track_grad) {
+                Tensor<T, N> self_copy = this->detach();
+                Tensor<T, N> other_copy = other.detach();
+                Tensor<T, N>* self_ptr = const_cast<Tensor<T, N>*>(this);
+                Tensor<T, N>* other_ptr = const_cast<Tensor<T, N>*>(&other);
+                
+                result.register_backward([self_ptr, other_ptr, self_copy, other_copy](const Tensor<T, N>& grad) {
+                    if (self_ptr->requires_grad_) {
+                        if (!self_ptr->grad_) {
+                            self_ptr->grad_ = std::make_unique<Tensor<T, N>>(self_ptr->dims_, self_ptr->use_gpu_, false);
+                            self_ptr->grad_->fill(T(0));
+                        }
+                        size_t total = self_ptr->total_size();
+                        for (size_t i = 0; i < total; ++i) {
+                            self_ptr->grad_->data_[i] += grad.data_[i] * other_copy.data_[i];
+                        }
+                        
+                        if (!self_ptr->is_leaf_ && !self_ptr->backward_funcs_.empty()) {
+                            for (auto& func : self_ptr->backward_funcs_) {
+                                func(*self_ptr->grad_);
+                            }
+                        }
+                    }
+                    
+                    if (other_ptr->requires_grad_) {
+                        if (!other_ptr->grad_) {
+                            other_ptr->grad_ = std::make_unique<Tensor<T, N>>(other_ptr->dims_, other_ptr->use_gpu_, false);
+                            other_ptr->grad_->fill(T(0));
+                        }
+                        size_t total = other_ptr->total_size();
+                        for (size_t i = 0; i < total; ++i) {
+                            other_ptr->grad_->data_[i] += grad.data_[i] * self_copy.data_[i];
+                        }
+                        
+                        if (!other_ptr->is_leaf_ && !other_ptr->backward_funcs_.empty()) {
+                            for (auto& func : other_ptr->backward_funcs_) {
+                                func(*other_ptr->grad_);
+                            }
+                        }
+                    }
+                });
+            }
+            
+            return result;
+        }
+        
+        // Try broadcasting
+        std::string error_msg;
+        if (!are_broadcastable(dims_, other.dims_, &error_msg)) {
             return TensorError::DimensionMismatch;
         }
         
-        bool track_grad = requires_grad_ || other.requires_grad_;
-        Tensor<T, N> result(dims_, use_gpu_, track_grad);
-        result.is_leaf_ = false;
-        size_t total = total_size();
-        
-#ifdef USE_GPU
-        if (use_gpu_ && other.use_gpu_) {
-            TensorGPU::mul_gpu(data_.get(), other.data_.get(), result.data_.get(), total);
-        } else
-#endif
-        {
-            for (size_t i = 0; i < total; ++i) {
-                result.data_[i] = data_[i] * other.data_[i];
-            }
+        // Determine broadcast shape
+        TensorIndices<N> broadcast_shape = dims_;
+        for (size_t i = 0; i < N; ++i) {
+            broadcast_shape[i] = std::max(dims_[i], other.dims_[i]);
         }
         
-        // Setup backward pass
-        if (track_grad) {
-            // Need to store copies of input data for gradient computation
-            Tensor<T, N> self_copy = this->detach();
-            Tensor<T, N> other_copy = other.detach();
-            Tensor<T, N>* self_ptr = const_cast<Tensor<T, N>*>(this);
-            Tensor<T, N>* other_ptr = const_cast<Tensor<T, N>*>(&other);
+        bool track_grad = requires_grad_ || other.requires_grad_;
+        Tensor<T, N> result(broadcast_shape, use_gpu_, track_grad);
+        result.is_leaf_ = false;
+        size_t total = result.total_size();
+        
+        // Perform broadcasted multiplication
+        for (size_t i = 0; i < total; ++i) {
+            TensorIndices<N> coords;
+            size_t idx = i;
+            for (size_t d = N; d > 0; --d) {
+                coords[d - 1] = idx % broadcast_shape[d - 1];
+                idx /= broadcast_shape[d - 1];
+            }
             
-            result.register_backward([self_ptr, other_ptr, self_copy, other_copy](const Tensor<T, N>& grad) {
-                // Gradient of multiplication: d/dx(x*y) = y, d/dy(x*y) = x
-                if (self_ptr->requires_grad_) {
-                    if (!self_ptr->grad_) {
-                        self_ptr->grad_ = std::make_unique<Tensor<T, N>>(self_ptr->dims_, self_ptr->use_gpu_, false);
-                        self_ptr->grad_->fill(T(0));
-                    }
-                    size_t total = self_ptr->total_size();
-                    for (size_t i = 0; i < total; ++i) {
-                        self_ptr->grad_->data_[i] += grad.data_[i] * other_copy.data_[i];
-                    }
-                    
-                    // If self is not a leaf, propagate gradients further
-                    if (!self_ptr->is_leaf_ && !self_ptr->backward_funcs_.empty()) {
-                        for (auto& func : self_ptr->backward_funcs_) {
-                            func(*self_ptr->grad_);
-                        }
-                    }
+            size_t self_idx = 0, other_idx = 0;
+            size_t self_stride = 1, other_stride = 1;
+            for (size_t d = N; d > 0; --d) {
+                size_t dim = d - 1;
+                size_t self_coord = (dims_[dim] == 1) ? 0 : coords[dim];
+                size_t other_coord = (other.dims_[dim] == 1) ? 0 : coords[dim];
+                
+                if (dim + 1 < N) {
+                    self_stride *= dims_[dim + 1];
+                    other_stride *= other.dims_[dim + 1];
                 }
                 
-                if (other_ptr->requires_grad_) {
-                    if (!other_ptr->grad_) {
-                        other_ptr->grad_ = std::make_unique<Tensor<T, N>>(other_ptr->dims_, other_ptr->use_gpu_, false);
-                        other_ptr->grad_->fill(T(0));
-                    }
-                    size_t total = other_ptr->total_size();
-                    for (size_t i = 0; i < total; ++i) {
-                        other_ptr->grad_->data_[i] += grad.data_[i] * self_copy.data_[i];
-                    }
-                    
-                    // If other is not a leaf, propagate gradients further
-                    if (!other_ptr->is_leaf_ && !other_ptr->backward_funcs_.empty()) {
-                        for (auto& func : other_ptr->backward_funcs_) {
-                            func(*other_ptr->grad_);
-                        }
-                    }
-                }
-            });
+                self_idx += self_coord * self_stride;
+                other_idx += other_coord * other_stride;
+            }
+            
+            result.data_[i] = data_[self_idx] * other.data_[other_idx];
         }
         
         return result;
@@ -1308,22 +1492,67 @@ public:
      * @return A variant containing either a new tensor with the result or an error.
      */
     TensorResult<Tensor<T, N>> operator/(const Tensor<T, N>& other) const {
-        if (dims_ != other.dims_) {
+        // Check if shapes match exactly
+        if (dims_ == other.dims_) {
+            // Fast path: exact shape match
+            Tensor<T, N> result(dims_, use_gpu_);
+            size_t total = total_size();
+            
+#ifdef USE_GPU
+            if (use_gpu_ && other.use_gpu_) {
+                TensorGPU::div_gpu(data_.get(), other.data_.get(), result.data_.get(), total);
+            } else
+#endif
+            {
+                for (size_t i = 0; i < total; ++i) {
+                    result.data_[i] = data_[i] / other.data_[i];
+                }
+            }
+            
+            return result;
+        }
+        
+        // Try broadcasting
+        std::string error_msg;
+        if (!are_broadcastable(dims_, other.dims_, &error_msg)) {
             return TensorError::DimensionMismatch;
         }
         
-        Tensor<T, N> result(dims_, use_gpu_);
-        size_t total = total_size();
+        // Determine broadcast shape
+        TensorIndices<N> broadcast_shape = dims_;
+        for (size_t i = 0; i < N; ++i) {
+            broadcast_shape[i] = std::max(dims_[i], other.dims_[i]);
+        }
         
-#ifdef USE_GPU
-        if (use_gpu_ && other.use_gpu_) {
-            TensorGPU::div_gpu(data_.get(), other.data_.get(), result.data_.get(), total);
-        } else
-#endif
-        {
-            for (size_t i = 0; i < total; ++i) {
-                result.data_[i] = data_[i] / other.data_[i];
+        Tensor<T, N> result(broadcast_shape, use_gpu_);
+        size_t total = result.total_size();
+        
+        // Perform broadcasted division
+        for (size_t i = 0; i < total; ++i) {
+            TensorIndices<N> coords;
+            size_t idx = i;
+            for (size_t d = N; d > 0; --d) {
+                coords[d - 1] = idx % broadcast_shape[d - 1];
+                idx /= broadcast_shape[d - 1];
             }
+            
+            size_t self_idx = 0, other_idx = 0;
+            size_t self_stride = 1, other_stride = 1;
+            for (size_t d = N; d > 0; --d) {
+                size_t dim = d - 1;
+                size_t self_coord = (dims_[dim] == 1) ? 0 : coords[dim];
+                size_t other_coord = (other.dims_[dim] == 1) ? 0 : coords[dim];
+                
+                if (dim + 1 < N) {
+                    self_stride *= dims_[dim + 1];
+                    other_stride *= other.dims_[dim + 1];
+                }
+                
+                self_idx += self_coord * self_stride;
+                other_idx += other_coord * other_stride;
+            }
+            
+            result.data_[i] = data_[self_idx] / other.data_[other_idx];
         }
         
         return result;
@@ -5938,7 +6167,7 @@ Tensor<T, N> repeat_along_axis(const Tensor<T, N>& tensor, size_t repeats, size_
 template <size_t N1, size_t N2>
 bool are_broadcastable(const TensorIndices<N1>& shape1, 
                        const TensorIndices<N2>& shape2,
-                       std::string* error_msg = nullptr) {
+                       std::string* error_msg) {
     // Align shapes from the right (trailing dimensions)
     size_t max_dims = std::max(N1, N2);
     size_t offset1 = max_dims - N1;
