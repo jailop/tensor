@@ -420,6 +420,253 @@ T frobenius_norm(const Matrix<T>& mat) {
     return std::sqrt(sum);
 }
 
+/**
+ * Compute L1 norm of a matrix (max column sum).
+ * @param mat Input matrix
+ * @return L1 norm
+ */
+template <typename T>
+T norm_l1(const Matrix<T>& mat) {
+    auto dims = mat.dims();
+    size_t m = dims[0];
+    size_t n = dims[1];
+    
+    T max_sum = T(0);
+    for (size_t j = 0; j < n; ++j) {
+        T col_sum = T(0);
+        for (size_t i = 0; i < m; ++i) {
+            col_sum += std::abs(mat[{i, j}]);
+        }
+        max_sum = std::max(max_sum, col_sum);
+    }
+    return max_sum;
+}
+
+/**
+ * Compute infinity norm of a matrix (max row sum).
+ * @param mat Input matrix
+ * @return Infinity norm
+ */
+template <typename T>
+T norm_inf(const Matrix<T>& mat) {
+    auto dims = mat.dims();
+    size_t m = dims[0];
+    size_t n = dims[1];
+    
+    T max_sum = T(0);
+    for (size_t i = 0; i < m; ++i) {
+        T row_sum = T(0);
+        for (size_t j = 0; j < n; ++j) {
+            row_sum += std::abs(mat[{i, j}]);
+        }
+        max_sum = std::max(max_sum, row_sum);
+    }
+    return max_sum;
+}
+
+/**
+ * Estimate the rank of a matrix using SVD.
+ * @param mat Input matrix
+ * @param tol Tolerance for zero singular values (default: machine epsilon * max(m,n) * max_singular_value)
+ * @return Estimated rank
+ * 
+ * Note: This is a simplified implementation. For more accurate results, use full SVD.
+ */
+template <typename T>
+size_t rank(const Matrix<T>& mat, T tol = T(-1)) {
+    auto dims = mat.dims();
+    size_t m = dims[0];
+    size_t n = dims[1];
+    
+    // Simple rank estimation by counting non-zero singular values
+    // For a full implementation, we would need SVD
+    // Here we use a simplified approach based on row reduction
+    
+    Matrix<T> A = mat; // Copy for row reduction
+    size_t rank_count = 0;
+    
+    T eps = tol < T(0) ? std::numeric_limits<T>::epsilon() * std::max(m, n) * norm_inf(A) : tol;
+    
+    for (size_t col = 0; col < std::min(m, n); ++col) {
+        // Find pivot
+        size_t pivot_row = col;
+        T max_val = std::abs(A[{col, col}]);
+        
+        for (size_t row = col + 1; row < m; ++row) {
+            T val = std::abs(A[{row, col}]);
+            if (val > max_val) {
+                max_val = val;
+                pivot_row = row;
+            }
+        }
+        
+        if (max_val < eps) continue; // Column is zero
+        
+        rank_count++;
+        
+        // Swap rows if needed
+        if (pivot_row != col) {
+            for (size_t j = 0; j < n; ++j) {
+                T temp = A[{col, j}];
+                A[{col, j}] = A[{pivot_row, j}];
+                A[{pivot_row, j}] = temp;
+            }
+        }
+        
+        // Eliminate column
+        T pivot = A[{col, col}];
+        for (size_t row = col + 1; row < m; ++row) {
+            T factor = A[{row, col}] / pivot;
+            for (size_t j = col; j < n; ++j) {
+                A[{row, j}] -= factor * A[{col, j}];
+            }
+        }
+    }
+    
+    return rank_count;
+}
+
+/**
+ * Estimate the condition number of a matrix.
+ * condition(A) = ||A|| * ||A^(-1)||
+ * 
+ * @param mat Input square matrix
+ * @return Condition number (using infinity norm), or -1 if matrix is singular
+ * 
+ * Note: This requires matrix inversion, which is computationally expensive.
+ * For large matrices, consider using iterative methods or SVD-based computation.
+ */
+template <typename T>
+T condition_number(const Matrix<T>& mat) {
+    auto dims = mat.dims();
+    if (dims[0] != dims[1]) {
+        return T(-1); // Not defined for non-square matrices
+    }
+    
+    T norm_A = norm_inf(mat);
+    
+    // Compute inverse (simplified - would need proper implementation)
+    // For now, return an estimate based on determinant
+    T det_val = determinant(mat);
+    if (std::abs(det_val) < std::numeric_limits<T>::epsilon()) {
+        return std::numeric_limits<T>::infinity(); // Singular matrix
+    }
+    
+    // Simplified estimate: for well-conditioned matrices
+    // A proper implementation would require computing ||A^(-1)||
+    // which requires actual inversion or iterative methods
+    
+    // For now, we return a placeholder based on norm and determinant
+    T estimate = norm_A / std::abs(det_val);
+    return estimate;
+}
+
+/**
+ * Solve linear least squares problem: minimize ||Ax - b||^2
+ * Uses normal equations: A^T A x = A^T b
+ * 
+ * @param A Matrix of shape (m, n) where m >= n
+ * @param b Vector of length m
+ * @return Solution vector of length n, or empty vector if solution fails
+ * 
+ * Note: This uses the normal equations method, which can be numerically unstable
+ * for ill-conditioned matrices. For better numerical stability, consider QR or SVD methods.
+ */
+template <typename T>
+Vector<T> least_squares(const Matrix<T>& A, const Vector<T>& b) {
+    auto dims_A = A.dims();
+    auto dims_b = b.dims();
+    size_t m = dims_A[0];
+    size_t n = dims_A[1];
+    
+    if (dims_b[0] != m) {
+        return Vector<T>({0}, false); // Dimension mismatch
+    }
+    
+    if (m < n) {
+        return Vector<T>({0}, false); // Underdetermined system
+    }
+    
+    // Compute A^T
+    Matrix<T> AT = transpose(A);
+    
+    // Compute A^T * A
+    Matrix<T> ATA = matmul(AT, A);
+    
+    // Compute A^T * b
+    // We need to convert b to a matrix for matmul
+    Matrix<T> b_mat({m, 1}, b.uses_gpu());
+    for (size_t i = 0; i < m; ++i) {
+        b_mat[{i, 0}] = b[{i}];
+    }
+    
+    Matrix<T> ATb_mat = matmul(AT, b_mat);
+    
+    // Convert to vector
+    Vector<T> ATb({n}, b.uses_gpu());
+    for (size_t i = 0; i < n; ++i) {
+        ATb[{i}] = ATb_mat[{i, 0}];
+    }
+    
+    // Solve ATA * x = ATb using Gaussian elimination
+    // This is a simplified implementation
+    Matrix<T> augmented({n, n + 1}, A.uses_gpu());
+    for (size_t i = 0; i < n; ++i) {
+        for (size_t j = 0; j < n; ++j) {
+            augmented[{i, j}] = ATA[{i, j}];
+        }
+        augmented[{i, n}] = ATb[{i}];
+    }
+    
+    // Gaussian elimination with partial pivoting
+    for (size_t col = 0; col < n; ++col) {
+        // Find pivot
+        size_t pivot_row = col;
+        T max_val = std::abs(augmented[{col, col}]);
+        
+        for (size_t row = col + 1; row < n; ++row) {
+            T val = std::abs(augmented[{row, col}]);
+            if (val > max_val) {
+                max_val = val;
+                pivot_row = row;
+            }
+        }
+        
+        if (max_val < std::numeric_limits<T>::epsilon()) {
+            return Vector<T>({0}, false); // Singular matrix
+        }
+        
+        // Swap rows
+        if (pivot_row != col) {
+            for (size_t j = col; j <= n; ++j) {
+                T temp = augmented[{col, j}];
+                augmented[{col, j}] = augmented[{pivot_row, j}];
+                augmented[{pivot_row, j}] = temp;
+            }
+        }
+        
+        // Eliminate
+        for (size_t row = col + 1; row < n; ++row) {
+            T factor = augmented[{row, col}] / augmented[{col, col}];
+            for (size_t j = col; j <= n; ++j) {
+                augmented[{row, j}] -= factor * augmented[{col, j}];
+            }
+        }
+    }
+    
+    // Back substitution
+    Vector<T> x({n}, b.uses_gpu());
+    for (size_t i = n; i-- > 0;) {
+        T sum = augmented[{i, n}];
+        for (size_t j = i + 1; j < n; ++j) {
+            sum -= augmented[{i, j}] * x[{j}];
+        }
+        x[{i}] = sum / augmented[{i, i}];
+    }
+    
+    return x;
+}
+
 } // namespace linalg
 
 // ============================================

@@ -199,3 +199,101 @@ TEST_F(TensorRandomSamplingTest, DifferentSeeds) {
     }
     ASSERT_GT(differences, 90);  // Most should be different
 }
+
+TEST_F(TensorRandomSamplingTest, GammaDistribution) {
+    auto tensor = TensorRandom<float>::gamma<1>({{5000}}, 2.0f, 1.0f);
+    
+    // Mean should be alpha * beta = 2 * 1 = 2
+    float sum = 0.0f;
+    for (size_t i = 0; i < tensor.total_size(); ++i) {
+        sum += tensor.data()[i];
+        ASSERT_GE(tensor.data()[i], 0.0f);  // All values should be non-negative
+    }
+    float mean = sum / tensor.total_size();
+    
+    ASSERT_NEAR(mean, 2.0f, 0.2f);
+}
+
+TEST_F(TensorRandomSamplingTest, BetaDistribution) {
+    auto tensor = TensorRandom<float>::beta<1>({{5000}}, 2.0f, 5.0f);
+    
+    // Mean should be alpha / (alpha + beta) = 2 / 7 ≈ 0.286
+    float sum = 0.0f;
+    for (size_t i = 0; i < tensor.total_size(); ++i) {
+        sum += tensor.data()[i];
+        ASSERT_GE(tensor.data()[i], 0.0f);  // All values should be in [0,1]
+        ASSERT_LE(tensor.data()[i], 1.0f);
+    }
+    float mean = sum / tensor.total_size();
+    
+    ASSERT_NEAR(mean, 2.0f / 7.0f, 0.1f);
+}
+
+TEST_F(TensorRandomSamplingTest, ChiSquaredDistribution) {
+    auto tensor = TensorRandom<float>::chi_squared<1>({{5000}}, 3.0f);
+    
+    // Mean should be k (degrees of freedom) = 3
+    float sum = 0.0f;
+    for (size_t i = 0; i < tensor.total_size(); ++i) {
+        sum += tensor.data()[i];
+        ASSERT_GE(tensor.data()[i], 0.0f);  // All values should be non-negative
+    }
+    float mean = sum / tensor.total_size();
+    
+    ASSERT_NEAR(mean, 3.0f, 0.3f);
+}
+
+TEST_F(TensorRandomSamplingTest, CauchyDistribution) {
+    auto tensor = TensorRandom<float>::cauchy<1>({{1000}}, 0.0f, 1.0f);
+    
+    // Cauchy has no defined mean, but median should be at location parameter (0)
+    // Just check that values are generated
+    ASSERT_EQ(tensor.dims()[0], 1000);
+    
+    // Values can be anywhere, but shouldn't all be the same
+    float first_val = tensor.data()[0];
+    int differences = 0;
+    for (size_t i = 1; i < tensor.total_size(); ++i) {
+        if (tensor.data()[i] != first_val) {
+            differences++;
+        }
+    }
+    ASSERT_GT(differences, 900);  // Most should be different
+}
+
+TEST_F(TensorRandomSamplingTest, MultinomialDistribution) {
+    std::vector<float> probs = {0.2f, 0.3f, 0.5f};
+    size_t n_trials = 100;
+    size_t n_samples = 1000;
+    
+    auto result = TensorRandom<float>::multinomial(n_trials, probs, n_samples);
+    
+    ASSERT_EQ(result.dims()[0], n_samples);
+    ASSERT_EQ(result.dims()[1], 3);
+    
+    // Check that each sample sums to n_trials
+    for (size_t i = 0; i < n_samples; ++i) {
+        float sum = 0.0f;
+        for (size_t j = 0; j < 3; ++j) {
+            float val = result[{i, j}];
+            sum += val;
+            ASSERT_GE(val, 0.0f);
+        }
+        ASSERT_NEAR(sum, static_cast<float>(n_trials), 0.01f);
+    }
+    
+    // Check average proportions are close to probabilities
+    float avg_counts[3] = {0.0f, 0.0f, 0.0f};
+    for (size_t i = 0; i < n_samples; ++i) {
+        for (size_t j = 0; j < 3; ++j) {
+            avg_counts[j] += result[{i, j}];
+        }
+    }
+    
+    for (size_t j = 0; j < 3; ++j) {
+        avg_counts[j] /= n_samples;
+        float expected = probs[j] * n_trials;
+        ASSERT_NEAR(avg_counts[j], expected, 3.0f);  // Allow some variance
+    }
+}
+

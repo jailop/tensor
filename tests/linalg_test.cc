@@ -128,3 +128,97 @@ TEST(LinalgTest, MatrixBlockView) {
     EXPECT_NEAR((block[{0, 0}]), 7.0f, 1e-5);
     EXPECT_NEAR((block[{1, 1}]), 13.0f, 1e-5);
 }
+
+TEST(LinalgTest, MatrixTrace) {
+    Matrix<float> mat({3, 3});
+    mat[{0, 0}] = 1.0f; mat[{0, 1}] = 2.0f; mat[{0, 2}] = 3.0f;
+    mat[{1, 0}] = 4.0f; mat[{1, 1}] = 5.0f; mat[{1, 2}] = 6.0f;
+    mat[{2, 0}] = 7.0f; mat[{2, 1}] = 8.0f; mat[{2, 2}] = 9.0f;
+    
+    float trace_val = linalg::trace(mat);
+    EXPECT_NEAR(trace_val, 15.0f, 1e-5); // 1 + 5 + 9
+}
+
+TEST(LinalgTest, MatrixDiagonal) {
+    Matrix<float> mat({3, 3});
+    mat[{0, 0}] = 1.0f; mat[{0, 1}] = 2.0f; mat[{0, 2}] = 3.0f;
+    mat[{1, 0}] = 4.0f; mat[{1, 1}] = 5.0f; mat[{1, 2}] = 6.0f;
+    mat[{2, 0}] = 7.0f; mat[{2, 1}] = 8.0f; mat[{2, 2}] = 9.0f;
+    
+    auto diag_vec = linalg::diag(mat);
+    EXPECT_NEAR((diag_vec[{0}]), 1.0f, 1e-5);
+    EXPECT_NEAR((diag_vec[{1}]), 5.0f, 1e-5);
+    EXPECT_NEAR((diag_vec[{2}]), 9.0f, 1e-5);
+}
+
+TEST(LinalgTest, DiagonalMatrixFromVector) {
+    Vector<float> vec({3});
+    vec[{0}] = 2.0f;
+    vec[{1}] = 3.0f;
+    vec[{2}] = 4.0f;
+    
+    auto diag_mat = linalg::diag(vec);
+    EXPECT_NEAR((diag_mat[{0, 0}]), 2.0f, 1e-5);
+    EXPECT_NEAR((diag_mat[{1, 1}]), 3.0f, 1e-5);
+    EXPECT_NEAR((diag_mat[{2, 2}]), 4.0f, 1e-5);
+    EXPECT_NEAR((diag_mat[{0, 1}]), 0.0f, 1e-5);
+}
+
+TEST(LinalgTest, FrobeniusNorm) {
+    Matrix<float> mat({2, 2});
+    mat[{0, 0}] = 1.0f; mat[{0, 1}] = 2.0f;
+    mat[{1, 0}] = 3.0f; mat[{1, 1}] = 4.0f;
+    
+    float norm_val = linalg::frobenius_norm(mat);
+    float expected = std::sqrt(1.0f + 4.0f + 9.0f + 16.0f); // sqrt(30)
+    EXPECT_NEAR(norm_val, expected, 1e-5);
+}
+
+TEST(LinalgTest, L1Norm) {
+    Matrix<float> mat({2, 2});
+    mat[{0, 0}] = 1.0f; mat[{0, 1}] = -2.0f;
+    mat[{1, 0}] = -3.0f; mat[{1, 1}] = 4.0f;
+    
+    float norm_val = linalg::norm_l1(mat);
+    EXPECT_NEAR(norm_val, 6.0f, 1e-5); // max(|1|+|-3|, |-2|+|4|) = max(4, 6) = 6
+}
+
+TEST(LinalgTest, InfinityNorm) {
+    Matrix<float> mat({2, 2});
+    mat[{0, 0}] = 1.0f; mat[{0, 1}] = -2.0f;
+    mat[{1, 0}] = -3.0f; mat[{1, 1}] = 4.0f;
+    
+    float norm_val = linalg::norm_inf(mat);
+    EXPECT_NEAR(norm_val, 7.0f, 1e-5); // max(|1|+|-2|, |-3|+|4|) = max(3, 7) = 7
+}
+
+TEST(LinalgTest, MatrixRank) {
+    Matrix<float> mat({3, 3});
+    mat[{0, 0}] = 1.0f; mat[{0, 1}] = 2.0f; mat[{0, 2}] = 3.0f;
+    mat[{1, 0}] = 2.0f; mat[{1, 1}] = 4.0f; mat[{1, 2}] = 6.0f; // 2 * row 1
+    mat[{2, 0}] = 0.0f; mat[{2, 1}] = 1.0f; mat[{2, 2}] = 2.0f;
+    
+    size_t rank_val = linalg::rank(mat);
+    EXPECT_EQ(rank_val, 2); // Second row is dependent
+}
+
+TEST(LinalgTest, LeastSquares) {
+    // Solve Ax = b where A is 3x2 (overdetermined system)
+    Matrix<float> A({3, 2});
+    A[{0, 0}] = 1.0f; A[{0, 1}] = 1.0f;
+    A[{1, 0}] = 1.0f; A[{1, 1}] = 2.0f;
+    A[{2, 0}] = 1.0f; A[{2, 1}] = 3.0f;
+    
+    Vector<float> b({3});
+    b[{0}] = 2.0f;
+    b[{1}] = 3.0f;
+    b[{2}] = 4.0f;
+    
+    auto x = linalg::least_squares(A, b);
+    
+    // Verify solution by checking residual
+    // x should be approximately [1, 1]
+    EXPECT_NEAR((x[{0}]), 1.0f, 0.1f);
+    EXPECT_NEAR((x[{1}]), 1.0f, 0.1f);
+}
+

@@ -4734,6 +4734,146 @@ public:
         }
         return result;
     }
+    
+    /**
+     * Generate tensor with gamma distribution.
+     * @param dims Dimensions of the tensor.
+     * @param alpha Shape parameter (k).
+     * @param beta Scale parameter (theta).
+     * @param use_gpu Whether to use GPU.
+     * @return Tensor filled with random values from gamma distribution.
+     */
+    template <size_t N>
+    static Tensor<T, N> gamma(const std::array<size_t, N>& dims, T alpha, T beta = T(1), bool use_gpu = false) {
+        Tensor<T, N> result(dims, use_gpu, false);
+        std::gamma_distribution<T> dist(alpha, beta);
+        auto& gen = get_generator();
+        
+        T* data = result.data();
+        size_t total = result.total_size();
+        for (size_t i = 0; i < total; ++i) {
+            data[i] = dist(gen);
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Generate tensor with beta distribution.
+     * @param dims Dimensions of the tensor.
+     * @param alpha First shape parameter.
+     * @param beta Second shape parameter.
+     * @param use_gpu Whether to use GPU.
+     * @return Tensor filled with random values from beta distribution.
+     * 
+     * Note: Beta distribution is generated using the relationship Beta(a,b) = X/(X+Y)
+     * where X ~ Gamma(a,1) and Y ~ Gamma(b,1).
+     */
+    template <size_t N>
+    static Tensor<T, N> beta(const std::array<size_t, N>& dims, T alpha, T beta_param, bool use_gpu = false) {
+        Tensor<T, N> result(dims, use_gpu, false);
+        std::gamma_distribution<T> dist_alpha(alpha, T(1));
+        std::gamma_distribution<T> dist_beta(beta_param, T(1));
+        auto& gen = get_generator();
+        
+        T* data = result.data();
+        size_t total = result.total_size();
+        for (size_t i = 0; i < total; ++i) {
+            T x = dist_alpha(gen);
+            T y = dist_beta(gen);
+            data[i] = x / (x + y);
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Generate tensor with chi-squared distribution.
+     * @param dims Dimensions of the tensor.
+     * @param degrees_of_freedom Degrees of freedom (k).
+     * @param use_gpu Whether to use GPU.
+     * @return Tensor filled with random values from chi-squared distribution.
+     */
+    template <size_t N>
+    static Tensor<T, N> chi_squared(const std::array<size_t, N>& dims, T degrees_of_freedom, bool use_gpu = false) {
+        Tensor<T, N> result(dims, use_gpu, false);
+        std::chi_squared_distribution<T> dist(degrees_of_freedom);
+        auto& gen = get_generator();
+        
+        T* data = result.data();
+        size_t total = result.total_size();
+        for (size_t i = 0; i < total; ++i) {
+            data[i] = dist(gen);
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Generate samples from multinomial distribution.
+     * @param n Number of trials.
+     * @param probs Vector of probabilities (must sum to 1).
+     * @param samples Number of samples to generate.
+     * @return Tensor of shape (samples, len(probs)) with counts for each category.
+     * 
+     * Each row represents one sample, and each column represents the count
+     * for a particular category.
+     */
+    static Tensor<T, 2> multinomial(size_t n, const std::vector<T>& probs, size_t samples, bool use_gpu = false) {
+        size_t k = probs.size();
+        Tensor<T, 2> result({samples, k}, use_gpu, false);
+        
+        std::uniform_real_distribution<T> dist(T(0), T(1));
+        auto& gen = get_generator();
+        
+        T* data = result.data();
+        
+        for (size_t s = 0; s < samples; ++s) {
+            std::vector<size_t> counts(k, 0);
+            
+            for (size_t trial = 0; trial < n; ++trial) {
+                T u = dist(gen);
+                T cumsum = T(0);
+                
+                for (size_t i = 0; i < k; ++i) {
+                    cumsum += probs[i];
+                    if (u <= cumsum) {
+                        counts[i]++;
+                        break;
+                    }
+                }
+            }
+            
+            for (size_t i = 0; i < k; ++i) {
+                data[s * k + i] = static_cast<T>(counts[i]);
+            }
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Generate tensor with Cauchy distribution.
+     * @param dims Dimensions of the tensor.
+     * @param location Location parameter (x0).
+     * @param scale Scale parameter (gamma).
+     * @param use_gpu Whether to use GPU.
+     * @return Tensor filled with random values from Cauchy distribution.
+     */
+    template <size_t N>
+    static Tensor<T, N> cauchy(const std::array<size_t, N>& dims, T location = T(0), T scale = T(1), bool use_gpu = false) {
+        Tensor<T, N> result(dims, use_gpu, false);
+        std::cauchy_distribution<T> dist(location, scale);
+        auto& gen = get_generator();
+        
+        T* data = result.data();
+        size_t total = result.total_size();
+        for (size_t i = 0; i < total; ++i) {
+            data[i] = dist(gen);
+        }
+        
+        return result;
+    }
 };
 
 // ============================================================================
