@@ -73,6 +73,8 @@
 #include <vector>
 #include <random>
 
+#include "tensor_perf.h"
+
 #ifdef USE_GPU
 #include "tensor_gpu.cuh"
 #endif
@@ -567,6 +569,12 @@ public:
      * @return An array containing the size of each dimension.
      */
     TensorIndices<N> dims() const { return dims_; }
+    
+    /**
+     * Get the shape of the tensor (alias for dims).
+     * @return An array containing the size of each dimension.
+     */
+    TensorIndices<N> shape() const { return dims_; }
     
     /**
      * Check if tensor uses GPU.
@@ -1643,6 +1651,121 @@ public:
         });
     }
     
+    /**
+     * Apply sign function to all elements (creates new tensor).
+     * Returns -1 for negative values, 0 for zero, and +1 for positive values.
+     * @return A new tensor with sign(x) applied to all elements.
+     */
+    Tensor<T, N> sign() const {
+        return map([](T x) { 
+            return (x > T(0)) ? T(1) : ((x < T(0)) ? T(-1) : T(0)); 
+        });
+    }
+    
+    /**
+     * Apply round function to all elements (creates new tensor).
+     * Rounds to nearest integer value.
+     * @return A new tensor with round(x) applied to all elements.
+     */
+    Tensor<T, N> round() const {
+        return map([](T x) { return std::round(x); });
+    }
+    
+    /**
+     * Apply error function (erf) to all elements (creates new tensor).
+     * The error function is used in probability and statistics.
+     * @return A new tensor with erf(x) applied to all elements.
+     */
+    Tensor<T, N> erf() const {
+        return map([](T x) { return std::erf(x); });
+    }
+    
+    /**
+     * Apply log1p function to all elements (creates new tensor).
+     * Computes log(1 + x) in a numerically stable way for small x.
+     * @return A new tensor with log1p(x) applied to all elements.
+     */
+    Tensor<T, N> log1p() const {
+        return map([](T x) { return std::log1p(x); });
+    }
+    
+    /**
+     * Apply expm1 function to all elements (creates new tensor).
+     * Computes exp(x) - 1 in a numerically stable way for small x.
+     * @return A new tensor with expm1(x) applied to all elements.
+     */
+    Tensor<T, N> expm1() const {
+        return map([](T x) { return std::expm1(x); });
+    }
+    
+    /**
+     * Check if elements are NaN (creates boolean-like tensor).
+     * @return A new tensor with 1 where NaN, 0 otherwise.
+     */
+    Tensor<T, N> isnan() const {
+        return map([](T x) { return std::isnan(x) ? T(1) : T(0); });
+    }
+    
+    /**
+     * Check if elements are infinite (creates boolean-like tensor).
+     * @return A new tensor with 1 where infinite, 0 otherwise.
+     */
+    Tensor<T, N> isinf() const {
+        return map([](T x) { return std::isinf(x) ? T(1) : T(0); });
+    }
+    
+    /**
+     * Check if elements are finite (creates boolean-like tensor).
+     * @return A new tensor with 1 where finite, 0 otherwise.
+     */
+    Tensor<T, N> isfinite() const {
+        return map([](T x) { return std::isfinite(x) ? T(1) : T(0); });
+    }
+    
+    /**
+     * Clip values to a minimum threshold (creates new tensor).
+     * @param min_val The minimum value.
+     * @return A new tensor with all elements >= min_val.
+     */
+    Tensor<T, N> clip_min(T min_val) const {
+        return map([min_val](T x) { return x < min_val ? min_val : x; });
+    }
+    
+    /**
+     * Clip values to a maximum threshold (creates new tensor).
+     * @param max_val The maximum value.
+     * @return A new tensor with all elements <= max_val.
+     */
+    Tensor<T, N> clip_max(T max_val) const {
+        return map([max_val](T x) { return x > max_val ? max_val : x; });
+    }
+    
+    /**
+     * Conditional selection (ternary operator for tensors).
+     * Returns a tensor where each element is taken from x if condition is true, otherwise from y.
+     * This is a static method that acts as a ternary operator: condition ? x : y
+     * @tparam C The condition tensor type (should be bool or numeric)
+     * @param condition Tensor of boolean/numeric values (non-zero is true).
+     * @param x Tensor to select from when condition is true.
+     * @param y Tensor to select from when condition is false.
+     * @return A new tensor with conditional values.
+     */
+    template<typename C>
+    static Tensor<T, N> where(const Tensor<C, N>& condition, const Tensor<T, N>& x, const Tensor<T, N>& y) {
+        if (condition.dims() != x.dims() || x.dims() != y.dims()) {
+            throw std::invalid_argument("where(): all tensors must have the same shape");
+        }
+        
+        Tensor<T, N> result(x.dims(), x.use_gpu_);
+        size_t total = x.total_size();
+        
+        for (size_t i = 0; i < total; ++i) {
+            result.data_[i] = condition.data()[i] ? x.data_[i] : y.data_[i];
+        }
+        
+        return result;
+    }
+    
     // ============================================
     // Derivative Functions
     // ============================================
@@ -2343,12 +2466,14 @@ public:
     
     /**
      * Masked fill: replace values where mask is true (non-zero) with fill_value.
+     * @tparam M The mask tensor element type (typically bool or numeric).
      * @param mask Boolean-like tensor (0 or non-zero values).
      * @param fill_value Value to fill where mask is non-zero.
      * @return A new tensor with masked values filled.
      */
-    Tensor<T, N> masked_fill(const Tensor<T, N>& mask, T fill_value) const {
-        if (dims_ != mask.dims_) {
+    template<typename M>
+    Tensor<T, N> masked_fill(const Tensor<M, N>& mask, T fill_value) const {
+        if (dims_ != mask.dims()) {
             return *this;
         }
         
@@ -2356,7 +2481,7 @@ public:
         size_t total = total_size();
         
         for (size_t i = 0; i < total; ++i) {
-            result.data_[i] = (mask.data_[i] != T(0)) ? fill_value : data_[i];
+            result.data_[i] = (mask.data()[i] != M(0)) ? fill_value : data_[i];
         }
         
         return result;
@@ -2364,11 +2489,13 @@ public:
     
     /**
      * Masked select: return 1D tensor of values where mask is true (non-zero).
+     * @tparam M The mask tensor element type (typically bool or numeric).
      * @param mask Boolean-like tensor (0 or non-zero values).
      * @return A 1D tensor containing selected values.
      */
-    Tensor<T, 1> masked_select(const Tensor<T, N>& mask) const {
-        if (dims_ != mask.dims_) {
+    template<typename M>
+    Tensor<T, 1> masked_select(const Tensor<M, N>& mask) const {
+        if (dims_ != mask.dims()) {
             return Tensor<T, 1>({0}, use_gpu_);
         }
         
@@ -2376,7 +2503,7 @@ public:
         size_t total = total_size();
         size_t count = 0;
         for (size_t i = 0; i < total; ++i) {
-            if (mask.data_[i] != T(0)) {
+            if (mask.data()[i] != M(0)) {
                 count++;
             }
         }
@@ -2384,7 +2511,7 @@ public:
         Tensor<T, 1> result({count}, use_gpu_);
         size_t idx = 0;
         for (size_t i = 0; i < total; ++i) {
-            if (mask.data_[i] != T(0)) {
+            if (mask.data()[i] != M(0)) {
                 result.data_[idx++] = data_[i];
             }
         }
@@ -3764,18 +3891,17 @@ public:
     // ============================================
     
     /**
-     * Extract elements at specific indices (fancy indexing).
-     * For 1D tensors, indices specify which elements to extract.
-     * @param indices Vector of indices to extract.
+     * Extract elements at specific flat indices (fancy indexing).
+     * Treats the tensor as a flattened 1D array and extracts elements at the given indices.
+     * @param indices Vector of flat indices to extract.
      * @return A new 1D tensor containing the extracted elements.
      */
     Tensor<T, 1> take(const std::vector<size_t>& indices) const {
-        static_assert(N == 1, "take() is currently only supported for 1D tensors");
-        
         Tensor<T, 1> result({indices.size()}, use_gpu_);
+        size_t total = total_size();
         
         for (size_t i = 0; i < indices.size(); ++i) {
-            if (indices[i] < dims_[0]) {
+            if (indices[i] < total) {
                 result.data_[i] = data_[indices[i]];
             } else {
                 result.data_[i] = T(0);  // Out of bounds returns zero
@@ -3786,17 +3912,17 @@ public:
     }
     
     /**
-     * Set elements at specific indices (fancy indexing assignment).
-     * For 1D tensors, sets values at specified indices.
-     * @param indices Vector of indices to set.
+     * Set elements at specific flat indices (fancy indexing assignment).
+     * Treats the tensor as a flattened 1D array and sets values at the given indices.
+     * @param indices Vector of flat indices to set.
      * @param values Vector of values to set (must match indices size).
      */
     void put(const std::vector<size_t>& indices, const std::vector<T>& values) {
-        static_assert(N == 1, "put() is currently only supported for 1D tensors");
-        
         size_t count = std::min(indices.size(), values.size());
+        size_t total = total_size();
+        
         for (size_t i = 0; i < count; ++i) {
-            if (indices[i] < dims_[0]) {
+            if (indices[i] < total) {
                 data_[indices[i]] = values[i];
             }
         }
@@ -4188,7 +4314,7 @@ public:
         // Compute strides
         std::array<size_t, N> strides;
         strides[N-1] = 1;
-        for (int i = N-2; i >= 0; --i) {
+        for (size_t i = N-1; i-- > 0;) {
             strides[i] = strides[i+1] * dims_[i+1];
         }
         
@@ -4233,7 +4359,7 @@ public:
         // Compute strides
         std::array<size_t, N> strides;
         strides[N-1] = 1;
-        for (int i = N-2; i >= 0; --i) {
+        for (size_t i = N-1; i-- > 0;) {
             strides[i] = strides[i+1] * dims_[i+1];
         }
         
@@ -4454,6 +4580,574 @@ Tensor<T, N> operator/(const T& scalar, const Tensor<T, N>& tensor) {
     
     for (size_t i = 0; i < total; ++i) {
         result.data_[i] = scalar / tensor.data_[i];
+    }
+    
+    return result;
+}
+
+// ============================================================================
+// RANDOM SAMPLING
+// ============================================================================
+
+/**
+ * @brief Random number generator for tensor operations
+ */
+template <typename T>
+class TensorRandom {
+private:
+    static std::mt19937& get_generator() {
+        static std::mt19937 gen(std::random_device{}());
+        return gen;
+    }
+    
+public:
+    /**
+     * Set seed for reproducible random number generation.
+     * @param seed Random seed value.
+     */
+    static void seed(unsigned int seed) {
+        get_generator().seed(seed);
+    }
+    
+    /**
+     * Generate tensor with random uniform distribution.
+     * @param dims Dimensions of the tensor.
+     * @param low Lower bound (inclusive).
+     * @param high Upper bound (exclusive).
+     * @param use_gpu Whether to use GPU.
+     * @return Tensor filled with random values.
+     */
+    template <size_t N>
+    static Tensor<T, N> uniform(const std::array<size_t, N>& dims, T low = T(0), T high = T(1), bool use_gpu = false) {
+        Tensor<T, N> result(dims, use_gpu, false);
+        std::uniform_real_distribution<T> dist(low, high);
+        auto& gen = get_generator();
+        
+        T* data = result.data();
+        size_t total = result.total_size();
+        for (size_t i = 0; i < total; ++i) {
+            data[i] = dist(gen);
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Generate tensor with random normal (Gaussian) distribution.
+     * @param dims Dimensions of the tensor.
+     * @param mean Mean of the distribution.
+     * @param std Standard deviation.
+     * @param use_gpu Whether to use GPU.
+     * @return Tensor filled with random values.
+     */
+    template <size_t N>
+    static Tensor<T, N> normal(const std::array<size_t, N>& dims, T mean = T(0), T std = T(1), bool use_gpu = false) {
+        Tensor<T, N> result(dims, use_gpu, false);
+        std::normal_distribution<T> dist(mean, std);
+        auto& gen = get_generator();
+        
+        T* data = result.data();
+        size_t total = result.total_size();
+        for (size_t i = 0; i < total; ++i) {
+            data[i] = dist(gen);
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Generate tensor with random exponential distribution.
+     * @param dims Dimensions of the tensor.
+     * @param lambda Rate parameter.
+     * @param use_gpu Whether to use GPU.
+     * @return Tensor filled with random values.
+     */
+    template <size_t N>
+    static Tensor<T, N> exponential(const std::array<size_t, N>& dims, T lambda = T(1), bool use_gpu = false) {
+        Tensor<T, N> result(dims, use_gpu, false);
+        std::exponential_distribution<T> dist(lambda);
+        auto& gen = get_generator();
+        
+        T* data = result.data();
+        size_t total = result.total_size();
+        for (size_t i = 0; i < total; ++i) {
+            data[i] = dist(gen);
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Generate random permutation of indices [0, n).
+     * @param n Number of elements.
+     * @return Vector of permuted indices.
+     */
+    static std::vector<size_t> permutation(size_t n) {
+        std::vector<size_t> indices(n);
+        for (size_t i = 0; i < n; ++i) {
+            indices[i] = i;
+        }
+        std::shuffle(indices.begin(), indices.end(), get_generator());
+        return indices;
+    }
+    
+    /**
+     * Generate 1D tensor with random permutation of indices.
+     * @param n Number of elements.
+     * @param use_gpu Whether to use GPU.
+     * @return 1D tensor with permuted indices.
+     */
+    static Tensor<T, 1> randperm(size_t n, bool use_gpu = false) {
+        auto perm = permutation(n);
+        Tensor<T, 1> result({n}, use_gpu, false);
+        T* data = result.data();
+        for (size_t i = 0; i < n; ++i) {
+            data[i] = static_cast<T>(perm[i]);
+        }
+        return result;
+    }
+    
+    /**
+     * Random choice: sample k elements from [0, n) without replacement.
+     * @param n Population size.
+     * @param k Number of samples.
+     * @return Vector of sampled indices.
+     */
+    static std::vector<size_t> choice(size_t n, size_t k) {
+        if (k > n) k = n;
+        auto perm = permutation(n);
+        return std::vector<size_t>(perm.begin(), perm.begin() + k);
+    }
+    
+    /**
+     * Random choice with replacement: sample k elements from [0, n).
+     * @param n Population size.
+     * @param k Number of samples.
+     * @return Vector of sampled indices (may contain duplicates).
+     */
+    static std::vector<size_t> choice_with_replacement(size_t n, size_t k) {
+        std::uniform_int_distribution<size_t> dist(0, n - 1);
+        auto& gen = get_generator();
+        std::vector<size_t> result(k);
+        for (size_t i = 0; i < k; ++i) {
+            result[i] = dist(gen);
+        }
+        return result;
+    }
+};
+
+// ============================================================================
+// SORTING AND SEARCHING
+// ============================================================================
+
+/**
+ * @brief Sort tensor elements and return sorted tensor (1D only).
+ * @param ascending If true, sort in ascending order; otherwise descending.
+ * @return Sorted 1D tensor.
+ */
+template <typename T>
+Tensor<T, 1> sort(const Tensor<T, 1>& tensor, bool ascending = true) {
+    Tensor<T, 1> result = tensor;
+    size_t n = result.total_size();
+    T* data = result.data();
+    
+    if (ascending) {
+        std::sort(data, data + n);
+    } else {
+        std::sort(data, data + n, std::greater<T>());
+    }
+    
+    return result;
+}
+
+/**
+ * @brief Return indices that would sort the tensor (1D only).
+ * @param ascending If true, sort in ascending order; otherwise descending.
+ * @return 1D tensor of indices.
+ */
+template <typename T>
+Tensor<size_t, 1> argsort(const Tensor<T, 1>& tensor, bool ascending = true) {
+    size_t n = tensor.total_size();
+    Tensor<size_t, 1> indices({n}, false, false);
+    
+    size_t* indices_data = indices.data();
+    const T* tensor_data = tensor.data();
+    
+    // Initialize indices
+    for (size_t i = 0; i < n; ++i) {
+        indices_data[i] = i;
+    }
+    
+    // Sort indices based on tensor values
+    if (ascending) {
+        std::sort(indices_data, indices_data + n,
+                  [tensor_data](size_t i1, size_t i2) {
+                      return tensor_data[i1] < tensor_data[i2];
+                  });
+    } else {
+        std::sort(indices_data, indices_data + n,
+                  [tensor_data](size_t i1, size_t i2) {
+                      return tensor_data[i1] > tensor_data[i2];
+                  });
+    }
+    
+    return indices;
+}
+
+/**
+ * @brief Find k largest or smallest elements and their indices (1D only).
+ * @param k Number of elements to return.
+ * @param largest If true, return k largest; otherwise k smallest.
+ * @return Pair of tensors: (values, indices).
+ */
+template <typename T>
+std::pair<Tensor<T, 1>, Tensor<size_t, 1>> topk(const Tensor<T, 1>& tensor, size_t k, bool largest = true) {
+    size_t n = tensor.total_size();
+    if (k > n) k = n;
+    
+    auto sorted_indices = argsort(tensor, !largest);  // Sort opposite of what we want
+    
+    // Take first k elements
+    Tensor<T, 1> values({k}, false, false);
+    Tensor<size_t, 1> indices({k}, false, false);
+    
+    const T* tensor_data = tensor.data();
+    const size_t* sorted_data = sorted_indices.data();
+    T* values_data = values.data();
+    size_t* indices_data = indices.data();
+    
+    for (size_t i = 0; i < k; ++i) {
+        size_t idx = sorted_data[i];
+        values_data[i] = tensor_data[idx];
+        indices_data[i] = idx;
+    }
+    
+    return {values, indices};
+}
+
+/**
+ * @brief Find unique elements in tensor (1D only).
+ * @return Tensor containing unique elements in sorted order.
+ */
+template <typename T>
+Tensor<T, 1> unique(const Tensor<T, 1>& tensor) {
+    size_t n = tensor.total_size();
+    const T* data = tensor.data();
+    std::vector<T> vec(data, data + n);
+    
+    std::sort(vec.begin(), vec.end());
+    auto last = std::unique(vec.begin(), vec.end());
+    vec.erase(last, vec.end());
+    
+    Tensor<T, 1> result({vec.size()}, false, false);
+    std::copy(vec.begin(), vec.end(), result.data());
+    
+    return result;
+}
+
+/**
+ * @brief Binary search to find indices where elements should be inserted (1D only).
+ * @param values Sorted tensor to search in.
+ * @param search_values Values to search for.
+ * @return Tensor of insertion indices.
+ */
+template <typename T>
+Tensor<size_t, 1> searchsorted(const Tensor<T, 1>& values, const Tensor<T, 1>& search_values) {
+    size_t n = values.total_size();
+    size_t m = search_values.total_size();
+    
+    Tensor<size_t, 1> result({m}, false, false);
+    
+    const T* values_data = values.data();
+    const T* search_data = search_values.data();
+    size_t* result_data = result.data();
+    
+    for (size_t i = 0; i < m; ++i) {
+        T val = search_data[i];
+        auto it = std::lower_bound(values_data, values_data + n, val);
+        result_data[i] = it - values_data;
+    }
+    
+    return result;
+}
+
+// ============================================================================
+// STACKING AND CONCATENATION EXTENSIONS
+// ============================================================================
+
+/**
+ * @brief Split tensor into chunks along specified axis.
+ * @param num_chunks Number of chunks to split into.
+ * @param axis Axis along which to split.
+ * @return Vector of tensors.
+ */
+template <typename T, size_t N>
+std::vector<Tensor<T, N>> split(const Tensor<T, N>& tensor, size_t num_chunks, size_t axis = 0) {
+    if (axis >= N || num_chunks == 0) {
+        return {tensor};
+    }
+    
+    auto dims = tensor.dims();
+    size_t dim_size = dims[axis];
+    
+    if (num_chunks > dim_size) {
+        num_chunks = dim_size;
+    }
+    
+    std::vector<Tensor<T, N>> chunks;
+    chunks.reserve(num_chunks);
+    
+    // Calculate chunk sizes
+    size_t base_size = dim_size / num_chunks;
+    size_t remainder = dim_size % num_chunks;
+    
+    size_t start = 0;
+    for (size_t chunk_idx = 0; chunk_idx < num_chunks; ++chunk_idx) {
+        // First 'remainder' chunks get an extra element
+        size_t chunk_size = base_size + (chunk_idx < remainder ? 1 : 0);
+        
+        if (chunk_size == 0) break;
+        
+        // Create new dimensions for the chunk
+        auto chunk_dims = dims;
+        chunk_dims[axis] = chunk_size;
+        
+        Tensor<T, N> chunk(chunk_dims, tensor.uses_gpu(), false);
+        
+        // Copy data - need to handle arbitrary dimensions
+        // For simplicity, we'll copy using flat indexing with stride calculations
+        std::array<size_t, N> strides;
+        strides[N-1] = 1;
+        for (size_t i = N-1; i-- > 0;) {
+            strides[i] = strides[i+1] * dims[i+1];
+        }
+        
+        std::array<size_t, N> chunk_strides;
+        chunk_strides[N-1] = 1;
+        for (size_t i = N-1; i-- > 0;) {
+            chunk_strides[i] = chunk_strides[i+1] * chunk_dims[i+1];
+        }
+        
+        // Iterate over the chunk
+        size_t chunk_total = chunk.total_size();
+        const T* src_data = tensor.data();
+        T* dst_data = chunk.data();
+        
+        for (size_t i = 0; i < chunk_total; ++i) {
+            // Convert flat index to coordinates in chunk
+            std::array<size_t, N> coords;
+            size_t remaining = i;
+            for (size_t d = 0; d < N; ++d) {
+                coords[d] = remaining / chunk_strides[d];
+                remaining %= chunk_strides[d];
+            }
+            
+            // Adjust coordinate on split axis
+            coords[axis] += start;
+            
+            // Convert to flat index in source
+            size_t src_idx = 0;
+            for (size_t d = 0; d < N; ++d) {
+                src_idx += coords[d] * strides[d];
+            }
+            
+            dst_data[i] = src_data[src_idx];
+        }
+        
+        chunks.push_back(std::move(chunk));
+        start += chunk_size;
+    }
+    
+    return chunks;
+}
+
+/**
+ * @brief Divide tensor into equal-sized chunks (last chunk may be smaller).
+ * @param chunk_size Size of each chunk along the axis.
+ * @param axis Axis along which to divide.
+ * @return Vector of tensors.
+ */
+template <typename T, size_t N>
+std::vector<Tensor<T, N>> chunk(const Tensor<T, N>& tensor, size_t chunk_size, size_t axis = 0) {
+    if (axis >= N || chunk_size == 0) {
+        return {tensor};
+    }
+    
+    auto dims = tensor.dims();
+    size_t dim_size = dims[axis];
+    size_t num_chunks = (dim_size + chunk_size - 1) / chunk_size;
+    
+    std::vector<Tensor<T, N>> chunks;
+    chunks.reserve(num_chunks);
+    
+    // Compute strides for indexing
+    std::array<size_t, N> strides;
+    strides[N-1] = 1;
+    for (size_t i = N-1; i-- > 0;) {
+        strides[i] = strides[i+1] * dims[i+1];
+    }
+    
+    size_t start = 0;
+    for (size_t chunk_idx = 0; chunk_idx < num_chunks; ++chunk_idx) {
+        // Each chunk gets chunk_size elements, except last may be smaller
+        size_t current_chunk_size = std::min(chunk_size, dim_size - start);
+        
+        if (current_chunk_size == 0) break;
+        
+        // Create new dimensions for the chunk
+        auto chunk_dims = dims;
+        chunk_dims[axis] = current_chunk_size;
+        
+        Tensor<T, N> chunk(chunk_dims, tensor.uses_gpu(), false);
+        
+        std::array<size_t, N> chunk_strides;
+        chunk_strides[N-1] = 1;
+        for (size_t i = N-1; i-- > 0;) {
+            chunk_strides[i] = chunk_strides[i+1] * chunk_dims[i+1];
+        }
+        
+        // Copy data
+        size_t chunk_total = chunk.total_size();
+        const T* src_data = tensor.data();
+        T* dst_data = chunk.data();
+        
+        for (size_t i = 0; i < chunk_total; ++i) {
+            // Convert flat index to coordinates in chunk
+            std::array<size_t, N> coords;
+            size_t remaining = i;
+            for (size_t d = 0; d < N; ++d) {
+                coords[d] = remaining / chunk_strides[d];
+                remaining %= chunk_strides[d];
+            }
+            
+            // Adjust coordinate on split axis
+            coords[axis] += start;
+            
+            // Convert to flat index in source
+            size_t src_idx = 0;
+            for (size_t d = 0; d < N; ++d) {
+                src_idx += coords[d] * strides[d];
+            }
+            
+            dst_data[i] = src_data[src_idx];
+        }
+        
+        chunks.push_back(std::move(chunk));
+        start += current_chunk_size;
+    }
+    
+    return chunks;
+}
+
+/**
+ * @brief Repeat tensor multiple times along each dimension.
+ * @param repeats Array specifying number of repetitions for each dimension.
+ * @return Tiled tensor.
+ */
+template <typename T, size_t N>
+Tensor<T, N> tile(const Tensor<T, N>& tensor, const std::array<size_t, N>& repeats) {
+    auto tensor_dims = tensor.dims();
+    std::array<size_t, N> new_dims;
+    for (size_t i = 0; i < N; ++i) {
+        new_dims[i] = tensor_dims[i] * repeats[i];
+    }
+    
+    Tensor<T, N> result(new_dims, tensor.uses_gpu(), false);
+    
+    const T* tensor_data = tensor.data();
+    T* result_data = result.data();
+    
+    // Compute strides for indexing
+    std::array<size_t, N> tensor_strides;
+    std::array<size_t, N> result_strides;
+    tensor_strides[N-1] = 1;
+    result_strides[N-1] = 1;
+    for (size_t i = N-1; i-- > 0;) {
+        tensor_strides[i] = tensor_strides[i+1] * tensor_dims[i+1];
+        result_strides[i] = result_strides[i+1] * new_dims[i+1];
+    }
+    
+    // Fill result with tiled values
+    size_t result_total = result.total_size();
+    for (size_t idx = 0; idx < result_total; ++idx) {
+        // Convert flat index to coordinates
+        std::array<size_t, N> coords;
+        size_t remaining = idx;
+        for (size_t i = 0; i < N; ++i) {
+            coords[i] = remaining / result_strides[i];
+            remaining %= result_strides[i];
+        }
+        
+        // Map to source coordinates
+        std::array<size_t, N> src_coords;
+        for (size_t i = 0; i < N; ++i) {
+            src_coords[i] = coords[i] % tensor_dims[i];
+        }
+        
+        // Convert source coordinates to flat index
+        size_t src_idx = 0;
+        for (size_t i = 0; i < N; ++i) {
+            src_idx += src_coords[i] * tensor_strides[i];
+        }
+        
+        result_data[idx] = tensor_data[src_idx];
+    }
+    
+    return result;
+}
+
+/**
+ * @brief Construct tensor by repeating along specified axis.
+ * @param repeats Number of repetitions.
+ * @param axis Axis along which to repeat.
+ * @return Repeated tensor.
+ */
+template <typename T, size_t N>
+Tensor<T, N> repeat_along_axis(const Tensor<T, N>& tensor, size_t repeats, size_t axis = 0) {
+    if (axis >= N) {
+        return tensor;
+    }
+    
+    auto tensor_dims = tensor.dims();
+    std::array<size_t, N> new_dims = tensor_dims;
+    new_dims[axis] *= repeats;
+    
+    Tensor<T, N> result(new_dims, tensor.uses_gpu(), false);
+    
+    const T* tensor_data = tensor.data();
+    T* result_data = result.data();
+    
+    // Compute strides
+    std::array<size_t, N> tensor_strides;
+    std::array<size_t, N> result_strides;
+    tensor_strides[N-1] = 1;
+    result_strides[N-1] = 1;
+    for (size_t i = N-1; i-- > 0;) {
+        tensor_strides[i] = tensor_strides[i+1] * tensor_dims[i+1];
+        result_strides[i] = result_strides[i+1] * new_dims[i+1];
+    }
+    
+    // Copy data with repetition
+    size_t result_total = result.total_size();
+    for (size_t idx = 0; idx < result_total; ++idx) {
+        // Convert flat index to coordinates
+        std::array<size_t, N> coords;
+        size_t remaining = idx;
+        for (size_t i = 0; i < N; ++i) {
+            coords[i] = remaining / result_strides[i];
+            remaining %= result_strides[i];
+        }
+        
+        // Map coordinate back to source
+        coords[axis] /= repeats;
+        
+        // Convert to flat index in source
+        size_t src_idx = 0;
+        for (size_t i = 0; i < N; ++i) {
+            src_idx += coords[i] * tensor_strides[i];
+        }
+        
+        result_data[idx] = tensor_data[src_idx];
     }
     
     return result;

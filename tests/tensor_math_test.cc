@@ -1,98 +1,75 @@
 #include "tensor.h"
-#include "optimizers.h"
-#include "loss_functions.h"
 #include <gtest/gtest.h>
 
-class TensorTest : public ::testing::Test {
+class TensorMathTest : public ::testing::Test {
 protected:
     void SetUp() override {}
     void TearDown() override {}
 };
 
-TEST_F(TensorTest, ExpFunction) {
-    TensorIndices<2> shape = {2, 2};
+TEST_F(TensorMathTest, ExpFunction) {
+    Tensor<float, 1> x({3});
+    x[{0}] = 0.0f; x[{1}] = 1.0f; x[{2}] = 2.0f;
+    
+    auto result = x.exp();
+    
+    EXPECT_NEAR(result[{0}], 1.0f, 1e-5);
+    EXPECT_NEAR(result[{1}], std::exp(1.0f), 1e-5);
+    EXPECT_NEAR(result[{2}], std::exp(2.0f), 1e-5);
+}
 
-TEST_F(TensorTest, LogFunction) {
-    TensorIndices<2> shape = {2, 2};
+TEST_F(TensorMathTest, LogFunction) {
+    Tensor<float, 1> x({3});
+    x[{0}] = 1.0f; x[{1}] = std::exp(1.0f); x[{2}] = std::exp(2.0f);
+    
+    auto result = x.log();
+    
+    EXPECT_NEAR(result[{0}], 0.0f, 1e-5);
+    EXPECT_NEAR(result[{1}], 1.0f, 1e-5);
+    EXPECT_NEAR(result[{2}], 2.0f, 1e-5);
+}
 
-TEST_F(TensorTest, SqrtFunction) {
-    TensorIndices<2> shape = {2, 2};
+TEST_F(TensorMathTest, SqrtFunction) {
+    Tensor<float, 1> x({3});
+    x[{0}] = 1.0f; x[{1}] = 4.0f; x[{2}] = 9.0f;
+    
+    auto result = x.sqrt();
+    
+    EXPECT_FLOAT_EQ(result[{0}], 1.0f);
+    EXPECT_FLOAT_EQ(result[{1}], 2.0f);
+    EXPECT_FLOAT_EQ(result[{2}], 3.0f);
+}
 
-TEST_F(TensorTest, PowFunction) {
-    TensorIndices<2> shape = {2, 2};
+TEST_F(TensorMathTest, PowFunction) {
+    Tensor<float, 1> x({3});
+    x[{0}] = 2.0f; x[{1}] = 3.0f; x[{2}] = 4.0f;
+    
+    auto result = x.pow(2.0f);
+    
+    EXPECT_FLOAT_EQ(result[{0}], 4.0f);
+    EXPECT_FLOAT_EQ(result[{1}], 9.0f);
+    EXPECT_FLOAT_EQ(result[{2}], 16.0f);
+}
 
-TEST_F(TensorTest, SinCosFunction) {
-    TensorIndices<2> shape = {2, 2};
+TEST_F(TensorMathTest, SigmoidFunction) {
+    Tensor<float, 1> x({3});
+    x[{0}] = 0.0f; x[{1}] = 1.0f; x[{2}] = -1.0f;
+    
+    auto result = x.sigmoid();
+    
+    EXPECT_FLOAT_EQ(result[{0}], 0.5f);
+    EXPECT_NEAR(result[{1}], 1.0f / (1.0f + std::exp(-1.0f)), 1e-5);
+    EXPECT_NEAR(result[{2}], 1.0f / (1.0f + std::exp(1.0f)), 1e-5);
+}
 
-TEST_F(TensorTest, SigmoidFunction) {
-    TensorIndices<2> shape = {2, 2};
-
-TEST_F(TensorTest, TanhFunction) {
-    TensorIndices<2> shape = {2, 2};
-
-TEST_F(TensorTest, ReluFunction) {
-    TensorIndices<2> shape = {2, 2};
-
-TEST_F(TensorTest, LeakyReluDerivative) {
-    TensorIndices<2> shape = {2, 2};
-
-TEST_F(TensorTest, AbsFunction) {
-    TensorIndices<2> shape = {2, 2};
-
-TEST_F(TensorTest, CeilFloorFunction) {
-    TensorIndices<2> shape = {2, 2};
-
-TEST_F(TensorTest, ClampFunction) {
-    TensorIndices<2> shape = {2, 3};
-
-TEST_F(TensorTest, ClipValues) {
-    TensorIndices<1> shape = {5};
-
-TEST_F(TensorTest, ClipWithGradient) {
-    TensorIndices<1> shape = {3};
-
-TEST_F(TensorTest, SquareFunction) {
-    TensorIndices<2> shape = {2, 2};
-
-TEST_F(TensorTest, ExpDerivative) {
-    TensorIndices<2> shape = {2, 2};
-
-TEST_F(TensorTest, LogDerivative) {
-    TensorIndices<2> shape = {2, 2};
-
-TEST_F(TensorTest, PowDerivative) {
-    TensorIndices<2> shape = {2, 2};
-
-TEST_F(TensorTest, SinCosDerivative) {
-    TensorIndices<2> shape = {2, 2};
-
-TEST_F(TensorTest, SigmoidDerivative) {
-    TensorIndices<2> shape = {2, 2};
-
-TEST_F(TensorTest, SigmoidDerivativeFromInput) {
-    TensorIndices<2> shape = {2, 2};
-
-TEST_F(TensorTest, TanhDerivative) {
-    TensorIndices<2> shape = {2, 2};
-
-TEST_F(TensorTest, ReluDerivative) {
-    TensorIndices<2> shape = {2, 2};
-
-TEST_F(TensorTest, SoftmaxBasic) {
-    TensorIndices<2> shape = {2, 3};
-
-TEST_F(TensorTest, LogSoftmax) {
-    TensorIndices<2> shape = {2, 3};
-
-TEST_F(TensorTest, MathFunctionsOn3DTensor) {
-    TensorIndices<3> shape = {2, 2, 2};
-
-TEST_F(TensorTest, ChainedMathOperations) {
-    TensorIndices<2> shape = {2, 2};
-
-TEST_F(TensorTest, MapCustomFunction) {
-    TensorIndices<2> shape = {2, 2};
-
-TEST_F(TensorTest, MapInplaceCustomFunction) {
-    TensorIndices<2> shape = {2, 2};
-
+TEST_F(TensorMathTest, ReluFunction) {
+    Tensor<float, 1> x({4});
+    x[{0}] = -2.0f; x[{1}] = -0.5f; x[{2}] = 0.0f; x[{3}] = 2.0f;
+    
+    auto result = x.relu();
+    
+    EXPECT_FLOAT_EQ(result[{0}], 0.0f);
+    EXPECT_FLOAT_EQ(result[{1}], 0.0f);
+    EXPECT_FLOAT_EQ(result[{2}], 0.0f);
+    EXPECT_FLOAT_EQ(result[{3}], 2.0f);
+}

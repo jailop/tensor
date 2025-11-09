@@ -57,12 +57,8 @@ if(USE_CUDA)
   set_source_files_properties(${GPU_SOURCES} PROPERTIES LANGUAGE CUDA)
 endif()
 
-# Collect test files (just the main comprehensive test file and linalg/io tests)
-set(TEST_SOURCES
-    tests/tensor_test.cc
-    tests/linalg_test.cc
-    tests/tensor_io_test.cc
-)
+# Collect all test files from tests directory
+file(GLOB TEST_SOURCES "tests/*.cc")
 
 # Test executables
 add_executable(

@@ -280,7 +280,7 @@ TEST_F(TensorIOTest, Print1D) {
     }
     
     std::ostringstream oss;
-    print(tensor, oss, 2, 10);
+    print(tensor, oss, 2, 10, 75);
     
     std::string output = oss.str();
     EXPECT_TRUE(output.find("Tensor") != std::string::npos);
@@ -298,7 +298,7 @@ TEST_F(TensorIOTest, Print2D) {
     }
     
     std::ostringstream oss;
-    print(tensor, oss, 1, 10);
+    print(tensor, oss, 1, 10, 75);
     
     std::string output = oss.str();
     EXPECT_TRUE(output.find("shape=[2, 3]") != std::string::npos);
@@ -313,7 +313,7 @@ TEST_F(TensorIOTest, Print1DTruncated) {
     }
     
     std::ostringstream oss;
-    print(tensor, oss, 1, 6);
+    print(tensor, oss, 1, 6, 75);
     
     std::string output = oss.str();
     EXPECT_TRUE(output.find("...") != std::string::npos);
@@ -330,7 +330,7 @@ TEST_F(TensorIOTest, Print2DTruncated) {
     }
     
     std::ostringstream oss;
-    print(tensor, oss, 1, 6);
+    print(tensor, oss, 1, 6, 75);
     
     std::string output = oss.str();
     EXPECT_TRUE(output.find("...") != std::string::npos);

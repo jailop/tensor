@@ -79,9 +79,9 @@ TEST_F(TensorShapeTest, Repeat2D) {
     EXPECT_EQ(dims[1], 6);
     
     // Check pattern is repeated
-    EXPECT_FLOAT_EQ(B[{0, 0}], 1.0f);
-    EXPECT_FLOAT_EQ(B[{0, 3}], 1.0f);  // Repeated in column
-    EXPECT_FLOAT_EQ(B[{2, 0}], 1.0f);  // Repeated in row
+    EXPECT_FLOAT_EQ((B[{0, 0}]), 1.0f);
+    EXPECT_FLOAT_EQ((B[{0, 3}]), 1.0f);  // Repeated in column
+    EXPECT_FLOAT_EQ((B[{2, 0}]), 1.0f);  // Repeated in row
 }
 
 TEST_F(TensorShapeTest, Repeat1D) {
@@ -93,12 +93,12 @@ TEST_F(TensorShapeTest, Repeat1D) {
     auto B = A.repeat({3});
     EXPECT_EQ(B.dims()[0], 9);
     
-    EXPECT_FLOAT_EQ(B[{0}], 1.0f);
-    EXPECT_FLOAT_EQ(B[{1}], 2.0f);
-    EXPECT_FLOAT_EQ(B[{2}], 3.0f);
-    EXPECT_FLOAT_EQ(B[{3}], 1.0f);  // Repeated
-    EXPECT_FLOAT_EQ(B[{4}], 2.0f);
-    EXPECT_FLOAT_EQ(B[{5}], 3.0f);
+    EXPECT_FLOAT_EQ((B[{0}]), 1.0f);
+    EXPECT_FLOAT_EQ((B[{1}]), 2.0f);
+    EXPECT_FLOAT_EQ((B[{2}]), 3.0f);
+    EXPECT_FLOAT_EQ((B[{3}]), 1.0f);  // Repeated
+    EXPECT_FLOAT_EQ((B[{4}]), 2.0f);
+    EXPECT_FLOAT_EQ((B[{5}]), 3.0f);
 }
 
 TEST_F(TensorShapeTest, RepeatNoChange) {
@@ -134,9 +134,9 @@ TEST_F(TensorShapeTest, Tile2D) {
     EXPECT_EQ(dims[1], 6);
     
     // Check tiling pattern
-    EXPECT_FLOAT_EQ(B[{0, 0}], 1.0f);
-    EXPECT_FLOAT_EQ(B[{0, 2}], 1.0f);
-    EXPECT_FLOAT_EQ(B[{2, 0}], 1.0f);
+    EXPECT_FLOAT_EQ((B[{0, 0}]), 1.0f);
+    EXPECT_FLOAT_EQ((B[{0, 2}]), 1.0f);
+    EXPECT_FLOAT_EQ((B[{2, 0}]), 1.0f);
 }
 
 TEST_F(TensorShapeTest, Tile1D) {
@@ -147,10 +147,10 @@ TEST_F(TensorShapeTest, Tile1D) {
     auto B = A.tile({4});
     EXPECT_EQ(B.dims()[0], 8);
     
-    EXPECT_FLOAT_EQ(B[{0}], 5.0f);
-    EXPECT_FLOAT_EQ(B[{1}], 10.0f);
-    EXPECT_FLOAT_EQ(B[{2}], 5.0f);
-    EXPECT_FLOAT_EQ(B[{3}], 10.0f);
+    EXPECT_FLOAT_EQ((B[{0}]), 5.0f);
+    EXPECT_FLOAT_EQ((B[{1}]), 10.0f);
+    EXPECT_FLOAT_EQ((B[{2}]), 5.0f);
+    EXPECT_FLOAT_EQ((B[{3}]), 10.0f);
 }
 
 int main(int argc, char **argv) {

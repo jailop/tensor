@@ -19,11 +19,11 @@ TEST_F(TensorReductionTest, CumsumFlat) {
     
     auto result = t.cumsum();
     
-    EXPECT_FLOAT_EQ(result[{0}], 1.0f);
-    EXPECT_FLOAT_EQ(result[{1}], 3.0f);
-    EXPECT_FLOAT_EQ(result[{2}], 6.0f);
-    EXPECT_FLOAT_EQ(result[{3}], 10.0f);
-    EXPECT_FLOAT_EQ(result[{4}], 15.0f);
+    EXPECT_FLOAT_EQ((result[{0}]), 1.0f);
+    EXPECT_FLOAT_EQ((result[{1}]), 3.0f);
+    EXPECT_FLOAT_EQ((result[{2}]), 6.0f);
+    EXPECT_FLOAT_EQ((result[{3}]), 10.0f);
+    EXPECT_FLOAT_EQ((result[{4}]), 15.0f);
 }
 
 TEST_F(TensorReductionTest, CumprodFlat) {
@@ -34,11 +34,11 @@ TEST_F(TensorReductionTest, CumprodFlat) {
     
     auto result = t.cumprod();
     
-    EXPECT_FLOAT_EQ(result[{0}], 1.0f);
-    EXPECT_FLOAT_EQ(result[{1}], 2.0f);
-    EXPECT_FLOAT_EQ(result[{2}], 6.0f);
-    EXPECT_FLOAT_EQ(result[{3}], 24.0f);
-    EXPECT_FLOAT_EQ(result[{4}], 120.0f);
+    EXPECT_FLOAT_EQ((result[{0}]), 1.0f);
+    EXPECT_FLOAT_EQ((result[{1}]), 2.0f);
+    EXPECT_FLOAT_EQ((result[{2}]), 6.0f);
+    EXPECT_FLOAT_EQ((result[{3}]), 24.0f);
+    EXPECT_FLOAT_EQ((result[{4}]), 120.0f);
 }
 
 TEST_F(TensorReductionTest, CumsumAxis0) {
@@ -50,12 +50,12 @@ TEST_F(TensorReductionTest, CumsumAxis0) {
     auto result = t.cumsum_axis(0);
     
     // Cumulative sum along rows
-    EXPECT_FLOAT_EQ(result[{0, 0}], 1.0f);
-    EXPECT_FLOAT_EQ(result[{0, 1}], 2.0f);
-    EXPECT_FLOAT_EQ(result[{1, 0}], 4.0f);
-    EXPECT_FLOAT_EQ(result[{1, 1}], 6.0f);
-    EXPECT_FLOAT_EQ(result[{2, 0}], 9.0f);
-    EXPECT_FLOAT_EQ(result[{2, 1}], 12.0f);
+    EXPECT_FLOAT_EQ((result[{0, 0}]), 1.0f);
+    EXPECT_FLOAT_EQ((result[{0, 1}]), 2.0f);
+    EXPECT_FLOAT_EQ((result[{1, 0}]), 4.0f);
+    EXPECT_FLOAT_EQ((result[{1, 1}]), 6.0f);
+    EXPECT_FLOAT_EQ((result[{2, 0}]), 9.0f);
+    EXPECT_FLOAT_EQ((result[{2, 1}]), 12.0f);
 }
 
 TEST_F(TensorReductionTest, CumsumAxis1) {
@@ -66,12 +66,12 @@ TEST_F(TensorReductionTest, CumsumAxis1) {
     auto result = t.cumsum_axis(1);
     
     // Cumulative sum along columns
-    EXPECT_FLOAT_EQ(result[{0, 0}], 1.0f);
-    EXPECT_FLOAT_EQ(result[{0, 1}], 3.0f);
-    EXPECT_FLOAT_EQ(result[{0, 2}], 6.0f);
-    EXPECT_FLOAT_EQ(result[{1, 0}], 4.0f);
-    EXPECT_FLOAT_EQ(result[{1, 1}], 9.0f);
-    EXPECT_FLOAT_EQ(result[{1, 2}], 15.0f);
+    EXPECT_FLOAT_EQ((result[{0, 0}]), 1.0f);
+    EXPECT_FLOAT_EQ((result[{0, 1}]), 3.0f);
+    EXPECT_FLOAT_EQ((result[{0, 2}]), 6.0f);
+    EXPECT_FLOAT_EQ((result[{1, 0}]), 4.0f);
+    EXPECT_FLOAT_EQ((result[{1, 1}]), 9.0f);
+    EXPECT_FLOAT_EQ((result[{1, 2}]), 15.0f);
 }
 
 TEST_F(TensorReductionTest, CumprodAxis0) {
@@ -83,12 +83,12 @@ TEST_F(TensorReductionTest, CumprodAxis0) {
     auto result = t.cumprod_axis(0);
     
     // Cumulative product along rows
-    EXPECT_FLOAT_EQ(result[{0, 0}], 1.0f);
-    EXPECT_FLOAT_EQ(result[{0, 1}], 2.0f);
-    EXPECT_FLOAT_EQ(result[{1, 0}], 3.0f);
-    EXPECT_FLOAT_EQ(result[{1, 1}], 8.0f);
-    EXPECT_FLOAT_EQ(result[{2, 0}], 15.0f);
-    EXPECT_FLOAT_EQ(result[{2, 1}], 48.0f);
+    EXPECT_FLOAT_EQ((result[{0, 0}]), 1.0f);
+    EXPECT_FLOAT_EQ((result[{0, 1}]), 2.0f);
+    EXPECT_FLOAT_EQ((result[{1, 0}]), 3.0f);
+    EXPECT_FLOAT_EQ((result[{1, 1}]), 8.0f);
+    EXPECT_FLOAT_EQ((result[{2, 0}]), 15.0f);
+    EXPECT_FLOAT_EQ((result[{2, 1}]), 48.0f);
 }
 
 TEST_F(TensorReductionTest, CumprodAxis1) {
@@ -99,12 +99,12 @@ TEST_F(TensorReductionTest, CumprodAxis1) {
     auto result = t.cumprod_axis(1);
     
     // Cumulative product along columns
-    EXPECT_FLOAT_EQ(result[{0, 0}], 1.0f);
-    EXPECT_FLOAT_EQ(result[{0, 1}], 2.0f);
-    EXPECT_FLOAT_EQ(result[{0, 2}], 6.0f);
-    EXPECT_FLOAT_EQ(result[{1, 0}], 2.0f);
-    EXPECT_FLOAT_EQ(result[{1, 1}], 6.0f);
-    EXPECT_FLOAT_EQ(result[{1, 2}], 24.0f);
+    EXPECT_FLOAT_EQ((result[{0, 0}]), 1.0f);
+    EXPECT_FLOAT_EQ((result[{0, 1}]), 2.0f);
+    EXPECT_FLOAT_EQ((result[{0, 2}]), 6.0f);
+    EXPECT_FLOAT_EQ((result[{1, 0}]), 2.0f);
+    EXPECT_FLOAT_EQ((result[{1, 1}]), 6.0f);
+    EXPECT_FLOAT_EQ((result[{1, 2}]), 24.0f);
 }
 
 TEST_F(TensorReductionTest, CumsumAxisOutOfBounds) {

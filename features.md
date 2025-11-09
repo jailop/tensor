@@ -11,6 +11,13 @@
 - Broadcasting support for operations
 - Scalar operations
 
+### Performance Optimizations (via tensor_perf.h)
+- [x] Automatic backend selection (GPU → BLAS → CPU)
+- [x] Memory pooling for reduced allocation overhead
+- [x] Multi-threading via ThreadPool and parallel_for
+- [x] Mixed precision support (FP16, BF16)
+- [x] Lazy evaluation support with operation fusion
+
 ### Automatic Differentiation (Autograd)
 - Gradient tracking (`requires_grad`)
 - Computational graph building
@@ -116,16 +123,41 @@
 - Zero/ones initialization
 - Identity matrix creation
 
+### Random Sampling (via tensor.h - TensorRandom class)
+- [x] `uniform()` - uniform distribution [low, high)
+- [x] `normal()` - normal/Gaussian distribution
+- [x] `exponential()` - exponential distribution
+- [x] `randperm()` - random permutation as tensor
+- [x] `permutation()` - random permutation as vector
+- [x] `choice()` - random sampling without replacement
+- [x] `choice_with_replacement()` - random sampling with replacement
+- [x] `seed()` - set random seed for reproducibility
+
+### Sorting and Searching (via tensor.h)
+- [x] `sort()` - sort tensor (1D, ascending/descending)
+- [x] `argsort()` - indices that would sort tensor
+- [x] `topk()` - k largest/smallest elements with indices
+- [x] `unique()` - find unique elements (sorted)
+- [x] `searchsorted()` - binary search for insertion indices
+
+### Stacking and Concatenation Extensions (via tensor.h)
+- [x] `split()` - split tensor into N chunks along axis
+- [x] `chunk()` - divide tensor into equal-sized chunks
+- [x] `tile()` - repeat tensor multiple times along dimensions
+- [x] `repeat_along_axis()` - repeat tensor along specific axis
+
+### Performance Optimizations (via tensor_perf.h)
+- [x] Automatic backend selection (GPU → BLAS → CPU)
+- [x] Memory pooling for reduced allocation overhead
+- [x] Multi-threading via ThreadPool and parallel_for
+- [x] Mixed precision support (FP16, BF16)
+- [x] Lazy evaluation support with operation fusion
+
 ## In Progress 🚧
 
 None currently - ready for next feature set!
 
 ## Pending Features 📋
-
-### Stacking and Concatenation Extensions
-- [ ] `split()` - split tensor into chunks
-- [ ] `chunk()` - divide tensor into equal parts
-- [ ] `tile()` - repeat tensor multiple times
 
 ### Additional Math Functions
 - [ ] `where()` - conditional selection (ternary operator)
@@ -143,28 +175,13 @@ None currently - ready for next feature set!
 - [ ] Condition number
 - [ ] Least squares solver
 
-### Sorting and Searching
-- [ ] `sort()` - sort tensor
-- [ ] `argsort()` - indices that would sort
-- [ ] `topk()` - k largest/smallest elements
-- [ ] `unique()` - find unique elements
-- [ ] `searchsorted()` - binary search
-
-### Random Sampling
-- [ ] Additional distributions (exponential, gamma, beta, etc.)
-- [ ] Random permutation
-- [ ] Random choice/sampling
+### Random Sampling Extensions
+- [ ] Additional distributions (gamma, beta, chi-square, etc.)
+- [ ] Multinomial distribution
 
 ### Broadcasting Enhancements
 - [ ] Explicit broadcast_to() function
 - [ ] Better error messages for broadcast failures
-
-### Performance Optimizations
-- [x] Automatic backend selection (GPU → BLAS → CPU)
-- [ ] Lazy evaluation for chained operations
-- [ ] Memory pooling
-- [ ] Multi-threading for CPU operations
-- [ ] Mixed precision support (fp16, bf16)
 
 ### Numpy Compatibility
 - [ ] Compatible API names where possible

@@ -21,7 +21,7 @@ int main() {
     
     // Print the tensor
     std::cout << "\nOriginal tensor:\n";
-    print(tensor, std::cout, 2);
+    print(tensor, std::cout, 2, 6, 75);
     
     // Save to binary format
     std::cout << "\n2. Saving to binary format (tensor.tnsr)...\n";
@@ -48,7 +48,7 @@ int main() {
     if (std::holds_alternative<Tensor<float, 2>>(result)) {
         auto loaded = std::get<Tensor<float, 2>>(result);
         std::cout << "Successfully loaded tensor:\n";
-        print(loaded, std::cout, 2);
+        print(loaded, std::cout, 2, 6, 75);
         
         // Verify data
         bool match = true;
@@ -88,7 +88,7 @@ int main() {
             large[{i, j}] = static_cast<float>(i * 10 + j);
         }
     }
-    print(large, std::cout, 1, 6);  // Print with truncation at 6 items
+    print(large, std::cout, 1, 6, 75);  // Print with truncation at 6 items
     
     // Clean up
     std::remove("tensor.tnsr");

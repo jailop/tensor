@@ -1,74 +1,70 @@
-#include "tensor.h"
-#include "optimizers.h"
-#include "loss_functions.h"
+#include "../include/tensor.h"
+#include "../include/optimizers.h"
+#include "../include/loss_functions.h"
 #include <gtest/gtest.h>
 
-class TensorTest : public ::testing::Test {
+class TensorBasicTest : public ::testing::Test {
 protected:
     void SetUp() override {}
     void TearDown() override {}
 };
 
-TEST_F(TensorTest, Constructor1DInitializesShape) {
-    TensorIndices<1> shape = {10};
+TEST_F(TensorBasicTest, Constructor1DInitializesShape) {
+    Tensor<float, 1> tensor({10});
+    ASSERT_EQ(tensor.dims()[0], 10);
+}
 
-TEST_F(TensorTest, Constructor2DInitializesShape) {
-    TensorIndices<2> shape = {3, 4};
+TEST_F(TensorBasicTest, Constructor2DInitializesShape) {
+    Tensor<float, 2> tensor({3, 4});
+    ASSERT_EQ(tensor.dims()[0], 3);
+    ASSERT_EQ(tensor.dims()[1], 4);
+}
 
-TEST_F(TensorTest, Constructor3DInitializesShape) {
-    TensorIndices<3> shape = {2, 3, 4};
+TEST_F(TensorBasicTest, Constructor3DInitializesShape) {
+    Tensor<float, 3> tensor({2, 3, 4});
+    ASSERT_EQ(tensor.dims()[0], 2);
+    ASSERT_EQ(tensor.dims()[1], 3);
+    ASSERT_EQ(tensor.dims()[2], 4);
+}
 
-TEST_F(TensorTest, Constructor4DInitializesShape) {
-    TensorIndices<4> shape = {2, 3, 4, 5};
+TEST_F(TensorBasicTest, FillMethod1DSetsAllElements) {
+    Tensor<float, 1> tensor({10});
+    tensor.fill(5.0f);
+    
+    for (size_t i = 0; i < 10; ++i) {
+        ASSERT_FLOAT_EQ(tensor[{i}], 5.0f);
+    }
+}
 
-TEST_F(TensorTest, SetAndGet1DElement) {
-    TensorIndices<1> shape = {10};
+TEST_F(TensorBasicTest, FillMethod2DSetsAllElements) {
+    Tensor<float, 2> tensor({3, 4});
+    tensor.fill(2.5f);
+    
+    for (size_t i = 0; i < 3; ++i) {
+        for (size_t j = 0; j < 4; ++j) {
+            ASSERT_FLOAT_EQ((tensor[{i, j}]), 2.5f);
+        }
+    }
+}
 
-TEST_F(TensorTest, SetAndGet2DElement) {
-    TensorIndices<2> shape = {3, 4};
+TEST_F(TensorBasicTest, SetAndGet2DElement) {
+    Tensor<float, 2> tensor({3, 4});
+    tensor[{1, 2}] = 7.5f;
+    ASSERT_FLOAT_EQ((tensor[{1, 2}]), 7.5f);
+}
 
-TEST_F(TensorTest, SetAndGet3DElement) {
-    TensorIndices<3> shape = {2, 3, 4};
-
-TEST_F(TensorTest, SetAndGetMultiple2DElements) {
-    TensorIndices<2> shape = {3, 3};
-
-TEST_F(TensorTest, SetAndGetMultiple3DElements) {
-    TensorIndices<3> shape = {2, 2, 2};
-
-TEST_F(TensorTest, CopyConstructor1DCreatesIndependentCopy) {
-    TensorIndices<1> shape = {5};
-
-TEST_F(TensorTest, CopyConstructor2DCreatesIndependentCopy) {
-    TensorIndices<2> shape = {3, 3};
-
-TEST_F(TensorTest, CopyConstructorCopiesAllElements) {
-    TensorIndices<2> shape = {2, 3};
-
-TEST_F(TensorTest, DifferentShapeSizes) {
-    TensorIndices<1> shape1 = {100};
-
-TEST_F(TensorTest, IntegerTypeWorks) {
-    TensorIndices<2> shape = {3, 3};
-
-TEST_F(TensorTest, DoubleTypeWorks) {
-    TensorIndices<2> shape = {3, 3};
-
-TEST_F(TensorTest, ConstAccessorWorks) {
-    TensorIndices<2> shape = {3, 3};
-
-TEST_F(TensorTest, BoundaryElements) {
-    TensorIndices<3> shape = {3, 4, 5};
-
-TEST_F(TensorTest, FillMethod1DSetsAllElements) {
-    TensorIndices<1> shape = {10};
-
-TEST_F(TensorTest, FillMethod2DSetsAllElements) {
-    TensorIndices<2> shape = {3, 4};
-
-TEST_F(TensorTest, FillMethod3DSetsAllElements) {
-    TensorIndices<3> shape = {2, 2, 2};
-
-TEST_F(TensorTest, FillWithIntegerType) {
-    TensorIndices<2> shape = {2, 3};
-
+TEST_F(TensorBasicTest, CopyConstructor) {
+    Tensor<float, 2> tensor({3, 3});
+    tensor.fill(1.0f);
+    
+    Tensor<float, 2> copy = tensor;
+    
+    ASSERT_EQ(copy.shape()[0], tensor.shape()[0]);
+    ASSERT_EQ(copy.shape()[1], tensor.shape()[1]);
+    
+    for (size_t i = 0; i < 3; ++i) {
+        for (size_t j = 0; j < 3; ++j) {
+            ASSERT_FLOAT_EQ((copy[{i, j}]), (tensor[{i, j}]));
+        }
+    }
+}

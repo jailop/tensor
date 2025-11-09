@@ -1585,6 +1585,182 @@ void write_results_to_csv(const std::string& filename) {
     std::cout << "\nResults written to: " << filename << std::endl;
 }
 
+// ============================================
+// Performance Optimization Benchmarks
+// ============================================
+
+void benchmark_memory_pool() {
+    std::cout << "\n=== Memory Pool Benchmark ===" << std::endl;
+    
+    // Benchmark standard allocation vs pool allocation
+    const size_t alloc_size = 10000;
+    const int num_allocs = 1000;
+    
+    benchmark(
+        "MemoryPool",
+        "Standard new/delete (" + std::to_string(num_allocs) + " allocations)",
+        [&]() {
+            std::vector<float*> ptrs;
+            for (int i = 0; i < num_allocs; ++i) {
+                ptrs.push_back(new float[alloc_size]);
+            }
+            for (auto ptr : ptrs) {
+                delete[] ptr;
+            }
+        }, 5, num_allocs * alloc_size);
+    
+    benchmark(
+        "MemoryPool",
+        "Pool allocate/deallocate (" + std::to_string(num_allocs) + " allocations)",
+        [&]() {
+            auto& pool = get_memory_pool<float>();
+            std::vector<float*> ptrs;
+            for (int i = 0; i < num_allocs; ++i) {
+                ptrs.push_back(pool.allocate(alloc_size));
+            }
+            for (auto ptr : ptrs) {
+                pool.deallocate(ptr, alloc_size);
+            }
+        }, 5, num_allocs * alloc_size);
+}
+
+void benchmark_thread_pool() {
+    std::cout << "\n=== Thread Pool Benchmark ===" << std::endl;
+    
+    const size_t num_tasks = 1000;
+    
+    benchmark(
+        "ThreadPool",
+        "Serial execution (" + std::to_string(num_tasks) + " tasks)",
+        [&]() {
+            std::vector<double> results;
+            for (size_t i = 0; i < num_tasks; ++i) {
+                results.push_back(std::sqrt(static_cast<double>(i)));
+            }
+            volatile double sum = 0;
+            for (auto r : results) sum += r;
+            (void)sum;
+        }, ITERATIONS_FAST, num_tasks);
+    
+    benchmark(
+        "ThreadPool",
+        "ThreadPool execution (" + std::to_string(num_tasks) + " tasks)",
+        [&]() {
+            auto& pool = get_thread_pool();
+            std::vector<std::future<double>> futures;
+            for (size_t i = 0; i < num_tasks; ++i) {
+                futures.push_back(pool.enqueue([i]() {
+                    return std::sqrt(static_cast<double>(i));
+                }));
+            }
+            volatile double sum = 0;
+            for (auto& f : futures) sum += f.get();
+            (void)sum;
+        }, ITERATIONS_FAST, num_tasks);
+}
+
+void benchmark_parallel_for() {
+    std::cout << "\n=== Parallel For Benchmark ===" << std::endl;
+    
+    const size_t data_size = 1000000;
+    std::vector<double> data(data_size);
+    
+    benchmark(
+        "ParallelFor",
+        "Serial for-loop (1M elements)",
+        [&]() {
+            for (size_t i = 0; i < data_size; ++i) {
+                data[i] = std::sqrt(static_cast<double>(i));
+            }
+        }, 5, data_size);
+    
+    benchmark(
+        "ParallelFor",
+        "parallel_for (1M elements)",
+        [&]() {
+            parallel_for(0, data_size, [&](size_t i) {
+                data[i] = std::sqrt(static_cast<double>(i));
+            });
+        }, 5, data_size);
+}
+
+void benchmark_mixed_precision() {
+    std::cout << "\n=== Mixed Precision Benchmark ===" << std::endl;
+    
+    const size_t array_size = 100000;
+    std::vector<float> fp32_data(array_size);
+    std::vector<Float16> fp16_data(array_size);
+    std::vector<BFloat16> bf16_data(array_size);
+    
+    // Initialize
+    for (size_t i = 0; i < array_size; ++i) {
+        fp32_data[i] = static_cast<float>(i) * 0.01f;
+    }
+    
+    benchmark(
+        "MixedPrecision",
+        "FP32 to FP16 conversion (100K elements)",
+        [&]() {
+            convert_fp32_to_fp16(fp32_data.data(), fp16_data.data(), array_size);
+        }, ITERATIONS_FAST, array_size);
+    
+    benchmark(
+        "MixedPrecision",
+        "FP16 to FP32 conversion (100K elements)",
+        [&]() {
+            convert_fp16_to_fp32(fp16_data.data(), fp32_data.data(), array_size);
+        }, ITERATIONS_FAST, array_size);
+    
+    benchmark(
+        "MixedPrecision",
+        "FP32 to BF16 conversion (100K elements)",
+        [&]() {
+            convert_fp32_to_bf16(fp32_data.data(), bf16_data.data(), array_size);
+        }, ITERATIONS_FAST, array_size);
+    
+    benchmark(
+        "MixedPrecision",
+        "BF16 to FP32 conversion (100K elements)",
+        [&]() {
+            convert_bf16_to_fp32(bf16_data.data(), fp32_data.data(), array_size);
+        }, ITERATIONS_FAST, array_size);
+}
+
+void benchmark_lazy_evaluation() {
+    std::cout << "\n=== Lazy Evaluation Benchmark ===" << std::endl;
+    
+    const size_t array_size = 100000;
+    std::vector<float> src(array_size);
+    std::vector<float> dst(array_size);
+    
+    // Initialize
+    for (size_t i = 0; i < array_size; ++i) {
+        src[i] = static_cast<float>(i) * 0.001f;
+    }
+    
+    benchmark(
+        "LazyEval",
+        "Separate exp + tanh (100K elements)",
+        [&]() {
+            std::vector<float> temp(array_size);
+            for (size_t i = 0; i < array_size; ++i) {
+                temp[i] = std::exp(src[i]);
+            }
+            for (size_t i = 0; i < array_size; ++i) {
+                dst[i] = std::tanh(temp[i]);
+            }
+        }, ITERATIONS_FAST, array_size * 2);
+    
+    benchmark(
+        "LazyEval",
+        "Fused exp + tanh (100K elements)",
+        [&]() {
+            std::vector<OperationType> ops = {OperationType::Exp, OperationType::Tanh};
+            auto fused = fuse_operations<float>(ops);
+            fused(dst.data(), src.data(), array_size);
+        }, ITERATIONS_FAST, array_size);
+}
+
 int main() {
     std::cout << "=====================================" << std::endl;
     std::cout << "  Tensor Performance Benchmark Suite" << std::endl;
@@ -1612,6 +1788,13 @@ int main() {
     benchmark_linalg_vector_ops();
     benchmark_linalg_matrix_ops();
     benchmark_linalg_views();
+    
+    // Performance optimization benchmarks
+    benchmark_memory_pool();
+    benchmark_thread_pool();
+    benchmark_parallel_for();
+    benchmark_mixed_precision();
+    benchmark_lazy_evaluation();
     
 #ifdef USE_GPU
     benchmark_gpu_intensive();
