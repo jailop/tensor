@@ -3176,8 +3176,3 @@ TEST_F(TensorTest, HStack) {
     EXPECT_FLOAT_EQ((hstacked[{0, 0}]), 1.0f);
     EXPECT_FLOAT_EQ((hstacked[{0, 2}]), 2.0f);
 }
-
-int main(int argc, char **argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}

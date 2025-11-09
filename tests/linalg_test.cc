@@ -128,8 +128,3 @@ TEST(LinalgTest, MatrixBlockView) {
     EXPECT_NEAR((block[{0, 0}]), 7.0f, 1e-5);
     EXPECT_NEAR((block[{1, 1}]), 13.0f, 1e-5);
 }
-
-int main(int argc, char **argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}

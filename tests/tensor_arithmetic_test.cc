@@ -23,7 +23,7 @@ TEST_F(TensorArithmeticTest, AddTensorToTensor1D) {
     }
     
     auto result_var = a + b;
-    ASSERT_TRUE(std::holds_alternative<Tensor<float, 1>>(result_var));
+    ASSERT_TRUE((std::holds_alternative<Tensor<float, 1>>(result_var)));
     auto& c = std::get<Tensor<float, 1>>(result_var);
     
     for (size_t i = 0; i < 5; ++i) {
@@ -39,9 +39,7 @@ TEST_F(TensorArithmeticTest, AddScalarToTensor) {
         a.data()[i] = static_cast<float>(i);
     }
     
-    auto result_var = a + 5.0f;
-    ASSERT_TRUE(std::holds_alternative<Tensor<float, 2>>(result_var));
-    auto& c = std::get<Tensor<float, 2>>(result_var);
+    auto c = a + 5.0f;
     
     for (size_t i = 0; i < 4; ++i) {
         EXPECT_FLOAT_EQ(c.data()[i], static_cast<float>(i) + 5.0f);
@@ -59,7 +57,7 @@ TEST_F(TensorArithmeticTest, SubtractTensorFromTensor) {
     }
     
     auto result_var = a - b;
-    ASSERT_TRUE(std::holds_alternative<Tensor<float, 2>>(result_var));
+    ASSERT_TRUE((std::holds_alternative<Tensor<float, 2>>(result_var)));
     auto& c = std::get<Tensor<float, 2>>(result_var);
     
     for (size_t i = 0; i < 4; ++i) {
@@ -78,7 +76,7 @@ TEST_F(TensorArithmeticTest, MultiplyTensorByTensor) {
     }
     
     auto result_var = a * b;
-    ASSERT_TRUE(std::holds_alternative<Tensor<float, 2>>(result_var));
+    ASSERT_TRUE((std::holds_alternative<Tensor<float, 2>>(result_var)));
     auto& c = std::get<Tensor<float, 2>>(result_var);
     
     for (size_t i = 0; i < 4; ++i) {
@@ -94,9 +92,7 @@ TEST_F(TensorArithmeticTest, MultiplyTensorByScalar) {
         a.data()[i] = static_cast<float>(i);
     }
     
-    auto result_var = a * 3.0f;
-    ASSERT_TRUE(std::holds_alternative<Tensor<float, 2>>(result_var));
-    auto& c = std::get<Tensor<float, 2>>(result_var);
+    auto c = a * 3.0f;
     
     for (size_t i = 0; i < 4; ++i) {
         EXPECT_FLOAT_EQ(c.data()[i], static_cast<float>(i * 3));
@@ -114,7 +110,7 @@ TEST_F(TensorArithmeticTest, DivideTensorByTensor) {
     }
     
     auto result_var = a / b;
-    ASSERT_TRUE(std::holds_alternative<Tensor<float, 2>>(result_var));
+    ASSERT_TRUE((std::holds_alternative<Tensor<float, 2>>(result_var)));
     auto& c = std::get<Tensor<float, 2>>(result_var);
     
     for (size_t i = 0; i < 4; ++i) {
@@ -162,9 +158,7 @@ TEST_F(TensorArithmeticTest, UnaryNegation) {
         a.data()[i] = static_cast<float>(i);
     }
     
-    auto result_var = -a;
-    ASSERT_TRUE(std::holds_alternative<Tensor<float, 2>>(result_var));
-    auto& b = std::get<Tensor<float, 2>>(result_var);
+    auto b = -a;
     
     for (size_t i = 0; i < 4; ++i) {
         EXPECT_FLOAT_EQ(b.data()[i], -static_cast<float>(i));
