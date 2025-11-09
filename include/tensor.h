@@ -5362,6 +5362,228 @@ public:
     Tensor<T, 2> rightCols(size_t n) const {
         return ::rightCols(*static_cast<const Tensor<T, 2>*>(static_cast<const void*>(this)), n);
     }
+    
+    // ============================================
+    // Enhanced Operations for Neural Networks
+    // ============================================
+    
+    /**
+     * @brief Apply softmax activation along rows (axis=1) for 2D tensors
+     * 
+     * Computes softmax(x) = exp(x - max(x)) / sum(exp(x - max(x))) row-wise.
+     * Numerically stable implementation using max subtraction.
+     * 
+     * @return New tensor with softmax applied to each row
+     * 
+     * @section example_softmax Example
+     * @code
+     * Tensor<float, 2> logits({batch_size, num_classes});
+     * auto probs = logits.softmax_rows();  // Convert to probabilities
+     * @endcode
+     */
+    template<size_t M = N, typename = std::enable_if_t<M == 2>>
+    Tensor<T, 2> softmax_rows() const {
+        auto shape = dims_;
+        size_t batch_size = shape[0];
+        size_t num_classes = shape[1];
+        
+        Tensor<T, 2> result(shape, use_gpu_);
+        const T* input_ptr = data_.get();
+        T* output_ptr = result.data_.get();
+        
+        for (size_t i = 0; i < batch_size; ++i) {
+            const T* row_in = input_ptr + i * num_classes;
+            T* row_out = output_ptr + i * num_classes;
+            
+            // Find max for numerical stability
+            T max_val = *std::max_element(row_in, row_in + num_classes);
+            
+            // Compute exp(x - max) and sum
+            T sum = T(0);
+            for (size_t j = 0; j < num_classes; ++j) {
+                row_out[j] = std::exp(row_in[j] - max_val);
+                sum += row_out[j];
+            }
+            
+            // Normalize
+            T inv_sum = T(1) / sum;
+            for (size_t j = 0; j < num_classes; ++j) {
+                row_out[j] *= inv_sum;
+            }
+        }
+        
+        return result;
+    }
+    
+    /**
+     * @brief Find argmax for each row in a 2D tensor
+     * 
+     * Returns column index of maximum value for each row.
+     * Useful for extracting predicted classes from probability distributions.
+     * 
+     * @return 1D tensor of size (rows) containing column indices
+     * 
+     * @section example_argmax_rows Example
+     * @code
+     * Tensor<float, 2> predictions({batch_size, num_classes});
+     * auto pred_classes = predictions.argmax_rows();  // 1D tensor with class indices
+     * @endcode
+     */
+    template<size_t M = N, typename = std::enable_if_t<M == 2>>
+    Tensor<size_t, 1> argmax_rows() const {
+        size_t num_rows = dims_[0];
+        size_t num_cols = dims_[1];
+        
+        Tensor<size_t, 1> result({num_rows}, false);  // Indices don't need GPU
+        const T* data_ptr = data_.get();
+        size_t* result_ptr = result.data_ptr();
+        
+        for (size_t i = 0; i < num_rows; ++i) {
+            const T* row = data_ptr + i * num_cols;
+            
+            size_t max_idx = 0;
+            T max_val = row[0];
+            
+            for (size_t j = 1; j < num_cols; ++j) {
+                if (row[j] > max_val) {
+                    max_val = row[j];
+                    max_idx = j;
+                }
+            }
+            
+            result_ptr[i] = max_idx;
+        }
+        
+        return result;
+    }
+    
+    /**
+     * @brief Fill tensor with random values from normal distribution
+     * 
+     * Uses direct pointer access for efficient initialization.
+     * 
+     * @param mean Mean of the distribution (default: 0.0)
+     * @param stddev Standard deviation (default: 1.0)
+     * 
+     * @section example_randn Example
+     * @code
+     * Tensor<float, 2> weights({hidden_size, input_size});
+     * weights.randn(0.0f, 0.01f);  // Initialize with small random values
+     * @endcode
+     */
+    void randn(T mean = T(0), T stddev = T(1)) {
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::normal_distribution<T> dist(mean, stddev);
+        
+        T* data_ptr = data_.get();
+        size_t total = total_size();
+        
+        for (size_t i = 0; i < total; ++i) {
+            data_ptr[i] = dist(gen);
+        }
+    }
+    
+    /**
+     * @brief Fill tensor with random values from uniform distribution
+     * 
+     * Uses direct pointer access for efficient initialization.
+     * 
+     * @param min Minimum value (default: 0.0)
+     * @param max Maximum value (default: 1.0)
+     * 
+     * @section example_rand_uniform Example
+     * @code
+     * Tensor<float, 2> dropout_mask({batch_size, features});
+     * dropout_mask.rand_uniform(0.0f, 1.0f);
+     * @endcode
+     */
+    void rand_uniform(T min = T(0), T max = T(1)) {
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_real_distribution<T> dist(min, max);
+        
+        T* data_ptr = data_.get();
+        size_t total = total_size();
+        
+        for (size_t i = 0; i < total; ++i) {
+            data_ptr[i] = dist(gen);
+        }
+    }
+    
+    /**
+     * @brief Fused operation: this -= scalar * other
+     * 
+     * Optimized for SGD weight updates: weights -= learning_rate * gradients
+     * Avoids temporary tensor allocation.
+     * 
+     * @param scalar Scaling factor
+     * @param other Tensor to scale and subtract
+     * @return Reference to this tensor for chaining
+     * 
+     * @section example_fused_scalar_mul_sub Example
+     * @code
+     * Tensor<float, 2> weights({output_size, input_size});
+     * Tensor<float, 2> gradients({output_size, input_size});
+     * weights.fused_scalar_mul_sub(0.01f, gradients);  // weights -= 0.01 * gradients
+     * @endcode
+     */
+    Tensor<T, N>& fused_scalar_mul_sub(T scalar, const Tensor<T, N>& other) {
+        if (dims_ != other.dims_) {
+            return *this;  // Dimensions must match
+        }
+        
+        size_t total = total_size();
+        T* this_ptr = data_.get();
+        const T* other_ptr = other.data_.get();
+        
+#ifdef USE_GPU
+        if (use_gpu_ && other.use_gpu_) {
+            // Could add GPU kernel for this operation
+            for (size_t i = 0; i < total; ++i) {
+                this_ptr[i] -= scalar * other_ptr[i];
+            }
+        } else
+#endif
+        {
+            for (size_t i = 0; i < total; ++i) {
+                this_ptr[i] -= scalar * other_ptr[i];
+            }
+        }
+        
+        return *this;
+    }
+    
+    /**
+     * @brief Fill rows from vector of vectors (2D tensors only)
+     * 
+     * Efficiently copies multiple rows from std::vector<std::vector<T>>.
+     * Useful for batch data preparation.
+     * 
+     * @param data Vector of row vectors to copy
+     * @param start_row Starting row index in tensor (default: 0)
+     * 
+     * @section example_fill_rows Example
+     * @code
+     * Tensor<float, 2> batch({batch_size, num_features});
+     * std::vector<std::vector<float>> images = load_images();
+     * batch.fill_rows(images, 0);  // Fill from row 0
+     * @endcode
+     */
+    template<size_t M = N, typename = std::enable_if_t<M == 2>>
+    void fill_rows(const std::vector<std::vector<T>>& data, size_t start_row = 0) {
+        size_t num_cols = dims_[1];
+        T* tensor_ptr = data_.get();
+        
+        for (size_t i = 0; i < data.size() && (start_row + i) < dims_[0]; ++i) {
+            if (data[i].size() != num_cols) {
+                continue;  // Skip rows with incorrect size
+            }
+            
+            T* row_ptr = tensor_ptr + (start_row + i) * num_cols;
+            std::copy(data[i].begin(), data[i].end(), row_ptr);
+        }
+    }
 };
 
 

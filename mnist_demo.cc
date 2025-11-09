@@ -41,6 +41,32 @@ constexpr size_t IMAGE_PIXELS = IMAGE_SIZE * IMAGE_SIZE;  // 784
 constexpr size_t NUM_CLASSES = 10;
 
 /**
+ * @brief Print system and backend information
+ */
+void print_system_info() {
+    std::cout << "\n=== System Information ===" << std::endl;
+    
+#ifdef USE_GPU
+    std::cout << "GPU Support: Enabled" << std::endl;
+    if (is_gpu_available()) {
+        std::cout << "GPU Status: Available and will be used" << std::endl;
+    } else {
+        std::cout << "GPU Status: Compiled with GPU support but no GPU detected" << std::endl;
+    }
+#else
+    std::cout << "GPU Support: Disabled (not compiled with USE_GPU)" << std::endl;
+#endif
+
+#ifdef USE_BLAS
+    std::cout << "BLAS Support: Enabled" << std::endl;
+#else
+    std::cout << "BLAS Support: Disabled" << std::endl;
+#endif
+    
+    std::cout << "Active Backend: " << backend_name(get_active_backend()) << std::endl;
+}
+
+/**
  * @brief Read 32-bit big-endian integer from file
  */
 int32_t read_int32(std::ifstream& file) {
@@ -113,71 +139,15 @@ bool load_mnist_labels(const std::string& filename, std::vector<uint8_t>& labels
 }
 
 /**
- * @brief Convert label to one-hot encoded vector
- */
-void label_to_onehot(uint8_t label, Tensor<float, 2>& onehot, size_t batch_idx) {
-    for (size_t i = 0; i < NUM_CLASSES; ++i) {
-        onehot[{batch_idx, i}] = (i == label) ? 1.0f : 0.0f;
-    }
-}
-
-/**
- * @brief Compute cross-entropy loss
- */
-float cross_entropy_loss(const Tensor<float, 2>& predictions, const Tensor<float, 2>& targets) {
-    auto shape = predictions.shape();
-    float loss = 0.0f;
-    float epsilon = 1e-7f;  // For numerical stability
-    
-    for (size_t i = 0; i < shape[0]; ++i) {
-        for (size_t j = 0; j < shape[1]; ++j) {
-            loss -= targets[{i, j}] * std::log(predictions[{i, j}] + epsilon);
-        }
-    }
-    
-    return loss / shape[0];
-}
-
-/**
- * @brief Compute accuracy
- */
-float compute_accuracy(const Tensor<float, 2>& predictions, const std::vector<uint8_t>& labels, 
-                      size_t start_idx) {
-    auto shape = predictions.shape();
-    size_t correct = 0;
-    
-    for (size_t i = 0; i < shape[0]; ++i) {
-        // Find predicted class (argmax)
-        size_t pred_class = 0;
-        float max_val = predictions[{i, 0}];
-        for (size_t j = 1; j < shape[1]; ++j) {
-            if (predictions[{i, j}] > max_val) {
-                max_val = predictions[{i, j}];
-                pred_class = j;
-            }
-        }
-        
-        if (pred_class == labels[start_idx + i]) {
-            correct++;
-        }
-    }
-    
-    return static_cast<float>(correct) / shape[0];
-}
-
-/**
- * @brief Simple SGD optimizer - update weights
+ * @brief Simple SGD optimizer - update weights using optimized fused operation
  */
 void sgd_update(std::vector<Tensor<float, 2>*>& params, 
                 std::vector<Tensor<float, 2>>& grads,
                 float learning_rate) {
     for (size_t i = 0; i < params.size(); ++i) {
-        auto shape = params[i]->shape();
-        for (size_t r = 0; r < shape[0]; ++r) {
-            for (size_t c = 0; c < shape[1]; ++c) {
-                (*params[i])[{r, c}] -= learning_rate * grads[i][{r, c}];
-            }
-        }
+        // Use fused operation: params -= learning_rate * grads
+        // Avoids temporary tensor allocation
+        params[i]->fused_scalar_mul_sub(learning_rate, grads[i]);
     }
 }
 
@@ -317,6 +287,8 @@ int main(int argc, char* argv[]) {
     std::cout << "=== MNIST Digit Classification Demo ===" << std::endl;
     std::cout << "Using nn_layers.h neural network implementation\n" << std::endl;
     
+    print_system_info();
+    
     // Default data path
     std::string data_path = "data/mnist/";
     if (argc > 1) {
@@ -326,6 +298,7 @@ int main(int argc, char* argv[]) {
         }
     }
     
+    std::cout << "\n=== Loading Dataset ===" << std::endl;
     std::cout << "Data path: " << data_path << std::endl;
     
     // Load training data
@@ -400,6 +373,12 @@ int main(int argc, char* argv[]) {
     std::cout << "\n=== Training Started ===" << std::endl;
     net.train(true);
     
+#ifdef USE_GPU
+    // Create a test tensor to verify which backend is being used
+    Tensor<float, 2> test_tensor({1, 1});
+    std::cout << "Tensor backend in use: " << backend_name(test_tensor.backend()) << std::endl;
+#endif
+    
     for (size_t epoch = 0; epoch < num_epochs; ++epoch) {
         float epoch_loss = 0.0f;
         float epoch_accuracy = 0.0f;
@@ -407,16 +386,22 @@ int main(int argc, char* argv[]) {
         for (size_t batch = 0; batch < num_batches; ++batch) {
             size_t start_idx = batch * batch_size;
             
-            // Prepare batch (GPU auto-selected)
+#ifdef USE_GPU
+            // Explicitly enable GPU (default is true, but being explicit per tensor_perf.cc schema)
             Tensor<float, 2> batch_input({batch_size, IMAGE_PIXELS});
             Tensor<float, 2> batch_targets({batch_size, NUM_CLASSES});
+#else
+            Tensor<float, 2> batch_input({batch_size, IMAGE_PIXELS});
+            Tensor<float, 2> batch_targets({batch_size, NUM_CLASSES});
+#endif
             
+            // Optimized batch preparation using row-wise copy
             for (size_t i = 0; i < batch_size; ++i) {
                 size_t idx = start_idx + i;
-                for (size_t j = 0; j < IMAGE_PIXELS; ++j) {
-                    batch_input[{i, j}] = train_images[idx][j];
-                }
-                label_to_onehot(train_labels[idx], batch_targets, i);
+                // Use std::copy for efficient row copy
+                float* batch_row = batch_input.data_ptr() + i * IMAGE_PIXELS;
+                std::copy(train_images[idx].begin(), train_images[idx].end(), batch_row);
+                label_to_onehot(train_labels[idx], batch_targets, i, NUM_CLASSES);
             }
             
             // Forward pass
@@ -429,14 +414,11 @@ int main(int argc, char* argv[]) {
             epoch_loss += loss;
             epoch_accuracy += acc;
             
-            // Backward pass: compute gradient of loss w.r.t. output
+            // Backward pass: compute gradient of loss w.r.t. output using optimized tensor operations
             // For cross-entropy + softmax: grad = (predictions - targets) / batch_size
-            Tensor<float, 2> grad_output({batch_size, NUM_CLASSES});
-            for (size_t i = 0; i < batch_size; ++i) {
-                for (size_t j = 0; j < NUM_CLASSES; ++j) {
-                    grad_output[{i, j}] = (predictions[{i, j}] - batch_targets[{i, j}]) / batch_size;
-                }
-            }
+            auto grad_diff_var = predictions - batch_targets;
+            auto grad_diff = std::get<Tensor<float, 2>>(grad_diff_var);
+            auto grad_output = grad_diff / static_cast<float>(batch_size);
             
             // Backpropagate gradients through network
             net.backward(grad_output);
@@ -473,13 +455,17 @@ int main(int argc, char* argv[]) {
     for (size_t batch = 0; batch < num_test_batches; ++batch) {
         size_t start_idx = batch * test_batch_size;
         
+#ifdef USE_GPU
         Tensor<float, 2> batch_input({test_batch_size, IMAGE_PIXELS});
+#else
+        Tensor<float, 2> batch_input({test_batch_size, IMAGE_PIXELS});
+#endif
         
+        // Optimized test batch preparation using row-wise copy
         for (size_t i = 0; i < test_batch_size; ++i) {
             size_t idx = start_idx + i;
-            for (size_t j = 0; j < IMAGE_PIXELS; ++j) {
-                batch_input[{i, j}] = test_images[idx][j];
-            }
+            float* batch_row = batch_input.data_ptr() + i * IMAGE_PIXELS;
+            std::copy(test_images[idx].begin(), test_images[idx].end(), batch_row);
         }
         
         auto predictions = net.forward(batch_input);
@@ -494,23 +480,23 @@ int main(int argc, char* argv[]) {
     
     // Display a few predictions
     std::cout << "\n=== Sample Predictions ===" << std::endl;
+#ifdef USE_GPU
     Tensor<float, 2> sample_input({1, IMAGE_PIXELS});
+#else
+    Tensor<float, 2> sample_input({1, IMAGE_PIXELS});
+#endif
     
     for (size_t i = 0; i < 5; ++i) {
-        for (size_t j = 0; j < IMAGE_PIXELS; ++j) {
-            sample_input[{0, j}] = test_images[i][j];
-        }
+        // Optimized input preparation using std::copy
+        float* input_row = sample_input.data_ptr();
+        std::copy(test_images[i].begin(), test_images[i].end(), input_row);
         
         auto pred = net.forward(sample_input);
         
-        size_t pred_class = 0;
-        float max_val = pred[{0, 0}];
-        for (size_t j = 1; j < NUM_CLASSES; ++j) {
-            if (pred[{0, j}] > max_val) {
-                max_val = pred[{0, j}];
-                pred_class = j;
-            }
-        }
+        // Use tensor's argmax for efficient prediction - argmax returns flattened index
+        size_t argmax_idx = pred.argmax();
+        size_t pred_class = argmax_idx % NUM_CLASSES;
+        float max_val = pred[{0, pred_class}];
         
         std::cout << "Image " << i << ": True label = " << static_cast<int>(test_labels[i])
                   << ", Predicted = " << pred_class

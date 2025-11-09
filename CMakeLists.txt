@@ -199,6 +199,31 @@ endif()
 include(GoogleTest)
 gtest_discover_tests(tensor_test)
 
+# Neural Network Enhancements test
+add_executable(
+  tensor_nn_enhancements_test
+  tests/tensor_nn_enhancements_test.cc
+  ${GPU_SOURCES}
+)
+
+target_link_libraries(
+  tensor_nn_enhancements_test
+  GTest::gtest_main
+  Threads::Threads
+)
+
+# Link TBB if found
+if(TBB_FOUND)
+  target_link_libraries(tensor_nn_enhancements_test TBB::tbb)
+endif()
+
+# Link BLAS if found
+if(BLAS_FOUND)
+  target_link_libraries(tensor_nn_enhancements_test ${BLAS_LIBRARIES})
+endif()
+
+gtest_discover_tests(tensor_nn_enhancements_test)
+
 # Performance benchmark executable
 add_executable(
   tensor_perf

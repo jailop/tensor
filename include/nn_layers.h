@@ -70,7 +70,8 @@ protected:
  * 
  * Performs: output = input @ weights^T + bias
  * 
- * Automatically uses GPU if available, otherwise falls back to BLAS or CPU.
+ * Uses GPU if available and compiled with USE_GPU, otherwise falls back to BLAS or CPU.
+ * Backend selection follows: GPU → BLAS → CPU
  */
 template<typename T>
 class Linear : public Layer<T> {
@@ -81,29 +82,34 @@ public:
      * @param out_features Number of output features
      * @param use_bias Whether to use bias term
      * 
-     * Note: GPU acceleration is automatically enabled if available.
-     *       The backend selection is: GPU → BLAS → CPU
+     * Note: GPU acceleration is automatically enabled if compiled with USE_GPU
+     *       and GPU hardware is available. Backend selection: GPU → BLAS → CPU
      */
     Linear(size_t in_features, size_t out_features, bool use_bias = true)
         : in_features_(in_features), out_features_(out_features), use_bias_(use_bias),
+#ifdef USE_GPU
           weights_({out_features, in_features}),  // use_gpu defaults to true
           bias_({1, out_features}),
           input_({1, in_features}),
           grad_weights_({out_features, in_features}),
           grad_bias_({1, out_features}) {
+#else
+          weights_({out_features, in_features}),
+          bias_({1, out_features}),
+          input_({1, in_features}),
+          grad_weights_({out_features, in_features}),
+          grad_bias_({1, out_features}) {
+#endif
         
-        // Initialize weights with Xavier/Glorot initialization
+        // Initialize weights with Xavier/Glorot initialization using optimized pointer access
         T stddev = std::sqrt(2.0 / (in_features + out_features));
         
         std::random_device rd;
         std::mt19937 gen(rd());
         std::normal_distribution<T> dist(0.0, stddev);
         
-        for (size_t i = 0; i < out_features; ++i) {
-            for (size_t j = 0; j < in_features; ++j) {
-                weights_[{i, j}] = dist(gen);
-            }
-        }
+        // Use direct pointer access for efficient initialization
+        weights_.randn(T(0), stddev);
         
         if (use_bias_) {
             bias_.fill(0);
@@ -416,6 +422,8 @@ private:
 
 /**
  * @brief Softmax activation layer
+ * 
+ * Applies softmax activation: converts logits to probabilities
  */
 template<typename T>
 class Softmax : public Layer<T> {
@@ -423,41 +431,18 @@ public:
     Softmax() : output_({1, 1}) {}
     
     Tensor<T, 2> forward(const Tensor<T, 2>& input) override {
-        auto shape = input.shape();
-        output_ = Tensor<T, 2>(shape, input.uses_gpu());
-        
-        // Compute softmax for each sample in batch
-        // Note: Row-wise operations require per-row processing for now
-        const T* input_ptr = input.data_ptr();
-        T* output_ptr = output_.data_ptr();
-        
-        for (size_t i = 0; i < shape[0]; ++i) {
-            const T* row_input = input_ptr + i * shape[1];
-            T* row_output = output_ptr + i * shape[1];
-            
-            // Find max for numerical stability
-            T max_val = *std::max_element(row_input, row_input + shape[1]);
-            
-            // Compute exp and sum
-            T sum = 0;
-            for (size_t j = 0; j < shape[1]; ++j) {
-                row_output[j] = std::exp(row_input[j] - max_val);
-                sum += row_output[j];
-            }
-            
-            // Normalize
-            T inv_sum = T(1) / sum;
-            for (size_t j = 0; j < shape[1]; ++j) {
-                row_output[j] *= inv_sum;
-            }
-        }
-        
+        // Use optimized softmax_rows() from tensor.h
+        output_ = input.softmax_rows();
         return output_;
     }
     
     Tensor<T, 2> backward(const Tensor<T, 2>& grad_output) override {
         auto shape = output_.shape();
+#ifdef USE_GPU
         auto grad_input = Tensor<T, 2>(shape, output_.uses_gpu());
+#else
+        auto grad_input = Tensor<T, 2>(shape, output_.uses_gpu());
+#endif
         
         // Jacobian of softmax is: S_i * (δ_ij - S_j)
         for (size_t i = 0; i < shape[0]; ++i) {
@@ -493,6 +478,122 @@ using BatchNorm1df = BatchNorm1d<float>;
 using BatchNorm1dd = BatchNorm1d<double>;
 using Softmaxf = Softmax<float>;
 using Softmaxd = Softmax<double>;
+
+// ============================================
+// Utility Functions for Classification Tasks
+// ============================================
+
+/**
+ * @brief Convert label to one-hot encoded vector
+ * @param label The class label (integer)
+ * @param onehot Output tensor to fill with one-hot encoding
+ * @param batch_idx Index in batch dimension to set
+ * @param num_classes Number of classes (columns in onehot tensor)
+ * 
+ * Optimized implementation using direct memory operations.
+ * 
+ * @section example_onehot Example
+ * @code
+ * Tensor<float, 2> targets({batch_size, 10});
+ * label_to_onehot(3, targets, 0, 10);  // Sets row 0 with [0,0,0,1,0,0,0,0,0,0]
+ * @endcode
+ */
+template<typename T>
+inline void label_to_onehot(uint8_t label, Tensor<T, 2>& onehot, size_t batch_idx, size_t num_classes) {
+    // Zero the entire row first, then set the appropriate index
+    T* row_ptr = onehot.data_ptr() + batch_idx * num_classes;
+    std::fill_n(row_ptr, num_classes, T(0));
+    row_ptr[label] = T(1);
+}
+
+/**
+ * @brief Compute cross-entropy loss between predictions and targets
+ * @param predictions Predicted probabilities (batch_size x num_classes)
+ * @param targets Target one-hot vectors (batch_size x num_classes)
+ * @param epsilon Small value for numerical stability (default: 1e-7)
+ * @return Average cross-entropy loss over the batch
+ * 
+ * Optimized implementation using vectorized tensor operations.
+ * Computes: -sum(targets * log(predictions + epsilon)) / batch_size
+ * 
+ * @section example_ce_loss Example
+ * @code
+ * auto predictions = softmax.forward(logits);
+ * float loss = cross_entropy_loss(predictions, targets);
+ * @endcode
+ */
+template<typename T>
+inline T cross_entropy_loss(const Tensor<T, 2>& predictions, const Tensor<T, 2>& targets, T epsilon = T(1e-7)) {
+    // Compute using optimized tensor operations:
+    // loss = -sum(targets * log(predictions + epsilon)) / batch_size
+    
+    // Add epsilon for numerical stability: predictions + epsilon
+    auto pred_stable = predictions.map([epsilon](T x) { return x + epsilon; });
+    
+    // Compute log: log(predictions + epsilon)
+    auto log_pred = pred_stable.log();
+    
+    // Element-wise multiplication: targets * log(predictions + epsilon)
+    auto product_var = targets * log_pred;
+    auto product = std::get<Tensor<T, 2>>(product_var);
+    
+    // Sum all elements and negate
+    T total_loss = -product.sum();
+    
+    // Divide by batch size
+    auto shape = predictions.shape();
+    return total_loss / static_cast<T>(shape[0]);
+}
+
+/**
+ * @brief Compute classification accuracy
+ * @param predictions Predicted probabilities (batch_size x num_classes)
+ * @param labels True labels (vector of class indices)
+ * @param offset Starting index in labels vector for this batch
+ * @return Accuracy as fraction of correct predictions (0.0 to 1.0)
+ * 
+ * Optimized implementation using argmax along rows.
+ * For 2D tensors, argmax is computed for each row efficiently.
+ * 
+ * @section example_accuracy Example
+ * @code
+ * auto predictions = net.forward(batch_input);
+ * float acc = compute_accuracy(predictions, all_labels, batch_start_idx);
+ * std::cout << "Accuracy: " << (acc * 100) << "%" << std::endl;
+ * @endcode
+ */
+template<typename T>
+inline T compute_accuracy(const Tensor<T, 2>& predictions, const std::vector<uint8_t>& labels, size_t offset = 0) {
+    auto shape = predictions.shape();
+    size_t batch_size = shape[0];
+    size_t num_classes = shape[1];
+    size_t correct = 0;
+    
+    // Get raw pointer for efficient row-wise argmax
+    const T* data = predictions.data_ptr();
+    
+    // Compute argmax for each row (sample) efficiently
+    for (size_t i = 0; i < batch_size; ++i) {
+        const T* row = data + i * num_classes;
+        
+        // Find argmax in this row
+        size_t pred_class = 0;
+        T max_val = row[0];
+        for (size_t j = 1; j < num_classes; ++j) {
+            if (row[j] > max_val) {
+                max_val = row[j];
+                pred_class = j;
+            }
+        }
+        
+        // Compare with true label
+        if (pred_class == labels[offset + i]) {
+            ++correct;
+        }
+    }
+    
+    return static_cast<T>(correct) / static_cast<T>(batch_size);
+}
 
 } // namespace nn
 } // namespace tensor4d
