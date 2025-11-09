@@ -83,7 +83,21 @@ namespace linalg {
  * @param v Input vector
  * @return L2 norm as scalar (sqrt of sum of squares)
  * 
+ * Computes ||v|| = sqrt(v₁² + v₂² + ... + vₙ²).
  * Uses GPU or BLAS acceleration when available.
+ * 
+ * @section example_norm Example
+ * @code
+ * Vector<float> v({3});
+ * v[{0}] = 3.0f;
+ * v[{1}] = 4.0f;
+ * v[{2}] = 0.0f;
+ * 
+ * float length = linalg::norm(v);  // Returns 5.0 = sqrt(9 + 16)
+ * 
+ * // Useful for normalization:
+ * auto unit_v = v / linalg::norm(v);  // Unit vector
+ * @endcode
  */
 template <typename T>
 T norm(const Vector<T>& v) {
@@ -115,9 +129,26 @@ T norm(const Vector<T>& v) {
 }
 
 /**
- * Normalize a vector to unit length.
+ * @brief Normalize a vector to unit length
+ * 
+ * Scales the vector so its L2 norm equals 1.
+ * Returns a zero vector if the input norm is too small (near zero).
+ * 
+ * @tparam T Data type
  * @param v Input vector
- * @return Normalized vector, or zero vector if norm is too small
+ * @return Normalized vector with ||v|| = 1, or zero vector if norm ≈ 0
+ * 
+ * @section example_normalize Example
+ * @code
+ * Vector<float> v({3});
+ * v[{0}] = 3.0f;
+ * v[{1}] = 4.0f;
+ * v[{2}] = 0.0f;
+ * 
+ * auto unit_v = linalg::normalize(v);
+ * // unit_v ≈ [0.6, 0.8, 0.0]
+ * // linalg::norm(unit_v) ≈ 1.0
+ * @endcode
  */
 template <typename T>
 Vector<T> normalize(const Vector<T>& v) {
@@ -129,10 +160,31 @@ Vector<T> normalize(const Vector<T>& v) {
 }
 
 /**
- * Compute dot product of two vectors.
+ * @brief Compute dot product of two vectors
+ * 
+ * Computes the inner product: a · b = a₁b₁ + a₂b₂ + ... + aₙbₙ
+ * Uses GPU or BLAS acceleration when available.
+ * 
+ * @tparam T Data type
  * @param a First vector
  * @param b Second vector
  * @return Dot product as scalar, or 0 if dimensions don't match
+ * 
+ * @section example_dot Example
+ * @code
+ * Vector<float> a({3});
+ * Vector<float> b({3});
+ * a[{0}] = 1.0f; a[{1}] = 2.0f; a[{2}] = 3.0f;
+ * b[{0}] = 4.0f; b[{1}] = 5.0f; b[{2}] = 6.0f;
+ * 
+ * float result = linalg::dot(a, b);
+ * // result = 1*4 + 2*5 + 3*6 = 32.0
+ * 
+ * // Check orthogonality:
+ * if (std::abs(linalg::dot(v1, v2)) < 1e-6) {
+ *     std::cout << "Vectors are orthogonal\n";
+ * }
+ * @endcode
  */
 template <typename T>
 T dot(const Vector<T>& a, const Vector<T>& b) {

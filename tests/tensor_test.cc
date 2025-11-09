@@ -532,6 +532,118 @@ TEST_F(TensorTest, DotProduct3DContractionMismatch) {
 }
 
 // ============================================
+// Cross Product Tests
+// ============================================
+
+TEST_F(TensorTest, CrossProduct3DBasic) {
+    // Test basic cross product: [1,0,0] × [0,1,0] = [0,0,1]
+    Tensor<float, 1> a({3});
+    a[{0}] = 1.0f; a[{1}] = 0.0f; a[{2}] = 0.0f;
+    
+    Tensor<float, 1> b({3});
+    b[{0}] = 0.0f; b[{1}] = 1.0f; b[{2}] = 0.0f;
+    
+    auto result_var = a.cross(b);
+    ASSERT_TRUE((std::holds_alternative<Tensor<float, 1>>(result_var)));
+    auto& result = std::get<Tensor<float, 1>>(result_var);
+    
+    EXPECT_FLOAT_EQ((result[{0}]), 0.0f);
+    EXPECT_FLOAT_EQ((result[{1}]), 0.0f);
+    EXPECT_FLOAT_EQ((result[{2}]), 1.0f);
+}
+
+TEST_F(TensorTest, CrossProduct3DAntiCommutative) {
+    // Test anti-commutativity: a × b = -(b × a)
+    Tensor<float, 1> a({3});
+    a[{0}] = 2.0f; a[{1}] = 3.0f; a[{2}] = 4.0f;
+    
+    Tensor<float, 1> b({3});
+    b[{0}] = 5.0f; b[{1}] = 6.0f; b[{2}] = 7.0f;
+    
+    auto result1_var = a.cross(b);
+    auto result2_var = b.cross(a);
+    
+    ASSERT_TRUE((std::holds_alternative<Tensor<float, 1>>(result1_var)));
+    ASSERT_TRUE((std::holds_alternative<Tensor<float, 1>>(result2_var)));
+    
+    auto& result1 = std::get<Tensor<float, 1>>(result1_var);
+    auto& result2 = std::get<Tensor<float, 1>>(result2_var);
+    
+    for (size_t i = 0; i < 3; ++i) {
+        EXPECT_FLOAT_EQ((result1[{i}]), -(result2[{i}]));
+    }
+}
+
+TEST_F(TensorTest, CrossProduct3DPerpendicular) {
+    // Test that result is perpendicular to both inputs
+    Tensor<float, 1> a({3});
+    a[{0}] = 1.0f; a[{1}] = 2.0f; a[{2}] = 3.0f;
+    
+    Tensor<float, 1> b({3});
+    b[{0}] = 4.0f; b[{1}] = 5.0f; b[{2}] = 6.0f;
+    
+    auto result_var = a.cross(b);
+    ASSERT_TRUE((std::holds_alternative<Tensor<float, 1>>(result_var)));
+    auto& result = std::get<Tensor<float, 1>>(result_var);
+    
+    // Compute dot products to check perpendicularity
+    auto dot_a_var = a.dot(result);
+    auto dot_b_var = b.dot(result);
+    
+    ASSERT_TRUE((std::holds_alternative<float>(dot_a_var)));
+    ASSERT_TRUE((std::holds_alternative<float>(dot_b_var)));
+    
+    float dot_a = std::get<float>(dot_a_var);
+    float dot_b = std::get<float>(dot_b_var);
+    
+    EXPECT_NEAR(dot_a, 0.0f, 1e-5);
+    EXPECT_NEAR(dot_b, 0.0f, 1e-5);
+}
+
+TEST_F(TensorTest, CrossProduct3DParallel) {
+    // Test cross product of parallel vectors = zero vector
+    Tensor<float, 1> a({3});
+    a[{0}] = 1.0f; a[{1}] = 2.0f; a[{2}] = 3.0f;
+    
+    Tensor<float, 1> b({3});
+    b[{0}] = 2.0f; b[{1}] = 4.0f; b[{2}] = 6.0f;  // b = 2*a
+    
+    auto result_var = a.cross(b);
+    ASSERT_TRUE((std::holds_alternative<Tensor<float, 1>>(result_var)));
+    auto& result = std::get<Tensor<float, 1>>(result_var);
+    
+    for (size_t i = 0; i < 3; ++i) {
+        EXPECT_NEAR((result[{i}]), 0.0f, 1e-5);
+    }
+}
+
+TEST_F(TensorTest, CrossProduct3DWrongDimension) {
+    // Test error when vectors are not 3D
+    Tensor<float, 1> a({2});
+    a[{0}] = 1.0f; a[{1}] = 2.0f;
+    
+    Tensor<float, 1> b({2});
+    b[{0}] = 3.0f; b[{1}] = 4.0f;
+    
+    auto result = a.cross(b);
+    ASSERT_TRUE((std::holds_alternative<TensorError>(result)));
+    EXPECT_EQ(std::get<TensorError>(result), TensorError::DimensionMismatch);
+}
+
+TEST_F(TensorTest, CrossProduct3DMismatchedSize) {
+    // Test error when vectors have different sizes
+    Tensor<float, 1> a({3});
+    a[{0}] = 1.0f; a[{1}] = 2.0f; a[{2}] = 3.0f;
+    
+    Tensor<float, 1> b({4});
+    b[{0}] = 4.0f; b[{1}] = 5.0f; b[{2}] = 6.0f; b[{3}] = 7.0f;
+    
+    auto result = a.cross(b);
+    ASSERT_TRUE((std::holds_alternative<TensorError>(result)));
+    EXPECT_EQ(std::get<TensorError>(result), TensorError::DimensionMismatch);
+}
+
+// ============================================
 // Arithmetic Operations Tests
 // ============================================
 

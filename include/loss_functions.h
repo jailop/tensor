@@ -25,7 +25,7 @@
  * @version 1.0
  * @date 2024
  * 
- * @section usage Usage Example
+ * @section usage_loss Usage Example
  * @code
  * Tensor<float, 2> predictions({10, 5}, true, true);
  * Tensor<float, 2> targets({10, 5});
@@ -53,7 +53,8 @@ namespace loss {
  * Computes: L = (1/n) * sum((predictions - targets)^2)
  * 
  * Commonly used for regression tasks. The gradient is smooth and proportional
- * to the error magnitude.
+ * to the error magnitude, making it well-suited for problems where large
+ * errors should be heavily penalized.
  * 
  * @tparam T Data type (float, double)
  * @tparam N Number of dimensions
@@ -61,6 +62,26 @@ namespace loss {
  * @param targets True target values
  * @param reduction Reduction strategy: "mean" (default), "sum", or "none"
  * @return Loss tensor with autograd support, or zero tensor if shapes don't match
+ * 
+ * @section example_mse Example
+ * @code
+ * // Regression example
+ * Tensor<float, 2> predictions({32, 10}, true, true);  // batch_size=32, output_dim=10
+ * Tensor<float, 2> targets({32, 10});
+ * 
+ * // Compute MSE loss
+ * auto loss = loss::mse_loss(predictions, targets, "mean");
+ * 
+ * // Backward pass
+ * loss.backward();
+ * 
+ * // Gradients are now in predictions.grad()
+ * // Gradient: d/dx[(x-y)^2] = 2(x-y)/n
+ * 
+ * // Different reduction modes:
+ * auto loss_sum = loss::mse_loss(pred, target, "sum");     // No averaging
+ * auto loss_none = loss::mse_loss(pred, target, "none");   // Element-wise
+ * @endcode
  */
 template<typename T, size_t N>
 Tensor<T, N> mse_loss(const Tensor<T, N>& predictions, const Tensor<T, N>& targets,

@@ -31,7 +31,7 @@
  * @version 1.0
  * @date 2024
  * 
- * @section usage Usage Example
+ * @section usage_tensor Usage Example
  * @code
  * // Create a 2D tensor (matrix) - automatically uses GPU if available
  * Tensor<float, 2> matrix({3, 4});
@@ -240,7 +240,13 @@ inline constexpr bool is_blas_available() {
 enum class TensorError {
     DimensionMismatch,    ///< Tensor dimensions do not match for the operation
     ContractionMismatch,  ///< Contraction dimensions are incompatible
-    InvalidArgument       ///< Invalid argument provided to a function
+    InvalidArgument,      ///< Invalid argument provided to a function
+    SingularMatrix,       ///< Matrix is singular (non-invertible)
+    NotPositiveDefinite,  ///< Matrix is not positive definite
+    NotSquare,            ///< Operation requires square matrix
+    EmptyMatrix,          ///< Matrix is empty
+    LapackError,          ///< LAPACK routine error
+    NotImplemented        ///< Feature not yet implemented
 };
 
 /**
@@ -256,6 +262,18 @@ inline std::string to_string(TensorError error) {
             return "Contraction dimension must match";
         case TensorError::InvalidArgument:
             return "Invalid argument provided";
+        case TensorError::SingularMatrix:
+            return "Matrix is singular (non-invertible)";
+        case TensorError::NotPositiveDefinite:
+            return "Matrix is not positive definite";
+        case TensorError::NotSquare:
+            return "Operation requires square matrix";
+        case TensorError::EmptyMatrix:
+            return "Matrix is empty";
+        case TensorError::LapackError:
+            return "LAPACK routine error";
+        case TensorError::NotImplemented:
+            return "Feature not yet implemented";
         default:
             return "Unknown error";
     }
@@ -339,6 +357,46 @@ namespace loss {
     template<typename T, size_t N>
     Tensor<T, 1> smooth_l1_loss(const Tensor<T, N>&, const Tensor<T, N>&, T = T(1), const std::string& = "mean");
 }
+
+// Forward declarations for broadcasting functions
+template <typename T, size_t N, size_t M>
+auto broadcast_to(const Tensor<T, N>& tensor, const TensorIndices<M>& target_shape)
+    -> std::variant<Tensor<T, M>, TensorError>;
+
+// Forward declarations for view functions
+template <typename T>
+Tensor<T, 1> row(const Tensor<T, 2>& matrix, size_t row_idx);
+
+template <typename T>
+Tensor<T, 1> col(const Tensor<T, 2>& matrix, size_t col_idx);
+
+template <typename T>
+Tensor<T, 1> diag(const Tensor<T, 2>& matrix);
+
+template <typename T>
+Tensor<T, 2> diag_matrix(const Tensor<T, 1>& vec);
+
+template <typename T>
+Tensor<T, 2> block(const Tensor<T, 2>& matrix, size_t start_row, size_t start_col,
+                   size_t num_rows, size_t num_cols);
+
+template <typename T>
+Tensor<T, 1> head(const Tensor<T, 1>& vec, size_t n);
+
+template <typename T>
+Tensor<T, 1> tail(const Tensor<T, 1>& vec, size_t n);
+
+template <typename T>
+Tensor<T, 2> topRows(const Tensor<T, 2>& matrix, size_t n);
+
+template <typename T>
+Tensor<T, 2> bottomRows(const Tensor<T, 2>& matrix, size_t n);
+
+template <typename T>
+Tensor<T, 2> leftCols(const Tensor<T, 2>& matrix, size_t n);
+
+template <typename T>
+Tensor<T, 2> rightCols(const Tensor<T, 2>& matrix, size_t n);
 
 /**
  * @class Tensor
@@ -465,6 +523,12 @@ public:
     const T* data() const { return data_.get(); }
     T* data() { return data_.get(); }
     
+    /**
+     * Get strides for each dimension.
+     * @return Array of strides for each dimension.
+     */
+    const TensorIndices<N>& strides() const { return strides_; }
+    
 public:
 
     /**
@@ -557,8 +621,17 @@ public:
     }
 
     /**
-     * Fill the tensor with a specified value.
-     * @param value The value to fill the tensor with.
+     * @brief Fill the tensor with a specified value
+     * 
+     * Sets all elements in the tensor to the same value.
+     * 
+     * @param value The value to fill the tensor with
+     * 
+     * @section example_fill Example
+     * @code
+     * Tensor<float, 2> matrix({3, 3});
+     * matrix.fill(5.0f);  // All elements are now 5.0
+     * @endcode
      */
     void fill(const T& value) {
         std::fill(data_.get(), data_.get() + total_size(), value);
@@ -693,7 +766,7 @@ public:
      * @note Returns error if tensor doesn't require gradients
      * @note Returns error if called on non-scalar without gradient argument
      * 
-     * @section example Usage Example
+     * @section example_autograd Usage Example
      * @code
      * // Scalar loss - no gradient needed
      * Tensor<float, 1> loss({1}, true, true);
@@ -762,10 +835,34 @@ public:
     }
     
     /**
-     * Element-wise addition with another tensor (creates new tensor).
-     * Supports automatic differentiation.
-     * @param other The tensor to add.
-     * @return A variant containing either a new tensor with the result or an error.
+     * @brief Element-wise addition with another tensor (creates new tensor)
+     * 
+     * Performs element-wise addition of two tensors. Supports automatic differentiation
+     * and will track gradients if either input requires gradients.
+     * 
+     * @param other The tensor to add
+     * @return A variant containing either a new tensor with the result or TensorError::DimensionMismatch
+     * 
+     * @section example_add Example
+     * @code
+     * Tensor<float, 2> A({2, 3});
+     * Tensor<float, 2> B({2, 3});
+     * A.fill(1.0f);
+     * B.fill(2.0f);
+     * 
+     * auto result = A + B;  // Returns TensorResult<Tensor<float, 2>>
+     * if (std::holds_alternative<Tensor<float, 2>>(result)) {
+     *     auto& C = std::get<Tensor<float, 2>>(result);
+     *     // C[{i, j}] == 3.0 for all i, j
+     * }
+     * 
+     * // With autograd:
+     * Tensor<float, 1> x({3}, true, true);  // requires_grad=true
+     * Tensor<float, 1> y({3}, true, true);
+     * auto z_result = x + y;
+     * auto& z = std::get<Tensor<float, 1>>(z_result);
+     * z.backward();  // Computes gradients
+     * @endcode
      */
     TensorResult<Tensor<T, N>> operator+(const Tensor<T, N>& other) const {
         if (dims_ != other.dims_) {
@@ -1317,9 +1414,30 @@ public:
     }
     
     /**
-     * Apply a function to each element of the tensor (creates new tensor).
-     * @param func The function to apply to each element.
-     * @return A new tensor with the function applied to all elements.
+     * @brief Apply a function to each element of the tensor (creates new tensor)
+     * 
+     * Maps a custom function over all elements, creating a new tensor with the results.
+     * The function should accept a single element of type T and return a value of type T.
+     * 
+     * @tparam Func Function type (can be lambda, function pointer, or functor)
+     * @param func The function to apply to each element
+     * @return A new tensor with the function applied to all elements
+     * 
+     * @section example_map Example
+     * @code
+     * Tensor<float, 2> matrix({2, 3});
+     * matrix.fill(2.0f);
+     * 
+     * // Square each element
+     * auto squared = matrix.map([](float x) { return x * x; });
+     * // squared contains all 4.0
+     * 
+     * // Apply custom function
+     * auto result = matrix.map([](float x) { return std::sqrt(x) + 1.0f; });
+     * 
+     * // Can also use function pointers
+     * auto exponential = matrix.map(std::exp<float>);
+     * @endcode
      */
     template<typename Func>
     Tensor<T, N> map(Func func) const {
@@ -1334,9 +1452,28 @@ public:
     }
     
     /**
-     * Apply a function to each element of the tensor (in-place).
-     * @param func The function to apply to each element.
-     * @return Reference to this tensor.
+     * @brief Apply a function to each element of the tensor (in-place)
+     * 
+     * Maps a custom function over all elements, modifying the tensor in-place.
+     * More memory-efficient than map() when you don't need to preserve the original.
+     * 
+     * @tparam Func Function type (can be lambda, function pointer, or functor)
+     * @param func The function to apply to each element
+     * @return Reference to this tensor (for method chaining)
+     * 
+     * @section example_map_inplace Example
+     * @code
+     * Tensor<float, 1> vec({5});
+     * vec.fill(3.0f);
+     * 
+     * // Double all elements in-place
+     * vec.map_inplace([](float x) { return x * 2.0f; });
+     * // vec now contains all 6.0
+     * 
+     * // Chain multiple operations
+     * vec.map_inplace([](float x) { return x + 1.0f; })
+     *    .map_inplace([](float x) { return x * x; });
+     * @endcode
      */
     template<typename Func>
     Tensor<T, N>& map_inplace(Func func) {
@@ -1350,8 +1487,27 @@ public:
     }
     
     /**
-     * Apply exponential function to all elements (creates new tensor).
-     * @return A new tensor with exp(x) applied to all elements.
+     * @brief Apply exponential function to all elements (creates new tensor)
+     * 
+     * Computes e^x for each element. Uses GPU acceleration when available.
+     * Supports automatic differentiation.
+     * 
+     * @return A new tensor with exp(x) applied to all elements
+     * 
+     * @section example_exp Example
+     * @code
+     * Tensor<float, 2> matrix({2, 2});
+     * matrix.fill(1.0f);
+     * 
+     * auto result = matrix.exp();  // All elements ≈ 2.718
+     * 
+     * // With autograd:
+     * Tensor<float, 1> x({3}, true, true);
+     * x.fill(0.0f);
+     * auto y = x.exp().sum();  // sum(exp(x))
+     * y.backward();
+     * // x.grad() contains derivatives
+     * @endcode
      */
     Tensor<T, N> exp() const {
         Tensor<T, N> result(dims_, use_gpu_);
@@ -1372,8 +1528,23 @@ public:
     }
     
     /**
-     * Apply natural logarithm to all elements (creates new tensor).
-     * @return A new tensor with log(x) applied to all elements.
+     * @brief Apply natural logarithm to all elements (creates new tensor)
+     * 
+     * Computes ln(x) for each element. Uses GPU acceleration when available.
+     * 
+     * @return A new tensor with log(x) applied to all elements
+     * @warning Elements must be positive (log of non-positive values is undefined)
+     * 
+     * @section example_log Example
+     * @code
+     * Tensor<float, 1> vec({4});
+     * vec.fill(2.718f);  // e
+     * 
+     * auto result = vec.log();  // All elements ≈ 1.0
+     * 
+     * // Useful for log-space computations
+     * auto log_probs = probs.log();
+     * @endcode
      */
     Tensor<T, N> log() const {
         Tensor<T, N> result(dims_, use_gpu_);
@@ -1394,8 +1565,24 @@ public:
     }
     
     /**
-     * Apply square root to all elements (creates new tensor).
-     * @return A new tensor with sqrt(x) applied to all elements.
+     * @brief Apply square root to all elements (creates new tensor)
+     * 
+     * Computes √x for each element. Uses GPU acceleration when available.
+     * 
+     * @return A new tensor with sqrt(x) applied to all elements
+     * @warning Elements must be non-negative (sqrt of negative values is undefined)
+     * 
+     * @section example_sqrt Example
+     * @code
+     * Tensor<float, 2> matrix({2, 2});
+     * matrix.fill(4.0f);
+     * 
+     * auto result = matrix.sqrt();  // All elements = 2.0
+     * 
+     * // Useful for computing standard deviation
+     * auto variance = data.variance();
+     * auto std_dev = variance.sqrt();
+     * @endcode
      */
     Tensor<T, N> sqrt() const {
         Tensor<T, N> result(dims_, use_gpu_);
@@ -1416,9 +1603,30 @@ public:
     }
     
     /**
-     * Apply power function to all elements (creates new tensor).
-     * @param exponent The exponent to raise each element to.
-     * @return A new tensor with pow(x, exponent) applied to all elements.
+     * @brief Apply power function to all elements (creates new tensor)
+     * 
+     * Computes x^exponent for each element. Uses GPU acceleration when available.
+     * Supports automatic differentiation.
+     * 
+     * @param exponent The exponent to raise each element to
+     * @return A new tensor with pow(x, exponent) applied to all elements
+     * 
+     * @section example_pow Example
+     * @code
+     * Tensor<float, 1> vec({3});
+     * vec.fill(2.0f);
+     * 
+     * auto squared = vec.pow(2.0f);    // All elements = 4.0
+     * auto cubed = vec.pow(3.0f);      // All elements = 8.0
+     * auto rooted = vec.pow(0.5f);     // All elements ≈ 1.414 (square root)
+     * 
+     * // With autograd:
+     * Tensor<float, 1> x({5}, true, true);
+     * x.fill(2.0f);
+     * auto y = x.pow(3.0f).sum();  // sum(x³)
+     * y.backward();
+     * // x.grad() contains 3*x²
+     * @endcode
      */
     Tensor<T, N> pow(T exponent) const {
         Tensor<T, N> result(dims_, use_gpu_);
@@ -1499,9 +1707,29 @@ public:
     }
     
     /**
-     * Apply hyperbolic tangent (tanh) to all elements (creates new tensor).
-     * Commonly used as activation function in neural networks.
-     * @return A new tensor with tanh(x) applied to all elements.
+     * @brief Apply hyperbolic tangent (tanh) to all elements (creates new tensor)
+     * 
+     * Computes tanh(x) = (exp(x) - exp(-x)) / (exp(x) + exp(-x)) for each element.
+     * Alternative activation function that outputs values in (-1, 1), making it
+     * zero-centered (unlike sigmoid). Often preferred in RNNs and hidden layers.
+     * 
+     * Range: (-1, 1) - zero-centered output helps with convergence.
+     * 
+     * @return A new tensor with tanh(x) applied to all elements
+     * 
+     * @section example_tanh Example
+     * @code
+     * // Hidden layer with tanh activation
+     * Tensor<float, 2> hidden({32, 64}, true, true);
+     * auto activated = hidden.tanh();
+     * 
+     * // Common in RNNs for cell state updates:
+     * auto cell_candidate = (W_c.matmul(concat) + b_c).tanh();
+     * 
+     * // Comparison with sigmoid:
+     * auto sigmoid_out = x.sigmoid();  // Range: (0, 1)
+     * auto tanh_out = x.tanh();        // Range: (-1, 1), zero-centered
+     * @endcode
      */
     Tensor<T, N> tanh() const {
         Tensor<T, N> result(dims_, use_gpu_);
@@ -1522,11 +1750,30 @@ public:
     }
     
     /**
-     * Apply sigmoid function to all elements (creates new tensor).
-     * sigmoid(x) = 1 / (1 + exp(-x))
-     * Commonly used as activation function in neural networks.
+     * @brief Apply sigmoid function to all elements (creates new tensor)
+     * 
+     * Computes sigmoid(x) = 1 / (1 + exp(-x)) for each element.
+     * Commonly used as activation function in neural networks, especially
+     * for binary classification in output layers.
+     * 
+     * Range: (0, 1) - useful for representing probabilities.
      * Supports automatic differentiation.
-     * @return A new tensor with sigmoid(x) applied to all elements.
+     * 
+     * @return A new tensor with sigmoid(x) applied to all elements
+     * 
+     * @section example_sigmoid Example
+     * @code
+     * // Binary classification output layer
+     * Tensor<float, 2> logits({32, 1}, true, true);  // batch_size=32
+     * auto probs = logits.sigmoid();  // Convert to probabilities in (0, 1)
+     * 
+     * // With autograd:
+     * auto loss = loss::binary_cross_entropy(probs, targets);
+     * loss.backward();  // Computes gradient through sigmoid
+     * 
+     * // Gating mechanism (like in LSTM)
+     * auto forget_gate = (W_f.matmul(x) + b_f).sigmoid();
+     * @endcode
      */
     Tensor<T, N> sigmoid() const {
         Tensor<T, N> result(dims_, use_gpu_, requires_grad_);
@@ -1576,11 +1823,36 @@ public:
     }
     
     /**
-     * Apply ReLU (Rectified Linear Unit) to all elements (creates new tensor).
-     * ReLU(x) = max(0, x)
-     * Commonly used as activation function in neural networks.
+     * @brief Apply ReLU (Rectified Linear Unit) to all elements (creates new tensor)
+     * 
+     * Computes ReLU(x) = max(0, x) for each element.
+     * Most widely used activation function in deep learning due to its
+     * simplicity and effectiveness in preventing vanishing gradients.
+     * 
+     * Properties:
+     * - Non-linearity without saturation for positive values
+     * - Sparse activation (outputs 0 for negative inputs)
+     * - Computationally efficient
+     * 
      * Supports automatic differentiation.
-     * @return A new tensor with ReLU(x) applied to all elements.
+     * 
+     * @return A new tensor with ReLU(x) applied to all elements
+     * 
+     * @section example_relu Example
+     * @code
+     * // Hidden layer in neural network
+     * Tensor<float, 2> hidden({32, 128}, true, true);
+     * auto activated = hidden.relu();  // Apply ReLU activation
+     * 
+     * // Full network layer example:
+     * auto layer1 = (input.matmul(W1) + b1).relu();
+     * auto layer2 = (layer1.matmul(W2) + b2).relu();
+     * auto output = layer2.matmul(W3) + b3;
+     * 
+     * // With autograd:
+     * auto loss = loss::mse_loss(output, target);
+     * loss.backward();  // Gradients flow through ReLU layers
+     * @endcode
      */
     Tensor<T, N> relu() const {
         Tensor<T, N> result(dims_, use_gpu_, requires_grad_);
@@ -1939,9 +2211,25 @@ public:
     // ============================================
     
     /**
-     * Compute sum reduction along all dimensions.
-     * Useful for computing loss or gradient aggregation.
-     * @return The sum of all elements.
+     * @brief Compute sum reduction along all dimensions
+     * 
+     * Sums all elements in the tensor to produce a single scalar value.
+     * Useful for computing loss, gradient aggregation, or total statistics.
+     * 
+     * @return The sum of all elements as a scalar
+     * 
+     * @section example_sum Example
+     * @code
+     * Tensor<float, 2> matrix({3, 3});
+     * matrix.fill(2.0f);
+     * 
+     * float total = matrix.sum();  // Returns 18.0 (9 elements × 2.0)
+     * 
+     * // Useful in loss computation:
+     * Tensor<float, 1> errors({100}, true, true);
+     * auto loss_tensor = errors.pow(2.0f);  // Square errors
+     * float mse = loss_tensor.sum() / 100.0f;  // Mean squared error
+     * @endcode
      */
     T sum() const {
         T result = T(0);
@@ -1955,17 +2243,59 @@ public:
     }
     
     /**
-     * Compute mean of all elements.
-     * @return The mean value.
+     * @brief Compute mean of all elements
+     * 
+     * Calculates the arithmetic mean (average) of all tensor elements.
+     * 
+     * @return The mean value as a scalar
+     * 
+     * @section example_mean Example
+     * @code
+     * Tensor<float, 2> data({2, 3});
+     * data[{0, 0}] = 1.0f;
+     * data[{0, 1}] = 2.0f;
+     * data[{0, 2}] = 3.0f;
+     * data[{1, 0}] = 4.0f;
+     * data[{1, 1}] = 5.0f;
+     * data[{1, 2}] = 6.0f;
+     * 
+     * float avg = data.mean();  // Returns 3.5 = (1+2+3+4+5+6)/6
+     * 
+     * // Useful for normalization:
+     * auto centered = data - data.mean();  // Center around zero
+     * @endcode
      */
     T mean() const {
         return sum() / static_cast<T>(total_size());
     }
     
     /**
-     * Compute variance of all elements.
-     * @param ddof Delta degrees of freedom (default 0 for population variance).
-     * @return The variance.
+     * @brief Compute variance of all elements
+     * 
+     * Calculates the variance, measuring the spread of data around the mean.
+     * Use ddof=1 for sample variance, ddof=0 for population variance.
+     * 
+     * @param ddof Delta degrees of freedom (default 0 for population variance)
+     * @return The variance as a scalar
+     * 
+     * @section example_variance Example
+     * @code
+     * Tensor<float, 1> data({5});
+     * data[{0}] = 1.0f;
+     * data[{1}] = 2.0f;
+     * data[{2}] = 3.0f;
+     * data[{3}] = 4.0f;
+     * data[{4}] = 5.0f;
+     * 
+     * float pop_var = data.variance(0);  // Population variance
+     * float sample_var = data.variance(1);  // Sample variance (unbiased)
+     * 
+     * // For normalized data distributions:
+     * float var = data.variance();
+     * if (var < 0.01f) {
+     *     std::cout << "Data has low variance\n";
+     * }
+     * @endcode
      */
     T variance(size_t ddof = 0) const {
         T m = mean();
@@ -2520,6 +2850,58 @@ public:
     }
     
     /**
+     * @brief Cast tensor to a different data type (NumPy-compatible astype)
+     * @tparam U Target data type
+     * @return A new tensor with the target data type
+     * 
+     * This method allows casting tensors between different types, similar to NumPy's astype.
+     * 
+     * Example:
+     * @code
+     * Tensor<int, 2> x({2, 3});
+     * auto y = x.astype<float>();  // Convert int tensor to float
+     * @endcode
+     */
+    template <typename U>
+    Tensor<U, N> astype() const {
+        Tensor<U, N> result(dims_, use_gpu_);
+        size_t total = total_size();
+        
+        const T* src_data = data_ptr();
+        U* dst_data = result.data_ptr();
+        
+        #pragma omp parallel for if(total > 10000)
+        for (size_t i = 0; i < total; ++i) {
+            dst_data[i] = static_cast<U>(src_data[i]);
+        }
+        
+        return result;
+    }
+    
+    /**
+     * @brief Broadcast this tensor to a new shape
+     * @tparam M The number of dimensions in target shape
+     * @param target_shape The target shape to broadcast to
+     * @return A variant containing the broadcast tensor or an error
+     * 
+     * Broadcasting rules (NumPy-compatible):
+     * - Prepend dimensions of size 1 if needed
+     * - For each dimension, sizes must either match or one must be 1
+     * - Dimensions of size 1 are "stretched" to match the target
+     * 
+     * Example:
+     * @code
+     * Tensor<float, 1> x({3});
+     * auto result = x.broadcast_to<2>({4, 3});  // Shape (3,) -> (4, 3)
+     * @endcode
+     */
+    template <size_t M>
+    auto broadcast_to(const TensorIndices<M>& target_shape) const
+        -> std::variant<Tensor<T, M>, TensorError> {
+        return ::broadcast_to(*this, target_shape);
+    }
+    
+    /**
      * Sample from uniform distribution [low, high).
      * @param low Lower bound (inclusive).
      * @param high Upper bound (exclusive).
@@ -2914,16 +3296,110 @@ public:
         return result;
     }
     
+    /**
+     * Cross product for 3D vectors.
+     * Computes the cross product of two 3D vectors: result = this × other.
+     * The cross product is perpendicular to both input vectors and follows the right-hand rule.
+     * 
+     * Formula: If a = [a1, a2, a3] and b = [b1, b2, b3], then
+     * a × b = [a2*b3 - a3*b2, a3*b1 - a1*b3, a1*b2 - a2*b1]
+     * 
+     * @param other The other 3D vector to compute cross product with.
+     * @return A variant containing either a new 3D tensor with the result or an error.
+     * 
+     * @code
+     * // Create two 3D vectors
+     * Tensor<float, 1> a({3});
+     * a[{0}] = 1.0f; a[{1}] = 0.0f; a[{2}] = 0.0f;  // [1, 0, 0]
+     * 
+     * Tensor<float, 1> b({3});
+     * b[{0}] = 0.0f; b[{1}] = 1.0f; b[{2}] = 0.0f;  // [0, 1, 0]
+     * 
+     * // Compute cross product
+     * auto result_var = a.cross(b);
+     * if (std::holds_alternative<Tensor<float, 1>>(result_var)) {
+     *     auto& result = std::get<Tensor<float, 1>>(result_var);
+     *     // result = [0, 0, 1] (perpendicular to both a and b)
+     * }
+     * @endcode
+     */
+    template<size_t M = N>
+    typename std::enable_if<M == 1, TensorResult<Tensor<T, 1>>>::type
+    cross(const Tensor<T, 1>& other) const {
+        static_assert(N == 1, "Cross product is only for 1D tensors");
+        if (dims_[0] != 3) {
+            return TensorError::DimensionMismatch;
+        }
+        if (other.dims_[0] != 3) {
+            return TensorError::DimensionMismatch;
+        }
+        
+        Tensor<T, 1> result({3}, use_gpu_);
+        
+        // Cross product formula: a × b = [a2*b3 - a3*b2, a3*b1 - a1*b3, a1*b2 - a2*b1]
+        T a1 = data_[0], a2 = data_[1], a3 = data_[2];
+        T b1 = other.data_[0], b2 = other.data_[1], b3 = other.data_[2];
+        
+#ifdef USE_GPU
+        if (use_gpu_ && other.use_gpu_) {
+            TensorGPU::cross_3d_gpu(data_.get(), other.data_.get(), result.data_.get());
+            return result;
+        }
+#endif
+        
+        result.data_[0] = a2 * b3 - a3 * b2;
+        result.data_[1] = a3 * b1 - a1 * b3;
+        result.data_[2] = a1 * b2 - a2 * b1;
+        
+        return result;
+    }
+    
     // ============================================
     // Phase 1: Core Neural Network Operations
     // ============================================
     
     /**
-     * Matrix multiplication with autograd support (matmul).
-     * For 2D tensors: A(m,n) @ B(n,p) = C(m,p)
-     * Supports automatic differentiation.
+     * @brief Matrix multiplication with autograd support (matmul)
+     * 
+     * Performs standard matrix multiplication: A(m,n) @ B(n,p) = C(m,p)
+     * 
+     * This is the fundamental operation for neural network layers. Uses optimized
+     * implementations (BLAS/GPU) when available. Supports automatic differentiation
+     * for training neural networks.
+     * 
+     * @tparam M Template parameter ensuring N==2 (2D tensors only)
      * @param other The tensor to multiply with (must have compatible dimensions)
-     * @return Result tensor or error
+     * @return Result tensor or TensorError::DimensionMismatch if incompatible
+     * 
+     * @section example_matmul Example
+     * @code
+     * // Linear layer: output = input @ weights
+     * Tensor<float, 2> input({32, 784}, true, true);   // batch=32, features=784
+     * Tensor<float, 2> weights({784, 128}, true, true); // 784 -> 128 hidden units
+     * 
+     * auto output_result = input.matmul(weights);
+     * if (std::holds_alternative<Tensor<float, 2>>(output_result)) {
+     *     auto& output = std::get<Tensor<float, 2>>(output_result);
+     *     // output shape: (32, 128)
+     * }
+     * 
+     * // Full neural network layer with bias:
+     * auto hidden = input.matmul(W1) + b1;  // Broadcasting b1
+     * auto activated = std::get<Tensor<float, 2>>(hidden).relu();
+     * 
+     * // Multi-layer network with autograd:
+     * auto h1_result = input.matmul(W1);
+     * auto& h1 = std::get<Tensor<float, 2>>(h1_result);
+     * auto h1_act = (h1 + b1).relu();
+     * auto h2_result = h1_act.matmul(W2);
+     * auto& h2 = std::get<Tensor<float, 2>>(h2_result);
+     * auto output = h2 + b2;
+     * 
+     * // Compute gradients:
+     * auto loss = loss::mse_loss(output, targets);
+     * loss.backward();
+     * // Now W1.grad(), W2.grad(), etc. contain gradients
+     * @endcode
      */
     template<size_t M = N>
     typename std::enable_if<M == 2, TensorResult<Tensor<T, 2>>>::type
@@ -3178,11 +3654,39 @@ public:
     }
     
     /**
-     * Softmax operation with autograd support.
-     * Applies softmax along the last dimension: softmax(x_i) = exp(x_i) / sum(exp(x_j))
-     * Numerically stable implementation (subtracts max before exp).
+     * @brief Softmax operation with autograd support
+     * 
+     * Applies softmax normalization along a specified axis:
+     * softmax(x_i) = exp(x_i) / sum(exp(x_j))
+     * 
+     * Converts logits to probabilities that sum to 1. Uses numerically stable
+     * implementation (subtracts max before exp) to prevent overflow.
+     * 
+     * Essential for multi-class classification output layers.
+     * 
      * @param axis The axis to apply softmax along (default: -1 = last axis)
      * @return Tensor with softmax applied, or zero tensor if axis is out of range
+     * 
+     * @section example_softmax Example
+     * @code
+     * // Multi-class classification (10 classes, batch size 32)
+     * Tensor<float, 2> logits({32, 10}, true, true);
+     * auto probs = logits.softmax(-1);  // Apply along class dimension
+     * // Each row now sums to 1.0 and represents class probabilities
+     * 
+     * // With loss computation:
+     * auto loss = loss::cross_entropy_loss(logits, targets);
+     * loss.backward();  // Gradient flows through softmax
+     * 
+     * // Attention mechanism example:
+     * auto scores = query.matmul(key.transpose());  // Attention scores
+     * auto attention_weights = scores.softmax(-1);   // Normalize scores
+     * auto context = attention_weights.matmul(value);
+     * 
+     * // Temperature scaling for controlling confidence:
+     * float temperature = 2.0f;
+     * auto calibrated_probs = (logits / temperature).softmax(-1);
+     * @endcode
      */
     Tensor<T, N> softmax(int axis = -1) const {
         if (axis < 0) {
@@ -4522,6 +5026,113 @@ public:
     Tensor<T, N> tile(const TensorIndices<N>& reps) const {
         return repeat(reps);
     }
+    
+    // ========================================================================
+    // Enhanced Submatrix View Methods (for 2D tensors)
+    // ========================================================================
+    
+    /**
+     * @brief Extract a single row (only for 2D tensors)
+     * @param row_idx Row index to extract
+     * @return 1D tensor containing the row
+     */
+    template<size_t M = N, typename = std::enable_if_t<M == 2>>
+    Tensor<T, 1> row(size_t row_idx) const {
+        return ::row(*static_cast<const Tensor<T, 2>*>(static_cast<const void*>(this)), row_idx);
+    }
+    
+    /**
+     * @brief Extract a single column (only for 2D tensors)
+     * @param col_idx Column index to extract
+     * @return 1D tensor containing the column
+     */
+    template<size_t M = N, typename = std::enable_if_t<M == 2>>
+    Tensor<T, 1> col(size_t col_idx) const {
+        return ::col(*static_cast<const Tensor<T, 2>*>(static_cast<const void*>(this)), col_idx);
+    }
+    
+    /**
+     * @brief Extract diagonal elements (only for 2D tensors)
+     * @return 1D tensor containing diagonal elements
+     */
+    template<size_t M = N, typename = std::enable_if_t<M == 2>>
+    Tensor<T, 1> diag() const {
+        return ::diag(*static_cast<const Tensor<T, 2>*>(static_cast<const void*>(this)));
+    }
+    
+    /**
+     * @brief Extract a rectangular block (only for 2D tensors)
+     * @param start_row Starting row index
+     * @param start_col Starting column index
+     * @param num_rows Number of rows to extract
+     * @param num_cols Number of columns to extract
+     * @return 2D tensor containing the block
+     */
+    template<size_t M = N, typename = std::enable_if_t<M == 2>>
+    Tensor<T, 2> block(size_t start_row, size_t start_col, size_t num_rows, size_t num_cols) const {
+        return ::block(*static_cast<const Tensor<T, 2>*>(static_cast<const void*>(this)), 
+                       start_row, start_col, num_rows, num_cols);
+    }
+    
+    /**
+     * @brief Extract first n elements (only for 1D tensors)
+     * @param n Number of elements to extract
+     * @return 1D tensor containing first n elements
+     */
+    template<size_t M = N, typename = std::enable_if_t<M == 1>>
+    Tensor<T, 1> head(size_t n) const {
+        return ::head(*static_cast<const Tensor<T, 1>*>(static_cast<const void*>(this)), n);
+    }
+    
+    /**
+     * @brief Extract last n elements (only for 1D tensors)
+     * @param n Number of elements to extract
+     * @return 1D tensor containing last n elements
+     */
+    template<size_t M = N, typename = std::enable_if_t<M == 1>>
+    Tensor<T, 1> tail(size_t n) const {
+        return ::tail(*static_cast<const Tensor<T, 1>*>(static_cast<const void*>(this)), n);
+    }
+    
+    /**
+     * @brief Extract top n rows (only for 2D tensors)
+     * @param n Number of rows to extract
+     * @return 2D tensor containing top n rows
+     */
+    template<size_t M = N, typename = std::enable_if_t<M == 2>>
+    Tensor<T, 2> topRows(size_t n) const {
+        return ::topRows(*static_cast<const Tensor<T, 2>*>(static_cast<const void*>(this)), n);
+    }
+    
+    /**
+     * @brief Extract bottom n rows (only for 2D tensors)
+     * @param n Number of rows to extract
+     * @return 2D tensor containing bottom n rows
+     */
+    template<size_t M = N, typename = std::enable_if_t<M == 2>>
+    Tensor<T, 2> bottomRows(size_t n) const {
+        return ::bottomRows(*static_cast<const Tensor<T, 2>*>(static_cast<const void*>(this)), n);
+    }
+    
+    /**
+     * @brief Extract leftmost n columns (only for 2D tensors)
+     * @param n Number of columns to extract
+     * @return 2D tensor containing leftmost n columns
+     */
+    template<size_t M = N, typename = std::enable_if_t<M == 2>>
+    Tensor<T, 2> leftCols(size_t n) const {
+        return ::leftCols(*static_cast<const Tensor<T, 2>*>(static_cast<const void*>(this)), n);
+    }
+    
+    /**
+     * @brief Extract rightmost n columns (only for 2D tensors)
+     * @param n Number of columns to extract
+     * @return 2D tensor containing rightmost n columns
+     */
+    template<size_t M = N, typename = std::enable_if_t<M == 2>>
+    Tensor<T, 2> rightCols(size_t n) const {
+        return ::rightCols(*static_cast<const Tensor<T, 2>*>(static_cast<const void*>(this)), n);
+    }
 };
 
 
@@ -4762,7 +5373,7 @@ public:
      * Generate tensor with beta distribution.
      * @param dims Dimensions of the tensor.
      * @param alpha First shape parameter.
-     * @param beta Second shape parameter.
+     * @param beta_param Second shape parameter.
      * @param use_gpu Whether to use GPU.
      * @return Tensor filled with random values from beta distribution.
      * 
@@ -4814,6 +5425,7 @@ public:
      * @param n Number of trials.
      * @param probs Vector of probabilities (must sum to 1).
      * @param samples Number of samples to generate.
+     * @param use_gpu Whether to use GPU.
      * @return Tensor of shape (samples, len(probs)) with counts for each category.
      * 
      * Each row represents one sample, and each column represents the count
@@ -4882,6 +5494,7 @@ public:
 
 /**
  * @brief Sort tensor elements and return sorted tensor (1D only).
+ * @param tensor Input tensor to sort.
  * @param ascending If true, sort in ascending order; otherwise descending.
  * @return Sorted 1D tensor.
  */
@@ -4902,6 +5515,7 @@ Tensor<T, 1> sort(const Tensor<T, 1>& tensor, bool ascending = true) {
 
 /**
  * @brief Return indices that would sort the tensor (1D only).
+ * @param tensor Input tensor to get sort indices for.
  * @param ascending If true, sort in ascending order; otherwise descending.
  * @return 1D tensor of indices.
  */
@@ -4936,6 +5550,7 @@ Tensor<size_t, 1> argsort(const Tensor<T, 1>& tensor, bool ascending = true) {
 
 /**
  * @brief Find k largest or smallest elements and their indices (1D only).
+ * @param tensor Input tensor to find top k elements.
  * @param k Number of elements to return.
  * @param largest If true, return k largest; otherwise k smallest.
  * @return Pair of tensors: (values, indices).
@@ -5017,6 +5632,7 @@ Tensor<size_t, 1> searchsorted(const Tensor<T, 1>& values, const Tensor<T, 1>& s
 
 /**
  * @brief Split tensor into chunks along specified axis.
+ * @param tensor Input tensor to split.
  * @param num_chunks Number of chunks to split into.
  * @param axis Axis along which to split.
  * @return Vector of tensors.
@@ -5103,6 +5719,7 @@ std::vector<Tensor<T, N>> split(const Tensor<T, N>& tensor, size_t num_chunks, s
 
 /**
  * @brief Divide tensor into equal-sized chunks (last chunk may be smaller).
+ * @param tensor Input tensor to divide into chunks.
  * @param chunk_size Size of each chunk along the axis.
  * @param axis Axis along which to divide.
  * @return Vector of tensors.
@@ -5181,6 +5798,9 @@ std::vector<Tensor<T, N>> chunk(const Tensor<T, N>& tensor, size_t chunk_size, s
 
 /**
  * @brief Repeat tensor multiple times along each dimension.
+ * @param tensor Input tensor to tile.
+ * @param repeats Number of repetitions for each dimension.
+ * @return Tiled tensor with expanded dimensions.
  * @param repeats Array specifying number of repetitions for each dimension.
  * @return Tiled tensor.
  */
@@ -5238,6 +5858,10 @@ Tensor<T, N> tile(const Tensor<T, N>& tensor, const std::array<size_t, N>& repea
 
 /**
  * @brief Construct tensor by repeating along specified axis.
+ * @param tensor Input tensor to repeat.
+ * @param repeats Number of times to repeat along the axis.
+ * @param axis Axis along which to repeat.
+ * @return Repeated tensor.
  * @param repeats Number of repetitions.
  * @param axis Axis along which to repeat.
  * @return Repeated tensor.
@@ -5288,6 +5912,1040 @@ Tensor<T, N> repeat_along_axis(const Tensor<T, N>& tensor, size_t repeats, size_
         }
         
         result_data[idx] = tensor_data[src_idx];
+    }
+    
+    return result;
+}
+
+// ============================================================================
+// Broadcasting Enhancements
+// ============================================================================
+
+/**
+ * @brief Check if two tensor shapes are broadcastable
+ * @tparam N1 Number of dimensions in first tensor
+ * @tparam N2 Number of dimensions in second tensor
+ * @param shape1 Shape of first tensor
+ * @param shape2 Shape of second tensor
+ * @param error_msg Optional pointer to store detailed error message
+ * @return true if shapes are broadcastable, false otherwise
+ * 
+ * Two shapes are broadcastable if:
+ * - They are equal, or
+ * - One of them is 1
+ * This is checked for each dimension from right to left.
+ */
+template <size_t N1, size_t N2>
+bool are_broadcastable(const TensorIndices<N1>& shape1, 
+                       const TensorIndices<N2>& shape2,
+                       std::string* error_msg = nullptr) {
+    // Align shapes from the right (trailing dimensions)
+    size_t max_dims = std::max(N1, N2);
+    size_t offset1 = max_dims - N1;
+    size_t offset2 = max_dims - N2;
+    
+    for (size_t i = 0; i < max_dims; ++i) {
+        size_t dim1 = (i < offset1) ? 1 : shape1[i - offset1];
+        size_t dim2 = (i < offset2) ? 1 : shape2[i - offset2];
+        
+        if (dim1 != dim2 && dim1 != 1 && dim2 != 1) {
+            if (error_msg) {
+                *error_msg = "Shapes are not broadcastable: shape1[" + 
+                            std::to_string(i) + "]=" + std::to_string(dim1) +
+                            " vs shape2[" + std::to_string(i) + "]=" + 
+                            std::to_string(dim2);
+            }
+            return false;
+        }
+    }
+    return true;
+}
+
+/**
+ * @brief Compute the broadcast shape of two tensors
+ * @tparam N1 Number of dimensions in first tensor
+ * @tparam N2 Number of dimensions in second tensor
+ * @param shape1 Shape of first tensor
+ * @param shape2 Shape of second tensor
+ * @return The broadcast shape (variant with TensorError on failure)
+ */
+template <size_t N1, size_t N2>
+auto compute_broadcast_shape(const TensorIndices<N1>& shape1,
+                             const TensorIndices<N2>& shape2) 
+    -> std::variant<TensorIndices<std::max(N1, N2)>, TensorError> {
+    constexpr size_t MaxN = std::max(N1, N2);
+    TensorIndices<MaxN> result;
+    
+    std::string error_msg;
+    if (!are_broadcastable(shape1, shape2, &error_msg)) {
+        return TensorError::DimensionMismatch;
+    }
+    
+    size_t offset1 = MaxN - N1;
+    size_t offset2 = MaxN - N2;
+    
+    for (size_t i = 0; i < MaxN; ++i) {
+        size_t dim1 = (i < offset1) ? 1 : shape1[i - offset1];
+        size_t dim2 = (i < offset2) ? 1 : shape2[i - offset2];
+        result[i] = std::max(dim1, dim2);
+    }
+    
+    return result;
+}
+
+/**
+ * @brief Broadcast a tensor to a new shape
+ * @tparam T The data type
+ * @tparam N The number of dimensions
+ * @tparam M The number of dimensions in target shape
+ * @param tensor The input tensor
+ * @param target_shape The target shape to broadcast to
+ * @return A new tensor with the broadcast shape, or TensorError on failure
+ * 
+ * @note This creates a new tensor with data copied according to broadcast rules.
+ * Broadcasting rules (NumPy-compatible):
+ * - Prepend dimensions of size 1 if needed
+ * - For each dimension, sizes must either match or one must be 1
+ * - Dimensions of size 1 are "stretched" to match the target
+ * 
+ * Example:
+ * @code
+ * Tensor<float, 1> x({3});
+ * auto result = broadcast_to(x, {4, 3});  // Shape (3,) -> (4, 3)
+ * @endcode
+ */
+template <typename T, size_t N, size_t M>
+auto broadcast_to(const Tensor<T, N>& tensor, const TensorIndices<M>& target_shape)
+    -> std::variant<Tensor<T, M>, TensorError> {
+    
+    // Check if broadcasting is valid
+    std::string error_msg;
+    if (!are_broadcastable(tensor.shape(), target_shape, &error_msg)) {
+        return TensorError::DimensionMismatch;
+    }
+    
+    // Create result tensor
+    Tensor<T, M> result(target_shape, tensor.uses_gpu());
+    
+    // Get raw pointers
+    const T* src_data = tensor.data_ptr();
+    T* dst_data = result.data_ptr();
+    
+    // Compute strides for broadcasting
+    size_t offset = M - N;
+    TensorIndices<M> src_strides;
+    for (size_t i = 0; i < M; ++i) {
+        if (i < offset) {
+            src_strides[i] = 0;  // New dimension, don't advance
+        } else {
+            size_t src_dim = i - offset;
+            if (tensor.shape()[src_dim] == 1) {
+                src_strides[i] = 0;  // Broadcast this dimension
+            } else {
+                src_strides[i] = tensor.strides()[src_dim];
+            }
+        }
+    }
+    
+    // Fill result with broadcast data
+    size_t total_size = result.total_size();
+    
+    #pragma omp parallel for if(total_size > 10000)
+    for (size_t i = 0; i < total_size; ++i) {
+        // Convert flat index to multi-dimensional coordinates
+        TensorIndices<M> coords;
+        size_t idx = i;
+        for (size_t d = M; d > 0; --d) {
+            coords[d - 1] = idx % target_shape[d - 1];
+            idx /= target_shape[d - 1];
+        }
+        
+        // Map to source index using broadcast strides
+        size_t src_idx = 0;
+        for (size_t d = 0; d < M; ++d) {
+            src_idx += coords[d] * src_strides[d];
+        }
+        
+        dst_data[i] = src_data[src_idx];
+    }
+    
+    return result;
+}
+
+// ============================================================================
+// NumPy Compatibility - Type Casting
+// ============================================================================
+
+/**
+ * @brief Cast tensor to a different data type (NumPy-compatible astype)
+ * @tparam T Source data type
+ * @tparam U Target data type
+ * @tparam N Number of dimensions
+ * @param tensor The input tensor
+ * @return A new tensor with the target data type
+ * 
+ * This is the NumPy-compatible version of type casting.
+ * 
+ * Example:
+ * @code
+ * Tensor<int, 2> x({2, 3});
+ * auto y = astype<float>(x);  // Convert int tensor to float
+ * @endcode
+ */
+template <typename U, typename T, size_t N>
+Tensor<U, N> astype(const Tensor<T, N>& tensor) {
+    Tensor<U, N> result(tensor.shape(), tensor.uses_gpu());
+    
+    const T* src_data = tensor.data_ptr();
+    U* dst_data = result.data_ptr();
+    size_t total_size = tensor.total_size();
+    
+    #pragma omp parallel for if(total_size > 10000)
+    for (size_t i = 0; i < total_size; ++i) {
+        dst_data[i] = static_cast<U>(src_data[i]);
+    }
+    
+    return result;
+}
+
+// ============================================================================
+// NumPy Compatibility - Convenience Functions
+// ============================================================================
+
+/**
+ * @brief Create a copy of a tensor (NumPy-compatible)
+ * @tparam T The data type
+ * @tparam N The number of dimensions
+ * @param tensor The input tensor
+ * @return A new tensor that is a copy of the input
+ */
+template <typename T, size_t N>
+Tensor<T, N> copy(const Tensor<T, N>& tensor) {
+    Tensor<T, N> result(tensor.shape(), tensor.uses_gpu());
+    std::copy_n(tensor.data_ptr(), tensor.total_size(), result.data_ptr());
+    return result;
+}
+
+/**
+ * @brief Create a tensor filled with zeros (NumPy-compatible)
+ * @tparam T The data type
+ * @tparam N The number of dimensions
+ * @param shape The shape of the tensor
+ * @param use_gpu Whether to use GPU
+ * @return A new tensor filled with zeros
+ */
+template <typename T, size_t N>
+Tensor<T, N> zeros(const TensorIndices<N>& shape, bool use_gpu = true) {
+    Tensor<T, N> result(shape, use_gpu);
+    result.fill(T(0));
+    return result;
+}
+
+/**
+ * @brief Create a tensor filled with ones (NumPy-compatible)
+ * @tparam T The data type
+ * @tparam N The number of dimensions
+ * @param shape The shape of the tensor
+ * @param use_gpu Whether to use GPU
+ * @return A new tensor filled with ones
+ */
+template <typename T, size_t N>
+Tensor<T, N> ones(const TensorIndices<N>& shape, bool use_gpu = true) {
+    Tensor<T, N> result(shape, use_gpu);
+    result.fill(T(1));
+    return result;
+}
+
+/**
+ * @brief Create a tensor with values in a range (NumPy arange-compatible)
+ * @tparam T The data type
+ * @param start Start value (inclusive)
+ * @param stop Stop value (exclusive)
+ * @param step Step size
+ * @param use_gpu Whether to use GPU
+ * @return A 1D tensor with values from start to stop with given step
+ */
+template <typename T>
+Tensor<T, 1> arange(T start, T stop, T step = T(1), bool use_gpu = true) {
+    size_t n = static_cast<size_t>((stop - start) / step);
+    if (n == 0) n = 1;
+    
+    Tensor<T, 1> result({n}, use_gpu);
+    T* data = result.data_ptr();
+    
+    for (size_t i = 0; i < n; ++i) {
+        data[i] = start + i * step;
+    }
+    
+    return result;
+}
+
+/**
+ * @brief Create a tensor with evenly spaced values (NumPy linspace-compatible)
+ * @tparam T The data type
+ * @param start Start value
+ * @param stop Stop value
+ * @param num Number of samples (default 50)
+ * @param use_gpu Whether to use GPU
+ * @return A 1D tensor with num evenly spaced values
+ */
+template <typename T>
+Tensor<T, 1> linspace(T start, T stop, size_t num = 50, bool use_gpu = true) {
+    Tensor<T, 1> result({num}, use_gpu);
+    T* data = result.data_ptr();
+    
+    if (num == 1) {
+        data[0] = start;
+        return result;
+    }
+    
+    T step = (stop - start) / (num - 1);
+    for (size_t i = 0; i < num; ++i) {
+        data[i] = start + i * step;
+    }
+    
+    return result;
+}
+
+/**
+ * @brief Create a tensor with values spaced evenly on a log scale
+ * @tparam T The data type
+ * @param start Start value (10^start)
+ * @param stop Stop value (10^stop)
+ * @param num Number of samples (default 50)
+ * @param base Base of the log space (default 10.0)
+ * @param use_gpu Whether to use GPU
+ * @return A 1D tensor with num log-spaced values
+ */
+template <typename T>
+Tensor<T, 1> logspace(T start, T stop, size_t num = 50, T base = T(10), 
+                      bool use_gpu = true) {
+    Tensor<T, 1> result({num}, use_gpu);
+    T* data = result.data_ptr();
+    
+    if (num == 1) {
+        data[0] = std::pow(base, start);
+        return result;
+    }
+    
+    T step = (stop - start) / (num - 1);
+    for (size_t i = 0; i < num; ++i) {
+        data[i] = std::pow(base, start + i * step);
+    }
+    
+    return result;
+}
+
+/**
+ * @brief Create an identity matrix (NumPy eye-compatible)
+ * @tparam T The data type
+ * @param n Size of the square matrix
+ * @param use_gpu Whether to use GPU
+ * @return An n×n identity matrix
+ */
+template <typename T>
+Tensor<T, 2> eye(size_t n, bool use_gpu = true) {
+    Tensor<T, 2> result({n, n}, use_gpu);
+    result.fill(T(0));
+    T* data = result.data_ptr();
+    
+    for (size_t i = 0; i < n; ++i) {
+        data[i * n + i] = T(1);
+    }
+    
+    return result;
+}
+
+/**
+ * @brief Reshape a tensor (returns variant for error handling)
+ * @tparam T The data type
+ * @tparam N Original number of dimensions
+ * @tparam M New number of dimensions
+ * @param tensor The input tensor
+ * @param new_shape The target shape
+ * @return A reshaped tensor or TensorError if sizes don't match
+ * 
+ * @note This is an alias for the reshape method but returns a variant
+ */
+template <typename T, size_t N, size_t M>
+auto reshape_to(const Tensor<T, N>& tensor, const TensorIndices<M>& new_shape)
+    -> std::variant<Tensor<T, M>, TensorError> {
+    
+    // Check if total size matches
+    size_t old_size = tensor.total_size();
+    size_t new_size = 1;
+    for (size_t i = 0; i < M; ++i) {
+        new_size *= new_shape[i];
+    }
+    
+    if (old_size != new_size) {
+        return TensorError::DimensionMismatch;
+    }
+    
+    Tensor<T, M> result(new_shape, tensor.uses_gpu());
+    std::copy_n(tensor.data_ptr(), old_size, result.data_ptr());
+    return result;
+}
+
+// ============================================================================
+// Normalization Functions
+// ============================================================================
+
+/**
+ * @brief Normalize tensor using L1 norm (sum of absolute values)
+ * @tparam T Data type
+ * @tparam N Number of dimensions
+ * @param tensor Input tensor
+ * @param axis Axis along which to normalize (-1 for all elements)
+ * @return Normalized tensor where L1 norm equals 1
+ * 
+ * L1 normalization divides each element by the sum of absolute values.
+ * Useful for probability distributions and sparse data.
+ */
+template <typename T, size_t N>
+Tensor<T, N> normalize_l1(const Tensor<T, N>& tensor, int axis = -1) {
+    Tensor<T, N> result(tensor.dims(), tensor.uses_gpu());
+    const T* src = tensor.data_ptr();
+    T* dst = result.data_ptr();
+    size_t total = tensor.total_size();
+    
+    if (axis == -1) {
+        // Normalize over all elements
+        T sum = T(0);
+        for (size_t i = 0; i < total; ++i) {
+            sum += std::abs(src[i]);
+        }
+        if (sum > T(0)) {
+            for (size_t i = 0; i < total; ++i) {
+                dst[i] = src[i] / sum;
+            }
+        } else {
+            std::copy_n(src, total, dst);
+        }
+    } else if constexpr (N >= 2) {
+        // Normalize along specific axis
+        auto dims = tensor.dims();
+        size_t axis_size = dims[axis];
+        size_t outer_size = 1;
+        size_t inner_size = 1;
+        
+        for (size_t i = 0; i < axis; ++i) {
+            outer_size *= dims[i];
+        }
+        for (size_t i = axis + 1; i < N; ++i) {
+            inner_size *= dims[i];
+        }
+        
+        for (size_t outer = 0; outer < outer_size; ++outer) {
+            for (size_t inner = 0; inner < inner_size; ++inner) {
+                // Compute sum for this slice
+                T sum = T(0);
+                for (size_t ax = 0; ax < axis_size; ++ax) {
+                    size_t idx = outer * axis_size * inner_size + ax * inner_size + inner;
+                    sum += std::abs(src[idx]);
+                }
+                
+                // Normalize
+                if (sum > T(0)) {
+                    for (size_t ax = 0; ax < axis_size; ++ax) {
+                        size_t idx = outer * axis_size * inner_size + ax * inner_size + inner;
+                        dst[idx] = src[idx] / sum;
+                    }
+                } else {
+                    for (size_t ax = 0; ax < axis_size; ++ax) {
+                        size_t idx = outer * axis_size * inner_size + ax * inner_size + inner;
+                        dst[idx] = src[idx];
+                    }
+                }
+            }
+        }
+    } else {
+        std::copy_n(src, total, dst);
+    }
+    
+    return result;
+}
+
+/**
+ * @brief Normalize tensor using L2 norm (Euclidean norm)
+ * @tparam T Data type
+ * @tparam N Number of dimensions
+ * @param tensor Input tensor
+ * @param axis Axis along which to normalize (-1 for all elements)
+ * @return Normalized tensor where L2 norm equals 1
+ * 
+ * L2 normalization divides each element by the square root of the sum of squares.
+ * Common in machine learning for feature normalization.
+ */
+template <typename T, size_t N>
+Tensor<T, N> normalize_l2(const Tensor<T, N>& tensor, int axis = -1) {
+    Tensor<T, N> result(tensor.dims(), tensor.uses_gpu());
+    const T* src = tensor.data_ptr();
+    T* dst = result.data_ptr();
+    size_t total = tensor.total_size();
+    
+    if (axis == -1) {
+        // Normalize over all elements
+        T sum_sq = T(0);
+        for (size_t i = 0; i < total; ++i) {
+            sum_sq += src[i] * src[i];
+        }
+        T norm = std::sqrt(sum_sq);
+        if (norm > T(0)) {
+            for (size_t i = 0; i < total; ++i) {
+                dst[i] = src[i] / norm;
+            }
+        } else {
+            std::copy_n(src, total, dst);
+        }
+    } else if constexpr (N >= 2) {
+        // Normalize along specific axis
+        auto dims = tensor.dims();
+        size_t axis_size = dims[axis];
+        size_t outer_size = 1;
+        size_t inner_size = 1;
+        
+        for (size_t i = 0; i < axis; ++i) {
+            outer_size *= dims[i];
+        }
+        for (size_t i = axis + 1; i < N; ++i) {
+            inner_size *= dims[i];
+        }
+        
+        for (size_t outer = 0; outer < outer_size; ++outer) {
+            for (size_t inner = 0; inner < inner_size; ++inner) {
+                // Compute sum of squares for this slice
+                T sum_sq = T(0);
+                for (size_t ax = 0; ax < axis_size; ++ax) {
+                    size_t idx = outer * axis_size * inner_size + ax * inner_size + inner;
+                    sum_sq += src[idx] * src[idx];
+                }
+                
+                T norm = std::sqrt(sum_sq);
+                
+                // Normalize
+                if (norm > T(0)) {
+                    for (size_t ax = 0; ax < axis_size; ++ax) {
+                        size_t idx = outer * axis_size * inner_size + ax * inner_size + inner;
+                        dst[idx] = src[idx] / norm;
+                    }
+                } else {
+                    for (size_t ax = 0; ax < axis_size; ++ax) {
+                        size_t idx = outer * axis_size * inner_size + ax * inner_size + inner;
+                        dst[idx] = src[idx];
+                    }
+                }
+            }
+        }
+    } else {
+        std::copy_n(src, total, dst);
+    }
+    
+    return result;
+}
+
+/**
+ * @brief Z-score normalization (standardization): (x - mean) / std
+ * @tparam T Data type
+ * @tparam N Number of dimensions
+ * @param tensor Input tensor
+ * @param axis Axis along which to normalize (-1 for all elements)
+ * @param eps Small constant to avoid division by zero
+ * @return Standardized tensor with mean ~0 and std ~1
+ * 
+ * Z-score normalization is common in statistical analysis and machine learning.
+ */
+template <typename T, size_t N>
+Tensor<T, N> normalize_zscore(const Tensor<T, N>& tensor, int axis = -1, T eps = T(1e-8)) {
+    Tensor<T, N> result(tensor.dims(), tensor.uses_gpu());
+    const T* src = tensor.data_ptr();
+    T* dst = result.data_ptr();
+    size_t total = tensor.total_size();
+    
+    if (axis == -1) {
+        // Normalize over all elements
+        T mean = T(0);
+        for (size_t i = 0; i < total; ++i) {
+            mean += src[i];
+        }
+        mean /= total;
+        
+        T var = T(0);
+        for (size_t i = 0; i < total; ++i) {
+            T diff = src[i] - mean;
+            var += diff * diff;
+        }
+        var /= total;
+        T std_dev = std::sqrt(var + eps);
+        
+        for (size_t i = 0; i < total; ++i) {
+            dst[i] = (src[i] - mean) / std_dev;
+        }
+    } else if constexpr (N >= 2) {
+        // Normalize along specific axis
+        auto dims = tensor.dims();
+        size_t axis_size = dims[axis];
+        size_t outer_size = 1;
+        size_t inner_size = 1;
+        
+        for (size_t i = 0; i < axis; ++i) {
+            outer_size *= dims[i];
+        }
+        for (size_t i = axis + 1; i < N; ++i) {
+            inner_size *= dims[i];
+        }
+        
+        for (size_t outer = 0; outer < outer_size; ++outer) {
+            for (size_t inner = 0; inner < inner_size; ++inner) {
+                // Compute mean for this slice
+                T mean = T(0);
+                for (size_t ax = 0; ax < axis_size; ++ax) {
+                    size_t idx = outer * axis_size * inner_size + ax * inner_size + inner;
+                    mean += src[idx];
+                }
+                mean /= axis_size;
+                
+                // Compute variance
+                T var = T(0);
+                for (size_t ax = 0; ax < axis_size; ++ax) {
+                    size_t idx = outer * axis_size * inner_size + ax * inner_size + inner;
+                    T diff = src[idx] - mean;
+                    var += diff * diff;
+                }
+                var /= axis_size;
+                T std_dev = std::sqrt(var + eps);
+                
+                // Normalize
+                for (size_t ax = 0; ax < axis_size; ++ax) {
+                    size_t idx = outer * axis_size * inner_size + ax * inner_size + inner;
+                    dst[idx] = (src[idx] - mean) / std_dev;
+                }
+            }
+        }
+    } else {
+        std::copy_n(src, total, dst);
+    }
+    
+    return result;
+}
+
+/**
+ * @brief Min-Max normalization: scales values to [min_val, max_val] range
+ * @tparam T Data type
+ * @tparam N Number of dimensions
+ * @param tensor Input tensor
+ * @param axis Axis along which to normalize (-1 for all elements)
+ * @param min_val Minimum value of output range (default 0)
+ * @param max_val Maximum value of output range (default 1)
+ * @param eps Small constant to avoid division by zero
+ * @return Scaled tensor in the range [min_val, max_val]
+ * 
+ * Min-max scaling is useful when you need values in a specific range.
+ */
+template <typename T, size_t N>
+Tensor<T, N> normalize_minmax(const Tensor<T, N>& tensor, int axis = -1, 
+                               T min_val = T(0), T max_val = T(1), T eps = T(1e-8)) {
+    Tensor<T, N> result(tensor.dims(), tensor.uses_gpu());
+    const T* src = tensor.data_ptr();
+    T* dst = result.data_ptr();
+    size_t total = tensor.total_size();
+    
+    if (axis == -1) {
+        // Normalize over all elements
+        T min_elem = src[0];
+        T max_elem = src[0];
+        for (size_t i = 1; i < total; ++i) {
+            if (src[i] < min_elem) min_elem = src[i];
+            if (src[i] > max_elem) max_elem = src[i];
+        }
+        
+        T range = max_elem - min_elem;
+        if (range > eps) {
+            T scale = (max_val - min_val) / range;
+            for (size_t i = 0; i < total; ++i) {
+                dst[i] = min_val + (src[i] - min_elem) * scale;
+            }
+        } else {
+            // All values are the same
+            T mid = (min_val + max_val) / T(2);
+            for (size_t i = 0; i < total; ++i) {
+                dst[i] = mid;
+            }
+        }
+    } else if constexpr (N >= 2) {
+        // Normalize along specific axis
+        auto dims = tensor.dims();
+        size_t axis_size = dims[axis];
+        size_t outer_size = 1;
+        size_t inner_size = 1;
+        
+        for (size_t i = 0; i < axis; ++i) {
+            outer_size *= dims[i];
+        }
+        for (size_t i = axis + 1; i < N; ++i) {
+            inner_size *= dims[i];
+        }
+        
+        for (size_t outer = 0; outer < outer_size; ++outer) {
+            for (size_t inner = 0; inner < inner_size; ++inner) {
+                // Find min and max for this slice
+                size_t first_idx = outer * axis_size * inner_size + inner;
+                T min_elem = src[first_idx];
+                T max_elem = src[first_idx];
+                
+                for (size_t ax = 1; ax < axis_size; ++ax) {
+                    size_t idx = outer * axis_size * inner_size + ax * inner_size + inner;
+                    if (src[idx] < min_elem) min_elem = src[idx];
+                    if (src[idx] > max_elem) max_elem = src[idx];
+                }
+                
+                T range = max_elem - min_elem;
+                
+                // Normalize
+                if (range > eps) {
+                    T scale = (max_val - min_val) / range;
+                    for (size_t ax = 0; ax < axis_size; ++ax) {
+                        size_t idx = outer * axis_size * inner_size + ax * inner_size + inner;
+                        dst[idx] = min_val + (src[idx] - min_elem) * scale;
+                    }
+                } else {
+                    T mid = (min_val + max_val) / T(2);
+                    for (size_t ax = 0; ax < axis_size; ++ax) {
+                        size_t idx = outer * axis_size * inner_size + ax * inner_size + inner;
+                        dst[idx] = mid;
+                    }
+                }
+            }
+        }
+    } else {
+        std::copy_n(src, total, dst);
+    }
+    
+    return result;
+}
+
+// ============================================================================
+// Enhanced Submatrix Views (Methods to add to Tensor class)
+// ============================================================================
+
+// Note: The following methods need to be added as member functions of Tensor<T, N> class.
+// They are declared here as free functions and should be moved inside the class definition.
+
+/**
+ * @brief Extract a single row from a 2D tensor
+ * @tparam T Data type
+ * @param matrix 2D tensor
+ * @param row_idx Row index to extract
+ * @return 1D tensor containing the row
+ * 
+ * This is a convenience method equivalent to select(0, row_idx) for matrices.
+ * @code
+ * Tensor<float, 2> mat({5, 3});
+ * auto row2 = mat.row(2);  // Extract 3rd row
+ * @endcode
+ */
+template <typename T>
+Tensor<T, 1> row(const Tensor<T, 2>& matrix, size_t row_idx) {
+    auto dims = matrix.dims();
+    if (row_idx >= dims[0]) {
+        throw std::out_of_range("Row index out of bounds");
+    }
+    
+    size_t cols = dims[1];
+    Tensor<T, 1> result({cols}, matrix.uses_gpu());
+    
+    const T* src = matrix.data_ptr();
+    T* dst = result.data_ptr();
+    
+    for (size_t j = 0; j < cols; ++j) {
+        dst[j] = src[row_idx * cols + j];
+    }
+    
+    return result;
+}
+
+/**
+ * @brief Extract a single column from a 2D tensor
+ * @tparam T Data type
+ * @param matrix 2D tensor
+ * @param col_idx Column index to extract
+ * @return 1D tensor containing the column
+ * 
+ * @code
+ * Tensor<float, 2> mat({5, 3});
+ * auto col1 = mat.col(1);  // Extract 2nd column
+ * @endcode
+ */
+template <typename T>
+Tensor<T, 1> col(const Tensor<T, 2>& matrix, size_t col_idx) {
+    auto dims = matrix.dims();
+    if (col_idx >= dims[1]) {
+        throw std::out_of_range("Column index out of bounds");
+    }
+    
+    size_t rows = dims[0];
+    size_t cols = dims[1];
+    Tensor<T, 1> result({rows}, matrix.uses_gpu());
+    
+    const T* src = matrix.data_ptr();
+    T* dst = result.data_ptr();
+    
+    for (size_t i = 0; i < rows; ++i) {
+        dst[i] = src[i * cols + col_idx];
+    }
+    
+    return result;
+}
+
+/**
+ * @brief Extract the diagonal of a 2D tensor
+ * @tparam T Data type
+ * @param matrix 2D tensor
+ * @return 1D tensor containing diagonal elements
+ * 
+ * For non-square matrices, extracts min(rows, cols) diagonal elements.
+ * @code
+ * Tensor<float, 2> mat({3, 3});
+ * auto diagonal = mat.diag();
+ * @endcode
+ */
+template <typename T>
+Tensor<T, 1> diag(const Tensor<T, 2>& matrix) {
+    auto dims = matrix.dims();
+    size_t rows = dims[0];
+    size_t cols = dims[1];
+    size_t diag_size = std::min(rows, cols);
+    
+    Tensor<T, 1> result({diag_size}, matrix.uses_gpu());
+    
+    const T* src = matrix.data_ptr();
+    T* dst = result.data_ptr();
+    
+    for (size_t i = 0; i < diag_size; ++i) {
+        dst[i] = src[i * cols + i];
+    }
+    
+    return result;
+}
+
+/**
+ * @brief Create a diagonal matrix from a 1D tensor
+ * @tparam T Data type
+ * @param vec 1D tensor containing diagonal values
+ * @return 2D square matrix with vec on diagonal, zeros elsewhere
+ * 
+ * @code
+ * Tensor<float, 1> vec({3});
+ * auto mat = diag_matrix(vec);  // Creates 3x3 diagonal matrix
+ * @endcode
+ */
+template <typename T>
+Tensor<T, 2> diag_matrix(const Tensor<T, 1>& vec) {
+    size_t n = vec.dims()[0];
+    Tensor<T, 2> result({n, n}, vec.uses_gpu());
+    result.fill(T(0));
+    
+    const T* src = vec.data_ptr();
+    T* dst = result.data_ptr();
+    
+    for (size_t i = 0; i < n; ++i) {
+        dst[i * n + i] = src[i];
+    }
+    
+    return result;
+}
+
+/**
+ * @brief Extract a rectangular block from a 2D tensor
+ * @tparam T Data type
+ * @param matrix 2D tensor
+ * @param start_row Starting row index
+ * @param start_col Starting column index
+ * @param num_rows Number of rows to extract
+ * @param num_cols Number of columns to extract
+ * @return 2D tensor containing the block
+ * 
+ * @code
+ * Tensor<float, 2> mat({10, 10});
+ * auto block = mat.block(2, 3, 4, 5);  // 4x5 block starting at (2,3)
+ * @endcode
+ */
+template <typename T>
+Tensor<T, 2> block(const Tensor<T, 2>& matrix, size_t start_row, size_t start_col,
+                   size_t num_rows, size_t num_cols) {
+    auto dims = matrix.dims();
+    if (start_row + num_rows > dims[0] || start_col + num_cols > dims[1]) {
+        throw std::out_of_range("Block exceeds matrix bounds");
+    }
+    
+    size_t cols = dims[1];
+    Tensor<T, 2> result({num_rows, num_cols}, matrix.uses_gpu());
+    
+    const T* src = matrix.data_ptr();
+    T* dst = result.data_ptr();
+    
+    for (size_t i = 0; i < num_rows; ++i) {
+        for (size_t j = 0; j < num_cols; ++j) {
+            dst[i * num_cols + j] = src[(start_row + i) * cols + (start_col + j)];
+        }
+    }
+    
+    return result;
+}
+
+/**
+ * @brief Extract first n elements from a 1D tensor
+ * @tparam T Data type
+ * @param vec 1D tensor
+ * @param n Number of elements to extract
+ * @return 1D tensor containing first n elements
+ * 
+ * @code
+ * Tensor<float, 1> vec({10});
+ * auto first5 = vec.head(5);
+ * @endcode
+ */
+template <typename T>
+Tensor<T, 1> head(const Tensor<T, 1>& vec, size_t n) {
+    size_t size = vec.dims()[0];
+    if (n > size) n = size;
+    
+    Tensor<T, 1> result({n}, vec.uses_gpu());
+    std::copy_n(vec.data_ptr(), n, result.data_ptr());
+    
+    return result;
+}
+
+/**
+ * @brief Extract last n elements from a 1D tensor
+ * @tparam T Data type
+ * @param vec 1D tensor
+ * @param n Number of elements to extract
+ * @return 1D tensor containing last n elements
+ * 
+ * @code
+ * Tensor<float, 1> vec({10});
+ * auto last5 = vec.tail(5);
+ * @endcode
+ */
+template <typename T>
+Tensor<T, 1> tail(const Tensor<T, 1>& vec, size_t n) {
+    size_t size = vec.dims()[0];
+    if (n > size) n = size;
+    
+    Tensor<T, 1> result({n}, vec.uses_gpu());
+    std::copy_n(vec.data_ptr() + (size - n), n, result.data_ptr());
+    
+    return result;
+}
+
+/**
+ * @brief Extract top n rows from a 2D tensor
+ * @tparam T Data type
+ * @param matrix 2D tensor
+ * @param n Number of rows to extract
+ * @return 2D tensor containing top n rows
+ * 
+ * @code
+ * Tensor<float, 2> mat({10, 5});
+ * auto top3 = mat.topRows(3);
+ * @endcode
+ */
+template <typename T>
+Tensor<T, 2> topRows(const Tensor<T, 2>& matrix, size_t n) {
+    auto dims = matrix.dims();
+    size_t rows = dims[0];
+    size_t cols = dims[1];
+    if (n > rows) n = rows;
+    
+    Tensor<T, 2> result({n, cols}, matrix.uses_gpu());
+    std::copy_n(matrix.data_ptr(), n * cols, result.data_ptr());
+    
+    return result;
+}
+
+/**
+ * @brief Extract bottom n rows from a 2D tensor
+ * @tparam T Data type
+ * @param matrix 2D tensor
+ * @param n Number of rows to extract
+ * @return 2D tensor containing bottom n rows
+ * 
+ * @code
+ * Tensor<float, 2> mat({10, 5});
+ * auto bottom3 = mat.bottomRows(3);
+ * @endcode
+ */
+template <typename T>
+Tensor<T, 2> bottomRows(const Tensor<T, 2>& matrix, size_t n) {
+    auto dims = matrix.dims();
+    size_t rows = dims[0];
+    size_t cols = dims[1];
+    if (n > rows) n = rows;
+    
+    Tensor<T, 2> result({n, cols}, matrix.uses_gpu());
+    std::copy_n(matrix.data_ptr() + (rows - n) * cols, n * cols, result.data_ptr());
+    
+    return result;
+}
+
+/**
+ * @brief Extract leftmost n columns from a 2D tensor
+ * @tparam T Data type
+ * @param matrix 2D tensor
+ * @param n Number of columns to extract
+ * @return 2D tensor containing leftmost n columns
+ * 
+ * @code
+ * Tensor<float, 2> mat({5, 10});
+ * auto left3 = mat.leftCols(3);
+ * @endcode
+ */
+template <typename T>
+Tensor<T, 2> leftCols(const Tensor<T, 2>& matrix, size_t n) {
+    auto dims = matrix.dims();
+    size_t rows = dims[0];
+    size_t cols = dims[1];
+    if (n > cols) n = cols;
+    
+    Tensor<T, 2> result({rows, n}, matrix.uses_gpu());
+    
+    const T* src = matrix.data_ptr();
+    T* dst = result.data_ptr();
+    
+    for (size_t i = 0; i < rows; ++i) {
+        std::copy_n(src + i * cols, n, dst + i * n);
+    }
+    
+    return result;
+}
+
+/**
+ * @brief Extract rightmost n columns from a 2D tensor
+ * @tparam T Data type
+ * @param matrix 2D tensor
+ * @param n Number of columns to extract
+ * @return 2D tensor containing rightmost n columns
+ * 
+ * @code
+ * Tensor<float, 2> mat({5, 10});
+ * auto right3 = mat.rightCols(3);
+ * @endcode
+ */
+template <typename T>
+Tensor<T, 2> rightCols(const Tensor<T, 2>& matrix, size_t n) {
+    auto dims = matrix.dims();
+    size_t rows = dims[0];
+    size_t cols = dims[1];
+    if (n > cols) n = cols;
+    
+    Tensor<T, 2> result({rows, n}, matrix.uses_gpu());
+    
+    const T* src = matrix.data_ptr();
+    T* dst = result.data_ptr();
+    
+    for (size_t i = 0; i < rows; ++i) {
+        std::copy_n(src + i * cols + (cols - n), n, dst + i * n);
     }
     
     return result;

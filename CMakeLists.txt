@@ -40,6 +40,15 @@ else()
   message(STATUS "BLAS not found - using standard CPU implementation")
 endif()
 
+# Try to find LAPACK for advanced linear algebra operations
+find_package(LAPACK QUIET)
+if(LAPACK_FOUND)
+  add_definitions(-DUSE_LAPACK)
+  message(STATUS "LAPACK found - advanced linear algebra enabled")
+else()
+  message(STATUS "LAPACK not found - using fallback implementations")
+endif()
+
 include(FetchContent)
 FetchContent_Declare(
   googletest
@@ -56,6 +65,105 @@ if(USE_CUDA)
   set(GPU_SOURCES src/tensor_gpu.cu)
   set_source_files_properties(${GPU_SOURCES} PROPERTIES LANGUAGE CUDA)
 endif()
+
+# ============================================
+# Tensor Library (Static and Shared)
+# ============================================
+
+# Core library sources
+set(TENSOR_LIB_SOURCES
+  src/tensor_instantiations.cc
+)
+
+# Build static library
+add_library(tensor4d_static STATIC
+  ${TENSOR_LIB_SOURCES}
+  ${GPU_SOURCES}
+)
+
+target_link_libraries(tensor4d_static
+  PUBLIC Threads::Threads
+)
+
+# Link TBB if found
+if(TBB_FOUND)
+  target_link_libraries(tensor4d_static PUBLIC TBB::tbb)
+endif()
+
+# Link BLAS if found
+if(BLAS_FOUND)
+  target_link_libraries(tensor4d_static PUBLIC ${BLAS_LIBRARIES})
+endif()
+
+# Link LAPACK if found
+if(LAPACK_FOUND)
+  target_link_libraries(tensor4d_static PUBLIC ${LAPACK_LIBRARIES})
+endif()
+
+# Build shared library
+add_library(tensor4d_shared SHARED
+  ${TENSOR_LIB_SOURCES}
+  ${GPU_SOURCES}
+)
+
+# Set output name to match static library (without _shared suffix)
+set_target_properties(tensor4d_shared PROPERTIES OUTPUT_NAME tensor4d)
+
+target_link_libraries(tensor4d_shared
+  PUBLIC Threads::Threads
+)
+
+# Link TBB if found
+if(TBB_FOUND)
+  target_link_libraries(tensor4d_shared PUBLIC TBB::tbb)
+endif()
+
+# Link BLAS if found
+if(BLAS_FOUND)
+  target_link_libraries(tensor4d_shared PUBLIC ${BLAS_LIBRARIES})
+endif()
+
+# Link LAPACK if found
+if(LAPACK_FOUND)
+  target_link_libraries(tensor4d_shared PUBLIC ${LAPACK_LIBRARIES})
+endif()
+
+# Set library properties
+set_target_properties(tensor4d_static PROPERTIES
+  OUTPUT_NAME tensor4d
+  POSITION_INDEPENDENT_CODE ON
+)
+
+set_target_properties(tensor4d_shared PROPERTIES
+  VERSION 1.0.0
+  SOVERSION 1
+  POSITION_INDEPENDENT_CODE ON
+)
+
+message(STATUS "Building static library: libtensor4d.a")
+message(STATUS "Building shared library: libtensor4d.so (version 1.0.0)")
+
+# ============================================
+# Installation Rules
+# ============================================
+
+# Install libraries
+install(TARGETS tensor4d_static tensor4d_shared
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
+
+# Install headers
+install(DIRECTORY include/
+  DESTINATION include/tensor4d
+  FILES_MATCHING PATTERN "*.h" PATTERN "*.cuh"
+  PATTERN "*.bak" EXCLUDE
+  PATTERN "*.bak2" EXCLUDE
+)
+
+message(STATUS "Install prefix: ${CMAKE_INSTALL_PREFIX}")
+message(STATUS "Use 'make install' to install libraries and headers")
 
 # Collect all test files from tests directory
 file(GLOB TEST_SOURCES "tests/*.cc")

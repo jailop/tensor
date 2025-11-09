@@ -170,6 +170,43 @@ template void dot_nd_gpu<int>(const int*, const int*, int*, size_t, size_t, size
 template void dot_nd_gpu<float>(const float*, const float*, float*, size_t, size_t, size_t);
 template void dot_nd_gpu<double>(const double*, const double*, double*, size_t, size_t, size_t);
 
+// Cross product kernel for 3D vectors
+template<typename T>
+__global__ void cross_3d_kernel(const T* a, const T* b, T* result) {
+    // Cross product: a × b = [a2*b3 - a3*b2, a3*b1 - a1*b3, a1*b2 - a2*b1]
+    if (threadIdx.x == 0) {
+        result[0] = a[1] * b[2] - a[2] * b[1];
+        result[1] = a[2] * b[0] - a[0] * b[2];
+        result[2] = a[0] * b[1] - a[1] * b[0];
+    }
+}
+
+template<typename T>
+void cross_3d_gpu(const T* a, const T* b, T* result) {
+    T *d_a, *d_b, *d_c;
+    
+    size_t size = 3 * sizeof(T);
+    
+    cudaMalloc(&d_a, size);
+    cudaMalloc(&d_b, size);
+    cudaMalloc(&d_c, size);
+    
+    cudaMemcpy(d_a, a, size, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_b, b, size, cudaMemcpyHostToDevice);
+    
+    cross_3d_kernel<<<1, 1>>>(d_a, d_b, d_c);
+    
+    cudaMemcpy(result, d_c, size, cudaMemcpyDeviceToHost);
+    
+    cudaFree(d_a);
+    cudaFree(d_b);
+    cudaFree(d_c);
+}
+
+template void cross_3d_gpu<int>(const int*, const int*, int*);
+template void cross_3d_gpu<float>(const float*, const float*, float*);
+template void cross_3d_gpu<double>(const double*, const double*, double*);
+
 // Element-wise operation kernels
 template<typename T>
 __global__ void add_kernel(const T* a, const T* b, T* result, size_t n) {

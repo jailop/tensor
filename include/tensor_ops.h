@@ -27,7 +27,7 @@
  * 
  * Example: (3, 1, 5) + (4, 5) broadcasts to (3, 4, 5)
  * 
- * @section usage Usage Example
+ * @section usage_ops Usage Example
  * @code
  * Matrix<float> A({3, 4});
  * Matrix<float> B({4, 5});

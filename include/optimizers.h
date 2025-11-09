@@ -1,3 +1,46 @@
+/**
+ * @file optimizers.h
+ * @brief Optimization algorithms for training neural networks
+ * 
+ * Provides common optimizers for gradient-based optimization:
+ * - SGD (Stochastic Gradient Descent) with momentum
+ * - Adam (Adaptive Moment Estimation)
+ * - RMSprop (Root Mean Square Propagation)
+ * 
+ * All optimizers support:
+ * - Learning rate scheduling
+ * - Weight decay (L2 regularization)
+ * - Automatic gradient management
+ * 
+ * @section example_optimizers Usage Example
+ * @code
+ * #include "optimizers.h"
+ * #include "loss_functions.h"
+ * 
+ * // Create parameters
+ * Tensor<float, 2> weights({10, 5}, true, true);
+ * Tensor<float, 1> bias({5}, true, true);
+ * 
+ * // Create optimizer
+ * std::vector<Tensor<float, 2>*> params = {&weights};
+ * SGD<float, 2> optimizer(params, 0.01f, 0.9f);  // lr=0.01, momentum=0.9
+ * 
+ * // Training loop
+ * for (int epoch = 0; epoch < 100; ++epoch) {
+ *     // Forward pass
+ *     auto output = model(input);
+ *     auto loss = loss::mse_loss(output, target);
+ *     
+ *     // Backward pass
+ *     optimizer.zero_grad();
+ *     loss.backward();
+ *     
+ *     // Update parameters
+ *     optimizer.step();
+ * }
+ * @endcode
+ */
+
 #ifndef OPTIMIZERS_H
 #define OPTIMIZERS_H
 
@@ -60,14 +103,43 @@ public:
 };
 
 /**
- * SGD (Stochastic Gradient Descent) optimizer with optional momentum.
+ * @brief SGD (Stochastic Gradient Descent) optimizer with optional momentum
+ * @tparam T Data type (float, double)
+ * @tparam N Number of tensor dimensions
  * 
- * Update rule:
- *   v_t = momentum * v_{t-1} + lr * grad
- *   param = param - v_t
+ * Implements the classic SGD algorithm with optional Nesterov momentum
+ * and weight decay (L2 regularization).
+ * 
+ * Update rule without momentum:
+ * ```
+ * param = param - lr * grad
+ * ```
+ * 
+ * Update rule with momentum:
+ * ```
+ * v_t = momentum * v_{t-1} + grad
+ * param = param - lr * v_t
+ * ```
  * 
  * With weight decay:
- *   grad = grad + weight_decay * param
+ * ```
+ * grad = grad + weight_decay * param
+ * ```
+ * 
+ * @section example_sgd Example
+ * @code
+ * Tensor<float, 2> W({100, 50}, true, true);
+ * std::vector<Tensor<float, 2>*> params = {&W};
+ * 
+ * // SGD with momentum and weight decay
+ * SGD<float, 2> optimizer(params, 0.01f, 0.9f, 0.0001f);
+ * 
+ * // Training step
+ * auto loss = compute_loss(W);
+ * optimizer.zero_grad();
+ * loss.backward();
+ * optimizer.step();
+ * @endcode
  */
 template<typename T, size_t N>
 class SGD : public Optimizer<T> {

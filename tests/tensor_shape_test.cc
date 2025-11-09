@@ -153,7 +153,3 @@ TEST_F(TensorShapeTest, Tile1D) {
     EXPECT_FLOAT_EQ((B[{3}]), 10.0f);
 }
 
-int main(int argc, char **argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}

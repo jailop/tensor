@@ -22,6 +22,10 @@ template<typename T>
 void dot_nd_gpu(const T* a, const T* b, T* result, 
                 size_t outer_size, size_t contract_dim, size_t inner_size);
 
+// Cross product for 3D vectors
+template<typename T>
+void cross_3d_gpu(const T* a, const T* b, T* result);
+
 // Element-wise operations
 template<typename T>
 void add_gpu(const T* a, const T* b, T* result, size_t n);

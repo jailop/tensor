@@ -1,6 +1,35 @@
 /**
  * @file tensor_io.h
- * @brief I/O operations for tensors (save/load/print).
+ * @brief I/O operations for tensors (save/load/print)
+ * 
+ * Provides functions to save and load tensors in various formats:
+ * - Binary format (custom, efficient)
+ * - Text format (human-readable)
+ * - NPY format (NumPy-compatible)
+ * 
+ * @section example_io Usage Example
+ * @code
+ * #include "tensor_io.h"
+ * 
+ * Tensor<float, 2> matrix({3, 3});
+ * matrix.fill(1.0f);
+ * 
+ * // Save in binary format (fast, compact)
+ * save_binary(matrix, "data.tnsr");
+ * 
+ * // Save in text format (human-readable)
+ * save_text(matrix, "data.txt");
+ * 
+ * // Save in NumPy format (Python interop)
+ * save_npy(matrix, "data.npy");
+ * 
+ * // Load back
+ * auto result = load_binary<float, 2>("data.tnsr");
+ * if (std::holds_alternative<Tensor<float, 2>>(result)) {
+ *     auto& loaded = std::get<Tensor<float, 2>>(result);
+ *     // Use loaded tensor
+ * }
+ * @endcode
  */
 
 #ifndef TENSOR_IO_H
@@ -8,6 +37,7 @@
 
 #include "tensor.h"
 #include <fstream>
+#include <iostream>
 #include <iomanip>
 #include <sstream>
 #include <cstring>
