@@ -918,6 +918,81 @@ template void sub_gpu<int>(const int*, const int*, int*, size_t);
 template void sub_gpu<float>(const float*, const float*, float*, size_t);
 template void sub_gpu<double>(const double*, const double*, double*, size_t);
 
+// ============================================================================
+// Axis Reduction Operations
+// ============================================================================
+
+/**
+ * @brief GPU kernel for summing along an axis
+ * Computes sum reduction along one dimension with outer x inner parallelism
+ */
+template<typename T>
+__global__ void reduce_sum_axis_kernel(const T* input, T* output,
+                                       size_t outer, size_t axis_size, size_t inner) {
+    size_t o = blockIdx.y;
+    size_t i = blockIdx.x * blockDim.x + threadIdx.x;
+    
+    if (o < outer && i < inner) {
+        T sum = T(0);
+        for (size_t a = 0; a < axis_size; ++a) {
+            size_t src_idx = o * axis_size * inner + a * inner + i;
+            sum += input[src_idx];
+        }
+        size_t dst_idx = o * inner + i;
+        output[dst_idx] = sum;
+    }
+}
+
+template<typename T>
+void reduce_sum_axis_gpu(const T* input, T* output,
+                         size_t outer, size_t axis_size, size_t inner) {
+    int threads = 256;
+    dim3 blocks((inner + threads - 1) / threads, outer);
+    
+    reduce_sum_axis_kernel<<<blocks, threads>>>(input, output, outer, axis_size, inner);
+    cudaDeviceSynchronize();
+}
+
+/**
+ * @brief GPU kernel for broadcasting gradient during backward pass
+ * Broadcasts reduced gradient back to original shape
+ */
+template<typename T>
+__global__ void broadcast_add_axis_kernel(const T* grad, T* output,
+                                          size_t outer, size_t axis_size, size_t inner) {
+    size_t o = blockIdx.y;
+    size_t i = blockIdx.x * blockDim.x + threadIdx.x;
+    
+    if (o < outer && i < inner) {
+        size_t grad_idx = o * inner + i;
+        T grad_val = grad[grad_idx];
+        
+        for (size_t a = 0; a < axis_size; ++a) {
+            size_t dst_idx = o * axis_size * inner + a * inner + i;
+            atomicAdd(&output[dst_idx], grad_val);
+        }
+    }
+}
+
+template<typename T>
+void broadcast_add_axis_gpu(const T* grad, T* output,
+                            size_t outer, size_t axis_size, size_t inner) {
+    int threads = 256;
+    dim3 blocks((inner + threads - 1) / threads, outer);
+    
+    broadcast_add_axis_kernel<<<blocks, threads>>>(grad, output, outer, axis_size, inner);
+    cudaDeviceSynchronize();
+}
+
+// Template instantiations for axis reduction operations
+template void reduce_sum_axis_gpu<float>(const float*, float*, size_t, size_t, size_t);
+template void reduce_sum_axis_gpu<double>(const double*, double*, size_t, size_t, size_t);
+
+template void broadcast_add_axis_gpu<float>(const float*, float*, size_t, size_t, size_t);
+template void broadcast_add_axis_gpu<double>(const double*, double*, size_t, size_t, size_t);
+
+// ============================================================================
+
 template void mul_gpu<int>(const int*, const int*, int*, size_t);
 template void mul_gpu<float>(const float*, const float*, float*, size_t);
 template void mul_gpu<double>(const double*, const double*, double*, size_t);

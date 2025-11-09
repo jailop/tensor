@@ -93,6 +93,15 @@ void max_gpu(const T* a, T* result, size_t n);
 template<typename T>
 void min_gpu(const T* a, T* result, size_t n);
 
+// Axis reduction operations
+template<typename T>
+void reduce_sum_axis_gpu(const T* input, T* output,
+                         size_t outer, size_t axis_size, size_t inner);
+
+template<typename T>
+void broadcast_add_axis_gpu(const T* grad, T* output,
+                            size_t outer, size_t axis_size, size_t inner);
+
 } // namespace TensorGPU
 
 #endif // _TENSOR_GPU_CUH

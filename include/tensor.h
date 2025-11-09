@@ -96,6 +96,8 @@ extern "C" {
                      const float *Y, const int incY);
     double cblas_ddot(const int N, const double *X, const int incX,
                       const double *Y, const int incY);
+    void cblas_sscal(const int N, const float alpha, float *X, const int incX);
+    void cblas_dscal(const int N, const double alpha, double *X, const int incX);
 }
 
 // BLAS constants
@@ -4757,12 +4759,21 @@ public:
         
         size_t axis_size = dims_[axis];
         
-        for (size_t o = 0; o < outer; ++o) {
-            for (size_t i = 0; i < inner; ++i) {
-                for (size_t a = 0; a < axis_size; ++a) {
-                    size_t src_idx = o * axis_size * inner + a * inner + i;
-                    size_t dst_idx = o * inner + i;
-                    result.data_[dst_idx] += data_[src_idx];
+#ifdef USE_GPU
+        if (use_gpu_ && (std::is_same_v<T, float> || std::is_same_v<T, double>)) {
+            TensorGPU::reduce_sum_axis_gpu(data_.get(), result.data_ptr(),
+                                           outer, axis_size, inner);
+        } else
+#endif
+        {
+            // CPU/BLAS fallback - triple nested loop
+            for (size_t o = 0; o < outer; ++o) {
+                for (size_t i = 0; i < inner; ++i) {
+                    for (size_t a = 0; a < axis_size; ++a) {
+                        size_t src_idx = o * axis_size * inner + a * inner + i;
+                        size_t dst_idx = o * inner + i;
+                        result.data_[dst_idx] += data_[src_idx];
+                    }
                 }
             }
         }
@@ -4799,12 +4810,21 @@ public:
                 
                 size_t axis_size = self_ptr->dims_[axis];
                 
-                for (size_t o = 0; o < outer; ++o) {
-                    for (size_t i = 0; i < inner; ++i) {
-                        size_t grad_idx = o * inner + i;
-                        for (size_t a = 0; a < axis_size; ++a) {
-                            size_t self_idx = o * axis_size * inner + a * inner + i;
-                            self_ptr->grad_->data_[self_idx] += grad.data_[grad_idx];
+#ifdef USE_GPU
+                if (self_ptr->use_gpu_ && (std::is_same_v<T, float> || std::is_same_v<T, double>)) {
+                    TensorGPU::broadcast_add_axis_gpu(grad.data_ptr(), self_ptr->grad_->data_ptr(),
+                                                      outer, axis_size, inner);
+                } else
+#endif
+                {
+                    // CPU fallback - triple nested loop
+                    for (size_t o = 0; o < outer; ++o) {
+                        for (size_t i = 0; i < inner; ++i) {
+                            size_t grad_idx = o * inner + i;
+                            for (size_t a = 0; a < axis_size; ++a) {
+                                size_t self_idx = o * axis_size * inner + a * inner + i;
+                                self_ptr->grad_->data_[self_idx] += grad.data_[grad_idx];
+                            }
                         }
                     }
                 }
@@ -4835,6 +4855,27 @@ public:
         T divisor = static_cast<T>(dims_[axis]);
         
         size_t total = result.total_size();
+        
+#ifdef USE_GPU
+        if (result.use_gpu_) {
+            TensorGPU::div_scalar_gpu(result.data_ptr(), divisor, result.data_ptr(), total);
+            return result;
+        }
+#endif
+
+#ifdef USE_BLAS
+        if (std::is_same_v<T, float>) {
+            cblas_sscal(static_cast<int>(total), 1.0f / divisor, 
+                       reinterpret_cast<float*>(result.data_ptr()), 1);
+            return result;
+        } else if (std::is_same_v<T, double>) {
+            cblas_dscal(static_cast<int>(total), 1.0 / divisor,
+                       reinterpret_cast<double*>(result.data_ptr()), 1);
+            return result;
+        }
+#endif
+        
+        // CPU fallback
         for (size_t i = 0; i < total; ++i) {
             result.data_[i] /= divisor;
         }

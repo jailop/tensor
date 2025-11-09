@@ -658,9 +658,18 @@ inline Tensor<T, 2> softmax_jacobian(const Tensor<T, 1>& softmax_output) {
     const T* s_data = softmax_output.data_ptr();
     T* diag_data = diag_s.data_ptr();
     
-    // Set diagonal elements
-    for (size_t i = 0; i < n; ++i) {
-        diag_data[i * n + i] = s_data[i];
+    // Set diagonal elements - use parallel execution for large matrices
+    if (n > 100) {
+        std::for_each(std::execution::par_unseq,
+                     std::ranges::iota_view{size_t(0), n}.begin(),
+                     std::ranges::iota_view{size_t(0), n}.end(),
+                     [diag_data, s_data, n](size_t i) {
+                         diag_data[i * n + i] = s_data[i];
+                     });
+    } else {
+        for (size_t i = 0; i < n; ++i) {
+            diag_data[i * n + i] = s_data[i];
+        }
     }
     
     // Convert 1D softmax output to column vector (n x 1) for outer product
