@@ -518,3 +518,209 @@ TEST_F(NNLayersTest, ClassificationNetwork) {
         EXPECT_TRUE(approx_equal(sum, 1.0f));
     }
 }
+
+// ============================================================================
+// Softmax Jacobian Tests
+// ============================================================================
+
+TEST_F(NNLayersTest, SoftmaxJacobianShape) {
+    Tensor<float, 1> softmax_output({5});
+    softmax_output[{0}] = 0.1f;
+    softmax_output[{1}] = 0.2f;
+    softmax_output[{2}] = 0.3f;
+    softmax_output[{3}] = 0.25f;
+    softmax_output[{4}] = 0.15f;
+    
+    auto jacobian = softmax_jacobian(softmax_output);
+    
+    EXPECT_EQ(jacobian.shape()[0], 5);
+    EXPECT_EQ(jacobian.shape()[1], 5);
+}
+
+TEST_F(NNLayersTest, SoftmaxJacobianDiagonal) {
+    Tensor<float, 1> softmax_output({3});
+    softmax_output[{0}] = 0.2f;
+    softmax_output[{1}] = 0.5f;
+    softmax_output[{2}] = 0.3f;
+    
+    auto jacobian = softmax_jacobian(softmax_output);
+    
+    // J_ii = s_i * (1 - s_i)
+    EXPECT_TRUE(approx_equal(jacobian[{0, 0}], 0.2f * (1.0f - 0.2f), 1e-5f));
+    EXPECT_TRUE(approx_equal(jacobian[{1, 1}], 0.5f * (1.0f - 0.5f), 1e-5f));
+    EXPECT_TRUE(approx_equal(jacobian[{2, 2}], 0.3f * (1.0f - 0.3f), 1e-5f));
+}
+
+TEST_F(NNLayersTest, SoftmaxJacobianOffDiagonal) {
+    Tensor<float, 1> softmax_output({3});
+    softmax_output[{0}] = 0.2f;
+    softmax_output[{1}] = 0.5f;
+    softmax_output[{2}] = 0.3f;
+    
+    auto jacobian = softmax_jacobian(softmax_output);
+    
+    // J_ij = -s_i * s_j for i != j
+    EXPECT_TRUE(approx_equal(jacobian[{0, 1}], -0.2f * 0.5f, 1e-5f));
+    EXPECT_TRUE(approx_equal(jacobian[{0, 2}], -0.2f * 0.3f, 1e-5f));
+    EXPECT_TRUE(approx_equal(jacobian[{1, 0}], -0.5f * 0.2f, 1e-5f));
+    EXPECT_TRUE(approx_equal(jacobian[{1, 2}], -0.5f * 0.3f, 1e-5f));
+    EXPECT_TRUE(approx_equal(jacobian[{2, 0}], -0.3f * 0.2f, 1e-5f));
+    EXPECT_TRUE(approx_equal(jacobian[{2, 1}], -0.3f * 0.5f, 1e-5f));
+}
+
+TEST_F(NNLayersTest, SoftmaxJacobianSymmetry) {
+    Tensor<float, 1> softmax_output({4});
+    softmax_output[{0}] = 0.1f;
+    softmax_output[{1}] = 0.3f;
+    softmax_output[{2}] = 0.4f;
+    softmax_output[{3}] = 0.2f;
+    
+    auto jacobian = softmax_jacobian(softmax_output);
+    
+    // Off-diagonal elements should be symmetric
+    for (size_t i = 0; i < 4; ++i) {
+        for (size_t j = 0; j < 4; ++j) {
+            if (i != j) {
+                EXPECT_TRUE(approx_equal(jacobian[{i, j}], jacobian[{j, i}], 1e-5f));
+            }
+        }
+    }
+}
+
+TEST_F(NNLayersTest, SoftmaxJacobianRowSum) {
+    Tensor<float, 1> softmax_output({3});
+    softmax_output[{0}] = 0.2f;
+    softmax_output[{1}] = 0.5f;
+    softmax_output[{2}] = 0.3f;
+    
+    auto jacobian = softmax_jacobian(softmax_output);
+    
+    // Each row of the Jacobian should sum to 0
+    for (size_t i = 0; i < 3; ++i) {
+        float row_sum = 0.0f;
+        for (size_t j = 0; j < 3; ++j) {
+            row_sum += jacobian[{i, j}];
+        }
+        EXPECT_TRUE(approx_equal(row_sum, 0.0f, 1e-5f));
+    }
+}
+
+TEST_F(NNLayersTest, SoftmaxJacobianBatch) {
+    Matrixf softmax_output({2, 3});
+    
+    // First sample
+    softmax_output[{0, 0}] = 0.2f;
+    softmax_output[{0, 1}] = 0.5f;
+    softmax_output[{0, 2}] = 0.3f;
+    
+    // Second sample
+    softmax_output[{1, 0}] = 0.1f;
+    softmax_output[{1, 1}] = 0.6f;
+    softmax_output[{1, 2}] = 0.3f;
+    
+    auto jacobians = softmax_jacobian_batch(softmax_output);
+    
+    EXPECT_EQ(jacobians.size(), 2);
+    EXPECT_EQ(jacobians[0].shape()[0], 3);
+    EXPECT_EQ(jacobians[0].shape()[1], 3);
+    EXPECT_EQ(jacobians[1].shape()[0], 3);
+    EXPECT_EQ(jacobians[1].shape()[1], 3);
+    
+    // Check first sample Jacobian diagonal
+    EXPECT_TRUE(approx_equal(jacobians[0][{0, 0}], 0.2f * (1.0f - 0.2f), 1e-5f));
+    EXPECT_TRUE(approx_equal(jacobians[0][{1, 1}], 0.5f * (1.0f - 0.5f), 1e-5f));
+    
+    // Check second sample Jacobian diagonal
+    EXPECT_TRUE(approx_equal(jacobians[1][{0, 0}], 0.1f * (1.0f - 0.1f), 1e-5f));
+    EXPECT_TRUE(approx_equal(jacobians[1][{1, 1}], 0.6f * (1.0f - 0.6f), 1e-5f));
+}
+
+TEST_F(NNLayersTest, SoftmaxJacobianWithTensorOperations) {
+    Matrixf logits({1, 4});
+    logits[{0, 0}] = 1.0f;
+    logits[{0, 1}] = 2.0f;
+    logits[{0, 2}] = 3.0f;
+    logits[{0, 3}] = 4.0f;
+    
+    // Apply softmax
+    auto probs = logits.softmax_rows();
+    
+    // Extract first row as 1D tensor
+    Tensor<float, 1> prob_vec({4});
+    const float* prob_data = probs.data_ptr();
+    std::copy_n(prob_data, 4, prob_vec.data_ptr());
+    
+    auto jacobian = softmax_jacobian(prob_vec);
+    
+    // Verify properties
+    EXPECT_EQ(jacobian.shape()[0], 4);
+    EXPECT_EQ(jacobian.shape()[1], 4);
+    
+    // Row sums should be zero
+    for (size_t i = 0; i < 4; ++i) {
+        float row_sum = 0.0f;
+        for (size_t j = 0; j < 4; ++j) {
+            row_sum += jacobian[{i, j}];
+        }
+        EXPECT_TRUE(approx_equal(row_sum, 0.0f, 1e-5f));
+    }
+}
+
+// ============================================================================
+// compute_accuracy Tests
+// ============================================================================
+
+TEST_F(NNLayersTest, ComputeAccuracyPerfectPredictions) {
+    Matrixf predictions({5, 3});
+    predictions[{0, 0}] = 0.9f; predictions[{0, 1}] = 0.05f; predictions[{0, 2}] = 0.05f;
+    predictions[{1, 0}] = 0.1f; predictions[{1, 1}] = 0.8f;  predictions[{1, 2}] = 0.1f;
+    predictions[{2, 0}] = 0.1f; predictions[{2, 1}] = 0.1f;  predictions[{2, 2}] = 0.8f;
+    predictions[{3, 0}] = 0.7f; predictions[{3, 1}] = 0.2f;  predictions[{3, 2}] = 0.1f;
+    predictions[{4, 0}] = 0.1f; predictions[{4, 1}] = 0.7f;  predictions[{4, 2}] = 0.2f;
+    
+    std::vector<uint8_t> labels = {0, 1, 2, 0, 1};
+    
+    float acc = compute_accuracy(predictions, labels);
+    
+    EXPECT_TRUE(approx_equal(acc, 1.0f, 1e-5f));
+}
+
+TEST_F(NNLayersTest, ComputeAccuracyPartialCorrect) {
+    Matrixf predictions({4, 3});
+    predictions[{0, 0}] = 0.9f; predictions[{0, 1}] = 0.05f; predictions[{0, 2}] = 0.05f;
+    predictions[{1, 0}] = 0.1f; predictions[{1, 1}] = 0.8f;  predictions[{1, 2}] = 0.1f;
+    predictions[{2, 0}] = 0.1f; predictions[{2, 1}] = 0.1f;  predictions[{2, 2}] = 0.8f;
+    predictions[{3, 0}] = 0.7f; predictions[{3, 1}] = 0.2f;  predictions[{3, 2}] = 0.1f;
+    
+    std::vector<uint8_t> labels = {0, 1, 2, 1};
+    
+    float acc = compute_accuracy(predictions, labels);
+    
+    EXPECT_TRUE(approx_equal(acc, 0.75f, 1e-5f));
+}
+
+TEST_F(NNLayersTest, ComputeAccuracyWithOffset) {
+    Matrixf predictions({3, 4});
+    predictions[{0, 0}] = 0.1f; predictions[{0, 1}] = 0.6f; predictions[{0, 2}] = 0.2f; predictions[{0, 3}] = 0.1f;
+    predictions[{1, 0}] = 0.7f; predictions[{1, 1}] = 0.1f; predictions[{1, 2}] = 0.1f; predictions[{1, 3}] = 0.1f;
+    predictions[{2, 0}] = 0.1f; predictions[{2, 1}] = 0.1f; predictions[{2, 2}] = 0.1f; predictions[{2, 3}] = 0.7f;
+    
+    std::vector<uint8_t> labels = {5, 6, 7, 1, 0, 3};
+    
+    float acc = compute_accuracy(predictions, labels, 3);
+    
+    EXPECT_TRUE(approx_equal(acc, 1.0f, 1e-5f));
+}
+
+TEST_F(NNLayersTest, ComputeAccuracyAllWrong) {
+    Matrixf predictions({3, 3});
+    predictions[{0, 0}] = 0.1f; predictions[{0, 1}] = 0.8f; predictions[{0, 2}] = 0.1f;
+    predictions[{1, 0}] = 0.1f; predictions[{1, 1}] = 0.1f; predictions[{1, 2}] = 0.8f;
+    predictions[{2, 0}] = 0.8f; predictions[{2, 1}] = 0.1f; predictions[{2, 2}] = 0.1f;
+    
+    std::vector<uint8_t> labels = {0, 0, 1};
+    
+    float acc = compute_accuracy(predictions, labels);
+    
+    EXPECT_TRUE(approx_equal(acc, 0.0f, 1e-5f));
+}

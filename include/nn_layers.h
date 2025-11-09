@@ -22,6 +22,12 @@ namespace nn {
 template<typename T>
 class Layer;
 
+template<typename T>
+inline Tensor<T, 2> softmax_jacobian(const Tensor<T, 1>& softmax_output);
+
+template<typename T>
+inline std::vector<Tensor<T, 2>> softmax_jacobian_batch(const Tensor<T, 2>& softmax_output);
+
 /**
  * @brief Base class for all neural network layers
  */
@@ -438,22 +444,32 @@ public:
     
     Tensor<T, 2> backward(const Tensor<T, 2>& grad_output) override {
         auto shape = output_.shape();
+        size_t batch_size = shape[0];
+        size_t num_classes = shape[1];
+        
 #ifdef USE_GPU
         auto grad_input = Tensor<T, 2>(shape, output_.uses_gpu());
 #else
         auto grad_input = Tensor<T, 2>(shape, output_.uses_gpu());
 #endif
         
-        // Jacobian of softmax is: S_i * (δ_ij - S_j)
-        for (size_t i = 0; i < shape[0]; ++i) {
-            for (size_t j = 0; j < shape[1]; ++j) {
-                T sum = 0;
-                for (size_t k = 0; k < shape[1]; ++k) {
-                    T delta = (j == k) ? 1.0 : 0.0;
-                    sum += grad_output[{i, k}] * output_[{i, j}] * (delta - output_[{i, k}]);
-                }
-                grad_input[{i, j}] = sum;
-            }
+        // Compute Jacobian matrices for all samples in batch
+        auto jacobians = softmax_jacobian_batch(output_);
+        
+        // For each sample: grad_input[i] = grad_output[i] @ Jacobian[i]
+        for (size_t i = 0; i < batch_size; ++i) {
+            // Extract row i from grad_output as (1 x num_classes)
+            Tensor<T, 2> grad_row({1, num_classes}, output_.uses_gpu());
+            const T* grad_data = grad_output.data_ptr() + i * num_classes;
+            std::copy_n(grad_data, num_classes, grad_row.data_ptr());
+            
+            // Multiply: (1 x num_classes) @ (num_classes x num_classes) = (1 x num_classes)
+            auto result_var = grad_row.matmul(jacobians[i]);
+            auto result = std::get<Tensor<T, 2>>(result_var);
+            
+            // Copy result back to grad_input row i
+            T* grad_input_row = grad_input.data_ptr() + i * num_classes;
+            std::copy_n(result.data_ptr(), num_classes, grad_input_row);
         }
         
         return grad_input;
@@ -552,47 +568,152 @@ inline T cross_entropy_loss(const Tensor<T, 2>& predictions, const Tensor<T, 2>&
  * @param offset Starting index in labels vector for this batch
  * @return Accuracy as fraction of correct predictions (0.0 to 1.0)
  * 
- * Optimized implementation using argmax along rows.
- * For 2D tensors, argmax is computed for each row efficiently.
- * 
- * @section example_accuracy Example
- * @code
- * auto predictions = net.forward(batch_input);
- * float acc = compute_accuracy(predictions, all_labels, batch_start_idx);
- * std::cout << "Accuracy: " << (acc * 100) << "%" << std::endl;
- * @endcode
+ * Optimized implementation using argmax_rows() tensor operation.
  */
 template<typename T>
 inline T compute_accuracy(const Tensor<T, 2>& predictions, const std::vector<uint8_t>& labels, size_t offset = 0) {
     auto shape = predictions.shape();
     size_t batch_size = shape[0];
-    size_t num_classes = shape[1];
+    
+    // Use tensor operation to get predicted classes for all rows at once
+    auto pred_classes = predictions.argmax_rows();
+    
+    // Count correct predictions
     size_t correct = 0;
+    const size_t* pred_data = pred_classes.data_ptr();
     
-    // Get raw pointer for efficient row-wise argmax
-    const T* data = predictions.data_ptr();
-    
-    // Compute argmax for each row (sample) efficiently
     for (size_t i = 0; i < batch_size; ++i) {
-        const T* row = data + i * num_classes;
-        
-        // Find argmax in this row
-        size_t pred_class = 0;
-        T max_val = row[0];
-        for (size_t j = 1; j < num_classes; ++j) {
-            if (row[j] > max_val) {
-                max_val = row[j];
-                pred_class = j;
-            }
-        }
-        
-        // Compare with true label
-        if (pred_class == labels[offset + i]) {
+        if (pred_data[i] == labels[offset + i]) {
             ++correct;
         }
     }
     
     return static_cast<T>(correct) / static_cast<T>(batch_size);
+}
+
+/**
+ * @brief Update weights of a linear layer using SGD
+ * @param layer The linear layer to update
+ * @param lr Learning rate
+ * 
+ * Performs SGD weight update using optimized tensor operations:
+ * weights -= lr * grad_weights
+ * bias -= lr * grad_bias
+ * 
+ * Uses vectorized operations for efficient updates across all backends (GPU/BLAS/CPU).
+ * 
+ * @section example_update_layer Example
+ * @code
+ * Linear<float> fc1(784, 128);
+ * // ... forward and backward passes ...
+ * update_linear_layer(fc1, 0.01f);  // Update with learning rate 0.01
+ * @endcode
+ */
+template<typename T>
+inline void update_linear_layer(Linear<T>& layer, T lr) {
+    // Get weights and their gradients
+    auto& weights = layer.weights();
+    auto& bias = layer.bias();
+    auto& grad_w = layer.grad_weights();
+    auto& grad_b = layer.grad_bias();
+    
+    // Update weights: w -= lr * grad_w using tensor operations
+    auto weight_update_var = weights - (grad_w * lr);
+    auto weight_update = std::get<Tensor<T, 2>>(weight_update_var);
+    weights = weight_update;
+    
+    // Update bias: b -= lr * grad_b using tensor operations
+    auto bias_update_var = bias - (grad_b * lr);
+    auto bias_update = std::get<Tensor<T, 2>>(bias_update_var);
+    bias = bias_update;
+}
+
+/**
+ * @brief Compute the Jacobian matrix of softmax for a single row
+ * @param softmax_output Softmax output vector (1D or single row from 2D tensor)
+ * @return Jacobian matrix (n x n) where n is the length of the softmax output
+ * 
+ * For softmax function σ(x), the Jacobian is:
+ * J_ij = σ_i * (δ_ij - σ_j)
+ * where δ_ij is the Kronecker delta (1 if i==j, 0 otherwise).
+ * 
+ * This can be computed using tensor operations as:
+ * J = diag(σ) - σ ⊗ σ^T
+ * 
+ * Uses optimized tensor operations for efficient computation across all backends.
+ */
+template<typename T>
+inline Tensor<T, 2> softmax_jacobian(const Tensor<T, 1>& softmax_output) {
+    auto dims = softmax_output.dims();
+    size_t n = dims[0];
+    bool use_gpu = softmax_output.uses_gpu();
+    
+    // Create result tensor (n x n)
+    Tensor<T, 2> jacobian({n, n}, use_gpu);
+    
+    // Create diagonal matrix with softmax values: diag(σ)
+    Tensor<T, 2> diag_s({n, n}, use_gpu);
+    diag_s.fill(T(0));
+    
+    const T* s_data = softmax_output.data_ptr();
+    T* diag_data = diag_s.data_ptr();
+    
+    // Set diagonal elements
+    for (size_t i = 0; i < n; ++i) {
+        diag_data[i * n + i] = s_data[i];
+    }
+    
+    // Convert 1D softmax output to column vector (n x 1) for outer product
+    Tensor<T, 2> s_col({n, 1}, use_gpu);
+    std::copy_n(s_data, n, s_col.data_ptr());
+    
+    // Convert to row vector (1 x n) for outer product
+    auto s_row = s_col.transpose();
+    
+    // Compute outer product: σ ⊗ σ^T using matmul
+    auto outer_var = s_col.matmul(s_row);
+    auto outer_product = std::get<Tensor<T, 2>>(outer_var);
+    
+    // Compute Jacobian: J = diag(σ) - σ ⊗ σ^T
+    auto jacobian_var = diag_s - outer_product;
+    jacobian = std::get<Tensor<T, 2>>(jacobian_var);
+    
+    return jacobian;
+}
+
+/**
+ * @brief Compute softmax Jacobian for batched input (batch_size x num_classes)
+ * @param softmax_output Softmax output tensor (batch_size x num_classes)
+ * @return Vector of Jacobian matrices, one for each sample in the batch
+ * 
+ * For each row i in the batch, computes the Jacobian J^(i) where:
+ * J^(i)_jk = σ^(i)_j * (δ_jk - σ^(i)_k)
+ * 
+ * Uses optimized tensor operations for efficient computation.
+ */
+template<typename T>
+inline std::vector<Tensor<T, 2>> softmax_jacobian_batch(const Tensor<T, 2>& softmax_output) {
+    auto shape = softmax_output.shape();
+    size_t batch_size = shape[0];
+    size_t num_classes = shape[1];
+    bool use_gpu = softmax_output.uses_gpu();
+    
+    std::vector<Tensor<T, 2>> jacobians;
+    jacobians.reserve(batch_size);
+    
+    const T* data = softmax_output.data_ptr();
+    
+    // Compute Jacobian for each sample in the batch
+    for (size_t i = 0; i < batch_size; ++i) {
+        // Extract row i into a 1D tensor
+        Tensor<T, 1> row({num_classes}, use_gpu);
+        std::copy_n(data + i * num_classes, num_classes, row.data_ptr());
+        
+        // Compute Jacobian for this row
+        jacobians.push_back(softmax_jacobian(row));
+    }
+    
+    return jacobians;
 }
 
 } // namespace nn

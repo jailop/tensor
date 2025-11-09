@@ -223,29 +223,6 @@ private:
     ReLU<float> relu2_;
     ReLU<float> relu3_;
     Softmax<float> softmax_;
-    
-    void update_linear_layer(Linear<float>& layer, float lr) {
-        // Get weights and their gradients
-        auto& weights = layer.weights();
-        auto& bias = layer.bias();
-        auto& grad_w = layer.grad_weights();
-        auto& grad_b = layer.grad_bias();
-        
-        auto w_shape = weights.shape();
-        auto b_shape = bias.shape();
-        
-        // Update weights: w -= lr * grad_w
-        for (size_t i = 0; i < w_shape[0]; ++i) {
-            for (size_t j = 0; j < w_shape[1]; ++j) {
-                weights[{i, j}] -= lr * grad_w[{i, j}];
-            }
-        }
-        
-        // Update bias: b -= lr * grad_b
-        for (size_t i = 0; i < b_shape[1]; ++i) {
-            bias[{0, i}] -= lr * grad_b[{0, i}];
-        }
-    }
 };
 
 /**
