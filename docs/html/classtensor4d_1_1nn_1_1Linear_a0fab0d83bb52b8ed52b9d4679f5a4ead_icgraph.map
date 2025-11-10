@@ -1,0 +1,5 @@
+<map id="tensor4d::nn::Linear::grad_weights" name="tensor4d::nn::Linear::grad_weights">
+<area shape="rect" id="Node000001" title=" " alt="" coords="194,5,330,48"/>
+<area shape="rect" id="Node000002" href="$namespacetensor4d_1_1nn.html#a834567aedd488a7451d76fec1bbba55e" title="Update weights of a linear layer using SGD." alt="" coords="5,5,146,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="178,29,146,29,146,24,178,24"/>
+</map>

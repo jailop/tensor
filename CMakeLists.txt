@@ -249,7 +249,7 @@ endif()
 # GPU/BLAS demo executable
 add_executable(
   gpu_blas_demo
-  gpu_blas_demo.cc
+  examples/gpu_blas_demo.cc
   ${GPU_SOURCES}
 )
 
@@ -271,7 +271,7 @@ endif()
 # Backend demo executable
 add_executable(
   backend_demo
-  backend_demo.cc
+  examples/backend_demo.cc
   ${GPU_SOURCES}
 )
 
@@ -343,7 +343,7 @@ install(FILES include/tensor_c.h
 message(STATUS "Building C interface library: libtensor_c.so")
 
 # C example program
-add_executable(c_example c_example.c)
+add_executable(c_example examples/c_example.c)
 target_link_libraries(c_example tensor_c)
 
 # C test program
@@ -356,7 +356,7 @@ add_test(NAME TensorCTest COMMAND tensor_c_test)
 # Tensor I/O demo executable
 add_executable(
   tensor_io_demo
-  tensor_io_demo.cc
+  examples/tensor_io_demo.cc
   ${GPU_SOURCES}
 )
 
@@ -378,7 +378,7 @@ endif()
 # Neural Network Layers demo executable
 add_executable(
   nn_layers_demo
-  nn_layers_demo.cc
+  examples/nn_layers_demo.cc
   ${GPU_SOURCES}
 )
 
@@ -400,7 +400,7 @@ endif()
 # MNIST demo executable
 add_executable(
   mnist_demo
-  mnist_demo.cc
+  examples/mnist_demo.cc
   ${GPU_SOURCES}
 )
 

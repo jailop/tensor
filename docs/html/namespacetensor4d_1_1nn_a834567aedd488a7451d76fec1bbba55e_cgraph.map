@@ -1,0 +1,11 @@
+<map id="tensor4d::nn::update_linear_layer" name="tensor4d::nn::update_linear_layer">
+<area shape="rect" id="Node000001" title="Update weights of a linear layer using SGD." alt="" coords="5,105,146,148"/>
+<area shape="rect" id="Node000002" href="$classtensor4d_1_1nn_1_1Linear.html#afefc9f73184487c8cb0abb37641a6932" title=" " alt="" coords="194,5,330,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="113,102,192,58,201,53,203,58,195,62,115,107"/>
+<area shape="rect" id="Node000003" href="$classtensor4d_1_1nn_1_1Linear.html#a24f7dbc86ee05b08278886cf1e8bf357" title=" " alt="" coords="194,72,330,115"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="146,111,178,106,179,111,147,117"/>
+<area shape="rect" id="Node000004" href="$classtensor4d_1_1nn_1_1Linear.html#a0fab0d83bb52b8ed52b9d4679f5a4ead" title=" " alt="" coords="194,139,330,181"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="147,137,179,142,178,148,146,142"/>
+<area shape="rect" id="Node000005" href="$classtensor4d_1_1nn_1_1Linear.html#a08cc48c658f333a45ca0ea084f69ec54" title=" " alt="" coords="194,205,330,248"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="115,146,195,191,203,195,201,200,192,196,113,151"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="ones" name="ones">
+<area shape="rect" id="Node000001" title="Create a tensor filled with ones (NumPy&#45;compatible)." alt="" coords="212,80,261,107"/>
+<area shape="rect" id="Node000002" href="$classtensor4d_1_1nn_1_1Sigmoid.html#a41e695161d280883a0002fe199efdf98" title=" " alt="" coords="10,5,159,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="197,78,163,62,137,51,139,46,165,58,199,73"/>
+<area shape="rect" id="Node000003" href="$classtensor4d_1_1nn_1_1Tanh.html#a8211c640d2b962ecad7a5c29203e663c" title=" " alt="" coords="17,72,152,115"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="196,96,152,96,152,91,196,91"/>
+<area shape="rect" id="Node000004" href="$classTensor.html#afff455663faa35d6cfa72aa03f689e94" title=" " alt="" coords="5,139,164,165"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="199,114,165,129,133,141,131,136,163,124,197,109"/>
+</map>

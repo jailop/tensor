@@ -1,0 +1,15 @@
+<map id="are_broadcastable" name="are_broadcastable">
+<area shape="rect" id="Node000001" title="Check if two tensor shapes are broadcastable." alt="" coords="231,132,358,159"/>
+<area shape="rect" id="Node000002" href="$tensor_8h.html#a34fae58316c67748882059be5f1d153c" title="Broadcast a tensor to a new shape." alt="" coords="46,5,142,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="270,122,231,83,181,46,142,31,144,26,184,42,234,79,273,118"/>
+<area shape="rect" id="Node000003" href="$tensor_8h.html#a9c62fb825b47530c2ec213d305b7c1d9" title="Compute the broadcast shape of two tensors." alt="" coords="5,56,183,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="251,127,182,97,147,86,149,81,184,92,254,123"/>
+<area shape="rect" id="Node000004" href="$classTensor.html#af352346a629f774750b12c97234979a9" title=" " alt="" coords="11,107,177,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="215,138,177,133,177,128,216,133"/>
+<area shape="rect" id="Node000005" href="$classTensor.html#a1947fa453cc8c0a746b26d2481bb6b39" title=" " alt="" coords="10,157,178,184"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="216,158,179,163,178,157,215,153"/>
+<area shape="rect" id="Node000006" href="$classTensor.html#ad2e51c1fbe247b637e415e60c3993ea9" title=" " alt="" coords="12,208,176,235"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="254,168,184,198,149,210,147,205,182,194,251,163"/>
+<area shape="rect" id="Node000007" href="$classTensor.html#a0e414490131d73889ccb977cc4ef047b" title=" " alt="" coords="12,259,176,285"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="273,173,234,212,184,249,158,260,156,256,181,244,231,208,270,169"/>
+</map>

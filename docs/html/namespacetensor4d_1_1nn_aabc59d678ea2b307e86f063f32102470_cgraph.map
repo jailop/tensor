@@ -1,0 +1,7 @@
+<map id="tensor4d::nn::compute_accuracy" name="tensor4d::nn::compute_accuracy">
+<area shape="rect" id="Node000001" title="Compute classification accuracy." alt="" coords="5,23,157,65"/>
+<area shape="rect" id="Node000002" href="$classTensor.html#a7e486401bc789c0d2344b2b271a3316b" title="Find argmax for each row in a 2D tensor." alt="" coords="205,5,351,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="157,32,189,27,190,33,157,37"/>
+<area shape="rect" id="Node000003" href="$classTensor.html#a80b3ffaf92ed36f02d6f4d4230b5d2a0" title=" " alt="" coords="226,56,330,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="157,51,211,58,211,63,157,56"/>
+</map>

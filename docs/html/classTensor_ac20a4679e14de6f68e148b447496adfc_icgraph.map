@@ -1,0 +1,7 @@
+<map id="Tensor::sum_axis" name="Tensor::sum_axis">
+<area shape="rect" id="Node000001" title=" " alt="" coords="235,47,359,73"/>
+<area shape="rect" id="Node000002" href="$classtensor4d_1_1nn_1_1BatchNorm1d.html#a48ea5fa069810067b9756e3d24b48b73" title=" " alt="" coords="5,5,187,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="219,50,187,44,187,39,220,45"/>
+<area shape="rect" id="Node000003" href="$classtensor4d_1_1nn_1_1Linear.html#a5364162aed6bb8c7758d88142ac74c1b" title=" " alt="" coords="28,72,164,115"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="220,75,165,85,164,79,219,70"/>
+</map>
