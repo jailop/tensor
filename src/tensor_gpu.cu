@@ -1063,6 +1063,159 @@ template void min_gpu<int>(const int*, int*, size_t);
 template void min_gpu<float>(const float*, float*, size_t);
 template void min_gpu<double>(const double*, double*, size_t);
 
+
+// =============================================================================
+// Direct GPU Operations (no malloc/memcpy) - operate on existing GPU memory
+// =============================================================================
+
+template<typename T>
+void add_gpu_direct(T* d_a, T* d_b, T* d_result, size_t n) {
+    int threads_per_block = 256;
+    int blocks = (n + threads_per_block - 1) / threads_per_block;
+    add_kernel<<<blocks, threads_per_block>>>(d_a, d_b, d_result, n);
+    cudaDeviceSynchronize();
+}
+
+template<typename T>
+void sub_gpu_direct(T* d_a, T* d_b, T* d_result, size_t n) {
+    int threads_per_block = 256;
+    int blocks = (n + threads_per_block - 1) / threads_per_block;
+    sub_kernel<<<blocks, threads_per_block>>>(d_a, d_b, d_result, n);
+    cudaDeviceSynchronize();
+}
+
+template<typename T>
+void mul_gpu_direct(T* d_a, T* d_b, T* d_result, size_t n) {
+    int threads_per_block = 256;
+    int blocks = (n + threads_per_block - 1) / threads_per_block;
+    mul_kernel<<<blocks, threads_per_block>>>(d_a, d_b, d_result, n);
+    cudaDeviceSynchronize();
+}
+
+template<typename T>
+void div_gpu_direct(T* d_a, T* d_b, T* d_result, size_t n) {
+    int threads_per_block = 256;
+    int blocks = (n + threads_per_block - 1) / threads_per_block;
+    div_kernel<<<blocks, threads_per_block>>>(d_a, d_b, d_result, n);
+    cudaDeviceSynchronize();
+}
+
+template<typename T>
+void exp_gpu_direct(T* d_a, T* d_result, size_t n) {
+    int threads_per_block = 256;
+    int blocks = (n + threads_per_block - 1) / threads_per_block;
+    exp_kernel<<<blocks, threads_per_block>>>(d_a, d_result, n);
+    cudaDeviceSynchronize();
+}
+
+template<typename T>
+void log_gpu_direct(T* d_a, T* d_result, size_t n) {
+    int threads_per_block = 256;
+    int blocks = (n + threads_per_block - 1) / threads_per_block;
+    log_kernel<<<blocks, threads_per_block>>>(d_a, d_result, n);
+    cudaDeviceSynchronize();
+}
+
+template<typename T>
+void sqrt_gpu_direct(T* d_a, T* d_result, size_t n) {
+    int threads_per_block = 256;
+    int blocks = (n + threads_per_block - 1) / threads_per_block;
+    sqrt_kernel<<<blocks, threads_per_block>>>(d_a, d_result, n);
+    cudaDeviceSynchronize();
+}
+
+template<typename T>
+void pow_gpu_direct(T* d_a, T exponent, T* d_result, size_t n) {
+    int threads_per_block = 256;
+    int blocks = (n + threads_per_block - 1) / threads_per_block;
+    pow_kernel<<<blocks, threads_per_block>>>(d_a, exponent, d_result, n);
+    cudaDeviceSynchronize();
+}
+
+template<typename T>
+void sin_gpu_direct(T* d_a, T* d_result, size_t n) {
+    int threads_per_block = 256;
+    int blocks = (n + threads_per_block - 1) / threads_per_block;
+    sin_kernel<<<blocks, threads_per_block>>>(d_a, d_result, n);
+    cudaDeviceSynchronize();
+}
+
+template<typename T>
+void cos_gpu_direct(T* d_a, T* d_result, size_t n) {
+    int threads_per_block = 256;
+    int blocks = (n + threads_per_block - 1) / threads_per_block;
+    cos_kernel<<<blocks, threads_per_block>>>(d_a, d_result, n);
+    cudaDeviceSynchronize();
+}
+
+template<typename T>
+void tanh_gpu_direct(T* d_a, T* d_result, size_t n) {
+    int threads_per_block = 256;
+    int blocks = (n + threads_per_block - 1) / threads_per_block;
+    tanh_kernel<<<blocks, threads_per_block>>>(d_a, d_result, n);
+    cudaDeviceSynchronize();
+}
+
+template<typename T>
+void sigmoid_gpu_direct(T* d_a, T* d_result, size_t n) {
+    int threads_per_block = 256;
+    int blocks = (n + threads_per_block - 1) / threads_per_block;
+    sigmoid_kernel<<<blocks, threads_per_block>>>(d_a, d_result, n);
+    cudaDeviceSynchronize();
+}
+
+template<typename T>
+void relu_gpu_direct(T* d_a, T* d_result, size_t n) {
+    int threads_per_block = 256;
+    int blocks = (n + threads_per_block - 1) / threads_per_block;
+    relu_kernel<<<blocks, threads_per_block>>>(d_a, d_result, n);
+    cudaDeviceSynchronize();
+}
+
+// Template instantiations for direct GPU operations
+template void add_gpu_direct<int>(int*, int*, int*, size_t);
+template void add_gpu_direct<float>(float*, float*, float*, size_t);
+template void add_gpu_direct<double>(double*, double*, double*, size_t);
+
+template void sub_gpu_direct<int>(int*, int*, int*, size_t);
+template void sub_gpu_direct<float>(float*, float*, float*, size_t);
+template void sub_gpu_direct<double>(double*, double*, double*, size_t);
+
+template void mul_gpu_direct<int>(int*, int*, int*, size_t);
+template void mul_gpu_direct<float>(float*, float*, float*, size_t);
+template void mul_gpu_direct<double>(double*, double*, double*, size_t);
+
+template void div_gpu_direct<int>(int*, int*, int*, size_t);
+template void div_gpu_direct<float>(float*, float*, float*, size_t);
+template void div_gpu_direct<double>(double*, double*, double*, size_t);
+
+template void exp_gpu_direct<float>(float*, float*, size_t);
+template void exp_gpu_direct<double>(double*, double*, size_t);
+
+template void log_gpu_direct<float>(float*, float*, size_t);
+template void log_gpu_direct<double>(double*, double*, size_t);
+
+template void sqrt_gpu_direct<float>(float*, float*, size_t);
+template void sqrt_gpu_direct<double>(double*, double*, size_t);
+
+template void pow_gpu_direct<float>(float*, float, float*, size_t);
+template void pow_gpu_direct<double>(double*, double, double*, size_t);
+
+template void sin_gpu_direct<float>(float*, float*, size_t);
+template void sin_gpu_direct<double>(double*, double*, size_t);
+
+template void cos_gpu_direct<float>(float*, float*, size_t);
+template void cos_gpu_direct<double>(double*, double*, size_t);
+
+template void tanh_gpu_direct<float>(float*, float*, size_t);
+template void tanh_gpu_direct<double>(double*, double*, size_t);
+
+template void sigmoid_gpu_direct<float>(float*, float*, size_t);
+template void sigmoid_gpu_direct<double>(double*, double*, size_t);
+
+template void relu_gpu_direct<float>(float*, float*, size_t);
+template void relu_gpu_direct<double>(double*, double*, size_t);
+
 } // namespace TensorGPU
 
 // C wrapper functions for CUDA API (for use in non-CUDA files)

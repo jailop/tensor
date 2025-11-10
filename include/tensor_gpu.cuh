@@ -102,6 +102,52 @@ template<typename T>
 void broadcast_add_axis_gpu(const T* grad, T* output,
                             size_t outer, size_t axis_size, size_t inner);
 
+// =============================================================================
+// Direct GPU operations (no malloc/memcpy) - operate on existing GPU memory
+// =============================================================================
+
+// Binary element-wise operations
+template<typename T>
+void add_gpu_direct(T* d_a, T* d_b, T* d_result, size_t n);
+
+template<typename T>
+void sub_gpu_direct(T* d_a, T* d_b, T* d_result, size_t n);
+
+template<typename T>
+void mul_gpu_direct(T* d_a, T* d_b, T* d_result, size_t n);
+
+template<typename T>
+void div_gpu_direct(T* d_a, T* d_b, T* d_result, size_t n);
+
+// Math functions
+template<typename T>
+void exp_gpu_direct(T* d_a, T* d_result, size_t n);
+
+template<typename T>
+void log_gpu_direct(T* d_a, T* d_result, size_t n);
+
+template<typename T>
+void sqrt_gpu_direct(T* d_a, T* d_result, size_t n);
+
+template<typename T>
+void pow_gpu_direct(T* d_a, T exponent, T* d_result, size_t n);
+
+template<typename T>
+void sin_gpu_direct(T* d_a, T* d_result, size_t n);
+
+template<typename T>
+void cos_gpu_direct(T* d_a, T* d_result, size_t n);
+
+template<typename T>
+void tanh_gpu_direct(T* d_a, T* d_result, size_t n);
+
+// Activation functions
+template<typename T>
+void sigmoid_gpu_direct(T* d_a, T* d_result, size_t n);
+
+template<typename T>
+void relu_gpu_direct(T* d_a, T* d_result, size_t n);
+
 } // namespace TensorGPU
 
 #endif // _TENSOR_GPU_CUH
