@@ -847,6 +847,9 @@ public:
     Tensor<T, N> detach() const {
         Tensor<T, N> result(dims_, use_gpu_, false);
         size_t total = total_size();
+#ifdef USE_GPU
+        ensure_on_cpu();  // Sync from GPU if needed
+#endif
         std::copy(data_.get(), data_.get() + total, result.data_.get());
         return result;
     }

@@ -1308,13 +1308,11 @@ TEST_F(TensorTest, ChainedMathOperations) {
     TensorIndices<2> shape = {2, 2};
     Tensor<float, 2> a(shape);
     
-    a.fill(2.0f);
-    
+    a.fill(2.0f);    
     // Test chaining: (x^2 + 1) * 2
-    auto result = a.pow(2.0f);
-    auto temp = result + 1.0f;  // Returns Tensor directly, not variant
-    auto final = temp * 2.0f;
-    
+    auto result = a.pow(2.0f);    
+    auto temp = result + 1.0f;  // Returns Tensor directly, not variant    
+    auto final = temp * 2.0f;    
     // 2^2 = 4, 4 + 1 = 5, 5 * 2 = 10
     EXPECT_FLOAT_EQ((final[{0, 0}]), 10.0f);
     EXPECT_FLOAT_EQ((final[{1, 1}]), 10.0f);
@@ -1760,15 +1758,12 @@ TEST_F(TensorTest, AutogradSigmoid) {
     
     x[{0}] = 0.0f;
     
-    auto y = x.sigmoid();
-    
+    auto y = x.sigmoid();    
     // sigmoid(0) = 0.5
     EXPECT_NEAR((y[{0}]), 0.5f, 1e-5);
     
     // Backward
-    y.backward();
-    
-    // Gradient of sigmoid at 0: 0.5 * (1 - 0.5) = 0.25
+    y.backward();    // Gradient of sigmoid at 0: 0.5 * (1 - 0.5) = 0.25
     EXPECT_NEAR(((*x.grad())[{0}]), 0.25f, 1e-5);
 }
 
@@ -1837,11 +1832,9 @@ TEST_F(TensorTest, AutogradChainedOperations) {
     x[{0}] = 1.0f;
     
     // y = x * 2
-    auto y = x * 2.0f;
-    
+    auto y = x * 2.0f;    
     // z = y + 3 = x * 2 + 3
-    auto z = y + 3.0f;
-    
+    auto z = y + 3.0f;    
     // Forward: z = 1 * 2 + 3 = 5
     EXPECT_FLOAT_EQ((z[{0}]), 5.0f);
     
