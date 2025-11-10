@@ -1,5 +1,4 @@
 #include "tensor_error.h"
-#include <string>
 
 /**
  * @brief Convert TensorError to human-readable string

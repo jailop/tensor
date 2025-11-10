@@ -1,6 +1,8 @@
 #ifndef TENSOR_ERROR_H
 #define TENSOR_ERROR_H
 
+#include <string>
+
 /**
  * @enum TensorError
  * @brief Error codes for tensor operations
@@ -19,5 +21,7 @@ enum class TensorError {
     LapackError,          ///< LAPACK routine error
     NotImplemented        ///< Feature not yet implemented
 };
+
+inline std::string to_string(TensorError error);
 
 #endif // TENSOR_ERROR_H
