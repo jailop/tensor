@@ -101,6 +101,7 @@ endif()
 # Core library sources
 set(TENSOR_LIB_SOURCES
   src/tensor_instantiations.cc
+  src/tensor_error.cc
 )
 
 # Build static library
