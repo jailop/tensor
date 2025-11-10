@@ -76,6 +76,14 @@
 #include "tensor_perf.h"
 
 #ifdef USE_GPU
+// Forward declarations for CUDA functions (implementation in tensor_gpu.cu)
+extern "C" {
+void* cuda_malloc_wrapper(size_t bytes);
+void cuda_free_wrapper(void* ptr);
+void cuda_memcpy_h2d_wrapper(void* dst, const void* src, size_t bytes);
+void cuda_memcpy_d2h_wrapper(void* dst, const void* src, size_t bytes);
+void cuda_memcpy_d2d_wrapper(void* dst, const void* src, size_t bytes);
+}
 #include "tensor_gpu.cuh"
 #endif
 
@@ -473,6 +481,15 @@ private:
     TensorIndices<N> strides_;       ///< Strides for each dimension
     bool use_gpu_;                   ///< Flag to indicate if GPU should be used
     
+#ifdef USE_GPU
+    /// @name Persistent GPU Memory Management
+    /// @{
+    mutable T* d_data_;              ///< Persistent GPU memory pointer
+    mutable bool data_on_gpu_;       ///< True if valid data is on GPU
+    mutable bool gpu_needs_sync_;    ///< True if GPU has newer data than CPU
+    /// @}
+#endif
+    
     /// @name Autograd Support
     /// @{
     bool requires_grad_;                              ///< Whether to track gradients
@@ -493,6 +510,51 @@ private:
         }
         return off;
     }
+    
+#ifdef USE_GPU
+    /**
+     * Ensure data is present on GPU (upload if needed).
+     */
+    void ensure_on_gpu() const {
+        if (!use_gpu_ || data_on_gpu_) return;
+        
+        size_t bytes = total_size() * sizeof(T);
+        if (!d_data_) {
+            const_cast<Tensor*>(this)->d_data_ = static_cast<T*>(cuda_malloc_wrapper(bytes));
+        }
+        cuda_memcpy_h2d_wrapper(d_data_, data_.get(), bytes);
+        const_cast<Tensor*>(this)->data_on_gpu_ = true;
+        const_cast<Tensor*>(this)->gpu_needs_sync_ = false;
+    }
+    
+    /**
+     * Ensure data is present on CPU (download from GPU if needed).
+     */
+    void ensure_on_cpu() const {
+        if (!use_gpu_ || !gpu_needs_sync_) return;
+        
+        size_t bytes = total_size() * sizeof(T);
+        cuda_memcpy_d2h_wrapper(data_.get(), d_data_, bytes);
+        const_cast<Tensor*>(this)->gpu_needs_sync_ = false;
+    }
+    
+    /**
+     * Mark GPU data as modified (CPU needs sync).
+     */
+    void mark_gpu_modified() {
+        if (use_gpu_) {
+            data_on_gpu_ = true;
+            gpu_needs_sync_ = true;
+        }
+    }
+    
+    /**
+     * Get GPU data pointer (for operations).
+     */
+    T* gpu_data() const {
+        return d_data_;
+    }
+#endif
     
     // Friend declaration to allow tensors of different dimensions to access each other's data
     template <typename U, size_t M>
@@ -572,6 +634,9 @@ public:
         data_ = std::make_unique<T[]>(total);
 #ifdef USE_GPU
         use_gpu_ = use_gpu && TensorGPU::is_gpu_available();
+        d_data_ = nullptr;
+        data_on_gpu_ = false;
+        gpu_needs_sync_ = false;
 #else
         use_gpu_ = false;
 #endif
@@ -579,6 +644,18 @@ public:
             grad_ = std::make_unique<Tensor<T, N>>(dims_, use_gpu_, false);
             grad_->fill(T(0));
         }
+    }
+    
+    /**
+     * Destructor to free GPU memory if allocated.
+     */
+    ~Tensor() {
+#ifdef USE_GPU
+        if (d_data_) {
+            cuda_free_wrapper(d_data_);
+            d_data_ = nullptr;
+        }
+#endif
     }
     
     /**
@@ -591,7 +668,27 @@ public:
           backward_funcs_(other.backward_funcs_) {
         size_t total = total_size();
         data_ = std::make_unique<T[]>(total);
+        
+#ifdef USE_GPU
+        d_data_ = nullptr;
+        data_on_gpu_ = false;
+        gpu_needs_sync_ = false;
+        
+        // If other has data on GPU, copy from GPU
+        if (other.use_gpu_ && other.data_on_gpu_) {
+            size_t bytes = total * sizeof(T);
+            d_data_ = static_cast<T*>(cuda_malloc_wrapper(bytes));
+            cuda_memcpy_d2d_wrapper(d_data_, other.d_data_, bytes);
+            data_on_gpu_ = true;
+            // Also copy to CPU memory
+            cuda_memcpy_d2h_wrapper(data_.get(), d_data_, bytes);
+        } else {
+            other.ensure_on_cpu();
+            std::copy(other.data_.get(), other.data_.get() + total, data_.get());
+        }
+#else
         std::copy(other.data_.get(), other.data_.get() + total, data_.get());
+#endif
         
         // Copy gradient if it exists
         if (other.grad_) {
@@ -606,6 +703,14 @@ public:
      */
     Tensor& operator=(const Tensor& other) {
         if (this != &other) {
+#ifdef USE_GPU
+            // Free existing GPU memory
+            if (d_data_) {
+                cuda_free_wrapper(d_data_);
+                d_data_ = nullptr;
+            }
+#endif
+            
             dims_ = other.dims_;
             strides_ = other.strides_;
             use_gpu_ = other.use_gpu_;
@@ -615,7 +720,22 @@ public:
             
             size_t total = total_size();
             data_ = std::make_unique<T[]>(total);
+            
+#ifdef USE_GPU
+            data_on_gpu_ = false;
+            gpu_needs_sync_ = false;
+            
+            if (other.use_gpu_) {
+                // Ensure source has latest data on CPU
+                other.ensure_on_cpu();
+                // Copy from CPU
+                std::copy(other.data_.get(), other.data_.get() + total, data_.get());
+            } else {
+                std::copy(other.data_.get(), other.data_.get() + total, data_.get());
+            }
+#else
             std::copy(other.data_.get(), other.data_.get() + total, data_.get());
+#endif
             
             // Copy gradient if it exists
             if (other.grad_) {

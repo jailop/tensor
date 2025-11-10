@@ -1064,3 +1064,30 @@ template void min_gpu<float>(const float*, float*, size_t);
 template void min_gpu<double>(const double*, double*, size_t);
 
 } // namespace TensorGPU
+
+// C wrapper functions for CUDA API (for use in non-CUDA files)
+extern "C" {
+
+void* cuda_malloc_wrapper(size_t bytes) {
+    void* ptr;
+    cudaMalloc(&ptr, bytes);
+    return ptr;
+}
+
+void cuda_free_wrapper(void* ptr) {
+    cudaFree(ptr);
+}
+
+void cuda_memcpy_h2d_wrapper(void* dst, const void* src, size_t bytes) {
+    cudaMemcpy(dst, src, bytes, cudaMemcpyHostToDevice);
+}
+
+void cuda_memcpy_d2h_wrapper(void* dst, const void* src, size_t bytes) {
+    cudaMemcpy(dst, src, bytes, cudaMemcpyDeviceToHost);
+}
+
+void cuda_memcpy_d2d_wrapper(void* dst, const void* src, size_t bytes) {
+    cudaMemcpy(dst, src, bytes, cudaMemcpyDeviceToDevice);
+}
+
+} // extern "C"
