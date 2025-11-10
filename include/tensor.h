@@ -1200,6 +1200,7 @@ public:
         
 #ifdef USE_GPU
         if (use_gpu_) {
+            ensure_on_cpu();  // Sync from GPU before scalar operations
             TensorGPU::add_scalar_gpu(data_.get(), scalar, result.data_.get(), total);
         } else
 #endif
@@ -1575,6 +1576,7 @@ public:
         
 #ifdef USE_GPU
         if (use_gpu_) {
+            ensure_on_cpu();  // Sync from GPU before scalar operations
             TensorGPU::mul_scalar_gpu(data_.get(), scalar, result.data_.get(), total);
         } else
 #endif
