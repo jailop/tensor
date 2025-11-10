@@ -72,14 +72,18 @@ int load_mnist_images(const char* filename, MatrixFloatHandle* images_tensor, si
     /* Create tensor to hold all images: (num_images x 784) */
     matrix_float_zeros(count, IMAGE_PIXELS, images_tensor);
     
-    /* Load images directly into tensor */
+    /* Get direct pointer to tensor data for efficient loading */
+    const float* data_ptr;
+    matrix_float_data(*images_tensor, &data_ptr);
+    float* data = (float*)data_ptr;  /* Cast away const for writing */
+    
+    /* Load images directly into tensor memory */
     unsigned char pixel;
     for (int32_t i = 0; i < count; ++i) {
         for (size_t j = 0; j < IMAGE_PIXELS; ++j) {
             fread(&pixel, 1, 1, file);
-            /* Normalize to [0, 1] and store directly in tensor */
-            float normalized = pixel / 255.0f;
-            matrix_float_set(*images_tensor, i, j, normalized);
+            /* Normalize to [0, 1] and store directly */
+            data[i * IMAGE_PIXELS + j] = pixel / 255.0f;
         }
     }
     
@@ -119,54 +123,18 @@ int load_mnist_labels(const char* filename, uint8_t** labels, size_t* num_labels
  * @brief Convert label to one-hot encoded vector
  */
 void label_to_onehot(uint8_t label, MatrixFloatHandle onehot, size_t batch_idx) {
-    for (size_t i = 0; i < NUM_CLASSES; ++i) {
-        float value = (i == label) ? 1.0f : 0.0f;
-        matrix_float_set(onehot, batch_idx, i, value);
-    }
-}
-
-/**
- * @brief Compute cross-entropy loss using optimized tensor operations
- */
-float cross_entropy_loss(MatrixFloatHandle predictions, MatrixFloatHandle targets) {
-    float loss;
-    matrix_float_cross_entropy_loss(predictions, targets, &loss);
-    return loss;
-}
-
-/**
- * @brief Compute accuracy using optimized tensor operations
- */
-float compute_accuracy(MatrixFloatHandle predictions, const uint8_t* labels, size_t start_idx) {
-    size_t rows, cols;
-    matrix_float_shape(predictions, &rows, &cols);
+    /* Direct pointer access for efficiency */
+    const float* data_ptr;
+    matrix_float_data(onehot, &data_ptr);
+    float* data = (float*)data_ptr;
     
-    float accuracy;
-    matrix_float_compute_accuracy(predictions, &labels[start_idx], rows, &accuracy);
-    return accuracy;
-}
-
-/**
- * @brief Compute softmax using optimized tensor operations
- * Note: This creates a new matrix. For in-place operation, use layer_softmax_forward.
- */
-void compute_softmax(MatrixFloatHandle matrix) {
-    /* For backward compatibility, we compute in-place using the C API's optimized softmax.
-     * This is less efficient than using layer_softmax_forward_float but maintains the same interface. */
-    MatrixFloatHandle result;
-    matrix_float_softmax(matrix, &result);
-    
-    /* Copy result back to original matrix */
     size_t rows, cols;
-    matrix_float_shape(result, &rows, &cols);
-    for (size_t i = 0; i < rows; ++i) {
-        for (size_t j = 0; j < cols; ++j) {
-            float val;
-            matrix_float_get(result, i, j, &val);
-            matrix_float_set(matrix, i, j, val);
-        }
+    matrix_float_shape(onehot, &rows, &cols);
+    
+    size_t offset = batch_idx * cols;
+    for (size_t i = 0; i < cols; ++i) {
+        data[offset + i] = (i == label) ? 1.0f : 0.0f;
     }
-    matrix_float_destroy(result);
 }
 
 /**
@@ -340,9 +308,12 @@ int main(int argc, char* argv[]) {
             layer_linear_forward_float(fc4, a3, &h4);
             layer_softmax_forward_float(softmax, h4, &predictions);
             
-            /* Compute loss and accuracy */
-            float loss = cross_entropy_loss(predictions, batch_targets);
-            float acc = compute_accuracy(predictions, train_labels, start_idx);
+            /* Compute loss and accuracy using direct API calls */
+            float loss;
+            matrix_float_cross_entropy_loss(predictions, batch_targets, &loss);
+            
+            float acc;
+            matrix_float_compute_accuracy(predictions, &train_labels[start_idx], BATCH_SIZE, &acc);
             
             epoch_loss += loss;
             epoch_accuracy += acc;
@@ -353,17 +324,23 @@ int main(int argc, char* argv[]) {
             matrix_float_copy(predictions, &grad_predictions);
             
             /* For cross-entropy loss with softmax: grad = (predictions - targets) / batch_size */
+            /* Use matrix operations instead of loops */
+            MatrixFloatHandle grad_diff;
+            matrix_float_subtract(grad_predictions, batch_targets, &grad_diff);
+            matrix_float_destroy(grad_predictions);
+            
+            /* Scale by 1/batch_size using direct pointer access */
             size_t rows, cols;
-            matrix_float_shape(grad_predictions, &rows, &cols);
-            for (size_t i = 0; i < rows; ++i) {
-                for (size_t j = 0; j < cols; ++j) {
-                    float pred, target;
-                    matrix_float_get(grad_predictions, i, j, &pred);
-                    matrix_float_get(batch_targets, i, j, &target);
-                    /* Use actual batch size (rows), not BATCH_SIZE constant */
-                    matrix_float_set(grad_predictions, i, j, (pred - target) / (float)rows);
-                }
+            matrix_float_shape(grad_diff, &rows, &cols);
+            const float* diff_ptr;
+            matrix_float_data(grad_diff, &diff_ptr);
+            float* diff_data = (float*)diff_ptr;
+            float scale = 1.0f / (float)rows;
+            size_t total = rows * cols;
+            for (size_t i = 0; i < total; ++i) {
+                diff_data[i] *= scale;
             }
+            grad_predictions = grad_diff;
             
             /* Backpropagate through network */
             /* Pass gradient through softmax backward */
@@ -389,34 +366,36 @@ int main(int argc, char* argv[]) {
                 printf("\n=== DEBUG: First Batch Analysis ===\n");
                 printf("Loss: %.6f, Accuracy: %.2f%%\n", loss, acc * 100);
                 
-                /* Check gradient magnitude */
+                /* Check gradient magnitude using direct pointer access */
                 MatrixFloatHandle grad_w;
                 layer_linear_get_grad_weights_float(fc4, &grad_w);
                 size_t g_rows, g_cols;
                 matrix_float_shape(grad_w, &g_rows, &g_cols);
+                
+                const float* grad_ptr;
+                matrix_float_data(grad_w, &grad_ptr);
+                
                 float grad_sum = 0.0f, grad_max = 0.0f;
-                for (size_t i = 0; i < g_rows; ++i) {
-                    for (size_t j = 0; j < g_cols; ++j) {
-                        float g;
-                        matrix_float_get(grad_w, i, j, &g);
-                        grad_sum += fabsf(g);
-                        if (fabsf(g) > grad_max) grad_max = fabsf(g);
-                    }
+                size_t grad_total = g_rows * g_cols;
+                for (size_t i = 0; i < grad_total; ++i) {
+                    float g = fabsf(grad_ptr[i]);
+                    grad_sum += g;
+                    if (g > grad_max) grad_max = g;
                 }
                 printf("FC4 gradient: sum=%.6f, max=%.6f, avg=%.8f\n", 
-                       grad_sum, grad_max, grad_sum / (g_rows * g_cols));
+                       grad_sum, grad_max, grad_sum / grad_total);
                 
-                /* Check predictions stats */
+                /* Check predictions stats using direct pointer access */
+                const float* pred_ptr;
+                matrix_float_data(predictions, &pred_ptr);
+                
                 float pred_sum = 0.0f;
-                for (size_t i = 0; i < rows; ++i) {
-                    for (size_t j = 0; j < cols; ++j) {
-                        float p;
-                        matrix_float_get(predictions, i, j, &p);
-                        pred_sum += p;
-                    }
+                size_t pred_total = rows * cols;
+                for (size_t i = 0; i < pred_total; ++i) {
+                    pred_sum += pred_ptr[i];
                 }
                 printf("Predictions: avg=%.6f (should be ~0.1 for 10 classes)\n", 
-                       pred_sum / (rows * cols));
+                       pred_sum / pred_total);
                 printf("=====================================\n\n");
             }
             
@@ -482,7 +461,8 @@ int main(int argc, char* argv[]) {
         layer_linear_forward_float(fc4, a3, &h4);
         layer_softmax_forward_float(softmax, h4, &predictions);
         
-        float acc = compute_accuracy(predictions, test_labels, start_idx);
+        float acc;
+        matrix_float_compute_accuracy(predictions, &test_labels[start_idx], test_batch_size, &acc);
         test_accuracy += acc;
         
         /* Clean up */
@@ -517,17 +497,12 @@ int main(int argc, char* argv[]) {
         layer_linear_forward_float(fc4, a3, &h4);
         layer_softmax_forward_float(softmax, h4, &pred);
         
-        size_t pred_class = 0;
+        /* Use direct API for argmax */
+        size_t pred_class;
+        matrix_float_argmax_rows(pred, &pred_class, 1);
+        
         float max_val;
-        matrix_float_get(pred, 0, 0, &max_val);
-        for (size_t j = 1; j < NUM_CLASSES; ++j) {
-            float val;
-            matrix_float_get(pred, 0, j, &val);
-            if (val > max_val) {
-                max_val = val;
-                pred_class = j;
-            }
-        }
+        matrix_float_get(pred, 0, pred_class, &max_val);
         
         printf("Image %zu: True label = %d, Predicted = %zu, Confidence = %.2f%%\n",
                i, test_labels[i], pred_class, max_val * 100);
