@@ -11,6 +11,9 @@ learning, written in C++ with an in-progress C/Python API. It features
 automatic GPU acceleration, optimized CPU operations, and support for
 building basic neural networks.
 
+- [User Guide](https://github.com/jailop/tensor/blob/main/userguide/00-index.md)
+- [API Documentation](https://jailop.github.io/tensor/html)
+
 ## Acknowledgments
 
 This project was created to explore:
