@@ -7,5 +7,6 @@ var searchData=
   ['where_4',['where',['../classTensor.html#ab35759b8f0cec852e27c31cf339737b8',1,'Tensor']]],
   ['why_20explicit_20instantiations_5',['Why Explicit Instantiations?',['../tensor__instantiations_8cc.html#inst_why',1,'']]],
   ['why_20no_20vector_20instantiations_6',['Why No Vector Instantiations?',['../instantiations.html#inst_vectors',1,'']]],
-  ['workers_5f_7',['workers_',['../classThreadPool.html#abaca4d80d846a7b21e45f9f81b73ad28',1,'ThreadPool']]]
+  ['workers_5f_7',['workers_',['../classThreadPool.html#abaca4d80d846a7b21e45f9f81b73ad28',1,'ThreadPool']]],
+  ['wrapping_20third_20party_20libraries_8',['Linear Algebra (wrapping third-party libraries)',['../index.html#autotoc_md7',1,'']]]
 ];

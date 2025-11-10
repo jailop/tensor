@@ -22,7 +22,7 @@ var tensor_8h =
       [ "NotImplemented", "tensor_8h.html#a2db6a67f5b95f95cb23a9d7b28deceaaa997ca4ce119685f40f03a9a8a6c5346e", null ]
     ] ],
     [ "arange", "tensor_8h.html#abee606191f2a9544a7acbbd79094ed5b", null ],
-    [ "are_broadcastable", "tensor_8h.html#a73f1eab7fbd472760c5d87a8acc9d7be", null ],
+    [ "are_broadcastable", "tensor_8h.html#af558fb1fbf98a2d78e5a85123c232d9f", null ],
     [ "argsort", "tensor_8h.html#a1ce61bbd53890adec19f5b19f946ef26", null ],
     [ "astype", "tensor_8h.html#a912e291f7a42f325c111def58ac98acf", null ],
     [ "backend_name", "tensor_8h.html#ae65fd500e7e89fd9a45a887f9c9b67e7", null ],

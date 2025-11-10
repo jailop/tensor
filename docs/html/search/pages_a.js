@@ -1,8 +1,7 @@
 var searchData=
 [
-  ['installation_0',['Installation',['../index.html#main_install',1,'']]],
-  ['instantiated_1',['What is Instantiated?',['../tensor__instantiations_8cc.html#inst_what',1,'']]],
-  ['instantiations_2',['Instantiations',['../instantiations.html#inst_available',1,'Available Instantiations'],['../instantiations.html#inst_custom',1,'Custom Instantiations'],['../instantiations.html',1,'Template Instantiations'],['../tensor__instantiations_8cc.html#inst_why',1,'Why Explicit Instantiations?'],['../instantiations.html#inst_vectors',1,'Why No Vector Instantiations?']]],
-  ['introduction_3',['Introduction',['../index.html#main_intro',1,'']]],
-  ['is_20instantiated_4',['What is Instantiated?',['../tensor__instantiations_8cc.html#inst_what',1,'']]]
+  ['h_0',['C API (&lt;span class=&quot;tt&quot;&gt;include/tensor_c.h&lt;/span&gt;)',['../index.html#autotoc_md31',1,'']]],
+  ['h_20main_20template_20header_1',['&lt;span class=&quot;tt&quot;&gt;include/tensor.h&lt;/span&gt; - Main Template Header',['../index.html#autotoc_md24',1,'']]],
+  ['header_2',['&lt;span class=&quot;tt&quot;&gt;include/tensor.h&lt;/span&gt; - Main Template Header',['../index.html#autotoc_md24',1,'']]],
+  ['headers_3',['Additional Headers',['../index.html#autotoc_md26',1,'']]]
 ];

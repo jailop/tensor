@@ -1,7 +1,9 @@
 <map id="Tensor::matmul" name="Tensor::matmul">
-<area shape="rect" id="Node000001" title="Matrix multiplication with autograd support (matmul)." alt="" coords="190,47,301,73"/>
-<area shape="rect" id="Node000002" href="$classtensor4d_1_1nn_1_1Linear.html#a5364162aed6bb8c7758d88142ac74c1b" title=" " alt="" coords="5,5,142,48"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="174,49,141,42,142,37,175,44"/>
-<area shape="rect" id="Node000003" href="$classtensor4d_1_1nn_1_1Linear.html#a0af1f08655e4b88cc7adc4e7d8a323e3" title=" " alt="" coords="5,72,142,115"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="175,76,142,83,141,78,174,71"/>
+<area shape="rect" id="Node000001" title="Matrix multiplication with autograd support (matmul)." alt="" coords="204,80,315,107"/>
+<area shape="rect" id="Node000002" href="$classtensor4d_1_1nn_1_1Linear.html#a5364162aed6bb8c7758d88142ac74c1b" title=" " alt="" coords="12,5,149,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="206,77,139,51,141,46,208,72"/>
+<area shape="rect" id="Node000003" href="$classtensor4d_1_1nn_1_1Softmax.html#abda8fce936f0e7f02d1779a120db27de" title=" " alt="" coords="5,72,156,115"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="188,96,156,96,156,91,188,91"/>
+<area shape="rect" id="Node000004" href="$classtensor4d_1_1nn_1_1Linear.html#a0af1f08655e4b88cc7adc4e7d8a323e3" title=" " alt="" coords="12,139,149,181"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="208,115,141,141,139,136,206,110"/>
 </map>

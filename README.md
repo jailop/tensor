@@ -419,6 +419,28 @@ make run_perf
 
 This will benchmark various operations across CPU, BLAS, and GPU (if available).
 
+### Python Bindginds: compared to Pytorch
+
+```
+Total benchmarks: 24
+tensor4d.nn faster: 5 (20.8%)
+PyTorch faster: 19 (79.2%)
+Average speedup: 2.69x
+Min speedup: 0.01x
+Max speedup: 44.06x
+```
+
+### Python Bindginds: compared to NumPy
+
+```
+Total benchmarks: 43
+tensor4d faster: 8 (18.6%)
+NumPy faster: 35 (81.4%)
+Average speedup: 2.70x
+Min speedup: 0.00x
+Max speedup: 47.44x
+```
+
 ## References
 
 - CUDA Programming Guide: https://docs.nvidia.com/cuda/

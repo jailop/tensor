@@ -8,9 +8,10 @@ var tensor__c_8h =
     [ "TensorFloatHandle", "tensor__c_8h.html#ace7c779d0fc5020fea118a0f15f0b7c0", null ],
     [ "VectorDoubleHandle", "tensor__c_8h.html#a4e5a4422afc7e4b2937d383e32b33251", null ],
     [ "VectorFloatHandle", "tensor__c_8h.html#a98965568042c2dd36688ebdcf3cd22c0", null ],
-    [ "TensorDevice", "tensor__c_8h.html#a81f169ae10ab5411625862e77c2f0fb8", [
-      [ "TENSOR_DEVICE_CPU", "tensor__c_8h.html#a81f169ae10ab5411625862e77c2f0fb8adbeabaa67cddecd0c238e4b3405313fe", null ],
-      [ "TENSOR_DEVICE_GPU", "tensor__c_8h.html#a81f169ae10ab5411625862e77c2f0fb8a625ea7ff15113d6dc68f4c961d36693a", null ]
+    [ "TensorBackend", "tensor__c_8h.html#aad1acf6372f3a0084c644f8e84d3c7ad", [
+      [ "TENSOR_BACKEND_CPU", "tensor__c_8h.html#aad1acf6372f3a0084c644f8e84d3c7ada2a0e3370bdcfabc2a8250147f208987a", null ],
+      [ "TENSOR_BACKEND_BLAS", "tensor__c_8h.html#aad1acf6372f3a0084c644f8e84d3c7ada55ec5a8369668b4bb0d203844a5ba566", null ],
+      [ "TENSOR_BACKEND_GPU", "tensor__c_8h.html#aad1acf6372f3a0084c644f8e84d3c7ada42ff0d91b84618ceb2d161ccdd0fb587", null ]
     ] ],
     [ "TensorErrorCode", "tensor__c_8h.html#a2253bd8781bf25a48d518b66a66feedb", [
       [ "TENSOR_SUCCESS", "tensor__c_8h.html#a2253bd8781bf25a48d518b66a66feedbaab59501e7f62c4028ba624617068798b", null ],
@@ -46,7 +47,10 @@ var tensor__c_8h =
     [ "layer_linear_forward_double", "tensor__c_8h.html#a2d879c01d43ec99ec014e092d661f57e", null ],
     [ "layer_linear_forward_float", "tensor__c_8h.html#a819b28c168f71c298723b0d202035788", null ],
     [ "layer_linear_get_bias_float", "tensor__c_8h.html#a3f0b7bba792a918342e08c9bf85ba542", null ],
+    [ "layer_linear_get_grad_bias_float", "tensor__c_8h.html#ab87ac8849187b433c1818e2ee998d59d", null ],
+    [ "layer_linear_get_grad_weights_float", "tensor__c_8h.html#a1b5674ebbd55420baefaa3f0b5035287", null ],
     [ "layer_linear_get_weights_float", "tensor__c_8h.html#aec3703f3a163fbdddf3f00857be21c77", null ],
+    [ "layer_linear_update_weights_float", "tensor__c_8h.html#a81380d5f848afe3d498bedfc93332493", null ],
     [ "layer_relu_backward_double", "tensor__c_8h.html#ad376e6fe93161c5931beae4bc690db31", null ],
     [ "layer_relu_backward_float", "tensor__c_8h.html#afc5f5f644c9b908fbda24281d9de2a12", null ],
     [ "layer_relu_create_double", "tensor__c_8h.html#af17057f452df12fc8b3bb54d53d7f22e", null ],
@@ -79,6 +83,7 @@ var tensor__c_8h =
     [ "matrix_double_exp", "tensor__c_8h.html#ac2e5dd173466bea756934d098a1ebd45", null ],
     [ "matrix_double_eye", "tensor__c_8h.html#a113ffbc50951369856f2ffd01debda12", null ],
     [ "matrix_double_get", "tensor__c_8h.html#a1d2268dec0e2609a5de6ddad0045383e", null ],
+    [ "matrix_double_get_backend", "tensor__c_8h.html#ac44f7b84ff9c18b4ff18234faba3398c", null ],
     [ "matrix_double_get_col", "tensor__c_8h.html#a6caf88ca765b604eab7b9bab9f47ee10", null ],
     [ "matrix_double_get_diag", "tensor__c_8h.html#a88652995e6c48df46b0553abbd82bb86", null ],
     [ "matrix_double_get_row", "tensor__c_8h.html#a9a603f0a92bc4eedac4296187b7532e6", null ],
@@ -132,6 +137,7 @@ var tensor__c_8h =
     [ "matrix_float_exp", "tensor__c_8h.html#ab0abee381c8a2238dd1f4be8b2e44806", null ],
     [ "matrix_float_eye", "tensor__c_8h.html#a14b3185d66dfec988feac1c4f9dacc68", null ],
     [ "matrix_float_get", "tensor__c_8h.html#a5a98f19069ba7a51f436659c6a6941b7", null ],
+    [ "matrix_float_get_backend", "tensor__c_8h.html#aa4fe783f1deb679b188548af9d0cbe18", null ],
     [ "matrix_float_get_col", "tensor__c_8h.html#a036fdfc552daa9f0aa2030e56775d327", null ],
     [ "matrix_float_get_diag", "tensor__c_8h.html#a5370639aad2768e7e2d1b55612a1cf19", null ],
     [ "matrix_float_get_row", "tensor__c_8h.html#ae244e8a6c44fcfe2f940110ce69250cb", null ],
@@ -184,9 +190,9 @@ var tensor__c_8h =
     [ "optimizer_sgd_destroy", "tensor__c_8h.html#a7171d7e80ae332188fa703f9f772ac62", null ],
     [ "optimizer_sgd_step", "tensor__c_8h.html#a5a00d0d73d053246e09bef1f70b831f6", null ],
     [ "optimizer_sgd_zero_grad", "tensor__c_8h.html#a55348fc0f59ab3a117f1a2d57aebcc67", null ],
-    [ "tensor_c_get_device", "tensor__c_8h.html#a7315d7ce868f26a7259a34b0d511535e", null ],
+    [ "tensor_c_backend_name", "tensor__c_8h.html#a5f05b520f9df10866c2b85c4b1fe4958", null ],
+    [ "tensor_c_is_gpu_available", "tensor__c_8h.html#a8414e0babe726176075827a99efef8c4", null ],
     [ "tensor_c_last_error", "tensor__c_8h.html#ab3d9181185e3fb96252d24e36620836c", null ],
-    [ "tensor_c_set_device", "tensor__c_8h.html#a10dd62055fae90d31c4708d91d2d6f00", null ],
     [ "tensor_c_version", "tensor__c_8h.html#a869473857968abddcd5504d47cbb6a37", null ],
     [ "vector_double_add", "tensor__c_8h.html#a178b1713858e8ae0d9083540d930e24d", null ],
     [ "vector_double_copy", "tensor__c_8h.html#a0a0f6368fa778104bbbf4f11f3e939b0", null ],

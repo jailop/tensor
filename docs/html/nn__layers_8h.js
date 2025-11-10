@@ -21,5 +21,11 @@ var nn__layers_8h =
     [ "tensor4d::nn::Softmaxd", "namespacetensor4d_1_1nn.html#a35558d36da40b43a93f6743d3aaf91eb", null ],
     [ "tensor4d::nn::Softmaxf", "namespacetensor4d_1_1nn.html#a227492f3cd887244ddf283565d4f5327", null ],
     [ "tensor4d::nn::Tanhd", "namespacetensor4d_1_1nn.html#a684fa7cf2cac6ab7b8d62edc2b1da9d6", null ],
-    [ "tensor4d::nn::Tanhf", "namespacetensor4d_1_1nn.html#a322020c52ad6d285a72c09a50ea4b467", null ]
+    [ "tensor4d::nn::Tanhf", "namespacetensor4d_1_1nn.html#a322020c52ad6d285a72c09a50ea4b467", null ],
+    [ "tensor4d::nn::compute_accuracy", "namespacetensor4d_1_1nn.html#aabc59d678ea2b307e86f063f32102470", null ],
+    [ "tensor4d::nn::cross_entropy_loss", "namespacetensor4d_1_1nn.html#a7682f7b06565fe530c833139aa5c52cd", null ],
+    [ "tensor4d::nn::label_to_onehot", "namespacetensor4d_1_1nn.html#ac2a195a98fc946944abd82c47d997189", null ],
+    [ "tensor4d::nn::softmax_jacobian", "namespacetensor4d_1_1nn.html#af4ed0870610368776140c66a749f99ab", null ],
+    [ "tensor4d::nn::softmax_jacobian_batch", "namespacetensor4d_1_1nn.html#ab2f304e755860ad8c80d7c67cfe953b2", null ],
+    [ "tensor4d::nn::update_linear_layer", "namespacetensor4d_1_1nn.html#a834567aedd488a7451d76fec1bbba55e", null ]
 ];

@@ -198,7 +198,10 @@ public:
     
     Tensor<T, 2> backward(const Tensor<T, 2>& grad_output) override {
         // ReLU gradient: grad * (input > 0)
-        auto mask = input_.map([](T val) { return val > 0 ? T(1) : T(0); });
+        // Optimized using tensor comparison operator
+        Tensor<T, 2> zeros(input_.shape(), input_.uses_gpu());
+        zeros.fill(T(0));
+        auto mask = input_ > zeros;  // Returns 0 or 1 tensor
         auto result = grad_output * mask;
         return std::get<Tensor<T, 2>>(result);
     }
@@ -222,7 +225,11 @@ public:
     
     Tensor<T, 2> backward(const Tensor<T, 2>& grad_output) override {
         // sigmoid'(x) = sigmoid(x) * (1 - sigmoid(x))
-        auto one_minus_output = output_.map([](T val) { return T(1) - val; });
+        // Optimized using tensor operations
+        Tensor<T, 2> ones(output_.shape(), output_.uses_gpu());
+        ones.fill(T(1));
+        auto one_minus_output_var = ones - output_;
+        auto& one_minus_output = std::get<Tensor<T, 2>>(one_minus_output_var);
         auto temp = output_ * one_minus_output;
         auto result = grad_output * std::get<Tensor<T, 2>>(temp);
         return std::get<Tensor<T, 2>>(result);
@@ -247,9 +254,13 @@ public:
     
     Tensor<T, 2> backward(const Tensor<T, 2>& grad_output) override {
         // tanh'(x) = 1 - tanh^2(x)
+        // Optimized using tensor operations
         auto tanh_squared_var = output_ * output_;
-        auto tanh_squared = std::get<Tensor<T, 2>>(tanh_squared_var);
-        auto derivative = tanh_squared.map([](T val) { return T(1) - val; });
+        auto& tanh_squared = std::get<Tensor<T, 2>>(tanh_squared_var);
+        Tensor<T, 2> ones(output_.shape(), output_.uses_gpu());
+        ones.fill(T(1));
+        auto derivative_var = ones - tanh_squared;
+        auto& derivative = std::get<Tensor<T, 2>>(derivative_var);
         auto result = grad_output * derivative;
         return std::get<Tensor<T, 2>>(result);
     }

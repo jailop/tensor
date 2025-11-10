@@ -1569,27 +1569,21 @@ TEST_F(TensorTest, MeanCalculation) {
 TEST_F(TensorTest, VarianceAndStd) {
     TensorIndices<1> shape = {5};
     Tensor<float, 1> a(shape);
-    
     a[{0}] = 2.0f;
     a[{1}] = 4.0f;
     a[{2}] = 4.0f;
     a[{3}] = 4.0f;
     a[{4}] = 6.0f;
-    
     float mean = a.mean();
     EXPECT_FLOAT_EQ(mean, 4.0f);
-    
     // Population variance (ddof=0): sum((x - mean)²) / n = 8/5 = 1.6
     float variance = a.variance();
     EXPECT_NEAR(variance, 1.6f, 1e-4);
-    
     float std_dev = a.std();
     EXPECT_NEAR(std_dev, std::sqrt(1.6f), 1e-4);
-    
     // Sample variance (ddof=1): sum((x - mean)²) / (n-1) = 8/4 = 2.0
     float sample_variance = a.variance(1);
     EXPECT_NEAR(sample_variance, 2.0f, 1e-4);
-    
     float sample_std = a.std(1);
     EXPECT_NEAR(sample_std, std::sqrt(2.0f), 1e-4);
 }

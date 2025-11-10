@@ -25,7 +25,55 @@
 var NAVTREE =
 [
   [ "Tensor Library", "index.html", [
-    [ "Tensor4D Library Documentation", "index.html", "index" ],
+    [ "Overview", "index.html#autotoc_md1", null ],
+    [ "Acknowledgments", "index.html#autotoc_md2", [
+      [ "Key Features", "index.html#autotoc_md3", [
+        [ "Core Tensor Operations", "index.html#autotoc_md4", null ],
+        [ "Performance &amp; Backends", "index.html#autotoc_md5", null ],
+        [ "Mathematical Operations", "index.html#autotoc_md6", null ],
+        [ "Linear Algebra (wrapping third-party libraries)", "index.html#autotoc_md7", null ],
+        [ "Neural Networks &amp; Deep Learning", "index.html#autotoc_md8", null ],
+        [ "Data I/O &amp; Serialization", "index.html#autotoc_md9", null ],
+        [ "Multi-Language Support", "index.html#autotoc_md10", null ]
+      ] ],
+      [ "Backend Selection", "index.html#autotoc_md11", null ]
+    ] ],
+    [ "Building", "index.html#autotoc_md12", [
+      [ "Requirements", "index.html#autotoc_md13", null ],
+      [ "Build Instructions", "index.html#autotoc_md14", null ],
+      [ "Build Options", "index.html#autotoc_md15", null ]
+    ] ],
+    [ "Usage", "index.html#autotoc_md16", [
+      [ "C++ API", "index.html#autotoc_md17", [
+        [ "Basic Tensor Operations", "index.html#autotoc_md18", null ],
+        [ "Neural Network Example", "index.html#autotoc_md19", null ]
+      ] ],
+      [ "C API", "index.html#autotoc_md20", null ],
+      [ "Python API", "index.html#autotoc_md21", null ]
+    ] ],
+    [ "Library Architecture", "index.html#autotoc_md22", [
+      [ "Core Components", "index.html#autotoc_md23", [
+        [ "<span class=\"tt\">include/tensor.h</span> - Main Template Header", "index.html#autotoc_md24", null ],
+        [ "<span class=\"tt\">src/tensor_instantiations.cc</span> - Explicit Template Instantiations", "index.html#autotoc_md25", null ]
+      ] ],
+      [ "Additional Headers", "index.html#autotoc_md26", [
+        [ "Type Aliases and Utilities", "index.html#autotoc_md27", null ],
+        [ "Linear Algebra", "index.html#autotoc_md28", null ],
+        [ "Neural Networks", "index.html#autotoc_md29", null ],
+        [ "Multi-Language Interfaces", "index.html#autotoc_md30", [
+          [ "C API (<span class=\"tt\">include/tensor_c.h</span>)", "index.html#autotoc_md31", null ],
+          [ "Python Bindings (<span class=\"tt\">python/</span> directory)", "index.html#autotoc_md32", null ]
+        ] ],
+        [ "GPU Support", "index.html#autotoc_md33", null ]
+      ] ]
+    ] ],
+    [ "Documentation", "index.html#autotoc_md34", null ],
+    [ "Testing", "index.html#autotoc_md35", null ],
+    [ "Performance Benchmarks", "index.html#autotoc_md36", [
+      [ "Python Bindginds: compared to Pytorch", "index.html#autotoc_md37", null ],
+      [ "Python Bindginds: compared to NumPy", "index.html#autotoc_md38", null ]
+    ] ],
+    [ "References", "index.html#autotoc_md39", null ],
     [ "Template Instantiations", "instantiations.html", [
       [ "Overview", "instantiations.html#inst_overview", null ],
       [ "Available Instantiations", "instantiations.html#inst_available", [
@@ -76,11 +124,11 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "annotated.html",
-"classTensor.html#aebe2b244763904422344add448a0c597",
-"classtensor4d_1_1nn_1_1Tanh.html#a657c2dab547dc900fda0a86818ea1172",
-"tensor_8h.html#a0d1116cdf6624cb52514979cd1869e55",
-"tensor__c_8cpp.html#abb95065f2ca94bd780bd278f6fc976b4",
-"tensor__c_8h.html#aad7b106bb8271d642858d8b6f52c05d3"
+"classTensor.html#ae5b52299c11f3ba81e781cb008542285",
+"classtensor4d_1_1nn_1_1Tanh.html#a5046b1e468f41cc660af5f541be017d6",
+"namespacetensor4d_1_1nn.html#a762e1706124db702d93be5bb8b18e629",
+"tensor__c_8cpp.html#a9b6a6ab1f2a9058da8d0d578bac83346",
+"tensor__c_8h.html#a8416883076d83b6acc8fea90601aa758"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronization';

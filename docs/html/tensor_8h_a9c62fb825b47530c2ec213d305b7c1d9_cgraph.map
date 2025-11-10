@@ -1,5 +1,5 @@
 <map id="compute_broadcast_shape" name="compute_broadcast_shape">
 <area shape="rect" id="Node000001" title="Compute the broadcast shape of two tensors." alt="" coords="5,5,183,32"/>
-<area shape="rect" id="Node000002" href="$tensor_8h.html#a73f1eab7fbd472760c5d87a8acc9d7be" title="Check if two tensor shapes are broadcastable." alt="" coords="231,5,358,32"/>
+<area shape="rect" id="Node000002" href="$tensor_8h.html#af558fb1fbf98a2d78e5a85123c232d9f" title="Check if two tensor shapes are broadcastable." alt="" coords="231,5,358,32"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="183,16,215,16,215,21,183,21"/>
 </map>

@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.15.0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Tensor Library: Tensor4D Library Documentation</title>
+<title>Tensor Library: Tensor Library</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -89,111 +89,437 @@ $(function(){initNavTree('index.html','',''); });
 </div>
 
 <div><div class="header">
-  <div class="headertitle"><div class="title">Tensor4D Library Documentation </div></div>
+  <div class="headertitle"><div class="title"><a class="el" href="classTensor.html" title="Forward declaration for autograd.">Tensor</a> Library </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h1 class="doxsection"><a class="anchor" id="main_intro"></a>
-Introduction</h1>
-<p>The <a class="el" href="namespacetensor4d.html">tensor4d</a> library is a high-performance C++ tensor computation library with support for automatic differentiation, GPU acceleration, and BLAS integration. It provides a NumPy-like API for C++ developers.</p>
-<h1 class="doxsection"><a class="anchor" id="main_features"></a>
-Key Features</h1>
+<div class="textblock"><p><a class="anchor" id="md_README"></a></p>
+<p><b>Disclaimer</b>: This is a personal project to learn about numerical computing and optimization techniques. It is only intended to be used for educative purposes and not at all for production use.</p>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md1"></a>
+Overview</h1>
+<p>A multi-dimensional tensor library for scientific computing and machine learning, written in C++ with an in-progress C/Python API. It features automatic GPU acceleration, optimized CPU operations, and support for building basic neural networks.</p>
 <ul>
-<li><b>Multi-dimensional Tensors</b>: Support for tensors of arbitrary rank</li>
-<li><b>Automatic Differentiation</b>: Built-in autograd for gradient computation</li>
-<li><b>GPU Acceleration</b>: CUDA support for tensor operations</li>
-<li><b>BLAS Integration</b>: Optimized matrix operations via BLAS</li>
-<li><b>NumPy-like API</b>: Familiar interface for Python developers</li>
-<li><b>Type Safety</b>: Compile-time shape checking for fixed-rank tensors</li>
-<li><b>Pre-compiled Types</b>: Common tensor types available as libraries</li>
+<li><a href="https://github.com/jailop/tensor/blob/main/userguide/00-index.md">User Guide</a></li>
+<li><a href="https://jailop.github.io/tensor/html">API Documentation</a></li>
 </ul>
-<h1 class="doxsection"><a class="anchor" id="main_getting_started"></a>
-Getting Started</h1>
-<h2 class="doxsection"><a class="anchor" id="main_install"></a>
-Installation</h2>
-<p>Build the library using CMake: </p><div class="fragment"><div class="line">mkdir build &amp;&amp; cd build</div>
-<div class="line">cmake .. -DCMAKE_BUILD_TYPE=Release</div>
-<div class="line">make</div>
-<div class="line">make install</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="main_usage"></a>
-Basic Usage</h2>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md2"></a>
+Acknowledgments</h1>
+<p>This project was created to explore:</p>
+<ul>
+<li>High-performance numerical computing</li>
+<li>GPU programming with CUDA</li>
+<li>Template metaprogramming in C++</li>
+<li>Neural network implementation from scratch</li>
+<li>Library design and API ergonomics</li>
+</ul>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md3"></a>
+Key Features</h2>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md4"></a>
+Core Tensor Operations</h3>
+<ul>
+<li>Multi-dimensional tensor operations with arbitrary dimensions (1D to 4D and beyond)</li>
+<li>Type-safe template-based design with compile-time dimension checking</li>
+<li>Efficient memory management with move semantics and smart pointers</li>
+<li><a class="el" href="classTensor.html" title="Forward declaration for autograd.">Tensor</a> views and slicing for memory-efficient operations</li>
+<li>Broadcasting for element-wise operations with shape compatibility</li>
+<li><a class="el" href="classTensor.html" title="Forward declaration for autograd.">Tensor</a> reshaping, transposition, and dimension manipulation</li>
+<li>Element-wise arithmetic operations (+, -, , /, etc.)</li>
+<li>In-place operations for memory efficiency</li>
+</ul>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md5"></a>
+Performance &amp; Backends</h3>
+<ul>
+<li>Automatic GPU acceleration via CUDA (when available)</li>
+<li>Optimized CPU operations via BLAS/LAPACK (when available)</li>
+<li>Smart backend selection: GPU → BLAS → CPU fallback</li>
+<li>Parallel execution support with Intel TBB</li>
+<li>Performance profiling and benchmarking tools</li>
+</ul>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md6"></a>
+Mathematical Operations</h3>
+<ul>
+<li>Mathematical functions: exp, log, sqrt, pow, abs</li>
+<li>Trigonometric functions: sin, cos, tan, asin, acos, atan</li>
+<li>Activation functions: sigmoid, relu, tanh, softmax</li>
+<li>Statistical operations: mean, variance, std, min, max, median, sum, product</li>
+<li>Normalization operations: standardization, min-max scaling</li>
+<li>Clipping and value constraints</li>
+</ul>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md7"></a>
+Linear Algebra (wrapping third-party libraries)</h3>
+<ul>
+<li><a class="el" href="linalg_8h.html#aab91b0e1295509532b53ec846e227dcc" title="Type alias for 2D matrices.">Matrix</a> multiplication (matmul)</li>
+<li><a class="el" href="linalg_8h.html#aab91b0e1295509532b53ec846e227dcc" title="Type alias for 2D matrices.">Matrix</a> decompositions: LU, QR, Cholesky, SVD, Eigenvalue</li>
+<li>Linear system solvers (LU-based, QR-based)</li>
+<li><a class="el" href="linalg_8h.html#aab91b0e1295509532b53ec846e227dcc" title="Type alias for 2D matrices.">Matrix</a> properties: determinant, inverse, rank, trace, norm</li>
+<li>Advanced operations: kronecker product, cross product</li>
+</ul>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md8"></a>
+Neural Networks &amp; Deep Learning</h3>
+<ul>
+<li>Automatic differentiation (autograd) for gradient computation</li>
+<li>Comprehensive gradient tracking and backpropagation</li>
+<li>Neural network layers: Linear, ReLU, Sigmoid, Softmax, Dropout, BatchNorm</li>
+<li>Loss functions: MSE, CrossEntropy</li>
+<li>Optimizers: <a class="el" href="classSGD.html" title="SGD (Stochastic Gradient Descent) optimizer with optional momentum.">SGD</a> with momentum, <a class="el" href="classAdam.html">Adam</a> with adaptive learning rates</li>
+<li>Training utilities and network building blocks</li>
+</ul>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md9"></a>
+Data I/O &amp; Serialization</h3>
+<ul>
+<li><a class="el" href="classTensor.html" title="Forward declaration for autograd.">Tensor</a> serialization (save/load to binary format)</li>
+<li>NumPy array interoperability (Python bindings)</li>
+<li>CSV and text data loading utilities</li>
+<li>Cross-platform binary format support</li>
+</ul>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md10"></a>
+Multi-Language Support</h3>
+<ul>
+<li>C++ API: Header-only template library with full feature access (see <span class="tt"><a class="el" href="tensor_8h.html" title="High-performance multi-dimensional tensor library with GPU, BLAS, and autograd support.">include/tensor.h</a></span>)</li>
+<li>C API: In-progress C bindings for foreign function interfaces</li>
+<li>Python API: In-progress Python bindings with NumPy interoperability (see <span class="tt">python/</span> directory)</li>
+</ul>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md11"></a>
+Backend Selection</h2>
+<p>The library automatically selects the best available backend at runtime:</p>
+<ol type="1">
+<li>GPU (CUDA): Used by default if compiled with <span class="tt">USE_GPU</span> and GPU hardware is available</li>
+<li>BLAS: Used if GPU is unavailable but compiled with <span class="tt">USE_BLAS</span></li>
+<li>CPU: Fallback implementation with optimized C++ algorithms</li>
+</ol>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md12"></a>
+Building</h1>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md13"></a>
+Requirements</h2>
+<ul>
+<li>CMake 3.14 or higher</li>
+<li>C++ compiler with C++20 support (GCC 10+, Clang 12+, MSVC 2019+)</li>
+<li>Optional: CUDA Toolkit (for GPU support)</li>
+<li>Optional: BLAS/LAPACK (for optimized CPU operations)</li>
+<li>Optional: Intel TBB (for parallel execution)</li>
+<li>Optional: Doxygen (for documentation generation)</li>
+</ul>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md14"></a>
+Build Instructions</h2>
+<div class="fragment"><div class="line">git clone git@github.com:jailop/tensor.git</div>
+<div class="line">cd tensor</div>
+<div class="line">mkdir -p build &amp;&amp; cd build</div>
+<div class="line">cmake ..</div>
+<div class="line">cmake --build . -j$(nproc)</div>
+<div class="line">ctest --output-on-failure</div>
+<div class="line">sudo cmake --install .</div>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md15"></a>
+Build Options</h2>
+<p>The build system automatically detects available features:</p>
+<ul>
+<li>CUDA: Automatically enabled if CUDA compiler is found</li>
+<li>BLAS/LAPACK: Automatically linked if found</li>
+<li>TBB: Automatically linked if found for parallel execution</li>
+</ul>
+<p>To specify CUDA architecture: </p><div class="fragment"><div class="line">cmake -DCMAKE_CUDA_ARCHITECTURES=86 ..  # For Ampere (RTX 30xx)</div>
+</div><!-- fragment --><h1 class="doxsection"><a class="anchor" id="autotoc_md16"></a>
+Usage</h1>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md17"></a>
+C++ API</h2>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md18"></a>
+Basic Tensor Operations</h3>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &quot;<a class="code" href="tensor_8h.html">tensor.h</a>&quot;</span></div>
 <div class="line"><span class="preprocessor">#include &quot;<a class="code" href="tensor__types_8h.html">tensor_types.h</a>&quot;</span></div>
 <div class="line"> </div>
 <div class="line"><span class="keyword">using namespace </span><a class="code hl_namespace" href="namespacetensor4d.html">tensor4d</a>;</div>
 <div class="line"> </div>
 <div class="line"><span class="keywordtype">int</span> main() {</div>
-<div class="line">    <span class="comment">// Create a 3x3 matrix</span></div>
-<div class="line">    <a class="code hl_typedef" href="group__TypeAliases.html#gac88e264922505b831268d8d3028bb2ed">Matrixf</a> A({3, 3});</div>
+<div class="line">    <span class="comment">// Create a 2D tensor (matrix) - automatically uses GPU if available</span></div>
+<div class="line">    <a class="code hl_typedef" href="group__TypeAliases.html#gac88e264922505b831268d8d3028bb2ed">Matrixf</a> A({3, 4});</div>
 <div class="line">    A.fill(1.0f);</div>
 <div class="line">    </div>
-<div class="line">    <span class="comment">// Create a vector</span></div>
-<div class="line">    <a class="code hl_typedef" href="group__TypeAliases.html#gac2aae0735556afea00bc5e4813819e3c">Vectorf</a> v({3});</div>
-<div class="line">    v.fill(2.0f);</div>
+<div class="line">    <span class="comment">// Check which backend is being used</span></div>
+<div class="line">    std::cout &lt;&lt; <span class="stringliteral">&quot;Backend: &quot;</span> &lt;&lt; <a class="code hl_function" href="tensor_8h.html#ae65fd500e7e89fd9a45a887f9c9b67e7">backend_name</a>(A.backend()) &lt;&lt; std::endl;</div>
 <div class="line">    </div>
-<div class="line">    <span class="comment">// Matrix-vector multiplication</span></div>
-<div class="line">    <span class="keyword">auto</span> result = A.matmul(v);</div>
+<div class="line">    <span class="comment">// Matrix operations</span></div>
+<div class="line">    <a class="code hl_typedef" href="group__TypeAliases.html#gac88e264922505b831268d8d3028bb2ed">Matrixf</a> B = Matrixf::eye(4);</div>
+<div class="line">    <a class="code hl_typedef" href="group__TypeAliases.html#gac88e264922505b831268d8d3028bb2ed">Matrixf</a> C = A.matmul(B);</div>
 <div class="line">    </div>
-<div class="line">    <span class="comment">// Access elements</span></div>
-<div class="line">    std::cout &lt;&lt; result[{0}] &lt;&lt; std::endl;</div>
+<div class="line">    <span class="comment">// Element-wise operations</span></div>
+<div class="line">    <a class="code hl_typedef" href="group__TypeAliases.html#gac88e264922505b831268d8d3028bb2ed">Matrixf</a> D = C.<a class="code hl_function" href="classTensor.html#ae94340cb4134b887428082dc683fe2b2">exp</a>().log().sqrt();</div>
+<div class="line">    </div>
+<div class="line">    <span class="comment">// Statistical operations</span></div>
+<div class="line">    <span class="keywordtype">float</span> mean = C.<a class="code hl_function" href="classTensor.html#a84b27bf0213ab3f228c2efe5ca31eaec">mean</a>();</div>
+<div class="line">    <span class="keywordtype">float</span> std = C.<a class="code hl_function" href="classTensor.html#a0cda55fce732dcb563b598ff636d8758">std</a>();</div>
+<div class="line">    </div>
+<div class="line">    <span class="keywordflow">return</span> 0;</div>
 <div class="line">}</div>
-<div class="ttc" id="agroup__TypeAliases_html_gac2aae0735556afea00bc5e4813819e3c"><div class="ttname"><a href="group__TypeAliases.html#gac2aae0735556afea00bc5e4813819e3c">tensor4d::Vectorf</a></div><div class="ttdeci">Tensor&lt; float, 1 &gt; Vectorf</div><div class="ttdoc">Float vector (1D tensor).</div><div class="ttdef"><b>Definition</b> <a href="tensor__types_8h_source.html#l00049">tensor_types.h:49</a></div></div>
+<div class="ttc" id="aclassTensor_html_a0cda55fce732dcb563b598ff636d8758"><div class="ttname"><a href="classTensor.html#a0cda55fce732dcb563b598ff636d8758">Tensor::std</a></div><div class="ttdeci">T std(size_t ddof=0) const</div><div class="ttdef"><b>Definition</b> <a href="tensor_8h_source.html#l02596">tensor.h:2596</a></div></div>
+<div class="ttc" id="aclassTensor_html_a84b27bf0213ab3f228c2efe5ca31eaec"><div class="ttname"><a href="classTensor.html#a84b27bf0213ab3f228c2efe5ca31eaec">Tensor::mean</a></div><div class="ttdeci">T mean() const</div><div class="ttdoc">Compute mean of all elements.</div><div class="ttdef"><b>Definition</b> <a href="tensor_8h_source.html#l02550">tensor.h:2550</a></div></div>
+<div class="ttc" id="aclassTensor_html_ae94340cb4134b887428082dc683fe2b2"><div class="ttname"><a href="classTensor.html#ae94340cb4134b887428082dc683fe2b2">Tensor::exp</a></div><div class="ttdeci">Tensor&lt; T, N &gt; exp() const</div><div class="ttdoc">Apply exponential function to all elements (creates new tensor).</div><div class="ttdef"><b>Definition</b> <a href="tensor_8h_source.html#l01780">tensor.h:1780</a></div></div>
 <div class="ttc" id="agroup__TypeAliases_html_gac88e264922505b831268d8d3028bb2ed"><div class="ttname"><a href="group__TypeAliases.html#gac88e264922505b831268d8d3028bb2ed">tensor4d::Matrixf</a></div><div class="ttdeci">Tensor&lt; float, 2 &gt; Matrixf</div><div class="ttdoc">Float matrix (2D tensor).</div><div class="ttdef"><b>Definition</b> <a href="tensor__types_8h_source.html#l00065">tensor_types.h:65</a></div></div>
 <div class="ttc" id="anamespacetensor4d_html"><div class="ttname"><a href="namespacetensor4d.html">tensor4d</a></div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00018">nn_layers.h:18</a></div></div>
 <div class="ttc" id="atensor_8h_html"><div class="ttname"><a href="tensor_8h.html">tensor.h</a></div><div class="ttdoc">High-performance multi-dimensional tensor library with GPU, BLAS, and autograd support.</div></div>
+<div class="ttc" id="atensor_8h_html_ae65fd500e7e89fd9a45a887f9c9b67e7"><div class="ttname"><a href="tensor_8h.html#ae65fd500e7e89fd9a45a887f9c9b67e7">backend_name</a></div><div class="ttdeci">std::string backend_name(Backend backend)</div><div class="ttdoc">Get the name of a backend as a string.</div><div class="ttdef"><b>Definition</b> <a href="tensor_8h_source.html#l00201">tensor.h:201</a></div></div>
 <div class="ttc" id="atensor__types_8h_html"><div class="ttname"><a href="tensor__types_8h.html">tensor_types.h</a></div><div class="ttdoc">Type aliases for common Tensor specializations.</div></div>
-</div><!-- fragment --><h1 class="doxsection"><a class="anchor" id="main_documentation"></a>
-Documentation Pages</h1>
+</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md19"></a>
+Neural Network Example</h3>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;<a class="code" href="nn__layers_8h.html">nn_layers.h</a>&quot;</span></div>
+<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="optimizers_8h.html">optimizers.h</a>&quot;</span></div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">using namespace </span><a class="code hl_namespace" href="namespacetensor4d.html">tensor4d</a>;</div>
+<div class="line"><span class="keyword">using namespace </span><a class="code hl_namespace" href="namespacetensor4d_1_1nn.html">tensor4d::nn</a>;</div>
+<div class="line"> </div>
+<div class="line"><span class="keywordtype">int</span> main() {</div>
+<div class="line">    <span class="comment">// Create a simple feedforward network (784 -&gt; 128 -&gt; 10)</span></div>
+<div class="line">    <a class="code hl_typedef" href="namespacetensor4d_1_1nn.html#aaf2467899756d1b58455dff42f976904">Linearf</a> fc1(784, 128, <span class="keyword">true</span>);</div>
+<div class="line">    <a class="code hl_typedef" href="namespacetensor4d_1_1nn.html#ac63545216aad7e4be2c45c0b70509653">ReLUf</a> relu;</div>
+<div class="line">    <a class="code hl_typedef" href="namespacetensor4d_1_1nn.html#aaf2467899756d1b58455dff42f976904">Linearf</a> fc2(128, 10, <span class="keyword">true</span>);</div>
+<div class="line">    <a class="code hl_typedef" href="namespacetensor4d_1_1nn.html#a227492f3cd887244ddf283565d4f5327">Softmaxf</a> softmax;</div>
+<div class="line">    </div>
+<div class="line">    <span class="comment">// Create input (batch_size=32, features=784)</span></div>
+<div class="line">    <a class="code hl_typedef" href="group__TypeAliases.html#gac88e264922505b831268d8d3028bb2ed">Matrixf</a> input({32, 784});</div>
+<div class="line">    input.random_normal(0.0f, 1.0f);</div>
+<div class="line">    </div>
+<div class="line">    <span class="comment">// Forward pass (automatically uses GPU if available)</span></div>
+<div class="line">    <span class="keyword">auto</span> h1 = fc1.forward(input);</div>
+<div class="line">    <span class="keyword">auto</span> a1 = relu.<a class="code hl_function" href="classtensor4d_1_1nn_1_1ReLU.html#a07b3b9bee90208e9510c4cc740639689">forward</a>(h1);</div>
+<div class="line">    <span class="keyword">auto</span> h2 = fc2.forward(a1);</div>
+<div class="line">    <span class="keyword">auto</span> output = softmax.<a class="code hl_function" href="classtensor4d_1_1nn_1_1Softmax.html#a62cc4acc056fbd4f8a365637e1159a9e">forward</a>(h2);</div>
+<div class="line">    </div>
+<div class="line">    <span class="comment">// Create optimizer</span></div>
+<div class="line">    <a class="code hl_class" href="classSGD.html">SGD</a> optimizer(0.01f, 0.9f);  <span class="comment">// lr=0.01, momentum=0.9</span></div>
+<div class="line">    </div>
+<div class="line">    <span class="comment">// Training loop would go here...</span></div>
+<div class="line">    </div>
+<div class="line">    <span class="keywordflow">return</span> 0;</div>
+<div class="line">}</div>
+<div class="ttc" id="aclassSGD_html"><div class="ttname"><a href="classSGD.html">SGD</a></div><div class="ttdoc">SGD (Stochastic Gradient Descent) optimizer with optional momentum.</div><div class="ttdef"><b>Definition</b> <a href="optimizers_8h_source.html#l00145">optimizers.h:145</a></div></div>
+<div class="ttc" id="aclasstensor4d_1_1nn_1_1ReLU_html_a07b3b9bee90208e9510c4cc740639689"><div class="ttname"><a href="classtensor4d_1_1nn_1_1ReLU.html#a07b3b9bee90208e9510c4cc740639689">tensor4d::nn::ReLU::forward</a></div><div class="ttdeci">Tensor&lt; T, 2 &gt; forward(const Tensor&lt; T, 2 &gt; &amp;input) override</div><div class="ttdoc">Forward pass through the layer.</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00194">nn_layers.h:194</a></div></div>
+<div class="ttc" id="aclasstensor4d_1_1nn_1_1Softmax_html_a62cc4acc056fbd4f8a365637e1159a9e"><div class="ttname"><a href="classtensor4d_1_1nn_1_1Softmax.html#a62cc4acc056fbd4f8a365637e1159a9e">tensor4d::nn::Softmax::forward</a></div><div class="ttdeci">Tensor&lt; T, 2 &gt; forward(const Tensor&lt; T, 2 &gt; &amp;input) override</div><div class="ttdoc">Forward pass through the layer.</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00450">nn_layers.h:450</a></div></div>
+<div class="ttc" id="anamespacetensor4d_1_1nn_html"><div class="ttname"><a href="namespacetensor4d_1_1nn.html">tensor4d::nn</a></div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00019">nn_layers.h:19</a></div></div>
+<div class="ttc" id="anamespacetensor4d_1_1nn_html_a227492f3cd887244ddf283565d4f5327"><div class="ttname"><a href="namespacetensor4d_1_1nn.html#a227492f3cd887244ddf283565d4f5327">tensor4d::nn::Softmaxf</a></div><div class="ttdeci">Softmax&lt; float &gt; Softmaxf</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00506">nn_layers.h:506</a></div></div>
+<div class="ttc" id="anamespacetensor4d_1_1nn_html_aaf2467899756d1b58455dff42f976904"><div class="ttname"><a href="namespacetensor4d_1_1nn.html#aaf2467899756d1b58455dff42f976904">tensor4d::nn::Linearf</a></div><div class="ttdeci">Linear&lt; float &gt; Linearf</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00494">nn_layers.h:494</a></div></div>
+<div class="ttc" id="anamespacetensor4d_1_1nn_html_ac63545216aad7e4be2c45c0b70509653"><div class="ttname"><a href="namespacetensor4d_1_1nn.html#ac63545216aad7e4be2c45c0b70509653">tensor4d::nn::ReLUf</a></div><div class="ttdeci">ReLU&lt; float &gt; ReLUf</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00496">nn_layers.h:496</a></div></div>
+<div class="ttc" id="ann__layers_8h_html"><div class="ttname"><a href="nn__layers_8h.html">nn_layers.h</a></div><div class="ttdoc">Common neural network layer implementations.</div></div>
+<div class="ttc" id="aoptimizers_8h_html"><div class="ttname"><a href="optimizers_8h.html">optimizers.h</a></div><div class="ttdoc">Optimization algorithms for training neural networks.</div></div>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md20"></a>
+C API</h2>
+<p>The library provides a in-progress C API for use with other languages:</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;<a class="code" href="tensor__c_8h.html">tensor_c.h</a>&quot;</span></div>
+<div class="line"> </div>
+<div class="line"><span class="keywordtype">int</span> main() {</div>
+<div class="line">    <span class="comment">// Check GPU availability</span></div>
+<div class="line">    <span class="keywordflow">if</span> (<a class="code hl_function" href="tensor__c_8h.html#a8414e0babe726176075827a99efef8c4">tensor_c_is_gpu_available</a>()) {</div>
+<div class="line">        printf(<span class="stringliteral">&quot;GPU acceleration enabled!\n&quot;</span>);</div>
+<div class="line">    }</div>
+<div class="line">    </div>
+<div class="line">    <span class="comment">// Create matrices (automatically uses GPU if available)</span></div>
+<div class="line">    <a class="code hl_typedef" href="tensor__c_8h.html#a928b87f949518111b3b17f18ac0648dc">MatrixFloatHandle</a> A, B, C;</div>
+<div class="line">    <a class="code hl_function" href="tensor__c_8h.html#a1a72f081df9afd553ef6af18324322b6">matrix_float_ones</a>(3, 3, &amp;A);</div>
+<div class="line">    <a class="code hl_function" href="tensor__c_8h.html#a14b3185d66dfec988feac1c4f9dacc68">matrix_float_eye</a>(3, &amp;B);</div>
+<div class="line">    </div>
+<div class="line">    <span class="comment">// Matrix multiplication (GPU-accelerated)</span></div>
+<div class="line">    <a class="code hl_function" href="tensor__c_8h.html#a66e419b46cbbdbd33a1c126b128dcaca">matrix_float_matmul</a>(A, B, &amp;C);</div>
+<div class="line">    </div>
+<div class="line">    <span class="comment">// Print result</span></div>
+<div class="line">    <a class="code hl_function" href="tensor__c_8h.html#ab6de4e7aafa98deef3911f95e11bbaff">matrix_float_print</a>(C);</div>
+<div class="line">    </div>
+<div class="line">    <span class="comment">// Clean up</span></div>
+<div class="line">    <a class="code hl_function" href="tensor__c_8h.html#a18f4780161ed2a94bef6c83b932a1fb4">matrix_float_destroy</a>(A);</div>
+<div class="line">    <a class="code hl_function" href="tensor__c_8h.html#a18f4780161ed2a94bef6c83b932a1fb4">matrix_float_destroy</a>(B);</div>
+<div class="line">    <a class="code hl_function" href="tensor__c_8h.html#a18f4780161ed2a94bef6c83b932a1fb4">matrix_float_destroy</a>(C);</div>
+<div class="line">    </div>
+<div class="line">    <span class="keywordflow">return</span> 0;</div>
+<div class="line">}</div>
+<div class="ttc" id="atensor__c_8h_html"><div class="ttname"><a href="tensor__c_8h.html">tensor_c.h</a></div><div class="ttdoc">C API for the tensor4d library.</div></div>
+<div class="ttc" id="atensor__c_8h_html_a14b3185d66dfec988feac1c4f9dacc68"><div class="ttname"><a href="tensor__c_8h.html#a14b3185d66dfec988feac1c4f9dacc68">matrix_float_eye</a></div><div class="ttdeci">TensorErrorCode matrix_float_eye(size_t n, MatrixFloatHandle *out_handle)</div><div class="ttdef"><b>Definition</b> <a href="tensor__c_8cpp_source.html#l00385">tensor_c.cpp:385</a></div></div>
+<div class="ttc" id="atensor__c_8h_html_a18f4780161ed2a94bef6c83b932a1fb4"><div class="ttname"><a href="tensor__c_8h.html#a18f4780161ed2a94bef6c83b932a1fb4">matrix_float_destroy</a></div><div class="ttdeci">TensorErrorCode matrix_float_destroy(MatrixFloatHandle handle)</div><div class="ttdef"><b>Definition</b> <a href="tensor__c_8cpp_source.html#l00393">tensor_c.cpp:393</a></div></div>
+<div class="ttc" id="atensor__c_8h_html_a1a72f081df9afd553ef6af18324322b6"><div class="ttname"><a href="tensor__c_8h.html#a1a72f081df9afd553ef6af18324322b6">matrix_float_ones</a></div><div class="ttdeci">TensorErrorCode matrix_float_ones(size_t rows, size_t cols, MatrixFloatHandle *out_handle)</div><div class="ttdef"><b>Definition</b> <a href="tensor__c_8cpp_source.html#l00375">tensor_c.cpp:375</a></div></div>
+<div class="ttc" id="atensor__c_8h_html_a66e419b46cbbdbd33a1c126b128dcaca"><div class="ttname"><a href="tensor__c_8h.html#a66e419b46cbbdbd33a1c126b128dcaca">matrix_float_matmul</a></div><div class="ttdeci">TensorErrorCode matrix_float_matmul(MatrixFloatHandle lhs, MatrixFloatHandle rhs, MatrixFloatHandle *out_handle)</div><div class="ttdef"><b>Definition</b> <a href="tensor__c_8cpp_source.html#l00475">tensor_c.cpp:475</a></div></div>
+<div class="ttc" id="atensor__c_8h_html_a8414e0babe726176075827a99efef8c4"><div class="ttname"><a href="tensor__c_8h.html#a8414e0babe726176075827a99efef8c4">tensor_c_is_gpu_available</a></div><div class="ttdeci">bool tensor_c_is_gpu_available(void)</div><div class="ttdoc">Check if GPU is available.</div><div class="ttdef"><b>Definition</b> <a href="tensor__c_8cpp_source.html#l02488">tensor_c.cpp:2488</a></div></div>
+<div class="ttc" id="atensor__c_8h_html_a928b87f949518111b3b17f18ac0648dc"><div class="ttname"><a href="tensor__c_8h.html#a928b87f949518111b3b17f18ac0648dc">MatrixFloatHandle</a></div><div class="ttdeci">void * MatrixFloatHandle</div><div class="ttdef"><b>Definition</b> <a href="tensor__c_8h_source.html#l00045">tensor_c.h:45</a></div></div>
+<div class="ttc" id="atensor__c_8h_html_ab6de4e7aafa98deef3911f95e11bbaff"><div class="ttname"><a href="tensor__c_8h.html#ab6de4e7aafa98deef3911f95e11bbaff">matrix_float_print</a></div><div class="ttdeci">TensorErrorCode matrix_float_print(MatrixFloatHandle handle)</div><div class="ttdef"><b>Definition</b> <a href="tensor__c_8cpp_source.html#l02394">tensor_c.cpp:2394</a></div></div>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md21"></a>
+Python API</h2>
+<p>The library includes Python bindings with NumPy interoperability:</p>
+<div class="fragment"><div class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</div>
+<div class="line"><span class="keyword">import</span> tensor4d <span class="keyword">as</span> t4d</div>
+<div class="line"> </div>
+<div class="line"><span class="comment"># Create from Python lists or NumPy arrays</span></div>
+<div class="line">matrix = t4d.Matrixf([[1.0, 2.0], [3.0, 4.0]])</div>
+<div class="line">np_array = np.array([[5.0, 6.0], [7.0, 8.0]], dtype=np.float32)</div>
+<div class="line">tensor = t4d.Matrixf.from_numpy(np_array)</div>
+<div class="line"> </div>
+<div class="line"><span class="comment"># Perform operations (GPU-accelerated if available)</span></div>
+<div class="line">result = matrix.matmul(tensor)</div>
+<div class="line">activated = result.relu()</div>
+<div class="line"> </div>
+<div class="line"><span class="comment"># Convert back to NumPy for visualization/further processing</span></div>
+<div class="line">np_result = activated.numpy()</div>
+<div class="line"> </div>
+<div class="line"><span class="comment"># Automatic differentiation</span></div>
+<div class="line">x = t4d.Vectorf([2.0, 3.0, 4.0])</div>
+<div class="line">x.set_requires_grad(<span class="keyword">True</span>)</div>
+<div class="line">y = x  x</div>
+<div class="line">z = y.sum()</div>
+<div class="line">z.backward()</div>
+<div class="line">gradients = x.grad().numpy()</div>
+<div class="line"> </div>
+<div class="line"><span class="comment"># Neural network training</span></div>
+<div class="line">fc1 = t4d.nn.Linearf(784, 128, use_bias=<span class="keyword">True</span>)</div>
+<div class="line">optimizer = t4d.nn.SGD(0.01, 0.9)</div>
+<div class="line"><span class="comment"># ... training loop</span></div>
+</div><!-- fragment --><p>Installation &amp; Documentation:</p>
+<p>For detailed Python API documentation, installation instructions, and examples, see:</p><ul>
+<li>python/README.md - Comprehensive Python guide</li>
+<li><span class="tt">python/example_.py</span> - Working examples</li>
+<li><span class="tt">python/test_.py</span> - Test suite demonstrating features</li>
+</ul>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md22"></a>
+Library Architecture</h1>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md23"></a>
+Core Components</h2>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md24"></a>
+<span class="tt">include/tensor.h</span> - Main Template Header</h3>
+<p>The primary header file containing the full <span class="tt"><a class="el" href="classTensor.html" title="Forward declaration for autograd.">Tensor</a>&lt;T, N&gt;</span> template class implementation. This is a header-only template library that provides:</p>
 <ul>
-<li><a class="el" href="instantiations.html">Template Instantiations</a> - Information about pre-compiled tensor types</li>
-<li><a class="el" href="group__TypeAliases.html">Type Aliases</a> - Type aliases for common tensor types</li>
+<li>Complete template class definition with all member functions</li>
+<li>Compile-time dimension checking and type safety</li>
+<li>Inline implementations for optimal performance</li>
+<li>Automatic backend selection (GPU/BLAS/CPU)</li>
+<li>All mathematical, statistical, and linear algebra operations</li>
+<li>Autograd functionality for automatic differentiation</li>
 </ul>
-<h1 class="doxsection"><a class="anchor" id="main_classes"></a>
-Main Classes</h1>
+<p>Usage: Include this header directly in your C++ code. All functionality is available at compile time through templates.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;<a class="code" href="tensor_8h.html">tensor.h</a>&quot;</span></div>
+<div class="line"><span class="keyword">using namespace </span><a class="code hl_namespace" href="namespacetensor4d.html">tensor4d</a>;</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Template instantiation happens at compile time</span></div>
+<div class="line"><a class="code hl_class" href="classTensor.html">Tensor&lt;float, 2&gt;</a> matrix({3, 4});  <span class="comment">// Creates a float matrix</span></div>
+<div class="line"><a class="code hl_class" href="classTensor.html">Tensor&lt;double, 3&gt;</a> tensor3d({2, 3, 4});  <span class="comment">// Creates a double 3D tensor</span></div>
+<div class="ttc" id="aclassTensor_html"><div class="ttname"><a href="classTensor.html">Tensor</a></div><div class="ttdoc">Forward declaration for autograd.</div><div class="ttdef"><b>Definition</b> <a href="tensor_8h_source.html#l00469">tensor.h:469</a></div></div>
+</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md25"></a>
+<span class="tt">src/tensor_instantiations.cc</span> - Explicit Template Instantiations</h3>
+<p>Provides explicit template instantiations for common tensor types, enabling the library to be compiled into static/shared libraries. This file:</p>
 <ul>
-<li>tensor4d::Tensor - Main tensor class template</li>
-<li>tensor4d::TensorView - View into tensor data</li>
-<li>tensor4d::Optimizer - Base class for optimization algorithms</li>
-<li>tensor4d::MSELoss, tensor4d::CrossEntropyLoss - Loss functions</li>
+<li>Pre-compiles template code for common types (float/double, rank 2-4)</li>
+<li>Reduces compilation time for client code using these common types</li>
+<li>Enables binary distribution without exposing full implementation</li>
+<li>Supports the following instantiated types:<ul>
+<li><span class="tt"><a class="el" href="classTensor.html" title="Forward declaration for autograd.">Tensor</a>&lt;float, 2&gt;</span>, <span class="tt"><a class="el" href="classTensor.html" title="Forward declaration for autograd.">Tensor</a>&lt;double, 2&gt;</span> (Matrixf, Matrixd)</li>
+<li><span class="tt"><a class="el" href="classTensor.html" title="Forward declaration for autograd.">Tensor</a>&lt;float, 3&gt;</span>, <span class="tt"><a class="el" href="classTensor.html" title="Forward declaration for autograd.">Tensor</a>&lt;double, 3&gt;</span> (Tensor3f, Tensor3d)</li>
+<li><span class="tt"><a class="el" href="classTensor.html" title="Forward declaration for autograd.">Tensor</a>&lt;float, 4&gt;</span>, <span class="tt"><a class="el" href="classTensor.html" title="Forward declaration for autograd.">Tensor</a>&lt;double, 4&gt;</span> (Tensor4f, Tensor4d)</li>
 </ul>
-<h1 class="doxsection"><a class="anchor" id="main_namespaces"></a>
-Namespaces</h1>
+</li>
+</ul>
+<p>Key Difference: While <span class="tt"><a class="el" href="tensor_8h.html" title="High-performance multi-dimensional tensor library with GPU, BLAS, and autograd support.">tensor.h</a></span> contains all template code for any type and dimension, <span class="tt"><a class="el" href="tensor__instantiations_8cc.html" title="Explicit template instantiations for Matrix and Tensor types.">tensor_instantiations.cc</a></span> pre-compiles specific commonly-used instantiations. Users can still instantiate other types (e.g., <span class="tt"><a class="el" href="classTensor.html" title="Forward declaration for autograd.">Tensor</a>&lt;int, 5&gt;</span>) by including the header, but pre-instantiated types link against the compiled library.</p>
+<p>Note: 1D tensors (Vectors) are not explicitly instantiated because some operations (transpose, vstack, hstack) require N ≥ 2. Vectors remain header-only.</p>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md26"></a>
+Additional Headers</h2>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md27"></a>
+Type Aliases and Utilities</h3>
 <ul>
-<li><a class="el" href="namespacetensor4d.html">tensor4d</a> - Main library namespace</li>
-<li>tensor4d::linalg - Linear algebra operations</li>
-<li>tensor4d::stats - Statistical functions</li>
+<li><span class="tt"><a class="el" href="tensor__types_8h.html" title="Type aliases for common Tensor specializations.">tensor_types.h</a></span> - Convenient type aliases (Vectorf, Matrixf, Tensor3f, Tensor4f, etc.)</li>
+<li><span class="tt"><a class="el" href="tensor__ops_8h.html" title="Core neural network operations with broadcasting and autograd.">tensor_ops.h</a></span> - Advanced tensor operations and broadcasting utilities</li>
+<li><span class="tt"><a class="el" href="tensor__io_8h.html" title="I/O operations for tensors (save/load/print).">tensor_io.h</a></span> - <a class="el" href="classTensor.html" title="Forward declaration for autograd.">Tensor</a> serialization (save/load binary format)</li>
+<li><span class="tt"><a class="el" href="tensor__perf_8h.html" title="Performance optimization features for tensor operations.">tensor_perf.h</a></span> - Performance profiling and benchmarking utilities</li>
 </ul>
-<h1 class="doxsection"><a class="anchor" id="main_backends"></a>
-Backends</h1>
-<p>The library automatically selects the best available backend:</p><ol type="1">
-<li><b>GPU (CUDA)</b> - If CUDA is available</li>
-<li><b>BLAS</b> - If BLAS/OpenBLAS is available</li>
-<li><b>CPU</b> - Fallback implementation</li>
-</ol>
-<h1 class="doxsection"><a class="anchor" id="main_libraries"></a>
-Library Files</h1>
-<p>Two library files are built:</p><ul>
-<li><b>libtensor4d_static.a</b> - Static library</li>
-<li><b>libtensor4d.so</b> - Shared library</li>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md28"></a>
+Linear Algebra</h3>
+<ul>
+<li><span class="tt"><a class="el" href="linalg_8h.html" title="Linear algebra operations for vectors and matrices.">linalg.h</a></span> - Basic linear algebra (matrix multiplication, inverse, determinant, transpose)</li>
+<li><span class="tt"><a class="el" href="linalg__advanced_8h.html" title="Advanced linear algebra operations with LAPACK/cuSOLVER support.">linalg_advanced.h</a></span> - <a class="el" href="linalg_8h.html#aab91b0e1295509532b53ec846e227dcc" title="Type alias for 2D matrices.">Matrix</a> decompositions (LU, QR, Cholesky, SVD, Eigenvalue)</li>
 </ul>
-<p>Both contain pre-compiled instantiations of common tensor types. See <a class="el" href="instantiations.html">Template Instantiations</a> for details.</p>
-<h1 class="doxsection"><a class="anchor" id="main_examples"></a>
-Examples</h1>
-<p>Example programs are included:</p><ul>
-<li><span class="tt">library_usage_demo.cc</span> - Basic library usage</li>
-<li><span class="tt">backend_demo.cc</span> - <a class="el" href="tensor_8h.html#ae4db5848267c1a5a1413b7f87cf6889d" title="Available computational backends.">Backend</a> selection examples</li>
-<li><span class="tt">tensor_io_demo.cc</span> - I/O operations</li>
-<li><span class="tt">numpy_interop_demo.py</span> - NumPy interoperability</li>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md29"></a>
+Neural Networks</h3>
+<ul>
+<li><span class="tt"><a class="el" href="nn__layers_8h.html" title="Common neural network layer implementations.">nn_layers.h</a></span> - Layer implementations (Linear, ReLU, Sigmoid, Softmax, Dropout, BatchNorm)</li>
+<li><span class="tt"><a class="el" href="loss__functions_8h.html" title="Loss functions for training neural networks.">loss_functions.h</a></span> - Loss functions (MSE, CrossEntropy)</li>
+<li><span class="tt"><a class="el" href="optimizers_8h.html" title="Optimization algorithms for training neural networks.">optimizers.h</a></span> - Optimization algorithms (<a class="el" href="classSGD.html" title="SGD (Stochastic Gradient Descent) optimizer with optional momentum.">SGD</a>, <a class="el" href="classAdam.html">Adam</a>)</li>
 </ul>
-<h1 class="doxsection"><a class="anchor" id="main_testing"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md30"></a>
+Multi-Language Interfaces</h3>
+<h4 class="doxsection"><a class="anchor" id="autotoc_md31"></a>
+C API (<span class="tt">include/tensor_c.h</span>)</h4>
+<p>C bindings for all tensor operations, enabling use from:</p>
+<ul>
+<li>C programs</li>
+<li>Languages with C FFI (Python ctypes, Rust, Go, etc.)</li>
+<li>Systems without C++ support</li>
+</ul>
+<p>Features:</p>
+<ul>
+<li>Opaque handle-based API (<a class="el" href="tensor__c_8h.html#a928b87f949518111b3b17f18ac0648dc">MatrixFloatHandle</a>, etc.)</li>
+<li>GPU availability checking</li>
+<li>Memory management functions</li>
+</ul>
+<p>Build: Produces <span class="tt">libtensor_c.so</span> shared library</p>
+<h4 class="doxsection"><a class="anchor" id="autotoc_md32"></a>
+Python Bindings (<span class="tt">python/</span> directory)</h4>
+<p>Python interface using pybind11 with:</p>
+<ul>
+<li>NumPy interoperability (seamless conversion to/from NumPy arrays)</li>
+<li>Pythonic API with operator overloading</li>
+<li>All tensor types: Vectorf/d, Matrixf/d, Tensor3f/d, Tensor4f/d</li>
+<li>Neural network layers and optimizers</li>
+<li>Automatic differentiation support</li>
+</ul>
+<p>Key Files:</p>
+<ul>
+<li><span class="tt">tensor_wrapper.cc</span> - pybind11 binding implementation</li>
+<li><span class="tt">python/README.md</span> - Python-specific documentation and examples</li>
+<li><span class="tt">setup.py</span> - Python package build configuration</li>
+<li><span class="tt">build.sh</span> - Build script for Python module</li>
+</ul>
+<p>Build: Produces <span class="tt">tensor4d.so</span> Python extension module</p>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md33"></a>
+GPU Support</h3>
+<ul>
+<li><span class="tt">tensor_gpu.cuh</span> - CUDA kernel implementations for GPU acceleration</li>
+<li><span class="tt">tensor_gpu.cu</span> - CUDA kernel definitions</li>
+</ul>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md34"></a>
+Documentation</h1>
+<p>Generate API documentation with Doxygen (if installed):</p>
+<div class="fragment"><div class="line">cd build</div>
+<div class="line">make doc        # Generate documentation</div>
+<div class="line">make doc_open   # Generate and open in browser</div>
+</div><!-- fragment --><p>Documentation will be generated in the <span class="tt">docs/html/</span> directory.</p>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md35"></a>
 Testing</h1>
-<p>Run tests with: </p><div class="fragment"><div class="line">cd build</div>
+<p>Run the test suite:</p>
+<div class="fragment"><div class="line">cd build</div>
 <div class="line">ctest --output-on-failure</div>
-</div><!-- fragment --><h1 class="doxsection"><a class="anchor" id="main_performance"></a>
-Performance</h1>
-<p>Benchmark the library with: </p><div class="fragment"><div class="line">./build/tensor_perf</div>
-</div><!-- fragment --><h1 class="doxsection"><a class="anchor" id="main_license"></a>
-License</h1>
-<p>See LICENSE file in the repository. </p>
+</div><!-- fragment --><p>Or run tests directly:</p>
+<div class="fragment"><div class="line">./tensor_test              # Main test suite</div>
+<div class="line">./tensor_nn_enhancements_test  # Neural network tests</div>
+<div class="line">./tensor_c_test            # C API tests</div>
+</div><!-- fragment --><h1 class="doxsection"><a class="anchor" id="autotoc_md36"></a>
+Performance Benchmarks</h1>
+<p>Run performance benchmarks:</p>
+<div class="fragment"><div class="line">cd build</div>
+<div class="line">./tensor_perf</div>
+<div class="line"># or</div>
+<div class="line">make run_perf</div>
+</div><!-- fragment --><p>This will benchmark various operations across CPU, BLAS, and GPU (if available).</p>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md37"></a>
+Python Bindginds: compared to Pytorch</h2>
+<div class="fragment"><div class="line">Total benchmarks: 24</div>
+<div class="line">tensor4d.nn faster: 5 (20.8%)</div>
+<div class="line">PyTorch faster: 19 (79.2%)</div>
+<div class="line">Average speedup: 2.69x</div>
+<div class="line">Min speedup: 0.01x</div>
+<div class="line">Max speedup: 44.06x</div>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md38"></a>
+Python Bindginds: compared to NumPy</h2>
+<div class="fragment"><div class="line">Total benchmarks: 43</div>
+<div class="line">tensor4d faster: 8 (18.6%)</div>
+<div class="line">NumPy faster: 35 (81.4%)</div>
+<div class="line">Average speedup: 2.70x</div>
+<div class="line">Min speedup: 0.00x</div>
+<div class="line">Max speedup: 47.44x</div>
+</div><!-- fragment --><h1 class="doxsection"><a class="anchor" id="autotoc_md39"></a>
+References</h1>
+<ul>
+<li>CUDA Programming Guide: <a href="https://docs.nvidia.com/cuda/">https://docs.nvidia.com/cuda/</a></li>
+<li>BLAS Reference: <a href="http://www.netlib.org/blas/">http://www.netlib.org/blas/</a></li>
+<li>LAPACK Reference: <a href="http://www.netlib.org/lapack/">http://www.netlib.org/lapack/</a> </li>
+</ul>
 </div></div><!-- PageDoc -->
 <a href="doxygen_crawl.html"></a>
 </div><!-- contents -->

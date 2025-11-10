@@ -1,19 +1,21 @@
 <map id="Tensor::shape" name="Tensor::shape">
-<area shape="rect" id="Node000001" title=" " alt="" coords="235,227,338,253"/>
-<area shape="rect" id="Node000002" href="$tensor_8h.html#a912e291f7a42f325c111def58ac98acf" title="Cast tensor to a different data type (NumPy&#45;compatible astype)." alt="" coords="66,5,126,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="276,212,264,174,246,129,220,84,185,46,156,31,126,24,127,18,158,26,188,42,224,81,251,127,269,172,281,211"/>
-<area shape="rect" id="Node000003" href="$classtensor4d_1_1nn_1_1BatchNorm1d.html#a48ea5fa069810067b9756e3d24b48b73" title=" " alt="" coords="5,56,187,99"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="269,215,234,163,211,136,185,113,166,101,169,97,188,109,215,132,239,160,273,212"/>
-<area shape="rect" id="Node000004" href="$classtensor4d_1_1nn_1_1Dropout.html#ad7713d85865e3238e14e920b47f44237" title=" " alt="" coords="22,123,170,165"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="252,220,185,180,160,168,162,163,188,175,255,215"/>
-<area shape="rect" id="Node000005" href="$classtensor4d_1_1nn_1_1Linear.html#a5364162aed6bb8c7758d88142ac74c1b" title=" " alt="" coords="28,189,164,232"/>
-<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="219,232,164,224,165,219,220,227"/>
-<area shape="rect" id="Node000006" href="$tensor_8h.html#a3331b6cf4ac182d022336e4d068a0e58" title="Create a copy of a tensor (NumPy&#45;compatible)." alt="" coords="71,256,121,283"/>
-<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="219,253,122,268,121,263,219,248"/>
-<area shape="rect" id="Node000007" href="$classtensor4d_1_1nn_1_1BatchNorm1d.html#a8e589b2051e3a2c38b1a0feccc33bdb2" title=" " alt="" coords="5,307,187,349"/>
-<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="251,264,188,297,161,309,159,304,186,292,248,259"/>
-<area shape="rect" id="Node000008" href="$classtensor4d_1_1nn_1_1Dropout.html#aff0f87aa27d1aceca0bbcc6b0655ce24" title=" " alt="" coords="22,373,170,416"/>
-<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="272,268,237,316,214,341,188,364,169,375,166,370,185,359,210,338,233,313,267,265"/>
-<area shape="rect" id="Node000009" href="$classtensor4d_1_1nn_1_1Softmax.html#a62cc4acc056fbd4f8a365637e1159a9e" title=" " alt="" coords="21,440,171,483"/>
-<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="280,269,267,305,248,348,222,392,188,430,172,442,169,437,185,426,218,389,244,346,262,303,275,267"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="433,215,536,241"/>
+<area shape="rect" id="Node000002" href="$tensor_8h.html#a912e291f7a42f325c111def58ac98acf" title="Cast tensor to a different data type (NumPy&#45;compatible astype)." alt="" coords="264,5,324,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="473,200,461,165,442,123,417,81,383,46,355,31,324,24,326,18,357,26,387,42,421,78,447,120,466,163,478,198"/>
+<area shape="rect" id="Node000003" href="$namespacetensor4d_1_1nn.html#aabc59d678ea2b307e86f063f32102470" title="Compute classification accuracy." alt="" coords="219,56,370,99"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="465,203,430,157,408,133,383,113,364,101,367,97,387,108,412,130,435,154,469,200"/>
+<area shape="rect" id="Node000004" href="$tensor_8h.html#a3331b6cf4ac182d022336e4d068a0e58" title="Create a copy of a tensor (NumPy&#45;compatible)." alt="" coords="270,123,319,149"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="453,207,421,184,384,164,350,151,319,143,320,138,352,146,386,159,424,180,456,203"/>
+<area shape="rect" id="Node000005" href="$namespacetensor4d_1_1nn.html#a7682f7b06565fe530c833139aa5c52cd" title="Compute cross&#45;entropy loss between predictions and targets." alt="" coords="228,173,361,216"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="417,219,361,209,362,204,418,214"/>
+<area shape="rect" id="Node000006" href="$classtensor4d_1_1nn_1_1BatchNorm1d.html#a8e589b2051e3a2c38b1a0feccc33bdb2" title=" " alt="" coords="204,240,385,283"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="418,242,386,248,385,243,417,237"/>
+<area shape="rect" id="Node000007" href="$classtensor4d_1_1nn_1_1Dropout.html#aff0f87aa27d1aceca0bbcc6b0655ce24" title=" " alt="" coords="221,307,368,349"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="455,253,386,297,361,309,359,304,384,292,452,249"/>
+<area shape="rect" id="Node000008" href="$tensor__c_8cpp.html#a81380d5f848afe3d498bedfc93332493" title=" " alt="" coords="228,373,361,416"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="472,257,438,310,414,339,387,363,363,378,360,373,383,359,410,335,433,307,467,254"/>
+<area shape="rect" id="Node000009" href="$namespacetensor4d_1_1nn.html#ab2f304e755860ad8c80d7c67cfe953b2" title="Compute softmax Jacobian for batched input (batch_size x num_classes)." alt="" coords="220,440,368,483"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="479,257,467,295,449,342,422,389,387,430,371,442,368,437,383,426,418,386,444,339,462,294,474,255"/>
+<area shape="rect" id="Node000010" href="$classtensor4d_1_1nn_1_1Softmax.html#abda8fce936f0e7f02d1779a120db27de" title=" " alt="" coords="5,440,156,483"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="204,464,156,464,156,459,204,459"/>
 </map>

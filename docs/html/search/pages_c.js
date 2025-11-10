@@ -1,7 +1,4 @@
 var searchData=
 [
-  ['layout_0',['Memory Layout',['../classTensor.html#memory',1,'']]],
-  ['library_20documentation_1',['Tensor4D Library Documentation',['../index.html',1,'']]],
-  ['library_20files_2',['Library Files',['../index.html#main_libraries',1,'']]],
-  ['license_3',['License',['../index.html#main_license',1,'']]]
+  ['key_20features_0',['Key Features',['../tensor_8h.html#features',1,'Key Features'],['../index.html#autotoc_md3',1,'Key Features'],['..//home/jailop/devel/datainquiry/tensor/docs/mainpage.dox#main_features',1,'Key Features']]]
 ];

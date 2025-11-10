@@ -27,9 +27,9 @@
  * }
  * @endcode
  * 
- * @author Tensor Library Team
+ * @author Jaime Lopez
  * @version 1.0
- * @date 2024
+ * @date 2025
  * 
  * @section usage_tensor Usage Example
  * @code
@@ -123,6 +123,24 @@ inline float blas_dot<float>(const int N, const float *X, const int incX, const 
 template<>
 inline double blas_dot<double>(const int N, const double *X, const int incX, const double *Y, const int incY) {
     return cblas_ddot(N, X, incX, Y, incY);
+}
+
+template<typename T>
+inline void blas_scal(const int N, const T alpha, T *X, const int incX) {
+    // Fallback for unsupported types
+    for (int i = 0; i < N; ++i) {
+        X[i * incX] *= alpha;
+    }
+}
+
+template<>
+inline void blas_scal<float>(const int N, const float alpha, float *X, const int incX) {
+    cblas_sscal(N, alpha, X, incX);
+}
+
+template<>
+inline void blas_scal<double>(const int N, const double alpha, double *X, const int incX) {
+    cblas_dscal(N, alpha, X, incX);
 }
 
 template<typename T>
@@ -1309,10 +1327,14 @@ public:
                             self_ptr->grad_ = std::make_unique<Tensor<T, N>>(self_ptr->dims_, self_ptr->use_gpu_, false);
                             self_ptr->grad_->fill(T(0));
                         }
-                        size_t total = self_ptr->total_size();
-                        for (size_t i = 0; i < total; ++i) {
-                            self_ptr->grad_->data_[i] += grad.data_[i] * other_copy.data_[i];
-                        }
+                        
+                        // Optimized using tensor operations
+                        auto grad_result = grad * other_copy;
+                        auto& grad_contrib = std::get<Tensor<T, N>>(grad_result);
+                        
+                        // Accumulate gradients using tensor addition
+                        auto grad_sum_result = *self_ptr->grad_ + grad_contrib;
+                        *self_ptr->grad_ = std::get<Tensor<T, N>>(grad_sum_result);
                         
                         if (!self_ptr->is_leaf_ && !self_ptr->backward_funcs_.empty()) {
                             for (auto& func : self_ptr->backward_funcs_) {
@@ -1326,10 +1348,14 @@ public:
                             other_ptr->grad_ = std::make_unique<Tensor<T, N>>(other_ptr->dims_, other_ptr->use_gpu_, false);
                             other_ptr->grad_->fill(T(0));
                         }
-                        size_t total = other_ptr->total_size();
-                        for (size_t i = 0; i < total; ++i) {
-                            other_ptr->grad_->data_[i] += grad.data_[i] * self_copy.data_[i];
-                        }
+                        
+                        // Optimized using tensor operations
+                        auto grad_result = grad * self_copy;
+                        auto& grad_contrib = std::get<Tensor<T, N>>(grad_result);
+                        
+                        // Accumulate gradients using tensor addition
+                        auto grad_sum_result = *other_ptr->grad_ + grad_contrib;
+                        *other_ptr->grad_ = std::get<Tensor<T, N>>(grad_sum_result);
                         
                         if (!other_ptr->is_leaf_ && !other_ptr->backward_funcs_.empty()) {
                             for (auto& func : other_ptr->backward_funcs_) {
@@ -1637,8 +1663,19 @@ public:
         Tensor<T, N> result(dims_, use_gpu_);
         size_t total = total_size();
         
-        for (size_t i = 0; i < total; ++i) {
-            result.data_[i] = -data_[i];
+        // Copy data first
+        std::copy(data_.get(), data_.get() + total, result.data_.get());
+        
+        // Negate in place using optimized operations
+#ifdef USE_BLAS
+        if (!use_gpu_) {
+            blas_scal(static_cast<int>(total), T(-1), result.data_.get(), 1);
+        } else
+#endif
+        {
+            for (size_t i = 0; i < total; ++i) {
+                result.data_[i] = -result.data_[i];
+            }
         }
         
         return result;
@@ -2034,11 +2071,20 @@ public:
                         self_ptr->grad_ = std::make_unique<Tensor<T, N>>(self_ptr->dims_, self_ptr->use_gpu_, false);
                         self_ptr->grad_->fill(T(0));
                     }
-                    size_t total = self_ptr->total_size();
-                    for (size_t i = 0; i < total; ++i) {
-                        T sig = output_copy.data_[i];
-                        self_ptr->grad_->data_[i] += grad.data_[i] * sig * (T(1) - sig);
-                    }
+                    
+                    // Optimized using tensor operations
+                    Tensor<T, N> ones(self_ptr->dims_, self_ptr->use_gpu_);
+                    ones.fill(T(1));
+                    auto one_minus_sig_result = ones - output_copy;
+                    auto& one_minus_sig = std::get<Tensor<T, N>>(one_minus_sig_result);
+                    auto sig_prod_result = output_copy * one_minus_sig;
+                    auto& sig_prod = std::get<Tensor<T, N>>(sig_prod_result);
+                    auto grad_result = grad * sig_prod;
+                    auto& grad_contrib = std::get<Tensor<T, N>>(grad_result);
+                    
+                    // Accumulate gradients using tensor addition
+                    auto grad_sum_result = *self_ptr->grad_ + grad_contrib;
+                    *self_ptr->grad_ = std::get<Tensor<T, N>>(grad_sum_result);
                     
                     // If self is not a leaf, propagate gradients further
                     if (!self_ptr->is_leaf_ && !self_ptr->backward_funcs_.empty()) {
@@ -2113,12 +2159,17 @@ public:
                         self_ptr->grad_ = std::make_unique<Tensor<T, N>>(self_ptr->dims_, self_ptr->use_gpu_, false);
                         self_ptr->grad_->fill(T(0));
                     }
-                    size_t total = self_ptr->total_size();
-                    for (size_t i = 0; i < total; ++i) {
-                        if (input_copy.data_[i] > T(0)) {
-                            self_ptr->grad_->data_[i] += grad.data_[i];
-                        }
-                    }
+                    
+                    // Optimized using tensor operations - create mask
+                    Tensor<T, N> zeros(self_ptr->dims_, self_ptr->use_gpu_);
+                    zeros.fill(T(0));
+                    Tensor<T, N> mask = input_copy > zeros;
+                    auto grad_result = grad * mask;
+                    auto& grad_contrib = std::get<Tensor<T, N>>(grad_result);
+                    
+                    // Accumulate gradients using tensor addition
+                    auto grad_sum_result = *self_ptr->grad_ + grad_contrib;
+                    *self_ptr->grad_ = std::get<Tensor<T, N>>(grad_sum_result);
                 }
             });
         }
@@ -2530,15 +2581,11 @@ public:
      */
     T variance(size_t ddof = 0) const {
         T m = mean();
-        T var = T(0);
-        size_t total = total_size();
-        
-        for (size_t i = 0; i < total; ++i) {
-            T diff = data_[i] - m;
-            var += diff * diff;
-        }
-        
-        return var / static_cast<T>(total - ddof);
+        Tensor<T, N> diff = *this - m;
+        auto squared_result = diff * diff;
+        auto& squared = std::get<Tensor<T, N>>(squared_result);
+        T var = squared.sum();
+        return var / static_cast<T>(total_size() - ddof);
     }
     
     /**
@@ -2569,11 +2616,12 @@ public:
         
         T mean1 = mean();
         T mean2 = other.mean();
-        T cov = T(0);
         
-        for (size_t i = 0; i < total; ++i) {
-            cov += (data_[i] - mean1) * (other.data_[i] - mean2);
-        }
+        Tensor<T, N> diff1 = *this - mean1;
+        Tensor<T, N> diff2 = other - mean2;
+        auto product_result = diff1 * diff2;
+        auto& product = std::get<Tensor<T, N>>(product_result);
+        T cov = product.sum();
         
         return cov / static_cast<T>(total - ddof);
     }
@@ -2589,21 +2637,23 @@ public:
             return TensorError::DimensionMismatch;
         }
         
-        size_t total = total_size();
         T mean1 = mean();
         T mean2 = other.mean();
         
-        T cov = T(0);
-        T var1 = T(0);
-        T var2 = T(0);
+        Tensor<T, N> diff1 = *this - mean1;
+        Tensor<T, N> diff2 = other - mean2;
         
-        for (size_t i = 0; i < total; ++i) {
-            T diff1 = data_[i] - mean1;
-            T diff2 = other.data_[i] - mean2;
-            cov += diff1 * diff2;
-            var1 += diff1 * diff1;
-            var2 += diff2 * diff2;
-        }
+        auto cov_result = diff1 * diff2;
+        auto& cov_tensor = std::get<Tensor<T, N>>(cov_result);
+        T cov = cov_tensor.sum();
+        
+        auto var1_result = diff1 * diff1;
+        auto& var1_tensor = std::get<Tensor<T, N>>(var1_result);
+        T var1 = var1_tensor.sum();
+        
+        auto var2_result = diff2 * diff2;
+        auto& var2_tensor = std::get<Tensor<T, N>>(var2_result);
+        T var2 = var2_tensor.sum();
         
         T denom = std::sqrt(var1 * var2);
         if (denom < std::numeric_limits<T>::epsilon()) {
@@ -2720,12 +2770,18 @@ public:
             rank2[data2[i].second] = static_cast<T>(i + 1);
         }
         
-        // Compute Pearson correlation on ranks
-        T sum_d_squared = T(0);
-        for (size_t i = 0; i < total; ++i) {
-            T diff = rank1[i] - rank2[i];
-            sum_d_squared += diff * diff;
-        }
+        // Compute Pearson correlation on ranks using tensor operations
+        Tensor<T, 1> rank1_tensor({total}, use_gpu_);
+        Tensor<T, 1> rank2_tensor({total}, use_gpu_);
+        
+        std::copy(rank1.begin(), rank1.end(), rank1_tensor.data_ptr());
+        std::copy(rank2.begin(), rank2.end(), rank2_tensor.data_ptr());
+        
+        auto diff_result = rank1_tensor - rank2_tensor;
+        auto& diff_tensor = std::get<Tensor<T, 1>>(diff_result);
+        auto squared_result = diff_tensor * diff_tensor;
+        auto& squared_tensor = std::get<Tensor<T, 1>>(squared_result);
+        T sum_d_squared = squared_tensor.sum();
         
         T n = static_cast<T>(total);
         return T(1) - (T(6) * sum_d_squared) / (n * (n * n - T(1)));
@@ -3276,15 +3332,13 @@ public:
             return TensorError::DimensionMismatch;
         }
         
-        T loss = T(0);
-        size_t total = total_size();
+        auto diff_result = *this - target;
+        auto& diff = std::get<Tensor<T, N>>(diff_result);
+        auto squared_result = diff * diff;
+        auto& squared = std::get<Tensor<T, N>>(squared_result);
+        T loss = squared.sum();
         
-        for (size_t i = 0; i < total; ++i) {
-            T diff = data_[i] - target.data_[i];
-            loss += diff * diff;
-        }
-        
-        return loss / static_cast<T>(total);
+        return loss / static_cast<T>(total_size());
     }
     
     /**
@@ -3298,13 +3352,10 @@ public:
             return TensorError::DimensionMismatch;
         }
         
-        Tensor<T, N> result(dims_, use_gpu_);
-        size_t total = total_size();
-        T scale = T(2) / static_cast<T>(total);
-        
-        for (size_t i = 0; i < total; ++i) {
-            result.data_[i] = scale * (data_[i] - target.data_[i]);
-        }
+        T scale = T(2) / static_cast<T>(total_size());
+        auto diff_result = *this - target;
+        auto& diff = std::get<Tensor<T, N>>(diff_result);
+        Tensor<T, N> result = diff * scale;
         
         return result;
     }

@@ -128,6 +128,27 @@ Typedefs</h2></td></tr>
 <tr class="memitem:a676f9d19eb47312f01a5c2ef0262e300" id="r_a676f9d19eb47312f01a5c2ef0262e300"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a676f9d19eb47312f01a5c2ef0262e300">BatchNorm1dd</a> = <a class="el" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">BatchNorm1d</a>&lt;double&gt;</td></tr>
 <tr class="memitem:a227492f3cd887244ddf283565d4f5327" id="r_a227492f3cd887244ddf283565d4f5327"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a227492f3cd887244ddf283565d4f5327">Softmaxf</a> = <a class="el" href="classtensor4d_1_1nn_1_1Softmax.html">Softmax</a>&lt;float&gt;</td></tr>
 <tr class="memitem:a35558d36da40b43a93f6743d3aaf91eb" id="r_a35558d36da40b43a93f6743d3aaf91eb"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a35558d36da40b43a93f6743d3aaf91eb">Softmaxd</a> = <a class="el" href="classtensor4d_1_1nn_1_1Softmax.html">Softmax</a>&lt;double&gt;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:af4ed0870610368776140c66a749f99ab" id="r_af4ed0870610368776140c66a749f99ab"><td class="memTemplParams" colspan="2">template&lt;typename T&gt; </td></tr>
+<tr class="memitem:af4ed0870610368776140c66a749f99ab template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classTensor.html">Tensor</a>&lt; T, 2 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af4ed0870610368776140c66a749f99ab">softmax_jacobian</a> (const <a class="el" href="classTensor.html">Tensor</a>&lt; T, 1 &gt; &amp;softmax_output)</td></tr>
+<tr class="memdesc:af4ed0870610368776140c66a749f99ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the Jacobian matrix of softmax for a single row.  <br /></td></tr>
+<tr class="memitem:ab2f304e755860ad8c80d7c67cfe953b2" id="r_ab2f304e755860ad8c80d7c67cfe953b2"><td class="memTemplParams" colspan="2">template&lt;typename T&gt; </td></tr>
+<tr class="memitem:ab2f304e755860ad8c80d7c67cfe953b2 template"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classTensor.html">Tensor</a>&lt; T, 2 &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab2f304e755860ad8c80d7c67cfe953b2">softmax_jacobian_batch</a> (const <a class="el" href="classTensor.html">Tensor</a>&lt; T, 2 &gt; &amp;softmax_output)</td></tr>
+<tr class="memdesc:ab2f304e755860ad8c80d7c67cfe953b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute softmax Jacobian for batched input (batch_size x num_classes).  <br /></td></tr>
+<tr class="memitem:ac2a195a98fc946944abd82c47d997189" id="r_ac2a195a98fc946944abd82c47d997189"><td class="memTemplParams" colspan="2">template&lt;typename T&gt; </td></tr>
+<tr class="memitem:ac2a195a98fc946944abd82c47d997189 template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac2a195a98fc946944abd82c47d997189">label_to_onehot</a> (uint8_t label, <a class="el" href="classTensor.html">Tensor</a>&lt; T, 2 &gt; &amp;onehot, size_t batch_idx, size_t num_classes)</td></tr>
+<tr class="memdesc:ac2a195a98fc946944abd82c47d997189"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert label to one-hot encoded vector.  <br /></td></tr>
+<tr class="memitem:a7682f7b06565fe530c833139aa5c52cd" id="r_a7682f7b06565fe530c833139aa5c52cd"><td class="memTemplParams" colspan="2">template&lt;typename T&gt; </td></tr>
+<tr class="memitem:a7682f7b06565fe530c833139aa5c52cd template"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7682f7b06565fe530c833139aa5c52cd">cross_entropy_loss</a> (const <a class="el" href="classTensor.html">Tensor</a>&lt; T, 2 &gt; &amp;predictions, const <a class="el" href="classTensor.html">Tensor</a>&lt; T, 2 &gt; &amp;targets, T epsilon=T(1e-7))</td></tr>
+<tr class="memdesc:a7682f7b06565fe530c833139aa5c52cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute cross-entropy loss between predictions and targets.  <br /></td></tr>
+<tr class="memitem:aabc59d678ea2b307e86f063f32102470" id="r_aabc59d678ea2b307e86f063f32102470"><td class="memTemplParams" colspan="2">template&lt;typename T&gt; </td></tr>
+<tr class="memitem:aabc59d678ea2b307e86f063f32102470 template"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aabc59d678ea2b307e86f063f32102470">compute_accuracy</a> (const <a class="el" href="classTensor.html">Tensor</a>&lt; T, 2 &gt; &amp;predictions, const std::vector&lt; uint8_t &gt; &amp;labels, size_t offset=0)</td></tr>
+<tr class="memdesc:aabc59d678ea2b307e86f063f32102470"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute classification accuracy.  <br /></td></tr>
+<tr class="memitem:a834567aedd488a7451d76fec1bbba55e" id="r_a834567aedd488a7451d76fec1bbba55e"><td class="memTemplParams" colspan="2">template&lt;typename T&gt; </td></tr>
+<tr class="memitem:a834567aedd488a7451d76fec1bbba55e template"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a834567aedd488a7451d76fec1bbba55e">update_linear_layer</a> (<a class="el" href="classtensor4d_1_1nn_1_1Linear.html">Linear</a>&lt; T &gt; &amp;layer, T lr)</td></tr>
+<tr class="memdesc:a834567aedd488a7451d76fec1bbba55e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update weights of a linear layer using <a class="el" href="classSGD.html" title="SGD (Stochastic Gradient Descent) optimizer with optional momentum.">SGD</a>.  <br /></td></tr>
 </table>
 <a name="doc-typedef-members" id="doc-typedef-members"></a><h2 id="header-doc-typedef-members" class="groupheader">Typedef Documentation</h2>
 <a id="a676f9d19eb47312f01a5c2ef0262e300" name="a676f9d19eb47312f01a5c2ef0262e300"></a>
@@ -142,7 +163,7 @@ Typedefs</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00553">553</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00505">505</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
 
 </div>
 </div>
@@ -158,7 +179,7 @@ Typedefs</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00552">552</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00504">504</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
 
 </div>
 </div>
@@ -174,7 +195,7 @@ Typedefs</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00551">551</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00503">503</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
 
 </div>
 </div>
@@ -190,7 +211,7 @@ Typedefs</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00550">550</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00502">502</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
 
 </div>
 </div>
@@ -206,7 +227,7 @@ Typedefs</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00543">543</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00495">495</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
 
 </div>
 </div>
@@ -222,7 +243,7 @@ Typedefs</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00542">542</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00494">494</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
 
 </div>
 </div>
@@ -238,7 +259,7 @@ Typedefs</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00545">545</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00497">497</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
 
 </div>
 </div>
@@ -254,7 +275,7 @@ Typedefs</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00544">544</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00496">496</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
 
 </div>
 </div>
@@ -270,7 +291,7 @@ Typedefs</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00547">547</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00499">499</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
 
 </div>
 </div>
@@ -286,7 +307,7 @@ Typedefs</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00546">546</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00498">498</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
 
 </div>
 </div>
@@ -302,7 +323,7 @@ Typedefs</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00555">555</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00507">507</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
 
 </div>
 </div>
@@ -318,7 +339,7 @@ Typedefs</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00554">554</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00506">506</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
 
 </div>
 </div>
@@ -334,7 +355,7 @@ Typedefs</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00549">549</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00501">501</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
 
 </div>
 </div>
@@ -350,7 +371,570 @@ Typedefs</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00548">548</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00500">500</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
+<a id="aabc59d678ea2b307e86f063f32102470" name="aabc59d678ea2b307e86f063f32102470"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aabc59d678ea2b307e86f063f32102470">&#9670;&#160;</a></span>compute_accuracy()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">T tensor4d::nn::compute_accuracy </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classTensor.html">Tensor</a>&lt; T, 2 &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>predictions</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; uint8_t &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>labels</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>offset</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0</span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Compute classification accuracy. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">predictions</td><td>Predicted probabilities (batch_size x num_classes) </td></tr>
+    <tr><td class="paramname">labels</td><td>True labels (vector of class indices) </td></tr>
+    <tr><td class="paramname">offset</td><td>Starting index in labels vector for this batch </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Accuracy as fraction of correct predictions (0.0 to 1.0)</dd></dl>
+<p>Optimized implementation using argmax_rows() tensor operation. </p>
+
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00585">585</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  585</span>                                                                                                                {</div>
+<div class="line"><span class="lineno">  586</span>    <span class="keyword">auto</span> shape = predictions.<a class="code hl_function" href="classTensor.html#a80b3ffaf92ed36f02d6f4d4230b5d2a0">shape</a>();</div>
+<div class="line"><span class="lineno">  587</span>    <span class="keywordtype">size_t</span> batch_size = shape[0];</div>
+<div class="line"><span class="lineno">  588</span>    </div>
+<div class="line"><span class="lineno">  589</span>    <span class="comment">// Use tensor operation to get predicted classes for all rows at once</span></div>
+<div class="line"><span class="lineno">  590</span>    <span class="keyword">auto</span> pred_classes = predictions.<a class="code hl_function" href="classTensor.html#a7e486401bc789c0d2344b2b271a3316b">argmax_rows</a>();</div>
+<div class="line"><span class="lineno">  591</span>    </div>
+<div class="line"><span class="lineno">  592</span>    <span class="comment">// Count correct predictions</span></div>
+<div class="line"><span class="lineno">  593</span>    <span class="keywordtype">size_t</span> correct = 0;</div>
+<div class="line"><span class="lineno">  594</span>    <span class="keyword">const</span> <span class="keywordtype">size_t</span>* pred_data = pred_classes.data_ptr();</div>
+<div class="line"><span class="lineno">  595</span>    </div>
+<div class="line"><span class="lineno">  596</span>    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; batch_size; ++i) {</div>
+<div class="line"><span class="lineno">  597</span>        <span class="keywordflow">if</span> (pred_data[i] == labels[offset + i]) {</div>
+<div class="line"><span class="lineno">  598</span>            ++correct;</div>
+<div class="line"><span class="lineno">  599</span>        }</div>
+<div class="line"><span class="lineno">  600</span>    }</div>
+<div class="line"><span class="lineno">  601</span>    </div>
+<div class="line"><span class="lineno">  602</span>    <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span>T<span class="keyword">&gt;</span>(correct) / <span class="keyword">static_cast&lt;</span>T<span class="keyword">&gt;</span>(batch_size);</div>
+<div class="line"><span class="lineno">  603</span>}</div>
+<div class="ttc" id="aclassTensor_html_a7e486401bc789c0d2344b2b271a3316b"><div class="ttname"><a href="classTensor.html#a7e486401bc789c0d2344b2b271a3316b">Tensor::argmax_rows</a></div><div class="ttdeci">Tensor&lt; size_t, 1 &gt; argmax_rows() const</div><div class="ttdoc">Find argmax for each row in a 2D tensor.</div><div class="ttdef"><b>Definition</b> <a href="tensor_8h_source.html#l05525">tensor.h:5525</a></div></div>
+<div class="ttc" id="aclassTensor_html_a80b3ffaf92ed36f02d6f4d4230b5d2a0"><div class="ttname"><a href="classTensor.html#a80b3ffaf92ed36f02d6f4d4230b5d2a0">Tensor::shape</a></div><div class="ttdeci">TensorIndices&lt; N &gt; shape() const</div><div class="ttdef"><b>Definition</b> <a href="tensor_8h_source.html#l00675">tensor.h:675</a></div></div>
+</div><!-- fragment --><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="namespacetensor4d_1_1nn_aabc59d678ea2b307e86f063f32102470_cgraph.png" border="0" usemap="#anamespacetensor4d_1_1nn_aabc59d678ea2b307e86f063f32102470_cgraph" loading="lazy" alt=""/></div>
+<map name="anamespacetensor4d_1_1nn_aabc59d678ea2b307e86f063f32102470_cgraph" id="anamespacetensor4d_1_1nn_aabc59d678ea2b307e86f063f32102470_cgraph">
+<area shape="rect" title="Compute classification accuracy." alt="" coords="5,23,157,65"/>
+<area shape="rect" href="classTensor.html#a7e486401bc789c0d2344b2b271a3316b" title="Find argmax for each row in a 2D tensor." alt="" coords="205,5,351,32"/>
+<area shape="poly" title=" " alt="" coords="157,32,189,27,190,33,157,37"/>
+<area shape="rect" href="classTensor.html#a80b3ffaf92ed36f02d6f4d4230b5d2a0" title=" " alt="" coords="226,56,330,83"/>
+<area shape="poly" title=" " alt="" coords="157,51,211,58,211,63,157,56"/>
+</map>
+</div>
+
+</div>
+</div>
+<a id="a7682f7b06565fe530c833139aa5c52cd" name="a7682f7b06565fe530c833139aa5c52cd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7682f7b06565fe530c833139aa5c52cd">&#9670;&#160;</a></span>cross_entropy_loss()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">T tensor4d::nn::cross_entropy_loss </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classTensor.html">Tensor</a>&lt; T, 2 &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>predictions</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classTensor.html">Tensor</a>&lt; T, 2 &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>targets</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T</td>          <td class="paramname"><span class="paramname"><em>epsilon</em></span><span class="paramdefsep"> = </span><span class="paramdefval">T(1e-7)</span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Compute cross-entropy loss between predictions and targets. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">predictions</td><td>Predicted probabilities (batch_size x num_classes) </td></tr>
+    <tr><td class="paramname">targets</td><td>Target one-hot vectors (batch_size x num_classes) </td></tr>
+    <tr><td class="paramname">epsilon</td><td>Small value for numerical stability (default: 1e-7) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Average cross-entropy loss over the batch</dd></dl>
+<p>Optimized implementation using vectorized tensor operations. Computes: -sum(targets * log(predictions + epsilon)) / batch_size</p>
+<h1 class="doxsection"><a class="anchor" id="example_ce_loss"></a>
+Example</h1>
+<div class="fragment"><div class="line"><span class="keyword">auto</span> predictions = softmax.forward(logits);</div>
+<div class="line"><span class="keywordtype">float</span> <a class="code hl_namespace" href="namespaceloss.html">loss</a> = <a class="code hl_function" href="#a7682f7b06565fe530c833139aa5c52cd">cross_entropy_loss</a>(predictions, targets);</div>
+<div class="ttc" id="anamespaceloss_html"><div class="ttname"><a href="namespaceloss.html">loss</a></div><div class="ttdoc">Loss functions for neural network training.</div></div>
+<div class="ttc" id="anamespacetensor4d_1_1nn_html_a7682f7b06565fe530c833139aa5c52cd"><div class="ttname"><a href="#a7682f7b06565fe530c833139aa5c52cd">tensor4d::nn::cross_entropy_loss</a></div><div class="ttdeci">T cross_entropy_loss(const Tensor&lt; T, 2 &gt; &amp;predictions, const Tensor&lt; T, 2 &gt; &amp;targets, T epsilon=T(1e-7))</div><div class="ttdoc">Compute cross-entropy loss between predictions and targets.</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00553">nn_layers.h:553</a></div></div>
+</div><!-- fragment --> 
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00553">553</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  553</span>                                                                                                               {</div>
+<div class="line"><span class="lineno">  554</span>    <span class="comment">// Compute using optimized tensor operations:</span></div>
+<div class="line"><span class="lineno">  555</span>    <span class="comment">// loss = -sum(targets * log(predictions + epsilon)) / batch_size</span></div>
+<div class="line"><span class="lineno">  556</span>    </div>
+<div class="line"><span class="lineno">  557</span>    <span class="comment">// Add epsilon for numerical stability: predictions + epsilon</span></div>
+<div class="line"><span class="lineno">  558</span>    <span class="keyword">auto</span> pred_stable = predictions.<a class="code hl_function" href="classTensor.html#a314dfaedc4f6b2dc8e3b44bbc5381eb3">map</a>([epsilon](T x) { <span class="keywordflow">return</span> x + epsilon; });</div>
+<div class="line"><span class="lineno">  559</span>    </div>
+<div class="line"><span class="lineno">  560</span>    <span class="comment">// Compute log: log(predictions + epsilon)</span></div>
+<div class="line"><span class="lineno">  561</span>    <span class="keyword">auto</span> log_pred = pred_stable.log();</div>
+<div class="line"><span class="lineno">  562</span>    </div>
+<div class="line"><span class="lineno">  563</span>    <span class="comment">// Element-wise multiplication: targets * log(predictions + epsilon)</span></div>
+<div class="line"><span class="lineno">  564</span>    <span class="keyword">auto</span> product_var = targets * log_pred;</div>
+<div class="line"><span class="lineno">  565</span>    <span class="keyword">auto</span> product = std::get&lt;Tensor&lt;T, 2&gt;&gt;(product_var);</div>
+<div class="line"><span class="lineno">  566</span>    </div>
+<div class="line"><span class="lineno">  567</span>    <span class="comment">// Sum all elements and negate</span></div>
+<div class="line"><span class="lineno">  568</span>    T total_loss = -product.<a class="code hl_function" href="classTensor.html#a3d279878b61732de2f1986dfc7de8400">sum</a>();</div>
+<div class="line"><span class="lineno">  569</span>    </div>
+<div class="line"><span class="lineno">  570</span>    <span class="comment">// Divide by batch size</span></div>
+<div class="line"><span class="lineno">  571</span>    <span class="keyword">auto</span> shape = predictions.<a class="code hl_function" href="classTensor.html#a80b3ffaf92ed36f02d6f4d4230b5d2a0">shape</a>();</div>
+<div class="line"><span class="lineno">  572</span>    <span class="keywordflow">return</span> total_loss / <span class="keyword">static_cast&lt;</span>T<span class="keyword">&gt;</span>(shape[0]);</div>
+<div class="line"><span class="lineno">  573</span>}</div>
+<div class="ttc" id="aclassTensor_html_a314dfaedc4f6b2dc8e3b44bbc5381eb3"><div class="ttname"><a href="classTensor.html#a314dfaedc4f6b2dc8e3b44bbc5381eb3">Tensor::map</a></div><div class="ttdeci">Tensor&lt; T, N &gt; map(Func func) const</div><div class="ttdoc">Apply a function to each element of the tensor (creates new tensor).</div><div class="ttdef"><b>Definition</b> <a href="tensor_8h_source.html#l01711">tensor.h:1711</a></div></div>
+<div class="ttc" id="aclassTensor_html_a3d279878b61732de2f1986dfc7de8400"><div class="ttname"><a href="classTensor.html#a3d279878b61732de2f1986dfc7de8400">Tensor::sum</a></div><div class="ttdeci">T sum() const</div><div class="ttdoc">Compute sum reduction along all dimensions.</div><div class="ttdef"><b>Definition</b> <a href="tensor_8h_source.html#l02516">tensor.h:2516</a></div></div>
+</div><!-- fragment --><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="namespacetensor4d_1_1nn_a7682f7b06565fe530c833139aa5c52cd_cgraph.png" border="0" usemap="#anamespacetensor4d_1_1nn_a7682f7b06565fe530c833139aa5c52cd_cgraph" loading="lazy" alt=""/></div>
+<map name="anamespacetensor4d_1_1nn_a7682f7b06565fe530c833139aa5c52cd_cgraph" id="anamespacetensor4d_1_1nn_a7682f7b06565fe530c833139aa5c52cd_cgraph">
+<area shape="rect" title="Compute cross&#45;entropy loss between predictions and targets." alt="" coords="5,48,139,91"/>
+<area shape="rect" href="classTensor.html#a314dfaedc4f6b2dc8e3b44bbc5381eb3" title="Apply a function to each element of the tensor (creates new tensor)." alt="" coords="192,5,285,32"/>
+<area shape="poly" title=" " alt="" coords="138,46,177,34,178,40,140,52"/>
+<area shape="rect" href="classTensor.html#a80b3ffaf92ed36f02d6f4d4230b5d2a0" title=" " alt="" coords="187,56,290,83"/>
+<area shape="poly" title=" " alt="" coords="139,67,171,67,171,72,139,72"/>
+<area shape="rect" href="classTensor.html#a3d279878b61732de2f1986dfc7de8400" title="Compute sum reduction along all dimensions." alt="" coords="192,107,285,133"/>
+<area shape="poly" title=" " alt="" coords="140,87,178,99,177,104,138,92"/>
+</map>
+</div>
+
+</div>
+</div>
+<a id="ac2a195a98fc946944abd82c47d997189" name="ac2a195a98fc946944abd82c47d997189"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac2a195a98fc946944abd82c47d997189">&#9670;&#160;</a></span>label_to_onehot()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void tensor4d::nn::label_to_onehot </td>
+          <td>(</td>
+          <td class="paramtype">uint8_t</td>          <td class="paramname"><span class="paramname"><em>label</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classTensor.html">Tensor</a>&lt; T, 2 &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>onehot</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>batch_idx</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>num_classes</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Convert label to one-hot encoded vector. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">label</td><td>The class label (integer) </td></tr>
+    <tr><td class="paramname">onehot</td><td>Output tensor to fill with one-hot encoding </td></tr>
+    <tr><td class="paramname">batch_idx</td><td>Index in batch dimension to set </td></tr>
+    <tr><td class="paramname">num_classes</td><td>Number of classes (columns in onehot tensor)</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Optimized implementation using direct memory operations.</p>
+<h1 class="doxsection"><a class="anchor" id="example_onehot"></a>
+Example</h1>
+<div class="fragment"><div class="line"><a class="code hl_class" href="classTensor.html">Tensor&lt;float, 2&gt;</a> targets({batch_size, 10});</div>
+<div class="line"><a class="code hl_function" href="#ac2a195a98fc946944abd82c47d997189">label_to_onehot</a>(3, targets, 0, 10);  <span class="comment">// Sets row 0 with [0,0,0,1,0,0,0,0,0,0]</span></div>
+<div class="ttc" id="aclassTensor_html"><div class="ttname"><a href="classTensor.html">Tensor</a></div><div class="ttdoc">Forward declaration for autograd.</div><div class="ttdef"><b>Definition</b> <a href="tensor_8h_source.html#l00469">tensor.h:469</a></div></div>
+<div class="ttc" id="anamespacetensor4d_1_1nn_html_ac2a195a98fc946944abd82c47d997189"><div class="ttname"><a href="#ac2a195a98fc946944abd82c47d997189">tensor4d::nn::label_to_onehot</a></div><div class="ttdeci">void label_to_onehot(uint8_t label, Tensor&lt; T, 2 &gt; &amp;onehot, size_t batch_idx, size_t num_classes)</div><div class="ttdoc">Convert label to one-hot encoded vector.</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00529">nn_layers.h:529</a></div></div>
+</div><!-- fragment --> 
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00529">529</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  529</span>                                                                                                       {</div>
+<div class="line"><span class="lineno">  530</span>    <span class="comment">// Zero the entire row first, then set the appropriate index</span></div>
+<div class="line"><span class="lineno">  531</span>    T* row_ptr = onehot.<a class="code hl_function" href="classTensor.html#a3f3c97d177cb960a4423afc3dafc612a">data_ptr</a>() + batch_idx * num_classes;</div>
+<div class="line"><span class="lineno">  532</span>    std::fill_n(row_ptr, num_classes, T(0));</div>
+<div class="line"><span class="lineno">  533</span>    row_ptr[label] = T(1);</div>
+<div class="line"><span class="lineno">  534</span>}</div>
+<div class="ttc" id="aclassTensor_html_a3f3c97d177cb960a4423afc3dafc612a"><div class="ttname"><a href="classTensor.html#a3f3c97d177cb960a4423afc3dafc612a">Tensor::data_ptr</a></div><div class="ttdeci">const T * data_ptr() const</div><div class="ttdef"><b>Definition</b> <a href="tensor_8h_source.html#l00529">tensor.h:529</a></div></div>
+</div><!-- fragment --><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="namespacetensor4d_1_1nn_ac2a195a98fc946944abd82c47d997189_cgraph.png" border="0" usemap="#anamespacetensor4d_1_1nn_ac2a195a98fc946944abd82c47d997189_cgraph" loading="lazy" alt=""/></div>
+<map name="anamespacetensor4d_1_1nn_ac2a195a98fc946944abd82c47d997189_cgraph" id="anamespacetensor4d_1_1nn_ac2a195a98fc946944abd82c47d997189_cgraph">
+<area shape="rect" title="Convert label to one&#45;hot encoded vector." alt="" coords="5,5,134,48"/>
+<area shape="rect" href="classTensor.html#a3f3c97d177cb960a4423afc3dafc612a" title=" " alt="" coords="182,13,297,40"/>
+<area shape="poly" title=" " alt="" coords="134,24,166,24,166,29,134,29"/>
+</map>
+</div>
+
+</div>
+</div>
+<a id="af4ed0870610368776140c66a749f99ab" name="af4ed0870610368776140c66a749f99ab"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af4ed0870610368776140c66a749f99ab">&#9670;&#160;</a></span>softmax_jacobian()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classTensor.html">Tensor</a>&lt; T, 2 &gt; tensor4d::nn::softmax_jacobian </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classTensor.html">Tensor</a>&lt; T, 1 &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>softmax_output</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Compute the Jacobian matrix of softmax for a single row. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">softmax_output</td><td><a class="el" href="classtensor4d_1_1nn_1_1Softmax.html" title="Softmax activation layer.">Softmax</a> output vector (1D or single row from 2D tensor) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Jacobian matrix (n x n) where n is the length of the softmax output</dd></dl>
+<p>For softmax function σ(x), the Jacobian is: J_ij = σ_i * (δ_ij - σ_j) where δ_ij is the Kronecker delta (1 if i==j, 0 otherwise).</p>
+<p>This can be computed using tensor operations as: J = diag(σ) - σ ⊗ σ^T</p>
+<p>Uses optimized tensor operations for efficient computation across all backends. </p>
+
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00657">657</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  657</span>                                                                         {</div>
+<div class="line"><span class="lineno">  658</span>    <span class="keyword">auto</span> dims = softmax_output.<a class="code hl_function" href="classTensor.html#a03d314303958ffc5644796d8025cd012">dims</a>();</div>
+<div class="line"><span class="lineno">  659</span>    <span class="keywordtype">size_t</span> n = dims[0];</div>
+<div class="line"><span class="lineno">  660</span>    <span class="keywordtype">bool</span> use_gpu = softmax_output.<a class="code hl_function" href="classTensor.html#a83ae42925e21d2871d755407d7505c10">uses_gpu</a>();</div>
+<div class="line"><span class="lineno">  661</span>    </div>
+<div class="line"><span class="lineno">  662</span>    <span class="comment">// Create result tensor (n x n)</span></div>
+<div class="line"><span class="lineno">  663</span>    <a class="code hl_class" href="classTensor.html">Tensor&lt;T, 2&gt;</a> jacobian({n, n}, use_gpu);</div>
+<div class="line"><span class="lineno">  664</span>    </div>
+<div class="line"><span class="lineno">  665</span>    <span class="comment">// Create diagonal matrix with softmax values: diag(σ)</span></div>
+<div class="line"><span class="lineno">  666</span>    <a class="code hl_class" href="classTensor.html">Tensor&lt;T, 2&gt;</a> diag_s({n, n}, use_gpu);</div>
+<div class="line"><span class="lineno">  667</span>    diag_s.<a class="code hl_function" href="classTensor.html#a234f74cd16bd13561f7963ba29efb163">fill</a>(T(0));</div>
+<div class="line"><span class="lineno">  668</span>    </div>
+<div class="line"><span class="lineno">  669</span>    <span class="keyword">const</span> T* s_data = softmax_output.<a class="code hl_function" href="classTensor.html#a3f3c97d177cb960a4423afc3dafc612a">data_ptr</a>();</div>
+<div class="line"><span class="lineno">  670</span>    T* diag_data = diag_s.data_ptr();</div>
+<div class="line"><span class="lineno">  671</span>    </div>
+<div class="line"><span class="lineno">  672</span>    <span class="comment">// Set diagonal elements - use parallel execution for large matrices</span></div>
+<div class="line"><span class="lineno">  673</span>    <span class="keywordflow">if</span> (n &gt; 100) {</div>
+<div class="line"><span class="lineno">  674</span>        std::for_each(std::execution::par_unseq,</div>
+<div class="line"><span class="lineno">  675</span>                     std::ranges::iota_view{size_t(0), n}.begin(),</div>
+<div class="line"><span class="lineno">  676</span>                     std::ranges::iota_view{size_t(0), n}.end(),</div>
+<div class="line"><span class="lineno">  677</span>                     [diag_data, s_data, n](<span class="keywordtype">size_t</span> i) {</div>
+<div class="line"><span class="lineno">  678</span>                         diag_data[i * n + i] = s_data[i];</div>
+<div class="line"><span class="lineno">  679</span>                     });</div>
+<div class="line"><span class="lineno">  680</span>    } <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  681</span>        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; n; ++i) {</div>
+<div class="line"><span class="lineno">  682</span>            diag_data[i * n + i] = s_data[i];</div>
+<div class="line"><span class="lineno">  683</span>        }</div>
+<div class="line"><span class="lineno">  684</span>    }</div>
+<div class="line"><span class="lineno">  685</span>    </div>
+<div class="line"><span class="lineno">  686</span>    <span class="comment">// Convert 1D softmax output to column vector (n x 1) for outer product</span></div>
+<div class="line"><span class="lineno">  687</span>    Tensor&lt;T, 2&gt; s_col({n, 1}, use_gpu);</div>
+<div class="line"><span class="lineno">  688</span>    std::copy_n(s_data, n, s_col.data_ptr());</div>
+<div class="line"><span class="lineno">  689</span>    </div>
+<div class="line"><span class="lineno">  690</span>    <span class="comment">// Convert to row vector (1 x n) for outer product</span></div>
+<div class="line"><span class="lineno">  691</span>    <span class="keyword">auto</span> s_row = s_col.transpose();</div>
+<div class="line"><span class="lineno">  692</span>    </div>
+<div class="line"><span class="lineno">  693</span>    <span class="comment">// Compute outer product: σ ⊗ σ^T using matmul</span></div>
+<div class="line"><span class="lineno">  694</span>    <span class="keyword">auto</span> outer_var = s_col.matmul(s_row);</div>
+<div class="line"><span class="lineno">  695</span>    <span class="keyword">auto</span> outer_product = std::get&lt;Tensor&lt;T, 2&gt;&gt;(outer_var);</div>
+<div class="line"><span class="lineno">  696</span>    </div>
+<div class="line"><span class="lineno">  697</span>    <span class="comment">// Compute Jacobian: J = diag(σ) - σ ⊗ σ^T</span></div>
+<div class="line"><span class="lineno">  698</span>    <span class="keyword">auto</span> jacobian_var = diag_s - outer_product;</div>
+<div class="line"><span class="lineno">  699</span>    jacobian = std::get&lt;Tensor&lt;T, 2&gt;&gt;(jacobian_var);</div>
+<div class="line"><span class="lineno">  700</span>    </div>
+<div class="line"><span class="lineno">  701</span>    <span class="keywordflow">return</span> jacobian;</div>
+<div class="line"><span class="lineno">  702</span>}</div>
+<div class="ttc" id="aclassTensor_html_a03d314303958ffc5644796d8025cd012"><div class="ttname"><a href="classTensor.html#a03d314303958ffc5644796d8025cd012">Tensor::dims</a></div><div class="ttdeci">TensorIndices&lt; N &gt; dims() const</div><div class="ttdef"><b>Definition</b> <a href="tensor_8h_source.html#l00669">tensor.h:669</a></div></div>
+<div class="ttc" id="aclassTensor_html_a234f74cd16bd13561f7963ba29efb163"><div class="ttname"><a href="classTensor.html#a234f74cd16bd13561f7963ba29efb163">Tensor::fill</a></div><div class="ttdeci">void fill(const T &amp;value)</div><div class="ttdoc">Fill the tensor with a specified value.</div><div class="ttdef"><b>Definition</b> <a href="tensor_8h_source.html#l00661">tensor.h:661</a></div></div>
+<div class="ttc" id="aclassTensor_html_a83ae42925e21d2871d755407d7505c10"><div class="ttname"><a href="classTensor.html#a83ae42925e21d2871d755407d7505c10">Tensor::uses_gpu</a></div><div class="ttdeci">bool uses_gpu() const</div><div class="ttdef"><b>Definition</b> <a href="tensor_8h_source.html#l00681">tensor.h:681</a></div></div>
+</div><!-- fragment --><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="namespacetensor4d_1_1nn_af4ed0870610368776140c66a749f99ab_cgraph.png" border="0" usemap="#anamespacetensor4d_1_1nn_af4ed0870610368776140c66a749f99ab_cgraph" loading="lazy" alt=""/></div>
+<map name="anamespacetensor4d_1_1nn_af4ed0870610368776140c66a749f99ab_cgraph" id="anamespacetensor4d_1_1nn_af4ed0870610368776140c66a749f99ab_cgraph">
+<area shape="rect" title="Compute the Jacobian matrix of softmax for a single row." alt="" coords="5,73,154,116"/>
+<area shape="rect" href="classTensor.html#a3f3c97d177cb960a4423afc3dafc612a" title=" " alt="" coords="206,5,322,32"/>
+<area shape="poly" title=" " alt="" coords="132,70,201,42,214,36,216,41,203,46,134,75"/>
+<area shape="rect" href="classTensor.html#a03d314303958ffc5644796d8025cd012" title=" " alt="" coords="216,56,312,83"/>
+<area shape="poly" title=" " alt="" coords="154,82,200,75,201,81,155,87"/>
+<area shape="rect" href="classTensor.html#a234f74cd16bd13561f7963ba29efb163" title="Fill the tensor with a specified value." alt="" coords="223,107,304,133"/>
+<area shape="poly" title=" " alt="" coords="155,102,208,110,208,115,154,108"/>
+<area shape="rect" href="classTensor.html#a83ae42925e21d2871d755407d7505c10" title=" " alt="" coords="202,157,326,184"/>
+<area shape="poly" title=" " alt="" coords="134,114,203,143,216,148,214,153,201,148,132,119"/>
+</map>
+</div>
+<div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="namespacetensor4d_1_1nn_af4ed0870610368776140c66a749f99ab_icgraph.png" border="0" usemap="#anamespacetensor4d_1_1nn_af4ed0870610368776140c66a749f99ab_icgraph" loading="lazy" alt=""/></div>
+<map name="anamespacetensor4d_1_1nn_af4ed0870610368776140c66a749f99ab_icgraph" id="anamespacetensor4d_1_1nn_af4ed0870610368776140c66a749f99ab_icgraph">
+<area shape="rect" title="Compute the Jacobian matrix of softmax for a single row." alt="" coords="400,5,548,48"/>
+<area shape="rect" href="namespacetensor4d_1_1nn.html#ab2f304e755860ad8c80d7c67cfe953b2" title="Compute softmax Jacobian for batched input (batch_size x num_classes)." alt="" coords="204,5,352,48"/>
+<area shape="poly" title=" " alt="" coords="385,29,352,29,352,24,385,24"/>
+<area shape="rect" href="classtensor4d_1_1nn_1_1Softmax.html#abda8fce936f0e7f02d1779a120db27de" title=" " alt="" coords="5,5,156,48"/>
+<area shape="poly" title=" " alt="" coords="188,29,156,29,156,24,188,24"/>
+</map>
+</div>
+
+</div>
+</div>
+<a id="ab2f304e755860ad8c80d7c67cfe953b2" name="ab2f304e755860ad8c80d7c67cfe953b2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab2f304e755860ad8c80d7c67cfe953b2">&#9670;&#160;</a></span>softmax_jacobian_batch()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt; <a class="el" href="classTensor.html">Tensor</a>&lt; T, 2 &gt; &gt; tensor4d::nn::softmax_jacobian_batch </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classTensor.html">Tensor</a>&lt; T, 2 &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>softmax_output</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Compute softmax Jacobian for batched input (batch_size x num_classes). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">softmax_output</td><td><a class="el" href="classtensor4d_1_1nn_1_1Softmax.html" title="Softmax activation layer.">Softmax</a> output tensor (batch_size x num_classes) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="linalg_8h.html#a99ba6a0becc538dc0109d3818ca80f3b" title="Type alias for 1D vectors.">Vector</a> of Jacobian matrices, one for each sample in the batch</dd></dl>
+<p>For each row i in the batch, computes the Jacobian J^(i) where: J^(i)_jk = σ^(i)_j * (δ_jk - σ^(i)_k)</p>
+<p>Uses optimized tensor operations for efficient computation. </p>
+
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00715">715</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  715</span>                                                                                          {</div>
+<div class="line"><span class="lineno">  716</span>    <span class="keyword">auto</span> shape = softmax_output.<a class="code hl_function" href="classTensor.html#a80b3ffaf92ed36f02d6f4d4230b5d2a0">shape</a>();</div>
+<div class="line"><span class="lineno">  717</span>    <span class="keywordtype">size_t</span> batch_size = shape[0];</div>
+<div class="line"><span class="lineno">  718</span>    <span class="keywordtype">size_t</span> num_classes = shape[1];</div>
+<div class="line"><span class="lineno">  719</span>    <span class="keywordtype">bool</span> use_gpu = softmax_output.<a class="code hl_function" href="classTensor.html#a83ae42925e21d2871d755407d7505c10">uses_gpu</a>();</div>
+<div class="line"><span class="lineno">  720</span>    </div>
+<div class="line"><span class="lineno">  721</span>    std::vector&lt;Tensor&lt;T, 2&gt;&gt; jacobians;</div>
+<div class="line"><span class="lineno">  722</span>    jacobians.reserve(batch_size);</div>
+<div class="line"><span class="lineno">  723</span>    </div>
+<div class="line"><span class="lineno">  724</span>    <span class="keyword">const</span> T* data = softmax_output.<a class="code hl_function" href="classTensor.html#a3f3c97d177cb960a4423afc3dafc612a">data_ptr</a>();</div>
+<div class="line"><span class="lineno">  725</span>    </div>
+<div class="line"><span class="lineno">  726</span>    <span class="comment">// Compute Jacobian for each sample in the batch</span></div>
+<div class="line"><span class="lineno">  727</span>    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; batch_size; ++i) {</div>
+<div class="line"><span class="lineno">  728</span>        <span class="comment">// Extract row i into a 1D tensor</span></div>
+<div class="line"><span class="lineno">  729</span>        <a class="code hl_class" href="classTensor.html">Tensor&lt;T, 1&gt;</a> <a class="code hl_function" href="tensor_8h.html#adf94b1b28dd9932dd278abaa3cb7a9ee">row</a>({num_classes}, use_gpu);</div>
+<div class="line"><span class="lineno">  730</span>        std::copy_n(data + i * num_classes, num_classes, <a class="code hl_function" href="tensor_8h.html#adf94b1b28dd9932dd278abaa3cb7a9ee">row</a>.data_ptr());</div>
+<div class="line"><span class="lineno">  731</span>        </div>
+<div class="line"><span class="lineno">  732</span>        <span class="comment">// Compute Jacobian for this row</span></div>
+<div class="line"><span class="lineno">  733</span>        jacobians.push_back(<a class="code hl_function" href="#af4ed0870610368776140c66a749f99ab">softmax_jacobian</a>(<a class="code hl_function" href="tensor_8h.html#adf94b1b28dd9932dd278abaa3cb7a9ee">row</a>));</div>
+<div class="line"><span class="lineno">  734</span>    }</div>
+<div class="line"><span class="lineno">  735</span>    </div>
+<div class="line"><span class="lineno">  736</span>    <span class="keywordflow">return</span> jacobians;</div>
+<div class="line"><span class="lineno">  737</span>}</div>
+<div class="ttc" id="anamespacetensor4d_1_1nn_html_af4ed0870610368776140c66a749f99ab"><div class="ttname"><a href="#af4ed0870610368776140c66a749f99ab">tensor4d::nn::softmax_jacobian</a></div><div class="ttdeci">Tensor&lt; T, 2 &gt; softmax_jacobian(const Tensor&lt; T, 1 &gt; &amp;softmax_output)</div><div class="ttdoc">Compute the Jacobian matrix of softmax for a single row.</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00657">nn_layers.h:657</a></div></div>
+<div class="ttc" id="atensor_8h_html_adf94b1b28dd9932dd278abaa3cb7a9ee"><div class="ttname"><a href="tensor_8h.html#adf94b1b28dd9932dd278abaa3cb7a9ee">row</a></div><div class="ttdeci">Tensor&lt; T, 1 &gt; row(const Tensor&lt; T, 2 &gt; &amp;matrix, size_t row_idx)</div><div class="ttdoc">Extract a single row from a 2D tensor.</div><div class="ttdef"><b>Definition</b> <a href="tensor_8h_source.html#l07191">tensor.h:7191</a></div></div>
+</div><!-- fragment --><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="namespacetensor4d_1_1nn_ab2f304e755860ad8c80d7c67cfe953b2_cgraph.png" border="0" usemap="#anamespacetensor4d_1_1nn_ab2f304e755860ad8c80d7c67cfe953b2_cgraph" loading="lazy" alt=""/></div>
+<map name="anamespacetensor4d_1_1nn_ab2f304e755860ad8c80d7c67cfe953b2_cgraph" id="anamespacetensor4d_1_1nn_ab2f304e755860ad8c80d7c67cfe953b2_cgraph">
+<area shape="rect" title="Compute softmax Jacobian for batched input (batch_size x num_classes)." alt="" coords="5,99,154,141"/>
+<area shape="rect" href="classTensor.html#a3f3c97d177cb960a4423afc3dafc612a" title=" " alt="" coords="402,5,518,32"/>
+<area shape="poly" title=" " alt="" coords="102,96,145,62,172,46,201,33,248,21,297,14,387,11,387,16,297,19,249,26,203,39,175,51,148,67,105,100"/>
+<area shape="rect" href="tensor_8h.html#adf94b1b28dd9932dd278abaa3cb7a9ee" title="Extract a single row from a 2D tensor." alt="" coords="255,48,297,75"/>
+<area shape="poly" title=" " alt="" coords="152,96,239,69,240,74,154,101"/>
+<area shape="rect" href="classTensor.html#a83ae42925e21d2871d755407d7505c10" title=" " alt="" coords="398,107,522,133"/>
+<area shape="poly" title=" " alt="" coords="148,139,202,151,276,158,350,151,409,136,410,141,350,156,276,163,201,156,147,145"/>
+<area shape="rect" href="classTensor.html#a80b3ffaf92ed36f02d6f4d4230b5d2a0" title=" " alt="" coords="224,216,328,243"/>
+<area shape="poly" title=" " alt="" coords="113,139,203,195,227,207,225,212,200,200,110,144"/>
+<area shape="rect" href="namespacetensor4d_1_1nn.html#af4ed0870610368776140c66a749f99ab" title="Compute the Jacobian matrix of softmax for a single row." alt="" coords="202,99,350,141"/>
+<area shape="poly" title=" " alt="" coords="154,117,186,117,186,123,154,123"/>
+<area shape="poly" title=" " alt="" coords="297,54,387,33,388,38,298,59"/>
+<area shape="rect" href="classTensor.html#a03d314303958ffc5644796d8025cd012" title=" " alt="" coords="412,56,508,83"/>
+<area shape="poly" title=" " alt="" coords="298,60,396,64,396,69,298,65"/>
+<area shape="poly" title=" " alt="" coords="298,65,402,99,401,104,297,70"/>
+<area shape="poly" title=" " alt="" coords="329,96,348,85,372,63,396,42,405,37,408,42,400,46,376,67,352,89,331,100"/>
+<area shape="poly" title=" " alt="" coords="350,97,397,84,398,89,351,102"/>
+<area shape="poly" title=" " alt="" coords="351,117,382,117,382,123,351,123"/>
+<area shape="rect" href="classTensor.html#a234f74cd16bd13561f7963ba29efb163" title="Fill the tensor with a specified value." alt="" coords="420,157,501,184"/>
+<area shape="poly" title=" " alt="" coords="351,138,405,153,404,158,350,143"/>
+</map>
+</div>
+<div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="namespacetensor4d_1_1nn_ab2f304e755860ad8c80d7c67cfe953b2_icgraph.png" border="0" usemap="#anamespacetensor4d_1_1nn_ab2f304e755860ad8c80d7c67cfe953b2_icgraph" loading="lazy" alt=""/></div>
+<map name="anamespacetensor4d_1_1nn_ab2f304e755860ad8c80d7c67cfe953b2_icgraph" id="anamespacetensor4d_1_1nn_ab2f304e755860ad8c80d7c67cfe953b2_icgraph">
+<area shape="rect" title="Compute softmax Jacobian for batched input (batch_size x num_classes)." alt="" coords="204,5,352,48"/>
+<area shape="rect" href="classtensor4d_1_1nn_1_1Softmax.html#abda8fce936f0e7f02d1779a120db27de" title=" " alt="" coords="5,5,156,48"/>
+<area shape="poly" title=" " alt="" coords="188,29,156,29,156,24,188,24"/>
+</map>
+</div>
+
+</div>
+</div>
+<a id="a834567aedd488a7451d76fec1bbba55e" name="a834567aedd488a7451d76fec1bbba55e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a834567aedd488a7451d76fec1bbba55e">&#9670;&#160;</a></span>update_linear_layer()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void tensor4d::nn::update_linear_layer </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classtensor4d_1_1nn_1_1Linear.html">Linear</a>&lt; T &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>layer</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T</td>          <td class="paramname"><span class="paramname"><em>lr</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Update weights of a linear layer using <a class="el" href="classSGD.html" title="SGD (Stochastic Gradient Descent) optimizer with optional momentum.">SGD</a>. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">layer</td><td>The linear layer to update </td></tr>
+    <tr><td class="paramname">lr</td><td>Learning rate</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Performs <a class="el" href="classSGD.html" title="SGD (Stochastic Gradient Descent) optimizer with optional momentum.">SGD</a> weight update using optimized tensor operations: weights -= lr * grad_weights bias -= lr * grad_bias</p>
+<p>Uses vectorized operations for efficient updates across all backends (GPU/BLAS/CPU).</p>
+<h1 class="doxsection"><a class="anchor" id="example_update_layer"></a>
+Example</h1>
+<div class="fragment"><div class="line"><a class="code hl_class" href="classtensor4d_1_1nn_1_1Linear.html">Linear&lt;float&gt;</a> fc1(784, 128);</div>
+<div class="line"><span class="comment">// ... forward and backward passes ...</span></div>
+<div class="line"><a class="code hl_function" href="#a834567aedd488a7451d76fec1bbba55e">update_linear_layer</a>(fc1, 0.01f);  <span class="comment">// Update with learning rate 0.01</span></div>
+<div class="ttc" id="aclasstensor4d_1_1nn_1_1Linear_html"><div class="ttname"><a href="classtensor4d_1_1nn_1_1Linear.html">tensor4d::nn::Linear</a></div><div class="ttdoc">Linear (Dense/Fully Connected) layer.</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00083">nn_layers.h:83</a></div></div>
+<div class="ttc" id="anamespacetensor4d_1_1nn_html_a834567aedd488a7451d76fec1bbba55e"><div class="ttname"><a href="#a834567aedd488a7451d76fec1bbba55e">tensor4d::nn::update_linear_layer</a></div><div class="ttdeci">void update_linear_layer(Linear&lt; T &gt; &amp;layer, T lr)</div><div class="ttdoc">Update weights of a linear layer using SGD.</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00624">nn_layers.h:624</a></div></div>
+</div><!-- fragment --> 
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00624">624</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  624</span>                                                        {</div>
+<div class="line"><span class="lineno">  625</span>    <span class="comment">// Get weights and their gradients</span></div>
+<div class="line"><span class="lineno">  626</span>    <span class="keyword">auto</span>&amp; weights = layer.<a class="code hl_function" href="classtensor4d_1_1nn_1_1Linear.html#a08cc48c658f333a45ca0ea084f69ec54">weights</a>();</div>
+<div class="line"><span class="lineno">  627</span>    <span class="keyword">auto</span>&amp; bias = layer.<a class="code hl_function" href="classtensor4d_1_1nn_1_1Linear.html#afefc9f73184487c8cb0abb37641a6932">bias</a>();</div>
+<div class="line"><span class="lineno">  628</span>    <span class="keyword">auto</span>&amp; grad_w = layer.<a class="code hl_function" href="classtensor4d_1_1nn_1_1Linear.html#a0fab0d83bb52b8ed52b9d4679f5a4ead">grad_weights</a>();</div>
+<div class="line"><span class="lineno">  629</span>    <span class="keyword">auto</span>&amp; grad_b = layer.<a class="code hl_function" href="classtensor4d_1_1nn_1_1Linear.html#a24f7dbc86ee05b08278886cf1e8bf357">grad_bias</a>();</div>
+<div class="line"><span class="lineno">  630</span>    </div>
+<div class="line"><span class="lineno">  631</span>    <span class="comment">// Update weights: w -= lr * grad_w using tensor operations</span></div>
+<div class="line"><span class="lineno">  632</span>    <span class="keyword">auto</span> weight_update_var = weights - (grad_w * lr);</div>
+<div class="line"><span class="lineno">  633</span>    <span class="keyword">auto</span> weight_update = std::get&lt;Tensor&lt;T, 2&gt;&gt;(weight_update_var);</div>
+<div class="line"><span class="lineno">  634</span>    weights = weight_update;</div>
+<div class="line"><span class="lineno">  635</span>    </div>
+<div class="line"><span class="lineno">  636</span>    <span class="comment">// Update bias: b -= lr * grad_b using tensor operations</span></div>
+<div class="line"><span class="lineno">  637</span>    <span class="keyword">auto</span> bias_update_var = bias - (grad_b * lr);</div>
+<div class="line"><span class="lineno">  638</span>    <span class="keyword">auto</span> bias_update = std::get&lt;Tensor&lt;T, 2&gt;&gt;(bias_update_var);</div>
+<div class="line"><span class="lineno">  639</span>    bias = bias_update;</div>
+<div class="line"><span class="lineno">  640</span>}</div>
+<div class="ttc" id="aclasstensor4d_1_1nn_1_1Linear_html_a08cc48c658f333a45ca0ea084f69ec54"><div class="ttname"><a href="classtensor4d_1_1nn_1_1Linear.html#a08cc48c658f333a45ca0ea084f69ec54">tensor4d::nn::Linear::weights</a></div><div class="ttdeci">Tensor&lt; T, 2 &gt; &amp; weights()</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00167">nn_layers.h:167</a></div></div>
+<div class="ttc" id="aclasstensor4d_1_1nn_1_1Linear_html_a0fab0d83bb52b8ed52b9d4679f5a4ead"><div class="ttname"><a href="classtensor4d_1_1nn_1_1Linear.html#a0fab0d83bb52b8ed52b9d4679f5a4ead">tensor4d::nn::Linear::grad_weights</a></div><div class="ttdeci">Tensor&lt; T, 2 &gt; &amp; grad_weights()</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00169">nn_layers.h:169</a></div></div>
+<div class="ttc" id="aclasstensor4d_1_1nn_1_1Linear_html_a24f7dbc86ee05b08278886cf1e8bf357"><div class="ttname"><a href="classtensor4d_1_1nn_1_1Linear.html#a24f7dbc86ee05b08278886cf1e8bf357">tensor4d::nn::Linear::grad_bias</a></div><div class="ttdeci">Tensor&lt; T, 2 &gt; &amp; grad_bias()</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00170">nn_layers.h:170</a></div></div>
+<div class="ttc" id="aclasstensor4d_1_1nn_1_1Linear_html_afefc9f73184487c8cb0abb37641a6932"><div class="ttname"><a href="classtensor4d_1_1nn_1_1Linear.html#afefc9f73184487c8cb0abb37641a6932">tensor4d::nn::Linear::bias</a></div><div class="ttdeci">Tensor&lt; T, 2 &gt; &amp; bias()</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00168">nn_layers.h:168</a></div></div>
+</div><!-- fragment --><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="namespacetensor4d_1_1nn_a834567aedd488a7451d76fec1bbba55e_cgraph.png" border="0" usemap="#anamespacetensor4d_1_1nn_a834567aedd488a7451d76fec1bbba55e_cgraph" loading="lazy" alt=""/></div>
+<map name="anamespacetensor4d_1_1nn_a834567aedd488a7451d76fec1bbba55e_cgraph" id="anamespacetensor4d_1_1nn_a834567aedd488a7451d76fec1bbba55e_cgraph">
+<area shape="rect" title="Update weights of a linear layer using SGD." alt="" coords="5,105,146,148"/>
+<area shape="rect" href="classtensor4d_1_1nn_1_1Linear.html#afefc9f73184487c8cb0abb37641a6932" title=" " alt="" coords="194,5,330,48"/>
+<area shape="poly" title=" " alt="" coords="113,102,192,58,201,53,203,58,195,62,115,107"/>
+<area shape="rect" href="classtensor4d_1_1nn_1_1Linear.html#a24f7dbc86ee05b08278886cf1e8bf357" title=" " alt="" coords="194,72,330,115"/>
+<area shape="poly" title=" " alt="" coords="146,111,178,106,179,111,147,117"/>
+<area shape="rect" href="classtensor4d_1_1nn_1_1Linear.html#a0fab0d83bb52b8ed52b9d4679f5a4ead" title=" " alt="" coords="194,139,330,181"/>
+<area shape="poly" title=" " alt="" coords="147,137,179,142,178,148,146,142"/>
+<area shape="rect" href="classtensor4d_1_1nn_1_1Linear.html#a08cc48c658f333a45ca0ea084f69ec54" title=" " alt="" coords="194,205,330,248"/>
+<area shape="poly" title=" " alt="" coords="115,146,195,191,203,195,201,200,192,196,113,151"/>
+</map>
+</div>
 
 </div>
 </div>

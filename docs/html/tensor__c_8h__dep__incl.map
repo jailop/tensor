@@ -1,5 +1,5 @@
 <map id="include/tensor_c.h" name="include/tensor_c.h">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,133,32"/>
+<area shape="rect" id="Node000001" title="C API for the tensor4d library." alt="" coords="5,5,133,32"/>
 <area shape="rect" id="Node000002" href="$tensor__c_8cpp.html" title=" " alt="" coords="10,80,128,107"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="72,48,72,80,66,80,66,48"/>
 </map>

@@ -1,65 +1,81 @@
 <map id="Tensor::fill" name="Tensor::fill">
-<area shape="rect" id="Node000001" title="Fill the tensor with a specified value." alt="" coords="643,537,725,564"/>
-<area shape="rect" id="Node000002" href="$namespacelinalg.html#a1df90002eef905350589edef7a4ace1b" title=" " alt="" coords="464,5,547,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="679,522,673,417,658,274,647,202,633,136,615,82,593,46,572,31,547,23,548,18,574,26,597,42,620,80,638,135,652,201,664,273,678,417,684,522"/>
-<area shape="rect" id="Node000003" href="$tensor_8h.html#ae66ddfcd20907014f524982e01698d82" title="Create a diagonal matrix from a 1D tensor." alt="" coords="461,56,549,83"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="678,522,671,427,655,299,644,235,630,176,613,129,593,96,573,82,549,75,551,70,576,78,597,93,618,126,635,175,649,234,660,298,676,426,684,522"/>
-<area shape="rect" id="Node000004" href="$classTensor.html#a452fb091d4b50605c931485385d29aac" title=" " alt="" coords="442,107,569,133"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="678,522,668,436,652,324,627,217,611,175,593,147,568,131,571,126,597,143,616,173,632,215,657,323,674,436,683,522"/>
-<area shape="rect" id="Node000005" href="$tensor_8h.html#a8a0e6e335b72a473208ce2c8f17b4a6e" title="Create an identity matrix (NumPy eye&#45;compatible)." alt="" coords="484,157,526,184"/>
-<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="677,523,666,446,648,349,624,257,609,222,593,198,579,187,561,180,526,173,527,168,563,174,581,182,597,194,614,219,629,255,654,348,671,446,682,522"/>
-<area shape="rect" id="Node000006" href="$namespacelinalg.html#a6ee776536e47c3e57b3b24ed6225bff2" title=" " alt="" coords="454,208,556,235"/>
-<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="680,522,677,465,665,391,654,352,639,315,619,279,594,249,576,236,556,229,558,224,579,232,597,245,623,276,644,312,659,351,670,390,682,464,686,522"/>
-<area shape="rect" id="Node000014" href="$tensor__c_8cpp.html#a47d70db99aa0a5e3874682316e4e173e" title=" " alt="" coords="436,259,574,285"/>
-<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="678,522,672,474,658,414,633,352,615,324,594,299,573,286,576,281,597,295,619,321,638,350,663,412,678,473,684,521"/>
-<area shape="rect" id="Node000015" href="$tensor__c_8cpp.html#a83628a7a4557aa438413f22c5b0cf244" title=" " alt="" coords="434,309,576,336"/>
-<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="676,523,667,484,651,437,627,390,594,350,575,338,578,334,597,346,632,387,656,435,672,482,681,522"/>
-<area shape="rect" id="Node000016" href="$tensor__c_8cpp.html#a1a72f081df9afd553ef6af18324322b6" title=" " alt="" coords="443,360,567,387"/>
-<area shape="poly" id="edge15_Node000001_Node000016" title=" " alt="" coords="671,524,643,461,621,428,594,401,567,386,569,382,597,397,625,425,648,459,676,522"/>
-<area shape="rect" id="Node000017" href="$tensor__c_8cpp.html#a6b1e7f8c3cd8c831827661bdf87c9bfa" title=" " alt="" coords="441,411,569,437"/>
-<area shape="poly" id="edge16_Node000001_Node000017" title=" " alt="" coords="665,526,635,487,615,468,594,452,569,439,571,435,597,447,619,464,639,484,669,523"/>
-<area shape="rect" id="Node000018" href="$namespaceloss.html#aff5180b0c38ddd16d08f058205c01ef7" title="Mean Squared Error (MSE) Loss." alt="" coords="450,461,560,488"/>
-<area shape="poly" id="edge17_Node000001_Node000018" title=" " alt="" coords="648,531,594,502,559,490,561,485,596,498,651,526"/>
-<area shape="rect" id="Node000019" href="$classTensor.html#aab0bca33fa0dbe68308c0a828cec9f44" title=" " alt="" coords="442,512,569,539"/>
-<area shape="poly" id="edge18_Node000001_Node000019" title=" " alt="" coords="627,545,569,537,570,532,628,540"/>
-<area shape="rect" id="Node000020" href="$tensor_8h.html#a37ee39b629ca93dc83259b6c8591d0d9" title="Create a tensor filled with ones (NumPy&#45;compatible)." alt="" coords="480,563,530,589"/>
-<area shape="poly" id="edge19_Node000001_Node000020" title=" " alt="" coords="628,561,530,575,530,570,627,556"/>
-<area shape="rect" id="Node000021" href="$classTensor.html#a26deab87b696076f055af17f4386b4d0" title=" " alt="" coords="421,613,589,640"/>
-<area shape="poly" id="edge20_Node000001_Node000021" title=" " alt="" coords="651,575,596,604,564,615,562,610,594,599,648,570"/>
-<area shape="rect" id="Node000022" href="$classTensor.html#a2cab1fc8ca70e8d2fa4bce5ff88fabe1" title=" " alt="" coords="417,664,593,691"/>
-<area shape="poly" id="edge21_Node000001_Node000022" title=" " alt="" coords="669,578,639,617,619,637,597,654,573,666,571,661,594,650,615,633,635,614,665,575"/>
-<area shape="rect" id="Node000023" href="$classTensor.html#a06eeff8ce7f54262b935b324bcb6833e" title=" " alt="" coords="415,715,595,741"/>
-<area shape="poly" id="edge22_Node000001_Node000023" title=" " alt="" coords="676,580,648,643,625,676,597,705,577,717,574,712,594,701,621,673,643,640,671,578"/>
-<area shape="rect" id="Node000024" href="$classTensor.html#ac20a4679e14de6f68e148b447496adfc" title=" " alt="" coords="420,765,590,792"/>
-<area shape="poly" id="edge23_Node000001_Node000024" title=" " alt="" coords="681,580,672,619,656,666,632,714,597,755,579,767,576,762,594,751,627,711,651,664,667,618,676,578"/>
-<area shape="rect" id="Node000027" href="$classTensor.html#ac15f7a77f31ef7862dd9909c9ad97160" title=" " alt="" coords="420,816,590,843"/>
-<area shape="poly" id="edge26_Node000001_Node000027" title=" " alt="" coords="684,580,678,629,663,689,638,752,619,781,597,806,580,818,577,813,594,802,615,777,633,749,658,688,672,628,678,579"/>
-<area shape="rect" id="Node000028" href="$tensor__c_8cpp.html#a6c7566970a435f965c674f01e5bdba09" title=" " alt="" coords="436,867,574,893"/>
-<area shape="poly" id="edge27_Node000001_Node000028" title=" " alt="" coords="686,580,682,637,670,711,659,751,644,789,623,825,597,857,576,871,573,867,594,853,619,822,639,787,654,749,665,710,677,637,680,579"/>
-<area shape="rect" id="Node000029" href="$tensor__c_8cpp.html#a87b984c2cf077d9da06fe364caddd4da" title=" " alt="" coords="434,917,576,944"/>
-<area shape="poly" id="edge28_Node000001_Node000029" title=" " alt="" coords="682,579,671,656,654,753,629,846,614,882,597,907,578,921,575,917,593,903,609,880,624,844,648,752,666,655,677,579"/>
-<area shape="rect" id="Node000030" href="$tensor__c_8cpp.html#ad2106718d1bf483b3daeefd07f1961f2" title=" " alt="" coords="443,968,567,995"/>
-<area shape="poly" id="edge29_Node000001_Node000030" title=" " alt="" coords="683,580,674,666,657,779,632,886,616,929,597,958,584,968,569,976,567,971,581,964,593,954,611,926,627,885,652,778,668,665,678,579"/>
-<area shape="rect" id="Node000031" href="$tensor__c_8cpp.html#a7a2d55aad07eba8741646b6c305c4352" title=" " alt="" coords="441,1019,569,1045"/>
-<area shape="poly" id="edge30_Node000001_Node000031" title=" " alt="" coords="684,579,676,675,660,803,649,868,635,927,618,975,597,1009,571,1026,568,1021,593,1005,613,973,630,925,644,867,655,802,671,675,678,579"/>
-<area shape="rect" id="Node000032" href="$tensor_8h.html#a249e6ed21f6e3540a11b62433237175a" title="Create a tensor filled with zeros (NumPy&#45;compatible)." alt="" coords="478,1069,532,1096"/>
-<area shape="poly" id="edge31_Node000001_Node000032" title=" " alt="" coords="684,579,678,685,664,828,652,900,638,967,620,1021,597,1059,583,1071,566,1078,533,1085,532,1080,565,1073,580,1066,593,1056,615,1019,633,965,647,899,658,827,673,684,679,579"/>
-<area shape="rect" id="Node000007" href="$namespacelinalg.html#a6b7af062b5a9642d788fcc084335b39c" title=" " alt="" coords="209,157,349,184"/>
-<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="438,209,341,187,342,182,439,204"/>
-<area shape="rect" id="Node000008" href="$namespacelinalg.html#a8405b084d692b1fc7f685f40425a0970" title="Solve least squares problem: minimize ||Ax &#45; b||²" alt="" coords="235,208,322,235"/>
-<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="439,224,323,224,323,219,439,219"/>
-<area shape="rect" id="Node000011" href="$namespacelinalg.html#a6ff4392ae10b75895ce02443bf3c77d6" title="Compute Moore&#45;Penrose pseudo&#45;inverse using SVD." alt="" coords="237,259,320,285"/>
-<area shape="poly" id="edge10_Node000006_Node000011" title=" " alt="" coords="440,239,321,265,320,260,438,233"/>
-<area shape="rect" id="Node000009" href="$tensor__c_8cpp.html#ac4676f00843bcb11305f402265e7b747" title=" " alt="" coords="5,157,143,184"/>
-<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="219,209,130,187,131,182,220,204"/>
-<area shape="rect" id="Node000010" href="$tensor__c_8cpp.html#ab0ed3244c40a7734ca7af5affd241c6d" title=" " alt="" coords="12,208,136,235"/>
-<area shape="poly" id="edge9_Node000008_Node000010" title=" " alt="" coords="220,224,137,224,137,219,220,219"/>
-<area shape="rect" id="Node000012" href="$tensor__c_8cpp.html#ad0eab2342bda5d725085476abc7c50b6" title=" " alt="" coords="7,259,141,285"/>
-<area shape="poly" id="edge11_Node000011_Node000012" title=" " alt="" coords="221,275,141,275,141,269,221,269"/>
-<area shape="rect" id="Node000013" href="$tensor__c_8cpp.html#acf74b6d7b42a82859c1fbec640125775" title=" " alt="" coords="14,309,134,336"/>
-<area shape="poly" id="edge12_Node000011_Node000013" title=" " alt="" coords="223,288,132,311,130,306,221,283"/>
-<area shape="rect" id="Node000025" href="$classTensor.html#adf1fcb0ddd0ef2db3003401db519ec1c" title=" " alt="" coords="191,740,367,767"/>
-<area shape="poly" id="edge24_Node000024_Node000025" title=" " alt="" coords="405,770,367,766,368,761,405,765"/>
-<area shape="rect" id="Node000026" href="$classTensor.html#aeb3f6a9bf8ee28d46a887238a9d3d460" title=" " alt="" coords="191,791,367,817"/>
-<area shape="poly" id="edge25_Node000024_Node000026" title=" " alt="" coords="405,793,368,797,367,791,405,787"/>
+<area shape="rect" id="Node000001" title="Fill the tensor with a specified value." alt="" coords="656,563,738,589"/>
+<area shape="rect" id="Node000002" href="$namespacelinalg.html#a1df90002eef905350589edef7a4ace1b" title=" " alt="" coords="476,5,560,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="692,547,687,437,673,287,662,211,647,141,629,84,606,46,585,31,560,23,561,18,587,26,610,42,634,82,652,140,667,210,678,286,692,437,698,547"/>
+<area shape="rect" id="Node000003" href="$tensor_8h.html#ae66ddfcd20907014f524982e01698d82" title="Create a diagonal matrix from a 1D tensor." alt="" coords="474,56,562,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="692,547,685,447,670,311,658,243,644,181,627,131,606,96,586,82,562,75,563,70,588,77,610,93,632,128,649,180,664,242,675,311,690,446,697,547"/>
+<area shape="rect" id="Node000004" href="$classTensor.html#a452fb091d4b50605c931485385d29aac" title=" " alt="" coords="454,107,582,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="691,548,683,457,666,337,641,222,625,177,606,147,581,131,584,126,610,143,630,175,646,220,672,336,688,456,696,547"/>
+<area shape="rect" id="Node000005" href="$tensor_8h.html#a8a0e6e335b72a473208ce2c8f17b4a6e" title="Create an identity matrix (NumPy eye&#45;compatible)." alt="" coords="497,157,539,184"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="690,547,680,466,663,361,638,262,623,224,606,198,592,187,574,179,539,173,540,168,576,174,594,182,610,194,628,221,643,260,668,360,686,465,695,547"/>
+<area shape="rect" id="Node000006" href="$namespacelinalg.html#a6ee776536e47c3e57b3b24ed6225bff2" title=" " alt="" coords="467,208,569,235"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="694,547,692,485,681,405,670,363,655,321,634,283,607,249,589,236,569,229,571,224,592,232,610,245,638,280,660,319,675,361,687,404,698,485,700,547"/>
+<area shape="rect" id="Node000014" href="$tensor__c_8cpp.html#a47d70db99aa0a5e3874682316e4e173e" title=" " alt="" coords="450,259,587,285"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="693,547,688,494,675,427,664,393,649,359,630,327,607,299,586,286,589,281,610,295,634,324,654,356,669,391,680,426,693,493,698,547"/>
+<area shape="rect" id="Node000015" href="$tensor__c_8cpp.html#a83628a7a4557aa438413f22c5b0cf244" title=" " alt="" coords="448,309,589,336"/>
+<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="690,548,683,504,668,451,643,396,626,372,607,350,588,338,591,333,610,346,631,368,648,394,673,449,688,503,696,547"/>
+<area shape="rect" id="Node000016" href="$tensor__c_8cpp.html#a1a72f081df9afd553ef6af18324322b6" title=" " alt="" coords="456,360,580,387"/>
+<area shape="poly" id="edge15_Node000001_Node000016" title=" " alt="" coords="687,548,676,514,660,474,637,434,607,401,579,386,582,381,610,397,641,431,665,472,681,512,692,547"/>
+<area shape="rect" id="Node000017" href="$tensor__c_8cpp.html#a6b1e7f8c3cd8c831827661bdf87c9bfa" title=" " alt="" coords="454,411,582,437"/>
+<area shape="poly" id="edge16_Node000001_Node000017" title=" " alt="" coords="681,550,652,499,631,473,607,452,581,438,584,434,610,447,635,470,656,496,686,547"/>
+<area shape="rect" id="Node000018" href="$namespaceloss.html#aff5180b0c38ddd16d08f058205c01ef7" title="Mean Squared Error (MSE) Loss." alt="" coords="464,461,573,488"/>
+<area shape="poly" id="edge17_Node000001_Node000018" title=" " alt="" coords="671,553,642,527,607,502,572,488,574,483,610,498,646,522,675,550"/>
+<area shape="rect" id="Node000019" href="$classTensor.html#aab0bca33fa0dbe68308c0a828cec9f44" title=" " alt="" coords="454,512,582,539"/>
+<area shape="poly" id="edge18_Node000001_Node000019" title=" " alt="" coords="640,563,608,553,568,542,569,537,609,548,642,558"/>
+<area shape="rect" id="Node000020" href="$tensor_8h.html#a37ee39b629ca93dc83259b6c8591d0d9" title="Create a tensor filled with ones (NumPy&#45;compatible)." alt="" coords="494,563,543,589"/>
+<area shape="poly" id="edge19_Node000001_Node000020" title=" " alt="" coords="641,579,543,579,543,573,641,573"/>
+<area shape="rect" id="Node000024" href="$classTensor.html#a26deab87b696076f055af17f4386b4d0" title=" " alt="" coords="434,613,602,640"/>
+<area shape="poly" id="edge23_Node000001_Node000024" title=" " alt="" coords="642,594,609,604,569,615,568,610,608,599,640,589"/>
+<area shape="rect" id="Node000025" href="$classTensor.html#a2cab1fc8ca70e8d2fa4bce5ff88fabe1" title=" " alt="" coords="430,664,606,691"/>
+<area shape="poly" id="edge24_Node000001_Node000025" title=" " alt="" coords="675,602,646,630,610,654,583,666,581,661,607,650,642,625,671,599"/>
+<area shape="rect" id="Node000026" href="$namespacetensor4d_1_1nn.html#af4ed0870610368776140c66a749f99ab" title="Compute the Jacobian matrix of softmax for a single row." alt="" coords="444,715,592,757"/>
+<area shape="poly" id="edge25_Node000001_Node000026" title=" " alt="" coords="685,605,655,655,634,682,610,705,591,716,589,712,607,701,630,678,651,652,681,602"/>
+<area shape="rect" id="Node000029" href="$classTensor.html#a06eeff8ce7f54262b935b324bcb6833e" title=" " alt="" coords="428,781,608,808"/>
+<area shape="poly" id="edge28_Node000001_Node000029" title=" " alt="" coords="693,605,684,642,668,687,644,733,610,771,592,783,589,779,607,767,639,729,663,685,679,641,688,604"/>
+<area shape="rect" id="Node000030" href="$classTensor.html#ac20a4679e14de6f68e148b447496adfc" title=" " alt="" coords="434,832,603,859"/>
+<area shape="poly" id="edge29_Node000001_Node000030" title=" " alt="" coords="696,605,690,652,675,711,650,770,632,798,610,822,593,834,590,829,607,818,628,794,645,768,670,709,684,651,691,605"/>
+<area shape="rect" id="Node000033" href="$classTensor.html#ac15f7a77f31ef7862dd9909c9ad97160" title=" " alt="" coords="434,883,603,909"/>
+<area shape="poly" id="edge32_Node000001_Node000033" title=" " alt="" coords="698,605,695,661,682,733,671,770,656,807,636,842,610,873,594,884,591,880,607,869,631,839,651,805,666,769,677,731,689,660,693,605"/>
+<area shape="rect" id="Node000034" href="$tensor__c_8cpp.html#a6c7566970a435f965c674f01e5bdba09" title=" " alt="" coords="450,933,587,960"/>
+<area shape="poly" id="edge33_Node000001_Node000034" title=" " alt="" coords="695,605,684,680,666,774,641,864,627,899,610,923,589,938,586,933,606,919,622,896,636,862,661,773,679,679,689,604"/>
+<area shape="rect" id="Node000035" href="$tensor__c_8cpp.html#a87b984c2cf077d9da06fe364caddd4da" title=" " alt="" coords="448,984,589,1011"/>
+<area shape="poly" id="edge34_Node000001_Node000035" title=" " alt="" coords="696,605,686,690,669,800,644,904,629,945,610,974,591,988,588,983,606,970,624,943,639,903,664,799,681,689,690,605"/>
+<area shape="rect" id="Node000036" href="$tensor__c_8cpp.html#ad2106718d1bf483b3daeefd07f1961f2" title=" " alt="" coords="456,1035,580,1061"/>
+<area shape="poly" id="edge35_Node000001_Node000036" title=" " alt="" coords="697,605,689,699,673,824,661,887,647,944,630,992,610,1024,597,1035,582,1042,580,1038,594,1031,606,1021,626,989,642,943,656,886,668,823,683,698,691,604"/>
+<area shape="rect" id="Node000037" href="$tensor__c_8cpp.html#a7a2d55aad07eba8741646b6c305c4352" title=" " alt="" coords="454,1085,582,1112"/>
+<area shape="poly" id="edge36_Node000001_Node000037" title=" " alt="" coords="697,605,691,708,676,849,665,920,650,985,632,1038,610,1075,584,1092,581,1088,606,1071,628,1036,645,983,660,919,671,848,685,708,692,605"/>
+<area shape="rect" id="Node000038" href="$tensor_8h.html#a249e6ed21f6e3540a11b62433237175a" title="Create a tensor filled with zeros (NumPy&#45;compatible)." alt="" coords="492,1136,545,1163"/>
+<area shape="poly" id="edge37_Node000001_Node000038" title=" " alt="" coords="698,605,693,718,679,874,668,953,653,1025,634,1084,610,1126,596,1137,579,1145,546,1152,545,1146,578,1140,593,1133,606,1122,629,1082,648,1024,663,952,674,873,687,718,692,605"/>
+<area shape="rect" id="Node000007" href="$namespacelinalg.html#a6b7af062b5a9642d788fcc084335b39c" title=" " alt="" coords="222,157,362,184"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="451,209,354,187,355,182,452,204"/>
+<area shape="rect" id="Node000008" href="$namespacelinalg.html#a8405b084d692b1fc7f685f40425a0970" title="Solve least squares problem: minimize ||Ax &#45; b||²" alt="" coords="248,208,336,235"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="452,224,336,224,336,219,452,219"/>
+<area shape="rect" id="Node000011" href="$namespacelinalg.html#a6ff4392ae10b75895ce02443bf3c77d6" title="Compute Moore&#45;Penrose pseudo&#45;inverse using SVD." alt="" coords="250,259,334,285"/>
+<area shape="poly" id="edge10_Node000006_Node000011" title=" " alt="" coords="453,239,334,265,333,260,451,233"/>
+<area shape="rect" id="Node000009" href="$tensor__c_8cpp.html#ac4676f00843bcb11305f402265e7b747" title=" " alt="" coords="12,157,149,184"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="232,210,139,187,140,182,234,205"/>
+<area shape="rect" id="Node000010" href="$tensor__c_8cpp.html#ab0ed3244c40a7734ca7af5affd241c6d" title=" " alt="" coords="18,208,143,235"/>
+<area shape="poly" id="edge9_Node000008_Node000010" title=" " alt="" coords="233,224,143,224,143,219,233,219"/>
+<area shape="rect" id="Node000012" href="$tensor__c_8cpp.html#ad0eab2342bda5d725085476abc7c50b6" title=" " alt="" coords="14,259,147,285"/>
+<area shape="poly" id="edge11_Node000011_Node000012" title=" " alt="" coords="235,275,148,275,148,269,235,269"/>
+<area shape="rect" id="Node000013" href="$tensor__c_8cpp.html#acf74b6d7b42a82859c1fbec640125775" title=" " alt="" coords="20,309,141,336"/>
+<area shape="poly" id="edge12_Node000011_Node000013" title=" " alt="" coords="236,288,140,311,139,306,234,283"/>
+<area shape="rect" id="Node000021" href="$classtensor4d_1_1nn_1_1Sigmoid.html#a41e695161d280883a0002fe199efdf98" title=" " alt="" coords="218,488,366,531"/>
+<area shape="poly" id="edge20_Node000020_Node000021" title=" " alt="" coords="478,568,427,553,363,534,365,529,429,548,479,563"/>
+<area shape="rect" id="Node000022" href="$classtensor4d_1_1nn_1_1Tanh.html#a8211c640d2b962ecad7a5c29203e663c" title=" " alt="" coords="225,555,359,597"/>
+<area shape="poly" id="edge21_Node000020_Node000022" title=" " alt="" coords="478,579,360,579,360,573,478,573"/>
+<area shape="rect" id="Node000023" href="$classTensor.html#afff455663faa35d6cfa72aa03f689e94" title=" " alt="" coords="213,621,371,648"/>
+<area shape="poly" id="edge22_Node000020_Node000023" title=" " alt="" coords="479,589,347,623,346,618,477,584"/>
+<area shape="rect" id="Node000027" href="$namespacetensor4d_1_1nn.html#ab2f304e755860ad8c80d7c67cfe953b2" title="Compute softmax Jacobian for batched input (batch_size x num_classes)." alt="" coords="218,715,366,757"/>
+<area shape="poly" id="edge26_Node000026_Node000027" title=" " alt="" coords="429,739,367,739,367,733,429,733"/>
+<area shape="rect" id="Node000028" href="$classtensor4d_1_1nn_1_1Softmax.html#abda8fce936f0e7f02d1779a120db27de" title=" " alt="" coords="5,715,156,757"/>
+<area shape="poly" id="edge27_Node000027_Node000028" title=" " alt="" coords="202,739,156,739,156,733,202,733"/>
+<area shape="rect" id="Node000031" href="$classTensor.html#adf1fcb0ddd0ef2db3003401db519ec1c" title=" " alt="" coords="204,807,380,833"/>
+<area shape="poly" id="edge30_Node000030_Node000031" title=" " alt="" coords="418,837,380,833,381,827,418,831"/>
+<area shape="rect" id="Node000032" href="$classTensor.html#aeb3f6a9bf8ee28d46a887238a9d3d460" title=" " alt="" coords="204,857,380,884"/>
+<area shape="poly" id="edge31_Node000030_Node000032" title=" " alt="" coords="418,859,381,863,380,858,418,854"/>
+<area shape="rect" id="Node000039" href="$classtensor4d_1_1nn_1_1ReLU.html#ac991c01d3b1607d533183075fb02f354" title=" " alt="" coords="224,1099,360,1141"/>
+<area shape="poly" id="edge38_Node000038_Node000039" title=" " alt="" coords="476,1147,360,1131,360,1126,476,1141"/>
+<area shape="rect" id="Node000040" href="$classTensor.html#a74db7588a7150d94b620ad63de1f5980" title=" " alt="" coords="225,1165,359,1192"/>
+<area shape="poly" id="edge39_Node000038_Node000040" title=" " alt="" coords="476,1157,360,1173,359,1167,476,1152"/>
 </map>
