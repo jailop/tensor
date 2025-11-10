@@ -1,6 +1,10 @@
 # Tensor4D Python Bindings
 
-Python bindings for the Tensor4D C++ tensor library, providing high-performance tensor operations with a NumPy-like interface.
+**Disclaimer**: This is a personal project to learn about numerical
+computing and optimization techniques. It is only intended to be used
+for educative purposes and not at all for production use.
+
+Python bindings for the Tensor C++ tensor library, providing tensor operations with a NumPy-like interface.
 
 ## Features
 
@@ -230,27 +234,3 @@ Performance tips:
 - Keep data on GPU when doing multiple operations
 - Use in-place operations (`+=`, `-=`, etc.) to reduce memory allocations
 - Batch operations when possible
-
-## Integration with Python Ecosystem
-
-The NumPy interoperability enables seamless integration with:
-
-- **NumPy**: Universal array interface
-- **Pandas**: Data manipulation (via NumPy)
-- **Matplotlib**: Visualization
-- **Scikit-learn**: Machine learning preprocessing/evaluation
-- **SciPy**: Scientific computing
-- **OpenCV**: Computer vision (via NumPy arrays)
-
-## License
-
-See the main project LICENSE file.
-
-## Documentation
-
-Full documentation is available in the `userguide/` directory, particularly:
-- `17-python-integration.md` - Comprehensive Python integration guide
-
-## Support
-
-For issues, questions, or contributions, please refer to the main project repository.
