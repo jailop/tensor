@@ -588,8 +588,22 @@ private:
     
 public:
     // Public data accessors for use by library functions
-    const T* data_ptr() const { return data_.get(); }
-    T* data_ptr() { return data_.get(); }
+    const T* data_ptr() const {
+#ifdef USE_GPU
+        ensure_on_cpu();  // Sync from GPU if needed
+#endif
+        return data_.get();
+    }
+    
+    T* data_ptr() {
+#ifdef USE_GPU
+        ensure_on_cpu();  // Sync from GPU if needed
+        // Non-const access means user might modify, so invalidate GPU
+        data_on_gpu_ = false;
+        gpu_needs_sync_ = false;
+#endif
+        return data_.get();
+    }
     
     /**
      * Calculate the total size of the tensor.
@@ -3881,7 +3895,13 @@ public:
         
         // Forward pass - use existing optimized dot product
 #ifdef USE_BLAS
-        if (!use_gpu_) {
+        // Use BLAS for CPU or GPU tensors (GPU tensors will sync to CPU)
+        if (true) {  // Always use BLAS when available
+#ifdef USE_GPU
+            // Sync GPU tensors to CPU before BLAS
+            if (use_gpu_) ensure_on_cpu();
+            if (other.use_gpu_) other.ensure_on_cpu();
+#endif
             blas_gemm<T>(CblasRowMajor, CblasNoTrans, CblasNoTrans,
                         m, p, n, T(1), data_.get(), n,
                         other.data_.get(), p, T(0), result.data_.get(), p);
