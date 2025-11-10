@@ -87,6 +87,47 @@ void cuda_memcpy_d2d_wrapper(void* dst, const void* src, size_t bytes);
 #include "tensor_gpu.cuh"
 #endif
 
+#ifdef USE_CUBLAS
+#include <cublas_v2.h>
+
+namespace tensor4d {
+namespace detail {
+
+/// @brief Singleton class for managing cuBLAS handle
+class CublasHandle {
+private:
+    inline static cublasHandle_t handle_ = nullptr;
+    inline static bool initialized_ = false;
+    
+public:
+    /// @brief Get the global cuBLAS handle (creates it if needed)
+    static cublasHandle_t get() {
+        if (!initialized_) {
+            cublasStatus_t status = cublasCreate(&handle_);
+            if (status != CUBLAS_STATUS_SUCCESS) {
+                throw std::runtime_error("Failed to create cuBLAS handle");
+            }
+            // Use host pointers for alpha/beta parameters
+            cublasSetPointerMode(handle_, CUBLAS_POINTER_MODE_HOST);
+            initialized_ = true;
+        }
+        return handle_;
+    }
+    
+    /// @brief Clean up cuBLAS handle
+    static void cleanup() {
+        if (initialized_) {
+            cublasDestroy(handle_);
+            handle_ = nullptr;
+            initialized_ = false;
+        }
+    }
+};
+
+}  // namespace detail
+}  // namespace tensor4d
+#endif
+
 #ifdef USE_BLAS
 extern "C" {
     /// @brief BLAS function declarations for optimized matrix operations
@@ -3891,23 +3932,73 @@ public:
         bool track_grad = requires_grad_ || other.requires_grad_;
         Tensor<T, 2> result({m, p}, use_gpu_, track_grad);
         result.is_leaf_ = false;
-        result.fill(T(0));
         
-        // Forward pass - use existing optimized dot product
+        // Forward pass - use cuBLAS for GPU, BLAS for CPU
+#ifdef USE_CUBLAS
+        // Use cuBLAS for GPU matrix multiplication
+        if (use_gpu_ && other.use_gpu_) {
+            // Ensure data is on GPU
+            ensure_on_gpu();
+            other.ensure_on_gpu();
+            result.ensure_on_gpu();
+            
+            // cuBLAS uses column-major layout, but we use row-major
+            // To compute C = A * B (row-major), we compute:
+            // C^T = B^T * A^T (column-major)
+            // So we swap A and B in the call
+            
+            T alpha = T(1);
+            T beta = T(0);
+            
+            cublasHandle_t handle = tensor4d::detail::CublasHandle::get();
+            cublasStatus_t status;
+            
+            if constexpr (std::is_same_v<T, float>) {
+                status = cublasSgemm(handle,
+                           CUBLAS_OP_N, CUBLAS_OP_N,
+                           p, m, n,              // Dimensions swapped for col-major
+                           &alpha,
+                           other.d_data_, p,     // B (treated as B^T in col-major)
+                           d_data_, n,           // A (treated as A^T in col-major)
+                           &beta,
+                           result.d_data_, p);   // C (treated as C^T in col-major)
+            } else if constexpr (std::is_same_v<T, double>) {
+                status = cublasDgemm(handle,
+                           CUBLAS_OP_N, CUBLAS_OP_N,
+                           p, m, n,
+                           &alpha,
+                           other.d_data_, p,
+                           d_data_, n,
+                           &beta,
+                           result.d_data_, p);
+            } else {
+                throw std::runtime_error("cuBLAS only supports float and double types");
+            }
+            
+            if (status != CUBLAS_STATUS_SUCCESS) {
+                throw std::runtime_error("cuBLAS gemm failed with status: " + std::to_string(status));
+            }
+            
+            result.mark_gpu_modified();
+        } else
+#endif
 #ifdef USE_BLAS
-        // Use BLAS for CPU or GPU tensors (GPU tensors will sync to CPU)
-        if (true) {  // Always use BLAS when available
-#ifdef USE_GPU
-            // Sync GPU tensors to CPU before BLAS
+        // Fallback to CPU BLAS
+        {
+            result.fill(T(0));
+            
+            // Sync GPU tensors to CPU if needed
             if (use_gpu_) ensure_on_cpu();
             if (other.use_gpu_) other.ensure_on_cpu();
-#endif
+            
             blas_gemm<T>(CblasRowMajor, CblasNoTrans, CblasNoTrans,
                         m, p, n, T(1), data_.get(), n,
                         other.data_.get(), p, T(0), result.data_.get(), p);
-        } else
-#endif
+        }
+#else
+        // Naive fallback for when neither cuBLAS nor BLAS is available
         {
+            result.fill(T(0));
             for (size_t i = 0; i < m; ++i) {
                 for (size_t j = 0; j < p; ++j) {
                     T sum = T(0);
@@ -3918,6 +4009,7 @@ public:
                 }
             }
         }
+#endif
         
         // Setup backward pass for autograd
         if (track_grad) {

@@ -20,6 +20,21 @@ if(CMAKE_CUDA_COMPILER)
   add_definitions(-DUSE_GPU)
   set(USE_CUDA ON)
   message(STATUS "CUDA found - GPU acceleration enabled (Architecture: ${CMAKE_CUDA_ARCHITECTURES})")
+  
+  # Find cuBLAS library for GPU matrix operations
+  find_library(CUBLAS_LIBRARY 
+               NAMES cublas
+               PATHS /opt/cuda/lib64 ${CMAKE_CUDA_TOOLKIT_ROOT_DIR}/lib64
+               NO_DEFAULT_PATH)
+  
+  if(CUBLAS_LIBRARY)
+    add_definitions(-DUSE_CUBLAS)
+    # Add cuBLAS include directory
+    include_directories(/opt/cuda/targets/x86_64-linux/include)
+    message(STATUS "cuBLAS found: ${CUBLAS_LIBRARY} - GPU matrix operations enabled")
+  else()
+    message(WARNING "cuBLAS not found - matmul will use CPU BLAS")
+  endif()
 else()
   set(USE_CUDA OFF)
   message(STATUS "CUDA not found - building CPU-only version")
@@ -48,6 +63,19 @@ if(LAPACK_FOUND)
 else()
   message(STATUS "LAPACK not found - using fallback implementations")
 endif()
+
+# Helper function to link math libraries to a target
+function(link_math_libraries target_name)
+  if(TBB_FOUND)
+    target_link_libraries(${target_name} TBB::tbb)
+  endif()
+  if(BLAS_FOUND)
+    target_link_libraries(${target_name} ${BLAS_LIBRARIES})
+  endif()
+  if(CUBLAS_LIBRARY)
+    target_link_libraries(${target_name} ${CUBLAS_LIBRARY})
+  endif()
+endfunction()
 
 include(FetchContent)
 FetchContent_Declare(
@@ -100,6 +128,11 @@ if(LAPACK_FOUND)
   target_link_libraries(tensor4d_static PUBLIC ${LAPACK_LIBRARIES})
 endif()
 
+# Link cuBLAS if found
+if(CUBLAS_LIBRARY)
+  target_link_libraries(tensor4d_static PUBLIC ${CUBLAS_LIBRARY})
+endif()
+
 # Build shared library
 add_library(tensor4d_shared SHARED
   ${TENSOR_LIB_SOURCES}
@@ -126,6 +159,11 @@ endif()
 # Link LAPACK if found
 if(LAPACK_FOUND)
   target_link_libraries(tensor4d_shared PUBLIC ${LAPACK_LIBRARIES})
+endif()
+
+# Link cuBLAS if found
+if(CUBLAS_LIBRARY)
+  target_link_libraries(tensor4d_shared PUBLIC ${CUBLAS_LIBRARY})
 endif()
 
 # Set library properties
@@ -196,6 +234,11 @@ if(BLAS_FOUND)
   target_link_libraries(tensor_test ${BLAS_LIBRARIES})
 endif()
 
+# Link cuBLAS if found
+if(CUBLAS_LIBRARY)
+  target_link_libraries(tensor_test ${CUBLAS_LIBRARY})
+endif()
+
 include(GoogleTest)
 gtest_discover_tests(tensor_test)
 
@@ -222,6 +265,11 @@ if(BLAS_FOUND)
   target_link_libraries(tensor_nn_enhancements_test ${BLAS_LIBRARIES})
 endif()
 
+# Link cuBLAS if found
+if(CUBLAS_LIBRARY)
+  target_link_libraries(tensor_nn_enhancements_test ${CUBLAS_LIBRARY})
+endif()
+
 gtest_discover_tests(tensor_nn_enhancements_test)
 
 # Performance benchmark executable
@@ -236,15 +284,7 @@ target_link_libraries(
   Threads::Threads
 )
 
-# Link TBB to performance benchmark if found
-if(TBB_FOUND)
-  target_link_libraries(tensor_perf TBB::tbb)
-endif()
-
-# Link BLAS to performance benchmark if found
-if(BLAS_FOUND)
-  target_link_libraries(tensor_perf ${BLAS_LIBRARIES})
-endif()
+link_math_libraries(tensor_perf)
 
 # GPU/BLAS demo executable
 add_executable(
@@ -258,15 +298,7 @@ target_link_libraries(
   Threads::Threads
 )
 
-# Link TBB to demo if found
-if(TBB_FOUND)
-  target_link_libraries(gpu_blas_demo TBB::tbb)
-endif()
-
-# Link BLAS to demo if found
-if(BLAS_FOUND)
-  target_link_libraries(gpu_blas_demo ${BLAS_LIBRARIES})
-endif()
+link_math_libraries(gpu_blas_demo)
 
 # Backend demo executable
 add_executable(
@@ -280,15 +312,7 @@ target_link_libraries(
   Threads::Threads
 )
 
-# Link TBB to backend demo if found
-if(TBB_FOUND)
-  target_link_libraries(backend_demo TBB::tbb)
-endif()
-
-# Link BLAS to backend demo if found
-if(BLAS_FOUND)
-  target_link_libraries(backend_demo ${BLAS_LIBRARIES})
-endif()
+link_math_libraries(backend_demo)
 
 # ============================================
 # C Interface Library
@@ -365,15 +389,7 @@ target_link_libraries(
   Threads::Threads
 )
 
-# Link TBB to tensor_io_demo if found
-if(TBB_FOUND)
-  target_link_libraries(tensor_io_demo TBB::tbb)
-endif()
-
-# Link BLAS to tensor_io_demo if found
-if(BLAS_FOUND)
-  target_link_libraries(tensor_io_demo ${BLAS_LIBRARIES})
-endif()
+link_math_libraries(tensor_io_demo)
 
 # Neural Network Layers demo executable
 add_executable(
@@ -387,15 +403,7 @@ target_link_libraries(
   Threads::Threads
 )
 
-# Link TBB to nn_layers_demo if found
-if(TBB_FOUND)
-  target_link_libraries(nn_layers_demo TBB::tbb)
-endif()
-
-# Link BLAS to nn_layers_demo if found
-if(BLAS_FOUND)
-  target_link_libraries(nn_layers_demo ${BLAS_LIBRARIES})
-endif()
+link_math_libraries(nn_layers_demo)
 
 # MNIST demo executable
 add_executable(
@@ -409,15 +417,7 @@ target_link_libraries(
   Threads::Threads
 )
 
-# Link TBB to mnist_demo if found
-if(TBB_FOUND)
-  target_link_libraries(mnist_demo TBB::tbb)
-endif()
-
-# Link BLAS to mnist_demo if found
-if(BLAS_FOUND)
-  target_link_libraries(mnist_demo ${BLAS_LIBRARIES})
-endif()
+link_math_libraries(mnist_demo)
 
 # Add custom target to run performance tests
 add_custom_target(run_perf

@@ -15,6 +15,11 @@
 #include <random>
 #include <cmath>
 
+// Only include CUDA headers if actually compiling with CUDA
+#if defined(USE_GPU) && defined(__CUDACC__)
+#include <cuda_runtime.h>
+#endif
+
 namespace tensor4d {
 namespace nn {
 
@@ -94,17 +99,17 @@ public:
     Linear(size_t in_features, size_t out_features, bool use_bias = true)
         : in_features_(in_features), out_features_(out_features), use_bias_(use_bias),
 #ifdef USE_GPU
-          weights_({out_features, in_features}),  // use_gpu defaults to true
-          bias_({1, out_features}),
-          input_({1, in_features}),
-          grad_weights_({out_features, in_features}),
-          grad_bias_({1, out_features}) {
+          weights_({out_features, in_features}, true),
+          bias_({1, out_features}, true),
+          input_({1, in_features}, true),
+          grad_weights_({out_features, in_features}, true),
+          grad_bias_({1, out_features}, true) {
 #else
-          weights_({out_features, in_features}),
-          bias_({1, out_features}),
-          input_({1, in_features}),
-          grad_weights_({out_features, in_features}),
-          grad_bias_({1, out_features}) {
+          weights_({out_features, in_features}, false),
+          bias_({1, out_features}, false),
+          input_({1, in_features}, false),
+          grad_weights_({out_features, in_features}, false),
+          grad_bias_({1, out_features}, false) {
 #endif
         
         // Initialize weights with Xavier/Glorot initialization using optimized pointer access
@@ -659,44 +664,39 @@ inline Tensor<T, 2> softmax_jacobian(const Tensor<T, 1>& softmax_output) {
     size_t n = dims[0];
     bool use_gpu = softmax_output.uses_gpu();
     
-    // Create result tensor (n x n)
-    Tensor<T, 2> jacobian({n, n}, use_gpu);
+    // For jacobian computation, we use CPU since it involves small matrices
+    // (typically 10-1000 classes) and complex diagonal operations
+    // The main GPU benefit is in the forward/backward matmul operations
     
-    // Create diagonal matrix with softmax values: diag(σ)
-    Tensor<T, 2> diag_s({n, n}, use_gpu);
-    diag_s.fill(T(0));
+    // Get CPU data
+    const T* s_data = softmax_output.data_ptr();  // This syncs to CPU if needed
     
-    const T* s_data = softmax_output.data_ptr();
-    T* diag_data = diag_s.data_ptr();
+    // Compute outer product on CPU for simplicity
+    Tensor<T, 2> outer_product({n, n}, false);  // CPU tensor
+    T* outer_data = outer_product.data_ptr();
     
-    // Set diagonal elements - use parallel execution for large matrices
-    if (n > 100) {
-        std::for_each(std::execution::par_unseq,
-                     std::ranges::iota_view{size_t(0), n}.begin(),
-                     std::ranges::iota_view{size_t(0), n}.end(),
-                     [diag_data, s_data, n](size_t i) {
-                         diag_data[i * n + i] = s_data[i];
-                     });
-    } else {
-        for (size_t i = 0; i < n; ++i) {
-            diag_data[i * n + i] = s_data[i];
+    for (size_t i = 0; i < n; ++i) {
+        for (size_t j = 0; j < n; ++j) {
+            outer_data[i * n + j] = s_data[i] * s_data[j];
         }
     }
     
-    // Convert 1D softmax output to column vector (n x 1) for outer product
-    Tensor<T, 2> s_col({n, 1}, use_gpu);
-    std::copy_n(s_data, n, s_col.data_ptr());
+    // Create diagonal matrix on CPU
+    Tensor<T, 2> diag_s({n, n}, false);  // CPU tensor
+    diag_s.fill(T(0));
+    T* diag_data = diag_s.data_ptr();
     
-    // Convert to row vector (1 x n) for outer product
-    auto s_row = s_col.transpose();
+    for (size_t i = 0; i < n; ++i) {
+        diag_data[i * n + i] = s_data[i];
+    }
     
-    // Compute outer product: σ ⊗ σ^T using matmul
-    auto outer_var = s_col.matmul(s_row);
-    auto outer_product = std::get<Tensor<T, 2>>(outer_var);
+    // Compute J = diag(s) - outer_product using tensor operation
+    auto result_var = diag_s - outer_product;
+    auto jacobian = std::get<Tensor<T, 2>>(result_var);
     
-    // Compute Jacobian: J = diag(σ) - σ ⊗ σ^T
-    auto jacobian_var = diag_s - outer_product;
-    jacobian = std::get<Tensor<T, 2>>(jacobian_var);
+    // If input was on GPU, optionally move result to GPU
+    // For now, keep on CPU since jacobian is used immediately for gradient computation
+    // which may involve element-wise operations easier on CPU
     
     return jacobian;
 }
@@ -716,17 +716,17 @@ inline std::vector<Tensor<T, 2>> softmax_jacobian_batch(const Tensor<T, 2>& soft
     auto shape = softmax_output.shape();
     size_t batch_size = shape[0];
     size_t num_classes = shape[1];
-    bool use_gpu = softmax_output.uses_gpu();
     
     std::vector<Tensor<T, 2>> jacobians;
     jacobians.reserve(batch_size);
     
+    // Get CPU data for processing
     const T* data = softmax_output.data_ptr();
     
-    // Compute Jacobian for each sample in the batch
+    // Process each sample - extract row and compute Jacobian
     for (size_t i = 0; i < batch_size; ++i) {
-        // Extract row i into a 1D tensor
-        Tensor<T, 1> row({num_classes}, use_gpu);
+        // Extract row i into a 1D tensor (on CPU)
+        Tensor<T, 1> row({num_classes}, false);
         std::copy_n(data + i * num_classes, num_classes, row.data_ptr());
         
         // Compute Jacobian for this row
