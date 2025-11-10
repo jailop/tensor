@@ -1,45 +1,9 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$classtensor4d_1_1nn_1_1Layer.html" title="Base class for all neural network layers." alt="" coords="5,680,170,707"/>
-<area shape="rect" id="Node000001" href="$classtensor4d_1_1nn_1_1BatchNorm1d.html" title=" " alt="" coords="233,5,414,48"/>
-<area shape="poly" id="edge4_Node000000_Node000001" title=" " alt="" coords="88,664,100,536,124,355,141,262,162,177,186,107,200,79,216,58,231,45,234,50,220,62,205,82,191,109,167,178,146,263,129,355,105,536,94,665"/>
-<area shape="rect" id="Node000002" href="$classtensor4d_1_1nn_1_1BatchNorm1d.html" title=" " alt="" coords="233,72,414,115"/>
-<area shape="poly" id="edge5_Node000000_Node000002" title=" " alt="" coords="89,664,103,548,128,387,145,305,166,230,189,168,216,125,231,112,234,116,220,128,194,170,171,231,150,306,133,388,108,549,94,665"/>
-<area shape="rect" id="Node000003" href="$classtensor4d_1_1nn_1_1Dropout.html" title=" " alt="" coords="250,139,398,181"/>
-<area shape="poly" id="edge6_Node000000_Node000003" title=" " alt="" coords="90,664,106,560,133,419,150,347,169,282,191,229,216,192,231,179,249,170,251,175,234,183,220,195,196,231,175,284,155,349,138,420,111,561,95,665"/>
-<area shape="rect" id="Node000004" href="$classtensor4d_1_1nn_1_1Dropout.html" title=" " alt="" coords="250,205,398,248"/>
-<area shape="poly" id="edge7_Node000000_Node000004" title=" " alt="" coords="86,664,91,585,108,476,125,418,147,360,177,306,216,258,231,246,248,237,251,242,234,250,220,262,182,309,152,362,130,419,114,477,96,585,91,665"/>
-<area shape="rect" id="Node000005" href="$classtensor4d_1_1nn_1_1Linear.html" title=" " alt="" coords="256,272,392,315"/>
-<area shape="poly" id="edge8_Node000000_Node000005" title=" " alt="" coords="88,664,96,595,117,505,133,456,155,409,182,364,216,325,234,311,254,302,256,307,237,316,219,329,186,367,160,411,138,458,122,506,102,596,93,665"/>
-<area shape="rect" id="Node000006" href="$classtensor4d_1_1nn_1_1Linear.html" title=" " alt="" coords="256,339,392,381"/>
-<area shape="poly" id="edge9_Node000000_Node000006" title=" " alt="" coords="90,664,103,607,126,534,142,495,163,458,187,422,216,391,234,379,254,370,256,374,237,383,219,395,191,426,167,460,147,497,131,536,108,608,96,665"/>
-<area shape="rect" id="Node000007" href="$classtensor4d_1_1nn_1_1ReLU.html" title=" " alt="" coords="256,405,392,448"/>
-<area shape="poly" id="edge10_Node000000_Node000007" title=" " alt="" coords="94,664,110,619,135,564,170,507,192,481,216,458,235,446,255,437,257,442,237,450,219,462,196,485,175,510,140,566,115,621,99,666"/>
-<area shape="rect" id="Node000008" href="$classtensor4d_1_1nn_1_1ReLU.html" title=" " alt="" coords="256,472,392,515"/>
-<area shape="poly" id="edge11_Node000000_Node000008" title=" " alt="" coords="101,664,146,595,178,557,216,524,255,505,257,510,219,529,182,561,150,598,105,667"/>
-<area shape="rect" id="Node000009" href="$classtensor4d_1_1nn_1_1Sigmoid.html" title=" " alt="" coords="250,539,398,581"/>
-<area shape="poly" id="edge12_Node000000_Node000009" title=" " alt="" coords="113,667,159,628,216,591,248,577,251,582,219,596,162,633,116,671"/>
-<area shape="rect" id="Node000010" href="$classtensor4d_1_1nn_1_1Sigmoid.html" title=" " alt="" coords="250,605,398,648"/>
-<area shape="poly" id="edge13_Node000000_Node000010" title=" " alt="" coords="152,673,248,645,250,650,153,678"/>
-<area shape="rect" id="Node000011" href="$classtensor4d_1_1nn_1_1Softmax.html" title=" " alt="" coords="249,672,399,715"/>
-<area shape="poly" id="edge14_Node000000_Node000011" title=" " alt="" coords="185,691,248,691,248,696,185,696"/>
-<area shape="rect" id="Node000012" href="$classtensor4d_1_1nn_1_1Softmax.html" title=" " alt="" coords="249,739,399,781"/>
-<area shape="poly" id="edge15_Node000000_Node000012" title=" " alt="" coords="153,709,249,736,248,741,152,714"/>
-<area shape="rect" id="Node000013" href="$classtensor4d_1_1nn_1_1Tanh.html" title=" " alt="" coords="259,805,388,848"/>
-<area shape="poly" id="edge16_Node000000_Node000013" title=" " alt="" coords="116,715,162,754,219,791,260,808,258,813,216,796,159,758,113,720"/>
-<area shape="rect" id="Node000014" href="$classtensor4d_1_1nn_1_1Tanh.html" title=" " alt="" coords="259,872,388,915"/>
-<area shape="poly" id="edge17_Node000000_Node000014" title=" " alt="" coords="105,719,150,789,182,826,219,858,260,877,257,882,216,862,178,830,146,792,101,722"/>
-<area shape="rect" id="Node000015" href="$classtensor4d_1_1nn_1_1BatchNorm1d.html" title="Batch Normalization layer." alt="" coords="218,939,430,965"/>
-<area shape="poly" id="edge18_Node000000_Node000015" title=" " alt="" coords="99,721,114,766,139,821,173,878,195,903,219,925,239,936,236,940,216,929,191,906,169,881,134,824,109,768,94,722"/>
-<area shape="rect" id="Node000016" href="$classtensor4d_1_1nn_1_1Dropout.html" title="Dropout layer for regularization." alt="" coords="235,989,413,1016"/>
-<area shape="poly" id="edge19_Node000000_Node000016" title=" " alt="" coords="96,721,108,776,131,845,148,881,168,916,191,948,219,975,237,986,234,991,216,979,187,951,163,919,143,883,126,847,103,777,91,723"/>
-<area shape="rect" id="Node000017" href="$classtensor4d_1_1nn_1_1Linear.html" title="Linear (Dense/Fully Connected) layer." alt="" coords="240,1040,408,1067"/>
-<area shape="poly" id="edge20_Node000000_Node000017" title=" " alt="" coords="94,722,103,785,124,868,141,911,162,953,188,992,219,1026,241,1039,238,1044,216,1030,183,996,157,956,136,913,119,869,98,786,88,722"/>
-<area shape="rect" id="Node000018" href="$classtensor4d_1_1nn_1_1ReLU.html" title="ReLU activation layer." alt="" coords="241,1091,407,1117"/>
-<area shape="poly" id="edge21_Node000000_Node000018" title=" " alt="" coords="92,722,99,794,118,890,134,941,156,991,184,1037,219,1077,242,1091,239,1095,216,1081,180,1040,151,993,129,943,112,892,93,795,87,723"/>
-<area shape="rect" id="Node000019" href="$classtensor4d_1_1nn_1_1Sigmoid.html" title="Sigmoid activation layer." alt="" coords="234,1141,414,1168"/>
-<area shape="poly" id="edge22_Node000000_Node000019" title=" " alt="" coords="91,722,94,803,100,855,111,912,127,971,150,1028,180,1081,219,1127,235,1139,232,1143,216,1131,176,1084,145,1030,122,972,106,913,95,856,89,803,86,723"/>
-<area shape="rect" id="Node000020" href="$classtensor4d_1_1nn_1_1Softmax.html" title="Softmax activation layer." alt="" coords="233,1192,414,1219"/>
-<area shape="poly" id="edge23_Node000000_Node000020" title=" " alt="" coords="95,722,111,824,137,961,155,1031,174,1093,196,1144,220,1178,235,1189,232,1194,216,1182,191,1147,169,1095,149,1032,132,963,105,825,90,723"/>
-<area shape="rect" id="Node000021" href="$classtensor4d_1_1nn_1_1Tanh.html" title="Tanh activation layer." alt="" coords="244,1243,404,1269"/>
-<area shape="poly" id="edge24_Node000000_Node000021" title=" " alt="" coords="94,722,108,833,134,986,151,1063,171,1133,194,1191,220,1229,244,1245,242,1249,216,1233,189,1193,166,1135,146,1064,129,987,103,834,89,722"/>
+<area shape="rect" id="Node000000" href="$classOptimizer.html" title="Base class for optimization algorithms." alt="" coords="5,56,114,83"/>
+<area shape="rect" id="Node000001" href="$classAdam.html" title=" " alt="" coords="172,5,276,32"/>
+<area shape="poly" id="edge1_Node000000_Node000001" title=" " alt="" coords="119,48,177,30,179,35,121,53"/>
+<area shape="rect" id="Node000002" href="$classRMSprop.html" title=" " alt="" coords="162,56,286,83"/>
+<area shape="poly" id="edge2_Node000000_Node000002" title=" " alt="" coords="129,67,161,67,161,72,129,72"/>
+<area shape="rect" id="Node000003" href="$classSGD.html" title="SGD (Stochastic Gradient Descent) optimizer with optional momentum." alt="" coords="175,107,273,133"/>
+<area shape="poly" id="edge3_Node000000_Node000003" title=" " alt="" coords="121,85,179,104,177,109,119,90"/>
 </map>

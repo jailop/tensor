@@ -1,22 +1,21 @@
 <map id="tensor4d::nn::softmax_jacobian_batch" name="tensor4d::nn::softmax_jacobian_batch">
-<area shape="rect" id="Node000001" title="Compute softmax Jacobian for batched input (batch_size x num_classes)." alt="" coords="5,99,154,141"/>
+<area shape="rect" id="Node000001" title="Compute softmax Jacobian for batched input (batch_size x num_classes)." alt="" coords="5,73,154,116"/>
 <area shape="rect" id="Node000002" href="$classTensor.html#a3f3c97d177cb960a4423afc3dafc612a" title=" " alt="" coords="402,5,518,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="102,96,145,62,172,46,201,33,248,21,297,14,387,11,387,16,297,19,249,26,203,39,175,51,148,67,105,100"/>
-<area shape="rect" id="Node000003" href="$tensor_8h.html#adf94b1b28dd9932dd278abaa3cb7a9ee" title="Extract a single row from a 2D tensor." alt="" coords="255,48,297,75"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="152,96,239,69,240,74,154,101"/>
-<area shape="rect" id="Node000005" href="$classTensor.html#a83ae42925e21d2871d755407d7505c10" title=" " alt="" coords="398,107,522,133"/>
-<area shape="poly" id="edge12_Node000001_Node000005" title=" " alt="" coords="148,139,202,151,276,158,350,151,409,136,410,141,350,156,276,163,201,156,147,145"/>
-<area shape="rect" id="Node000006" href="$classTensor.html#a80b3ffaf92ed36f02d6f4d4230b5d2a0" title=" " alt="" coords="224,216,328,243"/>
-<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="113,139,203,195,227,207,225,212,200,200,110,144"/>
-<area shape="rect" id="Node000007" href="$namespacetensor4d_1_1nn.html#af4ed0870610368776140c66a749f99ab" title="Compute the Jacobian matrix of softmax for a single row." alt="" coords="202,99,350,141"/>
-<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="154,117,186,117,186,123,154,123"/>
-<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="297,54,387,33,388,38,298,59"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="119,70,158,52,201,37,297,21,387,15,387,21,298,26,202,43,160,57,121,75"/>
+<area shape="rect" id="Node000003" href="$tensor_8h.html#adf94b1b28dd9932dd278abaa3cb7a9ee" title="Extract a single row from a 2D tensor." alt="" coords="255,52,297,79"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="154,81,239,68,240,73,154,86"/>
+<area shape="rect" id="Node000006" href="$classTensor.html#a80b3ffaf92ed36f02d6f4d4230b5d2a0" title=" " alt="" coords="224,169,328,196"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="121,114,203,155,218,161,216,166,201,160,118,119"/>
+<area shape="rect" id="Node000007" href="$namespacetensor4d_1_1nn.html#af4ed0870610368776140c66a749f99ab" title="Compute the Jacobian matrix of softmax for a single row." alt="" coords="202,103,350,145"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="154,103,187,108,186,113,154,108"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="297,57,389,34,390,39,298,63"/>
 <area shape="rect" id="Node000004" href="$classTensor.html#a03d314303958ffc5644796d8025cd012" title=" " alt="" coords="412,56,508,83"/>
-<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="298,60,396,64,396,69,298,65"/>
-<area shape="poly" id="edge5_Node000003_Node000005" title=" " alt="" coords="298,65,402,99,401,104,297,70"/>
-<area shape="poly" id="edge8_Node000007_Node000002" title=" " alt="" coords="329,96,348,85,372,63,396,42,405,37,408,42,400,46,376,67,352,89,331,100"/>
-<area shape="poly" id="edge9_Node000007_Node000004" title=" " alt="" coords="350,97,397,84,398,89,351,102"/>
-<area shape="poly" id="edge11_Node000007_Node000005" title=" " alt="" coords="351,117,382,117,382,123,351,123"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="298,63,396,65,396,71,298,68"/>
+<area shape="rect" id="Node000005" href="$classTensor.html#a83ae42925e21d2871d755407d7505c10" title=" " alt="" coords="398,107,522,133"/>
+<area shape="poly" id="edge5_Node000003_Node000005" title=" " alt="" coords="298,69,399,99,397,104,297,74"/>
+<area shape="poly" id="edge8_Node000007_Node000002" title=" " alt="" coords="329,100,348,89,372,65,382,54,396,42,404,37,407,42,400,46,385,58,376,69,352,93,332,104"/>
+<area shape="poly" id="edge9_Node000007_Node000004" title=" " alt="" coords="349,100,397,85,399,90,351,105"/>
+<area shape="poly" id="edge11_Node000007_Node000005" title=" " alt="" coords="350,120,382,119,382,124,351,125"/>
 <area shape="rect" id="Node000008" href="$classTensor.html#a234f74cd16bd13561f7963ba29efb163" title="Fill the tensor with a specified value." alt="" coords="420,157,501,184"/>
-<area shape="poly" id="edge10_Node000007_Node000008" title=" " alt="" coords="351,138,405,153,404,158,350,143"/>
+<area shape="poly" id="edge10_Node000007_Node000008" title=" " alt="" coords="351,140,405,154,404,159,350,145"/>
 </map>

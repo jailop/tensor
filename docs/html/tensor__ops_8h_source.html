@@ -98,68 +98,73 @@ $(function(){initNavTree('tensor__ops_8h_source.html','',''); });
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &quot;<a class="code" href="tensor_8h.html">tensor.h</a>&quot;</span></div>
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &lt;numeric&gt;</span></div>
 <div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span></div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span> </div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span><span class="preprocessor">#ifndef TENSOR_OPS_H</span></div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span><span class="preprocessor">#define TENSOR_OPS_H</span></div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span> </div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span><span class="preprocessor">#include &quot;<a class="code" href="tensor_8h.html">tensor.h</a>&quot;</span></div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span><span class="preprocessor">#include &lt;numeric&gt;</span></div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span></div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T, <span class="keywordtype">size_t</span> N&gt;</div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span><span class="keyword">class </span><a class="code hl_class" href="classTensor.html">Tensor</a>;</div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span></div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span><span class="keyword">namespace </span>tensor_ops {</div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span></div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span><span class="keyword">template</span>&lt;<span class="keywordtype">size_t</span> N1, <span class="keywordtype">size_t</span> N2&gt;</div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span><span class="keywordtype">bool</span> <a class="code hl_function" href="tensor_8h.html#af558fb1fbf98a2d78e5a85123c232d9f">are_broadcastable</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="tensor_8h.html#ab58b5b2b06188fb918bfa78bdfce068b">TensorIndices&lt;N1&gt;</a>&amp; shape1, <span class="keyword">const</span> <a class="code hl_typedef" href="tensor_8h.html#ab58b5b2b06188fb918bfa78bdfce068b">TensorIndices&lt;N2&gt;</a>&amp; shape2) {</div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>    <span class="keywordtype">size_t</span> max_dims = std::max(N1, N2);</div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; max_dims; ++i) {</div>
-<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>        <span class="keywordtype">size_t</span> idx1 = (i &lt; N1) ? (N1 - 1 - i) : 0;</div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>        <span class="keywordtype">size_t</span> idx2 = (i &lt; N2) ? (N2 - 1 - i) : 0;</div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>        </div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>        <span class="keywordtype">size_t</span> dim1 = (i &lt; N1) ? shape1[idx1] : 1;</div>
-<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>        <span class="keywordtype">size_t</span> dim2 = (i &lt; N2) ? shape2[idx2] : 1;</div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>        </div>
-<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>        <span class="keywordflow">if</span> (dim1 != dim2 &amp;&amp; dim1 != 1 &amp;&amp; dim2 != 1) {</div>
-<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>        }</div>
-<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>    }</div>
-<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>}</div>
-<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span></div>
-<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span><span class="keyword">template</span>&lt;<span class="keywordtype">size_t</span> N1, <span class="keywordtype">size_t</span> N2&gt;</div>
-<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span><span class="keyword">auto</span> broadcast_shape(<span class="keyword">const</span> <a class="code hl_typedef" href="tensor_8h.html#ab58b5b2b06188fb918bfa78bdfce068b">TensorIndices&lt;N1&gt;</a>&amp; shape1, <span class="keyword">const</span> <a class="code hl_typedef" href="tensor_8h.html#ab58b5b2b06188fb918bfa78bdfce068b">TensorIndices&lt;N2&gt;</a>&amp; shape2) {</div>
-<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>    <span class="keyword">constexpr</span> <span class="keywordtype">size_t</span> max_dims = std::max(N1, N2);</div>
-<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>    <a class="code hl_typedef" href="tensor_8h.html#ab58b5b2b06188fb918bfa78bdfce068b">TensorIndices&lt;max_dims&gt;</a> result;</div>
-<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>    </div>
-<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; max_dims; ++i) {</div>
-<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>        <span class="keywordtype">size_t</span> idx1 = (max_dims - 1 - i &lt; N1) ? (N1 - 1 - (max_dims - 1 - i)) : SIZE_MAX;</div>
-<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>        <span class="keywordtype">size_t</span> idx2 = (max_dims - 1 - i &lt; N2) ? (N2 - 1 - (max_dims - 1 - i)) : SIZE_MAX;</div>
-<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>        </div>
-<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>        <span class="keywordtype">size_t</span> dim1 = (idx1 != SIZE_MAX) ? shape1[idx1] : 1;</div>
-<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>        <span class="keywordtype">size_t</span> dim2 = (idx2 != SIZE_MAX) ? shape2[idx2] : 1;</div>
-<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>        </div>
-<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>        result[max_dims - 1 - i] = std::max(dim1, dim2);</div>
-<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>    }</div>
-<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>    </div>
-<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>    <span class="keywordflow">return</span> result;</div>
-<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>}</div>
-<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span> </div>
-<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>} <span class="comment">// namespace tensor_ops</span></div>
-<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span> </div>
-<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span><span class="comment">// Add these methods to Tensor class (will be inserted into tensor.h)</span></div>
-<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span> </div>
-<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span><span class="comment">// Helper template to compute result dimensions for matmul</span></div>
-<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span><span class="keyword">template</span>&lt;<span class="keywordtype">size_t</span> NA, <span class="keywordtype">size_t</span> NB&gt;</div>
-<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span><span class="keyword">struct </span>MatmulResultDims {</div>
-<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>    <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">size_t</span> value = NA + NB - 2;</div>
-<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>};</div>
-<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span> </div>
-<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span><span class="preprocessor">#endif </span><span class="comment">// TENSOR_OPS_H</span></div>
-<div class="ttc" id="aclassTensor_html"><div class="ttname"><a href="classTensor.html">Tensor</a></div><div class="ttdoc">Forward declaration for autograd.</div><div class="ttdef"><b>Definition</b> <a href="tensor_8h_source.html#l00469">tensor.h:469</a></div></div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span></div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T, <span class="keywordtype">size_t</span> N&gt;</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span><span class="keyword">class </span><a class="code hl_class" href="classTensor.html">Tensor</a>;</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span></div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacetensor__ops.html">tensor_ops</a> {</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span></div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span><span class="keyword">template</span>&lt;<span class="keywordtype">size_t</span> N1, <span class="keywordtype">size_t</span> N2&gt;</div>
+<div class="foldopen" id="foldopen00072" data-start="{" data-end="}">
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno"><a class="line" href="namespacetensor__ops.html#ae3907cded9af095d0b31a0272dc0429a">   72</a></span><span class="keywordtype">bool</span> <a class="code hl_function" href="namespacetensor__ops.html#ae3907cded9af095d0b31a0272dc0429a">are_broadcastable</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="tensor_8h.html#ab58b5b2b06188fb918bfa78bdfce068b">TensorIndices&lt;N1&gt;</a>&amp; shape1, <span class="keyword">const</span> <a class="code hl_typedef" href="tensor_8h.html#ab58b5b2b06188fb918bfa78bdfce068b">TensorIndices&lt;N2&gt;</a>&amp; shape2) {</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>    <span class="keywordtype">size_t</span> max_dims = std::max(N1, N2);</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; max_dims; ++i) {</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>        <span class="keywordtype">size_t</span> idx1 = (i &lt; N1) ? (N1 - 1 - i) : 0;</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>        <span class="keywordtype">size_t</span> idx2 = (i &lt; N2) ? (N2 - 1 - i) : 0;</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>        </div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>        <span class="keywordtype">size_t</span> dim1 = (i &lt; N1) ? shape1[idx1] : 1;</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>        <span class="keywordtype">size_t</span> dim2 = (i &lt; N2) ? shape2[idx2] : 1;</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>        </div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>        <span class="keywordflow">if</span> (dim1 != dim2 &amp;&amp; dim1 != 1 &amp;&amp; dim2 != 1) {</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>        }</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>    }</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>}</div>
+</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span></div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span><span class="keyword">template</span>&lt;<span class="keywordtype">size_t</span> N1, <span class="keywordtype">size_t</span> N2&gt;</div>
+<div class="foldopen" id="foldopen00097" data-start="{" data-end="}">
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno"><a class="line" href="namespacetensor__ops.html#a87eb5eae2b166a08853e5b508524df72">   97</a></span><span class="keyword">auto</span> <a class="code hl_function" href="namespacetensor__ops.html#a87eb5eae2b166a08853e5b508524df72">broadcast_shape</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="tensor_8h.html#ab58b5b2b06188fb918bfa78bdfce068b">TensorIndices&lt;N1&gt;</a>&amp; shape1, <span class="keyword">const</span> <a class="code hl_typedef" href="tensor_8h.html#ab58b5b2b06188fb918bfa78bdfce068b">TensorIndices&lt;N2&gt;</a>&amp; shape2) {</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>    <span class="keyword">constexpr</span> <span class="keywordtype">size_t</span> max_dims = std::max(N1, N2);</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>    <a class="code hl_typedef" href="tensor_8h.html#ab58b5b2b06188fb918bfa78bdfce068b">TensorIndices&lt;max_dims&gt;</a> result;</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>    </div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; max_dims; ++i) {</div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>        <span class="comment">// Align from the right: rightmost dimensions are aligned first</span></div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>        <span class="keywordtype">size_t</span> idx1 = (i &lt; N1) ? (N1 - 1 - i) : SIZE_MAX;</div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>        <span class="keywordtype">size_t</span> idx2 = (i &lt; N2) ? (N2 - 1 - i) : SIZE_MAX;</div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>        </div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>        <span class="keywordtype">size_t</span> dim1 = (idx1 != SIZE_MAX) ? shape1[idx1] : 1;</div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>        <span class="keywordtype">size_t</span> dim2 = (idx2 != SIZE_MAX) ? shape2[idx2] : 1;</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>        </div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>        result[max_dims - 1 - i] = std::max(dim1, dim2);</div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>    }</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>    </div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>    <span class="keywordflow">return</span> result;</div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>}</div>
+</div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span> </div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>} <span class="comment">// namespace tensor_ops</span></div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span> </div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span><span class="comment">// Add these methods to Tensor class (will be inserted into tensor.h)</span></div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span> </div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span><span class="comment">// Helper template to compute result dimensions for matmul</span></div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span><span class="keyword">template</span>&lt;<span class="keywordtype">size_t</span> NA, <span class="keywordtype">size_t</span> NB&gt;</div>
+<div class="foldopen" id="foldopen00121" data-start="{" data-end="};">
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno"><a class="line" href="structMatmulResultDims.html">  121</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structMatmulResultDims.html">MatmulResultDims</a> {</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno"><a class="line" href="structMatmulResultDims.html#aae135e1203aec35bbc3447c417f7da5d">  122</a></span>    <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keywordtype">size_t</span> <a class="code hl_variable" href="structMatmulResultDims.html#aae135e1203aec35bbc3447c417f7da5d">value</a> = NA + NB - 2;</div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>};</div>
+</div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span> </div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span><span class="preprocessor">#endif </span><span class="comment">// TENSOR_OPS_H</span></div>
+<div class="ttc" id="aclassTensor_html"><div class="ttname"><a href="classTensor.html">Tensor</a></div><div class="ttdoc">Forward declaration for autograd.</div><div class="ttdef"><b>Definition</b> <a href="tensor_8h_source.html#l00518">tensor.h:518</a></div></div>
+<div class="ttc" id="anamespacetensor__ops_html"><div class="ttname"><a href="namespacetensor__ops.html">tensor_ops</a></div><div class="ttdoc">Core tensor operations for neural networks.</div></div>
+<div class="ttc" id="anamespacetensor__ops_html_a87eb5eae2b166a08853e5b508524df72"><div class="ttname"><a href="namespacetensor__ops.html#a87eb5eae2b166a08853e5b508524df72">tensor_ops::broadcast_shape</a></div><div class="ttdeci">auto broadcast_shape(const TensorIndices&lt; N1 &gt; &amp;shape1, const TensorIndices&lt; N2 &gt; &amp;shape2)</div><div class="ttdoc">Compute broadcasted shape for two tensors.</div><div class="ttdef"><b>Definition</b> <a href="#l00097">tensor_ops.h:97</a></div></div>
+<div class="ttc" id="anamespacetensor__ops_html_ae3907cded9af095d0b31a0272dc0429a"><div class="ttname"><a href="namespacetensor__ops.html#ae3907cded9af095d0b31a0272dc0429a">tensor_ops::are_broadcastable</a></div><div class="ttdeci">bool are_broadcastable(const TensorIndices&lt; N1 &gt; &amp;shape1, const TensorIndices&lt; N2 &gt; &amp;shape2)</div><div class="ttdoc">Check if two tensor shapes are broadcastable.</div><div class="ttdef"><b>Definition</b> <a href="#l00072">tensor_ops.h:72</a></div></div>
+<div class="ttc" id="astructMatmulResultDims_html"><div class="ttname"><a href="structMatmulResultDims.html">MatmulResultDims</a></div><div class="ttdef"><b>Definition</b> <a href="#l00121">tensor_ops.h:121</a></div></div>
+<div class="ttc" id="astructMatmulResultDims_html_aae135e1203aec35bbc3447c417f7da5d"><div class="ttname"><a href="structMatmulResultDims.html#aae135e1203aec35bbc3447c417f7da5d">MatmulResultDims::value</a></div><div class="ttdeci">static constexpr size_t value</div><div class="ttdef"><b>Definition</b> <a href="#l00122">tensor_ops.h:122</a></div></div>
 <div class="ttc" id="atensor_8h_html"><div class="ttname"><a href="tensor_8h.html">tensor.h</a></div><div class="ttdoc">High-performance multi-dimensional tensor library with GPU, BLAS, and autograd support.</div></div>
-<div class="ttc" id="atensor_8h_html_ab58b5b2b06188fb918bfa78bdfce068b"><div class="ttname"><a href="tensor_8h.html#ab58b5b2b06188fb918bfa78bdfce068b">TensorIndices</a></div><div class="ttdeci">std::array&lt; size_t, N &gt; TensorIndices</div><div class="ttdoc">Type alias for tensor indices/coordinates.</div><div class="ttdef"><b>Definition</b> <a href="tensor_8h_source.html#l00330">tensor.h:330</a></div></div>
-<div class="ttc" id="atensor_8h_html_af558fb1fbf98a2d78e5a85123c232d9f"><div class="ttname"><a href="tensor_8h.html#af558fb1fbf98a2d78e5a85123c232d9f">are_broadcastable</a></div><div class="ttdeci">bool are_broadcastable(const TensorIndices&lt; N1 &gt; &amp;shape1, const TensorIndices&lt; N2 &gt; &amp;shape2, std::string *error_msg)</div><div class="ttdoc">Check if two tensor shapes are broadcastable.</div><div class="ttdef"><b>Definition</b> <a href="tensor_8h_source.html#l06482">tensor.h:6482</a></div></div>
+<div class="ttc" id="atensor_8h_html_ab58b5b2b06188fb918bfa78bdfce068b"><div class="ttname"><a href="tensor_8h.html#ab58b5b2b06188fb918bfa78bdfce068b">TensorIndices</a></div><div class="ttdeci">std::array&lt; size_t, N &gt; TensorIndices</div><div class="ttdoc">Type alias for tensor indices/coordinates.</div><div class="ttdef"><b>Definition</b> <a href="tensor_8h_source.html#l00379">tensor.h:379</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 </div><!-- container -->

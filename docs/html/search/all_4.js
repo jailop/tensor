@@ -38,9 +38,10 @@ var searchData=
   ['block_35',['Block',['../structMemoryPool_1_1Block.html',1,'MemoryPool&lt; T &gt;::Block'],['../structMemoryPool_1_1Block.html#a5a4ed58c45cdfe7de4b4ac4302a245b4',1,'MemoryPool::Block::Block()']]],
   ['block_36',['block',['../classTensorSlice.html#a1bd9b68295e8796f36452ba27a85e1fb',1,'TensorSlice::block()'],['../classTensor.html#a77397ac152988d5ed90941bac5a96c28',1,'Tensor::block()'],['../tensor_8h.html#adc912199dacbff108e0d2cadfae000df',1,'block():&#160;tensor.h']]],
   ['bottomrows_37',['bottomRows',['../classTensor.html#a8ecd760521443aca3613911d9af40d5a',1,'Tensor::bottomRows()'],['../tensor_8h.html#aa94ca571f8bc2b76cd1bdb6fd851c556',1,'bottomRows():&#160;tensor.h']]],
-  ['broadcast_5fto_38',['broadcast_to',['../classTensor.html#aebe2b244763904422344add448a0c597',1,'Tensor::broadcast_to()'],['../tensor_8h.html#a34fae58316c67748882059be5f1d153c',1,'broadcast_to():&#160;tensor.h']]],
-  ['broadcasting_20rules_39',['Broadcasting Rules',['../tensor__ops_8h.html#broadcasting',1,'']]],
-  ['build_20instructions_40',['Build Instructions',['../index.html#autotoc_md14',1,'']]],
-  ['build_20options_41',['Build Options',['../index.html#autotoc_md15',1,'']]],
-  ['building_42',['Building',['../index.html#autotoc_md12',1,'']]]
+  ['broadcast_5fshape_38',['broadcast_shape',['../namespacetensor__ops.html#a87eb5eae2b166a08853e5b508524df72',1,'tensor_ops']]],
+  ['broadcast_5fto_39',['broadcast_to',['../classTensor.html#aebe2b244763904422344add448a0c597',1,'Tensor::broadcast_to()'],['../tensor_8h.html#a34fae58316c67748882059be5f1d153c',1,'broadcast_to():&#160;tensor.h']]],
+  ['broadcasting_20rules_40',['Broadcasting Rules',['../tensor__ops_8h.html#broadcasting',1,'']]],
+  ['build_20instructions_41',['Build Instructions',['../index.html#autotoc_md14',1,'']]],
+  ['build_20options_42',['Build Options',['../index.html#autotoc_md15',1,'']]],
+  ['building_43',['Building',['../index.html#autotoc_md12',1,'']]]
 ];

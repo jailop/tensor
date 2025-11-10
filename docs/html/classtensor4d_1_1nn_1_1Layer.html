@@ -170,7 +170,7 @@ Protected Attributes</h2></td></tr>
 <div class="textblock"><div class="compoundTemplParams">template&lt;typename T&gt;<br />
 class tensor4d::nn::Layer&lt; T &gt;</div><p>Base class for all neural network layers. </p>
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00035">35</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00040">40</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
 </div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="aabd4feffefbe1a92d584484413289a05" name="aabd4feffefbe1a92d584484413289a05"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aabd4feffefbe1a92d584484413289a05">&#9670;&#160;</a></span>~Layer()</h2>
@@ -303,9 +303,9 @@ template&lt;typename T&gt; </div>
 
 <p>Check if layer is in training mode. </p>
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00068">68</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   68</span>{ <span class="keywordflow">return</span> <a class="code hl_variable" href="#a5046b1e468f41cc660af5f541be017d6">training_</a>; }</div>
-<div class="ttc" id="aclasstensor4d_1_1nn_1_1Layer_html_a5046b1e468f41cc660af5f541be017d6"><div class="ttname"><a href="#a5046b1e468f41cc660af5f541be017d6">tensor4d::nn::Layer::training_</a></div><div class="ttdeci">bool training_</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00071">nn_layers.h:71</a></div></div>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00073">73</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   73</span>{ <span class="keywordflow">return</span> <a class="code hl_variable" href="#a5046b1e468f41cc660af5f541be017d6">training_</a>; }</div>
+<div class="ttc" id="aclasstensor4d_1_1nn_1_1Layer_html_a5046b1e468f41cc660af5f541be017d6"><div class="ttname"><a href="#a5046b1e468f41cc660af5f541be017d6">tensor4d::nn::Layer::training_</a></div><div class="ttdeci">bool training_</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00076">nn_layers.h:76</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -339,8 +339,8 @@ template&lt;typename T&gt; </div>
 
 <p>Reimplemented in <a class="el" href="classtensor4d_1_1nn_1_1BatchNorm1d.html#a00a6dc7b408c9edaf7072301c75b4ccf">tensor4d::nn::BatchNorm1d&lt; T &gt;</a>, <a class="el" href="classtensor4d_1_1nn_1_1BatchNorm1d.html#a00a6dc7b408c9edaf7072301c75b4ccf">tensor4d::nn::BatchNorm1d&lt; double &gt;</a>, <a class="el" href="classtensor4d_1_1nn_1_1BatchNorm1d.html#a00a6dc7b408c9edaf7072301c75b4ccf">tensor4d::nn::BatchNorm1d&lt; float &gt;</a>, <a class="el" href="classtensor4d_1_1nn_1_1Linear.html#aa0fab014d4634b17ea27cda3e120d238">tensor4d::nn::Linear&lt; T &gt;</a>, <a class="el" href="classtensor4d_1_1nn_1_1Linear.html#aa0fab014d4634b17ea27cda3e120d238">tensor4d::nn::Linear&lt; double &gt;</a>, and <a class="el" href="classtensor4d_1_1nn_1_1Linear.html#aa0fab014d4634b17ea27cda3e120d238">tensor4d::nn::Linear&lt; float &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00057">57</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   57</span>{ <span class="keywordflow">return</span> {}; }</div>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00062">62</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   62</span>{ <span class="keywordflow">return</span> {}; }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -377,9 +377,9 @@ template&lt;typename T&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00063">63</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   63</span>{ <a class="code hl_variable" href="#a5046b1e468f41cc660af5f541be017d6">training_</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1Layer.html">mode</a>; }</div>
-<div class="ttc" id="aclasstensor4d_1_1nn_1_1Layer_html"><div class="ttname"><a href="classtensor4d_1_1nn_1_1Layer.html">tensor4d::nn::Layer</a></div><div class="ttdoc">Base class for all neural network layers.</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00035">nn_layers.h:35</a></div></div>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00068">68</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   68</span>{ <a class="code hl_variable" href="#a5046b1e468f41cc660af5f541be017d6">training_</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1Layer.html">mode</a>; }</div>
+<div class="ttc" id="aclasstensor4d_1_1nn_1_1Layer_html"><div class="ttname"><a href="classtensor4d_1_1nn_1_1Layer.html">tensor4d::nn::Layer</a></div><div class="ttdoc">Base class for all neural network layers.</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00040">nn_layers.h:40</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -418,7 +418,7 @@ template&lt;typename T&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00071">71</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00076">76</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
 
 </div>
 </div>

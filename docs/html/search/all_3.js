@@ -18,7 +18,7 @@ var searchData=
   ['api_20include_20tensor_5fc_20h_15',['C API (&lt;span class=&quot;tt&quot;&gt;include/tensor_c.h&lt;/span&gt;)',['../index.html#autotoc_md31',1,'']]],
   ['arange_16',['arange',['../tensor_8h.html#abee606191f2a9544a7acbbd79094ed5b',1,'tensor.h']]],
   ['architecture_17',['Library Architecture',['../index.html#autotoc_md22',1,'']]],
-  ['are_5fbroadcastable_18',['are_broadcastable',['../tensor_8h.html#af558fb1fbf98a2d78e5a85123c232d9f',1,'tensor.h']]],
+  ['are_5fbroadcastable_18',['are_broadcastable',['../tensor_8h.html#af558fb1fbf98a2d78e5a85123c232d9f',1,'are_broadcastable():&#160;tensor.h'],['../namespacetensor__ops.html#ae3907cded9af095d0b31a0272dc0429a',1,'tensor_ops::are_broadcastable()']]],
   ['argmax_19',['argmax',['../classTensor.html#addc6badb03ce57d1191f2d834169c30a',1,'Tensor']]],
   ['argmax_5faxis_20',['argmax_axis',['../classTensor.html#ae5260fcc92739949dd584a0b931d1853',1,'Tensor']]],
   ['argmax_5frows_21',['argmax_rows',['../classTensor.html#a7e486401bc789c0d2344b2b271a3316b',1,'Tensor']]],

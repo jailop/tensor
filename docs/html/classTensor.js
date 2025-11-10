@@ -1,6 +1,7 @@
 var classTensor =
 [
     [ "Tensor", "classTensor.html#a8a85c4bf5ad38b0ba4a3d8665dfce486", null ],
+    [ "~Tensor", "classTensor.html#a49bbb76821a6b0d03c05a0bbc26abc18", null ],
     [ "Tensor", "classTensor.html#a905559324e349a17f2530a9b5ce067ee", null ],
     [ "abs", "classTensor.html#a694440b236a5cfb314e68adec066a9c6", null ],
     [ "all", "classTensor.html#a2dc155b6d76e3ec3492e4693c59bc8c4", null ],

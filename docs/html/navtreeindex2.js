@@ -1,5 +1,6 @@
 var NAVTREEINDEX2 =
 {
+"classtensor4d_1_1nn_1_1Tanh.html#a5046b1e468f41cc660af5f541be017d6":[11,0,2,0,4,7],
 "classtensor4d_1_1nn_1_1Tanh.html#a5046b1e468f41cc660af5f541be017d6":[12,0,0,0,4,7],
 "classtensor4d_1_1nn_1_1Tanh.html#a5a29143edf7136c7a3d944846f23d05d":[11,0,2,0,4,4],
 "classtensor4d_1_1nn_1_1Tanh.html#a5a29143edf7136c7a3d944846f23d05d":[12,0,0,0,4,4],
@@ -248,6 +249,5 @@ var NAVTREEINDEX2 =
 "namespacetensor4d_1_1nn.html#a3315ab248317bf7d71c75b77ccc5f985":[11,0,2,0,11],
 "namespacetensor4d_1_1nn.html#a35558d36da40b43a93f6743d3aaf91eb":[11,0,2,0,18],
 "namespacetensor4d_1_1nn.html#a4d5c82c731007a58002b1973150bb7e5":[11,0,2,0,16],
-"namespacetensor4d_1_1nn.html#a676f9d19eb47312f01a5c2ef0262e300":[11,0,2,0,8],
-"namespacetensor4d_1_1nn.html#a684fa7cf2cac6ab7b8d62edc2b1da9d6":[11,0,2,0,20]
+"namespacetensor4d_1_1nn.html#a676f9d19eb47312f01a5c2ef0262e300":[11,0,2,0,8]
 };

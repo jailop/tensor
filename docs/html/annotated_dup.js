@@ -17,6 +17,7 @@ var annotated_dup =
     [ "ExponentialLR", "classExponentialLR.html", "classExponentialLR" ],
     [ "Float16", "structFloat16.html", "structFloat16" ],
     [ "LazyOperation", "classLazyOperation.html", "classLazyOperation" ],
+    [ "MatmulResultDims", "structMatmulResultDims.html", "structMatmulResultDims" ],
     [ "MemoryPool", "classMemoryPool.html", "classMemoryPool" ],
     [ "Optimizer", "classOptimizer.html", "classOptimizer" ],
     [ "RMSprop", "classRMSprop.html", "classRMSprop" ],

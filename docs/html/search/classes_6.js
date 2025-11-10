@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['memorypool_0',['MemoryPool',['../classMemoryPool.html',1,'']]]
+  ['matmulresultdims_0',['MatmulResultDims',['../structMatmulResultDims.html',1,'']]],
+  ['memorypool_1',['MemoryPool',['../classMemoryPool.html',1,'']]]
 ];

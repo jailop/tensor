@@ -159,6 +159,25 @@ Include dependency graph for tensor_ops.h:</div>
 </div>
 </div>
 <p><a href="tensor__ops_8h_source.html">Go to the source code of this file.</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr class="memitem:MatmulResultDims_3C_20NA_2C_20NB_20_3E" id="r_MatmulResultDims_3C_20NA_2C_20NB_20_3E"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMatmulResultDims.html">MatmulResultDims&lt; NA, NB &gt;</a></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-namespaces" class="groupheader"><a id="namespaces" name="namespaces"></a>
+Namespaces</h2></td></tr>
+<tr class="memitem:tensor_5Fops" id="r_tensor_5Fops"><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetensor__ops.html">tensor_ops</a></td></tr>
+<tr class="memdesc:namespacetensor__ops"><td class="mdescLeft">&#160;</td><td class="mdescRight">Core tensor operations for neural networks. <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:ae3907cded9af095d0b31a0272dc0429a" id="r_ae3907cded9af095d0b31a0272dc0429a"><td class="memTemplParams" colspan="2">template&lt;size_t N1, size_t N2&gt; </td></tr>
+<tr class="memitem:ae3907cded9af095d0b31a0272dc0429a template"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetensor__ops.html#ae3907cded9af095d0b31a0272dc0429a">tensor_ops::are_broadcastable</a> (const <a class="el" href="tensor_8h.html#ab58b5b2b06188fb918bfa78bdfce068b">TensorIndices</a>&lt; N1 &gt; &amp;shape1, const <a class="el" href="tensor_8h.html#ab58b5b2b06188fb918bfa78bdfce068b">TensorIndices</a>&lt; N2 &gt; &amp;shape2)</td></tr>
+<tr class="memdesc:ae3907cded9af095d0b31a0272dc0429a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if two tensor shapes are broadcastable.  <br /></td></tr>
+<tr class="memitem:a87eb5eae2b166a08853e5b508524df72" id="r_a87eb5eae2b166a08853e5b508524df72"><td class="memTemplParams" colspan="2">template&lt;size_t N1, size_t N2&gt; </td></tr>
+<tr class="memitem:a87eb5eae2b166a08853e5b508524df72 template"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacetensor__ops.html#a87eb5eae2b166a08853e5b508524df72">tensor_ops::broadcast_shape</a> (const <a class="el" href="tensor_8h.html#ab58b5b2b06188fb918bfa78bdfce068b">TensorIndices</a>&lt; N1 &gt; &amp;shape1, const <a class="el" href="tensor_8h.html#ab58b5b2b06188fb918bfa78bdfce068b">TensorIndices</a>&lt; N2 &gt; &amp;shape2)</td></tr>
+<tr class="memdesc:a87eb5eae2b166a08853e5b508524df72"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute broadcasted shape for two tensors.  <br /></td></tr>
+</table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Core neural network operations with broadcasting and autograd. </p>
 <p>This header provides essential operations for building neural networks:</p><ul>

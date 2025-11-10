@@ -8,7 +8,7 @@ var dir_d44c64559bbebec7f509842c48db8b23 =
     [ "tensor.h", "tensor_8h.html", "tensor_8h" ],
     [ "tensor_c.h", "tensor__c_8h.html", "tensor__c_8h" ],
     [ "tensor_io.h", "tensor__io_8h.html", "tensor__io_8h" ],
-    [ "tensor_ops.h", "tensor__ops_8h.html", null ],
+    [ "tensor_ops.h", "tensor__ops_8h.html", "tensor__ops_8h" ],
     [ "tensor_perf.h", "tensor__perf_8h.html", "tensor__perf_8h" ],
     [ "tensor_types.h", "tensor__types_8h.html", "tensor__types_8h" ]
 ];

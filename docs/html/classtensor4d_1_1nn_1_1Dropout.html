@@ -150,7 +150,7 @@ Private Attributes</h2></td></tr>
 <div class="textblock"><div class="compoundTemplParams">template&lt;typename T&gt;<br />
 class tensor4d::nn::Dropout&lt; T &gt;</div><p><a class="el" href="classtensor4d_1_1nn_1_1Dropout.html" title="Dropout layer for regularization.">Dropout</a> layer for regularization. </p>
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00276">276</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00281">281</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
 </div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="aea77c1d5fe4c7acaa55174fde51883c5" name="aea77c1d5fe4c7acaa55174fde51883c5"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aea77c1d5fe4c7acaa55174fde51883c5">&#9670;&#160;</a></span>Dropout()</h2>
@@ -185,15 +185,15 @@ template&lt;typename T&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00282">282</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  282</span>                                : <a class="code hl_variable" href="#add8163856fcd8550fc2d2bdbafdf7115">p_</a>(<a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">p</a>), <a class="code hl_variable" href="#a156bdcf7dd306241dfc47d6224c08b1c">mask_</a>({1, 1}, <span class="keyword">false</span>) {</div>
-<div class="line"><span class="lineno">  283</span>        <span class="keywordflow">if</span> (<a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">p &lt; 0 || p &gt;</a> 1) {</div>
-<div class="line"><span class="lineno">  284</span>            <span class="keywordflow">throw</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">std::invalid_argument</a>(<span class="stringliteral">&quot;Dropout probability must be between 0 and 1&quot;</span>);</div>
-<div class="line"><span class="lineno">  285</span>        }</div>
-<div class="line"><span class="lineno">  286</span>    }</div>
-<div class="ttc" id="aclasstensor4d_1_1nn_1_1Dropout_html"><div class="ttname"><a href="classtensor4d_1_1nn_1_1Dropout.html">tensor4d::nn::Dropout</a></div><div class="ttdoc">Dropout layer for regularization.</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00276">nn_layers.h:276</a></div></div>
-<div class="ttc" id="aclasstensor4d_1_1nn_1_1Dropout_html_a156bdcf7dd306241dfc47d6224c08b1c"><div class="ttname"><a href="#a156bdcf7dd306241dfc47d6224c08b1c">tensor4d::nn::Dropout::mask_</a></div><div class="ttdeci">Tensor&lt; T, 2 &gt; mask_</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00326">nn_layers.h:326</a></div></div>
-<div class="ttc" id="aclasstensor4d_1_1nn_1_1Dropout_html_add8163856fcd8550fc2d2bdbafdf7115"><div class="ttname"><a href="#add8163856fcd8550fc2d2bdbafdf7115">tensor4d::nn::Dropout::p_</a></div><div class="ttdeci">T p_</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00325">nn_layers.h:325</a></div></div>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00287">287</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  287</span>                                : <a class="code hl_variable" href="#add8163856fcd8550fc2d2bdbafdf7115">p_</a>(<a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">p</a>), <a class="code hl_variable" href="#a156bdcf7dd306241dfc47d6224c08b1c">mask_</a>({1, 1}, <span class="keyword">false</span>) {</div>
+<div class="line"><span class="lineno">  288</span>        <span class="keywordflow">if</span> (<a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">p &lt; 0 || p &gt;</a> 1) {</div>
+<div class="line"><span class="lineno">  289</span>            <span class="keywordflow">throw</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">std::invalid_argument</a>(<span class="stringliteral">&quot;Dropout probability must be between 0 and 1&quot;</span>);</div>
+<div class="line"><span class="lineno">  290</span>        }</div>
+<div class="line"><span class="lineno">  291</span>    }</div>
+<div class="ttc" id="aclasstensor4d_1_1nn_1_1Dropout_html"><div class="ttname"><a href="classtensor4d_1_1nn_1_1Dropout.html">tensor4d::nn::Dropout</a></div><div class="ttdoc">Dropout layer for regularization.</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00281">nn_layers.h:281</a></div></div>
+<div class="ttc" id="aclasstensor4d_1_1nn_1_1Dropout_html_a156bdcf7dd306241dfc47d6224c08b1c"><div class="ttname"><a href="#a156bdcf7dd306241dfc47d6224c08b1c">tensor4d::nn::Dropout::mask_</a></div><div class="ttdeci">Tensor&lt; T, 2 &gt; mask_</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00331">nn_layers.h:331</a></div></div>
+<div class="ttc" id="aclasstensor4d_1_1nn_1_1Dropout_html_add8163856fcd8550fc2d2bdbafdf7115"><div class="ttname"><a href="#add8163856fcd8550fc2d2bdbafdf7115">tensor4d::nn::Dropout::p_</a></div><div class="ttdeci">T p_</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00330">nn_layers.h:330</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -234,17 +234,17 @@ template&lt;typename T&gt; </div>
 
 <p>Implements <a class="el" href="classtensor4d_1_1nn_1_1Layer.html#a3d9932a950faa4534cc8c468c9152f22">tensor4d::nn::Layer&lt; T &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00314">314</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  314</span>                                                                    {</div>
-<div class="line"><span class="lineno">  315</span>        <span class="keywordflow">if</span> (!this-&gt;<a class="code hl_variable" href="classtensor4d_1_1nn_1_1Layer.html#a5046b1e468f41cc660af5f541be017d6">training_</a>) {</div>
-<div class="line"><span class="lineno">  316</span>            <span class="keywordflow">return</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">grad_output</a>;</div>
-<div class="line"><span class="lineno">  317</span>        }</div>
-<div class="line"><span class="lineno">  318</span>        </div>
-<div class="line"><span class="lineno">  319</span>        <span class="comment">// Gradient passes through mask</span></div>
-<div class="line"><span class="lineno">  320</span>        <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">result</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">grad_output</a> * <a class="code hl_variable" href="#a156bdcf7dd306241dfc47d6224c08b1c">mask_</a>;</div>
-<div class="line"><span class="lineno">  321</span>        <span class="keywordflow">return</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">std::get&lt;Tensor&lt;T, 2&gt;</a>&gt;(<a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">result</a>);</div>
-<div class="line"><span class="lineno">  322</span>    }</div>
-<div class="ttc" id="aclasstensor4d_1_1nn_1_1Layer_html_a5046b1e468f41cc660af5f541be017d6"><div class="ttname"><a href="classtensor4d_1_1nn_1_1Layer.html#a5046b1e468f41cc660af5f541be017d6">tensor4d::nn::Layer::training_</a></div><div class="ttdeci">bool training_</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00071">nn_layers.h:71</a></div></div>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00319">319</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  319</span>                                                                    {</div>
+<div class="line"><span class="lineno">  320</span>        <span class="keywordflow">if</span> (!this-&gt;<a class="code hl_variable" href="classtensor4d_1_1nn_1_1Layer.html#a5046b1e468f41cc660af5f541be017d6">training_</a>) {</div>
+<div class="line"><span class="lineno">  321</span>            <span class="keywordflow">return</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">grad_output</a>;</div>
+<div class="line"><span class="lineno">  322</span>        }</div>
+<div class="line"><span class="lineno">  323</span>        </div>
+<div class="line"><span class="lineno">  324</span>        <span class="comment">// Gradient passes through mask</span></div>
+<div class="line"><span class="lineno">  325</span>        <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">result</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">grad_output</a> * <a class="code hl_variable" href="#a156bdcf7dd306241dfc47d6224c08b1c">mask_</a>;</div>
+<div class="line"><span class="lineno">  326</span>        <span class="keywordflow">return</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">std::get&lt;Tensor&lt;T, 2&gt;</a>&gt;(<a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">result</a>);</div>
+<div class="line"><span class="lineno">  327</span>    }</div>
+<div class="ttc" id="aclasstensor4d_1_1nn_1_1Layer_html_a5046b1e468f41cc660af5f541be017d6"><div class="ttname"><a href="classtensor4d_1_1nn_1_1Layer.html#a5046b1e468f41cc660af5f541be017d6">tensor4d::nn::Layer::training_</a></div><div class="ttdeci">bool training_</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00076">nn_layers.h:76</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -284,32 +284,32 @@ template&lt;typename T&gt; </div>
 
 <p>Implements <a class="el" href="classtensor4d_1_1nn_1_1Layer.html#a2d171fcf4e726e2bd0f6c9399288436b">tensor4d::nn::Layer&lt; T &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00288">288</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  288</span>                                                             {</div>
-<div class="line"><span class="lineno">  289</span>        <span class="keywordflow">if</span> (!this-&gt;<a class="code hl_variable" href="classtensor4d_1_1nn_1_1Layer.html#a5046b1e468f41cc660af5f541be017d6">training_</a>) {</div>
-<div class="line"><span class="lineno">  290</span>            <span class="keywordflow">return</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">input</a>;  <span class="comment">// No dropout during inference</span></div>
-<div class="line"><span class="lineno">  291</span>        }</div>
-<div class="line"><span class="lineno">  292</span>        </div>
-<div class="line"><span class="lineno">  293</span>        <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">shape</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">input</a>.shape();</div>
-<div class="line"><span class="lineno">  294</span>        <a class="code hl_variable" href="#a156bdcf7dd306241dfc47d6224c08b1c">mask_</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">Tensor&lt;T, 2&gt;</a>(<a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">shape</a>, <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">input</a>.uses_gpu());</div>
-<div class="line"><span class="lineno">  295</span>        </div>
-<div class="line"><span class="lineno">  296</span>        <span class="comment">// Generate random mask</span></div>
-<div class="line"><span class="lineno">  297</span>        <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">std::random_device</a> <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">rd</a>;</div>
-<div class="line"><span class="lineno">  298</span>        <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">std::mt19937</a> <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">gen</a>(<a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">rd</a>());</div>
-<div class="line"><span class="lineno">  299</span>        <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">std::bernoulli_distribution</a> <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">dist</a>(1.0 - <a class="code hl_variable" href="#add8163856fcd8550fc2d2bdbafdf7115">p_</a>);</div>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00293">293</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  293</span>                                                             {</div>
+<div class="line"><span class="lineno">  294</span>        <span class="keywordflow">if</span> (!this-&gt;<a class="code hl_variable" href="classtensor4d_1_1nn_1_1Layer.html#a5046b1e468f41cc660af5f541be017d6">training_</a>) {</div>
+<div class="line"><span class="lineno">  295</span>            <span class="keywordflow">return</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">input</a>;  <span class="comment">// No dropout during inference</span></div>
+<div class="line"><span class="lineno">  296</span>        }</div>
+<div class="line"><span class="lineno">  297</span>        </div>
+<div class="line"><span class="lineno">  298</span>        <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">shape</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">input</a>.shape();</div>
+<div class="line"><span class="lineno">  299</span>        <a class="code hl_variable" href="#a156bdcf7dd306241dfc47d6224c08b1c">mask_</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">Tensor&lt;T, 2&gt;</a>(<a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">shape</a>, <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">input</a>.uses_gpu());</div>
 <div class="line"><span class="lineno">  300</span>        </div>
-<div class="line"><span class="lineno">  301</span>        <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">T</a> <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">scale</a> = 1.0 / (1.0 - <a class="code hl_variable" href="#add8163856fcd8550fc2d2bdbafdf7115">p_</a>);</div>
-<div class="line"><span class="lineno">  302</span>        <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">T</a>* <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">mask_ptr</a> = <a class="code hl_variable" href="#a156bdcf7dd306241dfc47d6224c08b1c">mask_</a>.data_ptr();</div>
-<div class="line"><span class="lineno">  303</span>        <span class="keywordtype">size_t</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">total_size</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">shape</a>[0] * <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">shape</a>[1];</div>
-<div class="line"><span class="lineno">  304</span>        </div>
-<div class="line"><span class="lineno">  305</span>        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">i</a> = 0; <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">i</a> &lt; <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">total_size</a>; ++<a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">i</a>) {</div>
-<div class="line"><span class="lineno">  306</span>            <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">mask_ptr</a>[<a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">i</a>] = <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">dist</a>(<a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">gen</a>) ? <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">scale</a> : 0;</div>
-<div class="line"><span class="lineno">  307</span>        }</div>
-<div class="line"><span class="lineno">  308</span>        </div>
-<div class="line"><span class="lineno">  309</span>        <span class="comment">// Apply mask using tensor multiplication</span></div>
-<div class="line"><span class="lineno">  310</span>        <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">result</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">input</a> * <a class="code hl_variable" href="#a156bdcf7dd306241dfc47d6224c08b1c">mask_</a>;</div>
-<div class="line"><span class="lineno">  311</span>        <span class="keywordflow">return</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">std::get&lt;Tensor&lt;T, 2&gt;</a>&gt;(<a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">result</a>);</div>
-<div class="line"><span class="lineno">  312</span>    }</div>
+<div class="line"><span class="lineno">  301</span>        <span class="comment">// Generate random mask</span></div>
+<div class="line"><span class="lineno">  302</span>        <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">std::random_device</a> <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">rd</a>;</div>
+<div class="line"><span class="lineno">  303</span>        <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">std::mt19937</a> <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">gen</a>(<a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">rd</a>());</div>
+<div class="line"><span class="lineno">  304</span>        <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">std::bernoulli_distribution</a> <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">dist</a>(1.0 - <a class="code hl_variable" href="#add8163856fcd8550fc2d2bdbafdf7115">p_</a>);</div>
+<div class="line"><span class="lineno">  305</span>        </div>
+<div class="line"><span class="lineno">  306</span>        <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">T</a> <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">scale</a> = 1.0 / (1.0 - <a class="code hl_variable" href="#add8163856fcd8550fc2d2bdbafdf7115">p_</a>);</div>
+<div class="line"><span class="lineno">  307</span>        <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">T</a>* <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">mask_ptr</a> = <a class="code hl_variable" href="#a156bdcf7dd306241dfc47d6224c08b1c">mask_</a>.data_ptr();</div>
+<div class="line"><span class="lineno">  308</span>        <span class="keywordtype">size_t</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">total_size</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">shape</a>[0] * <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">shape</a>[1];</div>
+<div class="line"><span class="lineno">  309</span>        </div>
+<div class="line"><span class="lineno">  310</span>        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">i</a> = 0; <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">i</a> &lt; <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">total_size</a>; ++<a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">i</a>) {</div>
+<div class="line"><span class="lineno">  311</span>            <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">mask_ptr</a>[<a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">i</a>] = <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">dist</a>(<a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">gen</a>) ? <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">scale</a> : 0;</div>
+<div class="line"><span class="lineno">  312</span>        }</div>
+<div class="line"><span class="lineno">  313</span>        </div>
+<div class="line"><span class="lineno">  314</span>        <span class="comment">// Apply mask using tensor multiplication</span></div>
+<div class="line"><span class="lineno">  315</span>        <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">result</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">input</a> * <a class="code hl_variable" href="#a156bdcf7dd306241dfc47d6224c08b1c">mask_</a>;</div>
+<div class="line"><span class="lineno">  316</span>        <span class="keywordflow">return</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">std::get&lt;Tensor&lt;T, 2&gt;</a>&gt;(<a class="code hl_class" href="classtensor4d_1_1nn_1_1Dropout.html">result</a>);</div>
+<div class="line"><span class="lineno">  317</span>    }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -340,8 +340,8 @@ template&lt;typename T&gt; </div>
 
 <p>Check if layer is in training mode. </p>
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00068">68</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   68</span>{ <span class="keywordflow">return</span> <a class="code hl_variable" href="classtensor4d_1_1nn_1_1Layer.html#a5046b1e468f41cc660af5f541be017d6">training_</a>; }</div>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00073">73</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   73</span>{ <span class="keywordflow">return</span> <a class="code hl_variable" href="classtensor4d_1_1nn_1_1Layer.html#a5046b1e468f41cc660af5f541be017d6">training_</a>; }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -375,8 +375,8 @@ template&lt;typename T&gt; </div>
 
 <p>Reimplemented in <a class="el" href="classtensor4d_1_1nn_1_1BatchNorm1d.html#a00a6dc7b408c9edaf7072301c75b4ccf">tensor4d::nn::BatchNorm1d&lt; T &gt;</a>, <a class="el" href="classtensor4d_1_1nn_1_1BatchNorm1d.html#a00a6dc7b408c9edaf7072301c75b4ccf">tensor4d::nn::BatchNorm1d&lt; double &gt;</a>, <a class="el" href="classtensor4d_1_1nn_1_1BatchNorm1d.html#a00a6dc7b408c9edaf7072301c75b4ccf">tensor4d::nn::BatchNorm1d&lt; float &gt;</a>, <a class="el" href="classtensor4d_1_1nn_1_1Linear.html#aa0fab014d4634b17ea27cda3e120d238">tensor4d::nn::Linear&lt; T &gt;</a>, <a class="el" href="classtensor4d_1_1nn_1_1Linear.html#aa0fab014d4634b17ea27cda3e120d238">tensor4d::nn::Linear&lt; double &gt;</a>, and <a class="el" href="classtensor4d_1_1nn_1_1Linear.html#aa0fab014d4634b17ea27cda3e120d238">tensor4d::nn::Linear&lt; float &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00057">57</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   57</span>{ <span class="keywordflow">return</span> {}; }</div>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00062">62</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   62</span>{ <span class="keywordflow">return</span> {}; }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -413,9 +413,9 @@ template&lt;typename T&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00063">63</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   63</span>{ <a class="code hl_variable" href="classtensor4d_1_1nn_1_1Layer.html#a5046b1e468f41cc660af5f541be017d6">training_</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1Layer.html">mode</a>; }</div>
-<div class="ttc" id="aclasstensor4d_1_1nn_1_1Layer_html"><div class="ttname"><a href="classtensor4d_1_1nn_1_1Layer.html">tensor4d::nn::Layer</a></div><div class="ttdoc">Base class for all neural network layers.</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00035">nn_layers.h:35</a></div></div>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00068">68</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   68</span>{ <a class="code hl_variable" href="classtensor4d_1_1nn_1_1Layer.html#a5046b1e468f41cc660af5f541be017d6">training_</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1Layer.html">mode</a>; }</div>
+<div class="ttc" id="aclasstensor4d_1_1nn_1_1Layer_html"><div class="ttname"><a href="classtensor4d_1_1nn_1_1Layer.html">tensor4d::nn::Layer</a></div><div class="ttdoc">Base class for all neural network layers.</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00040">nn_layers.h:40</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -454,7 +454,7 @@ template&lt;typename T&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00326">326</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00331">331</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
 
 </div>
 </div>
@@ -480,7 +480,7 @@ template&lt;typename T&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00325">325</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00330">330</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
 
 </div>
 </div>
@@ -506,7 +506,7 @@ template&lt;typename T&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00071">71</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00076">76</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
 
 </div>
 </div>

@@ -162,7 +162,7 @@ Private Attributes</h2></td></tr>
 class tensor4d::nn::BatchNorm1d&lt; T &gt;</div><p>Batch Normalization layer. </p>
 <p>Automatically uses GPU if available. </p>
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00335">335</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00340">340</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
 </div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a2775a2774d8a6c4216b4cf2c5691335b" name="a2775a2774d8a6c4216b4cf2c5691335b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a2775a2774d8a6c4216b4cf2c5691335b">&#9670;&#160;</a></span>BatchNorm1d()</h2>
@@ -209,33 +209,33 @@ template&lt;typename T&gt; </div>
 </dl>
 <p>Note: GPU acceleration is automatically enabled if available. </p>
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00345">345</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  346</span>        : <a class="code hl_variable" href="#a2c9cea8478dc951c47bc95c219e87db1">num_features_</a>(<a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">num_features</a>), <a class="code hl_variable" href="#a66a9964817b54848afc8b46d7367207d">eps_</a>(<a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">eps</a>), <a class="code hl_variable" href="#a5615d826982a2f132397419ca7881609">momentum_</a>(<a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">momentum</a>),</div>
-<div class="line"><span class="lineno">  347</span>          <a class="code hl_variable" href="#a311f849757fe8d8f70cfd55ce896b5da">gamma_</a>({1, <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">num_features</a>}), <a class="code hl_variable" href="#a06aa43a886c3349131e4cec95a847a5e">beta_</a>({1, <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">num_features</a>}),</div>
-<div class="line"><span class="lineno">  348</span>          <a class="code hl_variable" href="#a5804439c12b21f719bdab6b8bac01fdc">running_mean_</a>({1, <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">num_features</a>}), <a class="code hl_variable" href="#afeec797fa0b23c42329aecb063a826b4">running_var_</a>({1, <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">num_features</a>}),</div>
-<div class="line"><span class="lineno">  349</span>          <a class="code hl_variable" href="#ae56fd1f24787c14016e2fb0f14719b65">batch_mean_</a>({1, <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">num_features</a>}), <a class="code hl_variable" href="#af4cb5a26201a5cb84493fd4ade774989">batch_var_</a>({1, <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">num_features</a>}),</div>
-<div class="line"><span class="lineno">  350</span>          <a class="code hl_variable" href="#a20ef166dce9b80f2697e645af2bb451e">input_</a>({1, <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">num_features</a>}), <a class="code hl_variable" href="#ac9f443c1167f9978a0ab6a0dc97f02b2">input_normalized_</a>({1, <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">num_features</a>}),</div>
-<div class="line"><span class="lineno">  351</span>          <a class="code hl_variable" href="#a3ba4cd0f7addeb22751af6893a23491f">grad_gamma_</a>({1, <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">num_features</a>}), <a class="code hl_variable" href="#a8295c6940c580ef2aed68f78099c7698">grad_beta_</a>({1, <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">num_features</a>}) {</div>
-<div class="line"><span class="lineno">  352</span>        </div>
-<div class="line"><span class="lineno">  353</span>        <a class="code hl_variable" href="#a311f849757fe8d8f70cfd55ce896b5da">gamma_</a>.fill(1);</div>
-<div class="line"><span class="lineno">  354</span>        <a class="code hl_variable" href="#a06aa43a886c3349131e4cec95a847a5e">beta_</a>.fill(0);</div>
-<div class="line"><span class="lineno">  355</span>        <a class="code hl_variable" href="#a5804439c12b21f719bdab6b8bac01fdc">running_mean_</a>.fill(0);</div>
-<div class="line"><span class="lineno">  356</span>        <a class="code hl_variable" href="#afeec797fa0b23c42329aecb063a826b4">running_var_</a>.fill(1);</div>
-<div class="line"><span class="lineno">  357</span>    }</div>
-<div class="ttc" id="aclasstensor4d_1_1nn_1_1BatchNorm1d_html"><div class="ttname"><a href="classtensor4d_1_1nn_1_1BatchNorm1d.html">tensor4d::nn::BatchNorm1d</a></div><div class="ttdoc">Batch Normalization layer.</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00335">nn_layers.h:335</a></div></div>
-<div class="ttc" id="aclasstensor4d_1_1nn_1_1BatchNorm1d_html_a06aa43a886c3349131e4cec95a847a5e"><div class="ttname"><a href="#a06aa43a886c3349131e4cec95a847a5e">tensor4d::nn::BatchNorm1d::beta_</a></div><div class="ttdeci">Tensor&lt; T, 2 &gt; beta_</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00429">nn_layers.h:429</a></div></div>
-<div class="ttc" id="aclasstensor4d_1_1nn_1_1BatchNorm1d_html_a20ef166dce9b80f2697e645af2bb451e"><div class="ttname"><a href="#a20ef166dce9b80f2697e645af2bb451e">tensor4d::nn::BatchNorm1d::input_</a></div><div class="ttdeci">Tensor&lt; T, 2 &gt; input_</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00434">nn_layers.h:434</a></div></div>
-<div class="ttc" id="aclasstensor4d_1_1nn_1_1BatchNorm1d_html_a2c9cea8478dc951c47bc95c219e87db1"><div class="ttname"><a href="#a2c9cea8478dc951c47bc95c219e87db1">tensor4d::nn::BatchNorm1d::num_features_</a></div><div class="ttdeci">size_t num_features_</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00424">nn_layers.h:424</a></div></div>
-<div class="ttc" id="aclasstensor4d_1_1nn_1_1BatchNorm1d_html_a311f849757fe8d8f70cfd55ce896b5da"><div class="ttname"><a href="#a311f849757fe8d8f70cfd55ce896b5da">tensor4d::nn::BatchNorm1d::gamma_</a></div><div class="ttdeci">Tensor&lt; T, 2 &gt; gamma_</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00428">nn_layers.h:428</a></div></div>
-<div class="ttc" id="aclasstensor4d_1_1nn_1_1BatchNorm1d_html_a3ba4cd0f7addeb22751af6893a23491f"><div class="ttname"><a href="#a3ba4cd0f7addeb22751af6893a23491f">tensor4d::nn::BatchNorm1d::grad_gamma_</a></div><div class="ttdeci">Tensor&lt; T, 2 &gt; grad_gamma_</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00436">nn_layers.h:436</a></div></div>
-<div class="ttc" id="aclasstensor4d_1_1nn_1_1BatchNorm1d_html_a5615d826982a2f132397419ca7881609"><div class="ttname"><a href="#a5615d826982a2f132397419ca7881609">tensor4d::nn::BatchNorm1d::momentum_</a></div><div class="ttdeci">T momentum_</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00426">nn_layers.h:426</a></div></div>
-<div class="ttc" id="aclasstensor4d_1_1nn_1_1BatchNorm1d_html_a5804439c12b21f719bdab6b8bac01fdc"><div class="ttname"><a href="#a5804439c12b21f719bdab6b8bac01fdc">tensor4d::nn::BatchNorm1d::running_mean_</a></div><div class="ttdeci">Tensor&lt; T, 2 &gt; running_mean_</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00430">nn_layers.h:430</a></div></div>
-<div class="ttc" id="aclasstensor4d_1_1nn_1_1BatchNorm1d_html_a66a9964817b54848afc8b46d7367207d"><div class="ttname"><a href="#a66a9964817b54848afc8b46d7367207d">tensor4d::nn::BatchNorm1d::eps_</a></div><div class="ttdeci">T eps_</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00425">nn_layers.h:425</a></div></div>
-<div class="ttc" id="aclasstensor4d_1_1nn_1_1BatchNorm1d_html_a8295c6940c580ef2aed68f78099c7698"><div class="ttname"><a href="#a8295c6940c580ef2aed68f78099c7698">tensor4d::nn::BatchNorm1d::grad_beta_</a></div><div class="ttdeci">Tensor&lt; T, 2 &gt; grad_beta_</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00437">nn_layers.h:437</a></div></div>
-<div class="ttc" id="aclasstensor4d_1_1nn_1_1BatchNorm1d_html_ac9f443c1167f9978a0ab6a0dc97f02b2"><div class="ttname"><a href="#ac9f443c1167f9978a0ab6a0dc97f02b2">tensor4d::nn::BatchNorm1d::input_normalized_</a></div><div class="ttdeci">Tensor&lt; T, 2 &gt; input_normalized_</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00435">nn_layers.h:435</a></div></div>
-<div class="ttc" id="aclasstensor4d_1_1nn_1_1BatchNorm1d_html_ae56fd1f24787c14016e2fb0f14719b65"><div class="ttname"><a href="#ae56fd1f24787c14016e2fb0f14719b65">tensor4d::nn::BatchNorm1d::batch_mean_</a></div><div class="ttdeci">Tensor&lt; T, 2 &gt; batch_mean_</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00432">nn_layers.h:432</a></div></div>
-<div class="ttc" id="aclasstensor4d_1_1nn_1_1BatchNorm1d_html_af4cb5a26201a5cb84493fd4ade774989"><div class="ttname"><a href="#af4cb5a26201a5cb84493fd4ade774989">tensor4d::nn::BatchNorm1d::batch_var_</a></div><div class="ttdeci">Tensor&lt; T, 2 &gt; batch_var_</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00433">nn_layers.h:433</a></div></div>
-<div class="ttc" id="aclasstensor4d_1_1nn_1_1BatchNorm1d_html_afeec797fa0b23c42329aecb063a826b4"><div class="ttname"><a href="#afeec797fa0b23c42329aecb063a826b4">tensor4d::nn::BatchNorm1d::running_var_</a></div><div class="ttdeci">Tensor&lt; T, 2 &gt; running_var_</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00431">nn_layers.h:431</a></div></div>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00350">350</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  351</span>        : <a class="code hl_variable" href="#a2c9cea8478dc951c47bc95c219e87db1">num_features_</a>(<a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">num_features</a>), <a class="code hl_variable" href="#a66a9964817b54848afc8b46d7367207d">eps_</a>(<a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">eps</a>), <a class="code hl_variable" href="#a5615d826982a2f132397419ca7881609">momentum_</a>(<a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">momentum</a>),</div>
+<div class="line"><span class="lineno">  352</span>          <a class="code hl_variable" href="#a311f849757fe8d8f70cfd55ce896b5da">gamma_</a>({1, <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">num_features</a>}), <a class="code hl_variable" href="#a06aa43a886c3349131e4cec95a847a5e">beta_</a>({1, <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">num_features</a>}),</div>
+<div class="line"><span class="lineno">  353</span>          <a class="code hl_variable" href="#a5804439c12b21f719bdab6b8bac01fdc">running_mean_</a>({1, <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">num_features</a>}), <a class="code hl_variable" href="#afeec797fa0b23c42329aecb063a826b4">running_var_</a>({1, <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">num_features</a>}),</div>
+<div class="line"><span class="lineno">  354</span>          <a class="code hl_variable" href="#ae56fd1f24787c14016e2fb0f14719b65">batch_mean_</a>({1, <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">num_features</a>}), <a class="code hl_variable" href="#af4cb5a26201a5cb84493fd4ade774989">batch_var_</a>({1, <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">num_features</a>}),</div>
+<div class="line"><span class="lineno">  355</span>          <a class="code hl_variable" href="#a20ef166dce9b80f2697e645af2bb451e">input_</a>({1, <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">num_features</a>}), <a class="code hl_variable" href="#ac9f443c1167f9978a0ab6a0dc97f02b2">input_normalized_</a>({1, <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">num_features</a>}),</div>
+<div class="line"><span class="lineno">  356</span>          <a class="code hl_variable" href="#a3ba4cd0f7addeb22751af6893a23491f">grad_gamma_</a>({1, <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">num_features</a>}), <a class="code hl_variable" href="#a8295c6940c580ef2aed68f78099c7698">grad_beta_</a>({1, <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">num_features</a>}) {</div>
+<div class="line"><span class="lineno">  357</span>        </div>
+<div class="line"><span class="lineno">  358</span>        <a class="code hl_variable" href="#a311f849757fe8d8f70cfd55ce896b5da">gamma_</a>.fill(1);</div>
+<div class="line"><span class="lineno">  359</span>        <a class="code hl_variable" href="#a06aa43a886c3349131e4cec95a847a5e">beta_</a>.fill(0);</div>
+<div class="line"><span class="lineno">  360</span>        <a class="code hl_variable" href="#a5804439c12b21f719bdab6b8bac01fdc">running_mean_</a>.fill(0);</div>
+<div class="line"><span class="lineno">  361</span>        <a class="code hl_variable" href="#afeec797fa0b23c42329aecb063a826b4">running_var_</a>.fill(1);</div>
+<div class="line"><span class="lineno">  362</span>    }</div>
+<div class="ttc" id="aclasstensor4d_1_1nn_1_1BatchNorm1d_html"><div class="ttname"><a href="classtensor4d_1_1nn_1_1BatchNorm1d.html">tensor4d::nn::BatchNorm1d</a></div><div class="ttdoc">Batch Normalization layer.</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00340">nn_layers.h:340</a></div></div>
+<div class="ttc" id="aclasstensor4d_1_1nn_1_1BatchNorm1d_html_a06aa43a886c3349131e4cec95a847a5e"><div class="ttname"><a href="#a06aa43a886c3349131e4cec95a847a5e">tensor4d::nn::BatchNorm1d::beta_</a></div><div class="ttdeci">Tensor&lt; T, 2 &gt; beta_</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00434">nn_layers.h:434</a></div></div>
+<div class="ttc" id="aclasstensor4d_1_1nn_1_1BatchNorm1d_html_a20ef166dce9b80f2697e645af2bb451e"><div class="ttname"><a href="#a20ef166dce9b80f2697e645af2bb451e">tensor4d::nn::BatchNorm1d::input_</a></div><div class="ttdeci">Tensor&lt; T, 2 &gt; input_</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00439">nn_layers.h:439</a></div></div>
+<div class="ttc" id="aclasstensor4d_1_1nn_1_1BatchNorm1d_html_a2c9cea8478dc951c47bc95c219e87db1"><div class="ttname"><a href="#a2c9cea8478dc951c47bc95c219e87db1">tensor4d::nn::BatchNorm1d::num_features_</a></div><div class="ttdeci">size_t num_features_</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00429">nn_layers.h:429</a></div></div>
+<div class="ttc" id="aclasstensor4d_1_1nn_1_1BatchNorm1d_html_a311f849757fe8d8f70cfd55ce896b5da"><div class="ttname"><a href="#a311f849757fe8d8f70cfd55ce896b5da">tensor4d::nn::BatchNorm1d::gamma_</a></div><div class="ttdeci">Tensor&lt; T, 2 &gt; gamma_</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00433">nn_layers.h:433</a></div></div>
+<div class="ttc" id="aclasstensor4d_1_1nn_1_1BatchNorm1d_html_a3ba4cd0f7addeb22751af6893a23491f"><div class="ttname"><a href="#a3ba4cd0f7addeb22751af6893a23491f">tensor4d::nn::BatchNorm1d::grad_gamma_</a></div><div class="ttdeci">Tensor&lt; T, 2 &gt; grad_gamma_</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00441">nn_layers.h:441</a></div></div>
+<div class="ttc" id="aclasstensor4d_1_1nn_1_1BatchNorm1d_html_a5615d826982a2f132397419ca7881609"><div class="ttname"><a href="#a5615d826982a2f132397419ca7881609">tensor4d::nn::BatchNorm1d::momentum_</a></div><div class="ttdeci">T momentum_</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00431">nn_layers.h:431</a></div></div>
+<div class="ttc" id="aclasstensor4d_1_1nn_1_1BatchNorm1d_html_a5804439c12b21f719bdab6b8bac01fdc"><div class="ttname"><a href="#a5804439c12b21f719bdab6b8bac01fdc">tensor4d::nn::BatchNorm1d::running_mean_</a></div><div class="ttdeci">Tensor&lt; T, 2 &gt; running_mean_</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00435">nn_layers.h:435</a></div></div>
+<div class="ttc" id="aclasstensor4d_1_1nn_1_1BatchNorm1d_html_a66a9964817b54848afc8b46d7367207d"><div class="ttname"><a href="#a66a9964817b54848afc8b46d7367207d">tensor4d::nn::BatchNorm1d::eps_</a></div><div class="ttdeci">T eps_</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00430">nn_layers.h:430</a></div></div>
+<div class="ttc" id="aclasstensor4d_1_1nn_1_1BatchNorm1d_html_a8295c6940c580ef2aed68f78099c7698"><div class="ttname"><a href="#a8295c6940c580ef2aed68f78099c7698">tensor4d::nn::BatchNorm1d::grad_beta_</a></div><div class="ttdeci">Tensor&lt; T, 2 &gt; grad_beta_</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00442">nn_layers.h:442</a></div></div>
+<div class="ttc" id="aclasstensor4d_1_1nn_1_1BatchNorm1d_html_ac9f443c1167f9978a0ab6a0dc97f02b2"><div class="ttname"><a href="#ac9f443c1167f9978a0ab6a0dc97f02b2">tensor4d::nn::BatchNorm1d::input_normalized_</a></div><div class="ttdeci">Tensor&lt; T, 2 &gt; input_normalized_</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00440">nn_layers.h:440</a></div></div>
+<div class="ttc" id="aclasstensor4d_1_1nn_1_1BatchNorm1d_html_ae56fd1f24787c14016e2fb0f14719b65"><div class="ttname"><a href="#ae56fd1f24787c14016e2fb0f14719b65">tensor4d::nn::BatchNorm1d::batch_mean_</a></div><div class="ttdeci">Tensor&lt; T, 2 &gt; batch_mean_</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00437">nn_layers.h:437</a></div></div>
+<div class="ttc" id="aclasstensor4d_1_1nn_1_1BatchNorm1d_html_af4cb5a26201a5cb84493fd4ade774989"><div class="ttname"><a href="#af4cb5a26201a5cb84493fd4ade774989">tensor4d::nn::BatchNorm1d::batch_var_</a></div><div class="ttdeci">Tensor&lt; T, 2 &gt; batch_var_</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00438">nn_layers.h:438</a></div></div>
+<div class="ttc" id="aclasstensor4d_1_1nn_1_1BatchNorm1d_html_afeec797fa0b23c42329aecb063a826b4"><div class="ttname"><a href="#afeec797fa0b23c42329aecb063a826b4">tensor4d::nn::BatchNorm1d::running_var_</a></div><div class="ttdeci">Tensor&lt; T, 2 &gt; running_var_</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00436">nn_layers.h:436</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -276,21 +276,21 @@ template&lt;typename T&gt; </div>
 
 <p>Implements <a class="el" href="classtensor4d_1_1nn_1_1Layer.html#a3d9932a950faa4534cc8c468c9152f22">tensor4d::nn::Layer&lt; T &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00404">404</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  404</span>                                                                    {</div>
-<div class="line"><span class="lineno">  405</span>        <span class="comment">// Gradients w.r.t. gamma and beta using tensor operations</span></div>
-<div class="line"><span class="lineno">  406</span>        <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">temp_var</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">grad_output</a> * <a class="code hl_variable" href="#ac9f443c1167f9978a0ab6a0dc97f02b2">input_normalized_</a>;</div>
-<div class="line"><span class="lineno">  407</span>        <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">temp</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">std::get&lt;Tensor&lt;T, 2&gt;</a>&gt;(<a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">temp_var</a>);</div>
-<div class="line"><span class="lineno">  408</span>        <a class="code hl_variable" href="#a3ba4cd0f7addeb22751af6893a23491f">grad_gamma_</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">temp</a>.sum_axis(0, <span class="keyword">true</span>);</div>
-<div class="line"><span class="lineno">  409</span>        <a class="code hl_variable" href="#a8295c6940c580ef2aed68f78099c7698">grad_beta_</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">grad_output</a>.sum_axis(0, <span class="keyword">true</span>);</div>
-<div class="line"><span class="lineno">  410</span>        </div>
-<div class="line"><span class="lineno">  411</span>        <span class="comment">// Gradient w.r.t. input (simplified) using broadcasting</span></div>
-<div class="line"><span class="lineno">  412</span>        <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">inv_std</a> = <a class="code hl_variable" href="#af4cb5a26201a5cb84493fd4ade774989">batch_var_</a>.map([<span class="keyword">this</span>](<a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">T</a> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">v</a>) { <span class="keywordflow">return</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">T</a>(1) / <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">std::sqrt</a>(<a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">v</a> + <a class="code hl_variable" href="#a66a9964817b54848afc8b46d7367207d">eps_</a>); });</div>
-<div class="line"><span class="lineno">  413</span>        <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">temp1_var</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">grad_output</a> * <a class="code hl_variable" href="#a311f849757fe8d8f70cfd55ce896b5da">gamma_</a>;</div>
-<div class="line"><span class="lineno">  414</span>        <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">temp1</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">std::get&lt;Tensor&lt;T, 2&gt;</a>&gt;(<a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">temp1_var</a>);</div>
-<div class="line"><span class="lineno">  415</span>        <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">grad_input_var</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">temp1</a> * <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">inv_std</a>;</div>
-<div class="line"><span class="lineno">  416</span>        <span class="keywordflow">return</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">std::get&lt;Tensor&lt;T, 2&gt;</a>&gt;(<a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">grad_input_var</a>);</div>
-<div class="line"><span class="lineno">  417</span>    }</div>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00409">409</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  409</span>                                                                    {</div>
+<div class="line"><span class="lineno">  410</span>        <span class="comment">// Gradients w.r.t. gamma and beta using tensor operations</span></div>
+<div class="line"><span class="lineno">  411</span>        <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">temp_var</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">grad_output</a> * <a class="code hl_variable" href="#ac9f443c1167f9978a0ab6a0dc97f02b2">input_normalized_</a>;</div>
+<div class="line"><span class="lineno">  412</span>        <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">temp</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">std::get&lt;Tensor&lt;T, 2&gt;</a>&gt;(<a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">temp_var</a>);</div>
+<div class="line"><span class="lineno">  413</span>        <a class="code hl_variable" href="#a3ba4cd0f7addeb22751af6893a23491f">grad_gamma_</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">temp</a>.sum_axis(0, <span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">  414</span>        <a class="code hl_variable" href="#a8295c6940c580ef2aed68f78099c7698">grad_beta_</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">grad_output</a>.sum_axis(0, <span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">  415</span>        </div>
+<div class="line"><span class="lineno">  416</span>        <span class="comment">// Gradient w.r.t. input (simplified) using broadcasting</span></div>
+<div class="line"><span class="lineno">  417</span>        <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">inv_std</a> = <a class="code hl_variable" href="#af4cb5a26201a5cb84493fd4ade774989">batch_var_</a>.map([<span class="keyword">this</span>](<a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">T</a> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">v</a>) { <span class="keywordflow">return</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">T</a>(1) / <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">std::sqrt</a>(<a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">v</a> + <a class="code hl_variable" href="#a66a9964817b54848afc8b46d7367207d">eps_</a>); });</div>
+<div class="line"><span class="lineno">  418</span>        <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">temp1_var</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">grad_output</a> * <a class="code hl_variable" href="#a311f849757fe8d8f70cfd55ce896b5da">gamma_</a>;</div>
+<div class="line"><span class="lineno">  419</span>        <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">temp1</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">std::get&lt;Tensor&lt;T, 2&gt;</a>&gt;(<a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">temp1_var</a>);</div>
+<div class="line"><span class="lineno">  420</span>        <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">grad_input_var</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">temp1</a> * <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">inv_std</a>;</div>
+<div class="line"><span class="lineno">  421</span>        <span class="keywordflow">return</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">std::get&lt;Tensor&lt;T, 2&gt;</a>&gt;(<a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">grad_input_var</a>);</div>
+<div class="line"><span class="lineno">  422</span>    }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -330,52 +330,52 @@ template&lt;typename T&gt; </div>
 
 <p>Implements <a class="el" href="classtensor4d_1_1nn_1_1Layer.html#a2d171fcf4e726e2bd0f6c9399288436b">tensor4d::nn::Layer&lt; T &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00359">359</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  359</span>                                                             {</div>
-<div class="line"><span class="lineno">  360</span>        <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">shape</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">input</a>.shape();</div>
-<div class="line"><span class="lineno">  361</span>        <span class="keywordtype">size_t</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">batch_size</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">shape</a>[0];</div>
-<div class="line"><span class="lineno">  362</span>        </div>
-<div class="line"><span class="lineno">  363</span>        <span class="keywordflow">if</span> (this-&gt;<a class="code hl_variable" href="classtensor4d_1_1nn_1_1Layer.html#a5046b1e468f41cc660af5f541be017d6">training_</a>) {</div>
-<div class="line"><span class="lineno">  364</span>            <span class="comment">// Compute batch statistics using tensor operations</span></div>
-<div class="line"><span class="lineno">  365</span>            <a class="code hl_variable" href="#ae56fd1f24787c14016e2fb0f14719b65">batch_mean_</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">input</a>.mean_axis(0, <span class="keyword">true</span>);</div>
-<div class="line"><span class="lineno">  366</span>            </div>
-<div class="line"><span class="lineno">  367</span>            <span class="comment">// Compute variance: E[(X - mean)^2] using broadcasting</span></div>
-<div class="line"><span class="lineno">  368</span>            <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">centered_var</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">input</a> - <a class="code hl_variable" href="#ae56fd1f24787c14016e2fb0f14719b65">batch_mean_</a>;</div>
-<div class="line"><span class="lineno">  369</span>            <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">centered</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">std::get&lt;Tensor&lt;T, 2&gt;</a>&gt;(<a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">centered_var</a>);</div>
-<div class="line"><span class="lineno">  370</span>            <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">squared_var</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">centered</a> * <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">centered</a>;</div>
-<div class="line"><span class="lineno">  371</span>            <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">squared</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">std::get&lt;Tensor&lt;T, 2&gt;</a>&gt;(<a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">squared_var</a>);</div>
-<div class="line"><span class="lineno">  372</span>            <a class="code hl_variable" href="#af4cb5a26201a5cb84493fd4ade774989">batch_var_</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">squared</a>.mean_axis(0, <span class="keyword">true</span>);</div>
-<div class="line"><span class="lineno">  373</span>            </div>
-<div class="line"><span class="lineno">  374</span>            <span class="comment">// Update running statistics</span></div>
-<div class="line"><span class="lineno">  375</span>            <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">running_mean_scaled</a> = <a class="code hl_variable" href="#a5804439c12b21f719bdab6b8bac01fdc">running_mean_</a> * (<a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">T</a>(1) - <a class="code hl_variable" href="#a5615d826982a2f132397419ca7881609">momentum_</a>);</div>
-<div class="line"><span class="lineno">  376</span>            <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">batch_mean_scaled</a> = <a class="code hl_variable" href="#ae56fd1f24787c14016e2fb0f14719b65">batch_mean_</a> * <a class="code hl_variable" href="#a5615d826982a2f132397419ca7881609">momentum_</a>;</div>
-<div class="line"><span class="lineno">  377</span>            <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">new_running_mean_var</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">running_mean_scaled</a> + <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">batch_mean_scaled</a>;</div>
-<div class="line"><span class="lineno">  378</span>            <a class="code hl_variable" href="#a5804439c12b21f719bdab6b8bac01fdc">running_mean_</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">std::get&lt;Tensor&lt;T, 2&gt;</a>&gt;(<a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">new_running_mean_var</a>);</div>
-<div class="line"><span class="lineno">  379</span>            </div>
-<div class="line"><span class="lineno">  380</span>            <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">running_var_scaled</a> = <a class="code hl_variable" href="#afeec797fa0b23c42329aecb063a826b4">running_var_</a> * (<a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">T</a>(1) - <a class="code hl_variable" href="#a5615d826982a2f132397419ca7881609">momentum_</a>);</div>
-<div class="line"><span class="lineno">  381</span>            <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">batch_var_scaled</a> = <a class="code hl_variable" href="#af4cb5a26201a5cb84493fd4ade774989">batch_var_</a> * <a class="code hl_variable" href="#a5615d826982a2f132397419ca7881609">momentum_</a>;</div>
-<div class="line"><span class="lineno">  382</span>            <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">new_running_var_var</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">running_var_scaled</a> + <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">batch_var_scaled</a>;</div>
-<div class="line"><span class="lineno">  383</span>            <a class="code hl_variable" href="#afeec797fa0b23c42329aecb063a826b4">running_var_</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">std::get&lt;Tensor&lt;T, 2&gt;</a>&gt;(<a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">new_running_var_var</a>);</div>
-<div class="line"><span class="lineno">  384</span>        }</div>
-<div class="line"><span class="lineno">  385</span>        </div>
-<div class="line"><span class="lineno">  386</span>        <span class="comment">// Normalize and scale using broadcasting</span></div>
-<div class="line"><span class="lineno">  387</span>        <span class="keyword">const</span> <span class="keyword">auto</span>&amp; <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">mean</a> = this-&gt;<a class="code hl_variable" href="classtensor4d_1_1nn_1_1Layer.html#a5046b1e468f41cc660af5f541be017d6">training_</a> ? <a class="code hl_variable" href="#ae56fd1f24787c14016e2fb0f14719b65">batch_mean_</a> : <a class="code hl_variable" href="#a5804439c12b21f719bdab6b8bac01fdc">running_mean_</a>;</div>
-<div class="line"><span class="lineno">  388</span>        <span class="keyword">const</span> <span class="keyword">auto</span>&amp; <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">var</a> = this-&gt;<a class="code hl_variable" href="classtensor4d_1_1nn_1_1Layer.html#a5046b1e468f41cc660af5f541be017d6">training_</a> ? <a class="code hl_variable" href="#af4cb5a26201a5cb84493fd4ade774989">batch_var_</a> : <a class="code hl_variable" href="#afeec797fa0b23c42329aecb063a826b4">running_var_</a>;</div>
-<div class="line"><span class="lineno">  389</span>        </div>
-<div class="line"><span class="lineno">  390</span>        <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">std_dev</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">var</a>.map([<span class="keyword">this</span>](<a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">T</a> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">v</a>) { <span class="keywordflow">return</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">std::sqrt</a>(<a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">v</a> + <a class="code hl_variable" href="#a66a9964817b54848afc8b46d7367207d">eps_</a>); });</div>
-<div class="line"><span class="lineno">  391</span>        <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">centered_var</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">input</a> - <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">mean</a>;</div>
-<div class="line"><span class="lineno">  392</span>        <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">centered</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">std::get&lt;Tensor&lt;T, 2&gt;</a>&gt;(<a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">centered_var</a>);</div>
-<div class="line"><span class="lineno">  393</span>        <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">normalized_var</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">centered</a> / <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">std_dev</a>;</div>
-<div class="line"><span class="lineno">  394</span>        <a class="code hl_variable" href="#ac9f443c1167f9978a0ab6a0dc97f02b2">input_normalized_</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">std::get&lt;Tensor&lt;T, 2&gt;</a>&gt;(<a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">normalized_var</a>);</div>
-<div class="line"><span class="lineno">  395</span>        <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">scaled_var</a> = <a class="code hl_variable" href="#ac9f443c1167f9978a0ab6a0dc97f02b2">input_normalized_</a> * <a class="code hl_variable" href="#a311f849757fe8d8f70cfd55ce896b5da">gamma_</a>;</div>
-<div class="line"><span class="lineno">  396</span>        <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">scaled</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">std::get&lt;Tensor&lt;T, 2&gt;</a>&gt;(<a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">scaled_var</a>);</div>
-<div class="line"><span class="lineno">  397</span>        <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">output_var</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">scaled</a> + <a class="code hl_variable" href="#a06aa43a886c3349131e4cec95a847a5e">beta_</a>;</div>
-<div class="line"><span class="lineno">  398</span>        <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">output</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">std::get&lt;Tensor&lt;T, 2&gt;</a>&gt;(<a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">output_var</a>);</div>
-<div class="line"><span class="lineno">  399</span>        </div>
-<div class="line"><span class="lineno">  400</span>        <a class="code hl_variable" href="#a20ef166dce9b80f2697e645af2bb451e">input_</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">input</a>;</div>
-<div class="line"><span class="lineno">  401</span>        <span class="keywordflow">return</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">output</a>;</div>
-<div class="line"><span class="lineno">  402</span>    }</div>
-<div class="ttc" id="aclasstensor4d_1_1nn_1_1Layer_html_a5046b1e468f41cc660af5f541be017d6"><div class="ttname"><a href="classtensor4d_1_1nn_1_1Layer.html#a5046b1e468f41cc660af5f541be017d6">tensor4d::nn::Layer::training_</a></div><div class="ttdeci">bool training_</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00071">nn_layers.h:71</a></div></div>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00364">364</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  364</span>                                                             {</div>
+<div class="line"><span class="lineno">  365</span>        <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">shape</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">input</a>.shape();</div>
+<div class="line"><span class="lineno">  366</span>        <span class="keywordtype">size_t</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">batch_size</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">shape</a>[0];</div>
+<div class="line"><span class="lineno">  367</span>        </div>
+<div class="line"><span class="lineno">  368</span>        <span class="keywordflow">if</span> (this-&gt;<a class="code hl_variable" href="classtensor4d_1_1nn_1_1Layer.html#a5046b1e468f41cc660af5f541be017d6">training_</a>) {</div>
+<div class="line"><span class="lineno">  369</span>            <span class="comment">// Compute batch statistics using tensor operations</span></div>
+<div class="line"><span class="lineno">  370</span>            <a class="code hl_variable" href="#ae56fd1f24787c14016e2fb0f14719b65">batch_mean_</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">input</a>.mean_axis(0, <span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">  371</span>            </div>
+<div class="line"><span class="lineno">  372</span>            <span class="comment">// Compute variance: E[(X - mean)^2] using broadcasting</span></div>
+<div class="line"><span class="lineno">  373</span>            <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">centered_var</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">input</a> - <a class="code hl_variable" href="#ae56fd1f24787c14016e2fb0f14719b65">batch_mean_</a>;</div>
+<div class="line"><span class="lineno">  374</span>            <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">centered</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">std::get&lt;Tensor&lt;T, 2&gt;</a>&gt;(<a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">centered_var</a>);</div>
+<div class="line"><span class="lineno">  375</span>            <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">squared_var</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">centered</a> * <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">centered</a>;</div>
+<div class="line"><span class="lineno">  376</span>            <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">squared</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">std::get&lt;Tensor&lt;T, 2&gt;</a>&gt;(<a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">squared_var</a>);</div>
+<div class="line"><span class="lineno">  377</span>            <a class="code hl_variable" href="#af4cb5a26201a5cb84493fd4ade774989">batch_var_</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">squared</a>.mean_axis(0, <span class="keyword">true</span>);</div>
+<div class="line"><span class="lineno">  378</span>            </div>
+<div class="line"><span class="lineno">  379</span>            <span class="comment">// Update running statistics</span></div>
+<div class="line"><span class="lineno">  380</span>            <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">running_mean_scaled</a> = <a class="code hl_variable" href="#a5804439c12b21f719bdab6b8bac01fdc">running_mean_</a> * (<a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">T</a>(1) - <a class="code hl_variable" href="#a5615d826982a2f132397419ca7881609">momentum_</a>);</div>
+<div class="line"><span class="lineno">  381</span>            <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">batch_mean_scaled</a> = <a class="code hl_variable" href="#ae56fd1f24787c14016e2fb0f14719b65">batch_mean_</a> * <a class="code hl_variable" href="#a5615d826982a2f132397419ca7881609">momentum_</a>;</div>
+<div class="line"><span class="lineno">  382</span>            <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">new_running_mean_var</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">running_mean_scaled</a> + <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">batch_mean_scaled</a>;</div>
+<div class="line"><span class="lineno">  383</span>            <a class="code hl_variable" href="#a5804439c12b21f719bdab6b8bac01fdc">running_mean_</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">std::get&lt;Tensor&lt;T, 2&gt;</a>&gt;(<a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">new_running_mean_var</a>);</div>
+<div class="line"><span class="lineno">  384</span>            </div>
+<div class="line"><span class="lineno">  385</span>            <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">running_var_scaled</a> = <a class="code hl_variable" href="#afeec797fa0b23c42329aecb063a826b4">running_var_</a> * (<a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">T</a>(1) - <a class="code hl_variable" href="#a5615d826982a2f132397419ca7881609">momentum_</a>);</div>
+<div class="line"><span class="lineno">  386</span>            <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">batch_var_scaled</a> = <a class="code hl_variable" href="#af4cb5a26201a5cb84493fd4ade774989">batch_var_</a> * <a class="code hl_variable" href="#a5615d826982a2f132397419ca7881609">momentum_</a>;</div>
+<div class="line"><span class="lineno">  387</span>            <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">new_running_var_var</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">running_var_scaled</a> + <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">batch_var_scaled</a>;</div>
+<div class="line"><span class="lineno">  388</span>            <a class="code hl_variable" href="#afeec797fa0b23c42329aecb063a826b4">running_var_</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">std::get&lt;Tensor&lt;T, 2&gt;</a>&gt;(<a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">new_running_var_var</a>);</div>
+<div class="line"><span class="lineno">  389</span>        }</div>
+<div class="line"><span class="lineno">  390</span>        </div>
+<div class="line"><span class="lineno">  391</span>        <span class="comment">// Normalize and scale using broadcasting</span></div>
+<div class="line"><span class="lineno">  392</span>        <span class="keyword">const</span> <span class="keyword">auto</span>&amp; <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">mean</a> = this-&gt;<a class="code hl_variable" href="classtensor4d_1_1nn_1_1Layer.html#a5046b1e468f41cc660af5f541be017d6">training_</a> ? <a class="code hl_variable" href="#ae56fd1f24787c14016e2fb0f14719b65">batch_mean_</a> : <a class="code hl_variable" href="#a5804439c12b21f719bdab6b8bac01fdc">running_mean_</a>;</div>
+<div class="line"><span class="lineno">  393</span>        <span class="keyword">const</span> <span class="keyword">auto</span>&amp; <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">var</a> = this-&gt;<a class="code hl_variable" href="classtensor4d_1_1nn_1_1Layer.html#a5046b1e468f41cc660af5f541be017d6">training_</a> ? <a class="code hl_variable" href="#af4cb5a26201a5cb84493fd4ade774989">batch_var_</a> : <a class="code hl_variable" href="#afeec797fa0b23c42329aecb063a826b4">running_var_</a>;</div>
+<div class="line"><span class="lineno">  394</span>        </div>
+<div class="line"><span class="lineno">  395</span>        <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">std_dev</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">var</a>.map([<span class="keyword">this</span>](<a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">T</a> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">v</a>) { <span class="keywordflow">return</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">std::sqrt</a>(<a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">v</a> + <a class="code hl_variable" href="#a66a9964817b54848afc8b46d7367207d">eps_</a>); });</div>
+<div class="line"><span class="lineno">  396</span>        <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">centered_var</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">input</a> - <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">mean</a>;</div>
+<div class="line"><span class="lineno">  397</span>        <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">centered</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">std::get&lt;Tensor&lt;T, 2&gt;</a>&gt;(<a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">centered_var</a>);</div>
+<div class="line"><span class="lineno">  398</span>        <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">normalized_var</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">centered</a> / <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">std_dev</a>;</div>
+<div class="line"><span class="lineno">  399</span>        <a class="code hl_variable" href="#ac9f443c1167f9978a0ab6a0dc97f02b2">input_normalized_</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">std::get&lt;Tensor&lt;T, 2&gt;</a>&gt;(<a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">normalized_var</a>);</div>
+<div class="line"><span class="lineno">  400</span>        <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">scaled_var</a> = <a class="code hl_variable" href="#ac9f443c1167f9978a0ab6a0dc97f02b2">input_normalized_</a> * <a class="code hl_variable" href="#a311f849757fe8d8f70cfd55ce896b5da">gamma_</a>;</div>
+<div class="line"><span class="lineno">  401</span>        <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">scaled</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">std::get&lt;Tensor&lt;T, 2&gt;</a>&gt;(<a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">scaled_var</a>);</div>
+<div class="line"><span class="lineno">  402</span>        <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">output_var</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">scaled</a> + <a class="code hl_variable" href="#a06aa43a886c3349131e4cec95a847a5e">beta_</a>;</div>
+<div class="line"><span class="lineno">  403</span>        <span class="keyword">auto</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">output</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">std::get&lt;Tensor&lt;T, 2&gt;</a>&gt;(<a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">output_var</a>);</div>
+<div class="line"><span class="lineno">  404</span>        </div>
+<div class="line"><span class="lineno">  405</span>        <a class="code hl_variable" href="#a20ef166dce9b80f2697e645af2bb451e">input_</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">input</a>;</div>
+<div class="line"><span class="lineno">  406</span>        <span class="keywordflow">return</span> <a class="code hl_class" href="classtensor4d_1_1nn_1_1BatchNorm1d.html">output</a>;</div>
+<div class="line"><span class="lineno">  407</span>    }</div>
+<div class="ttc" id="aclasstensor4d_1_1nn_1_1Layer_html_a5046b1e468f41cc660af5f541be017d6"><div class="ttname"><a href="classtensor4d_1_1nn_1_1Layer.html#a5046b1e468f41cc660af5f541be017d6">tensor4d::nn::Layer::training_</a></div><div class="ttdeci">bool training_</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00076">nn_layers.h:76</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -406,8 +406,8 @@ template&lt;typename T&gt; </div>
 
 <p>Check if layer is in training mode. </p>
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00068">68</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   68</span>{ <span class="keywordflow">return</span> <a class="code hl_variable" href="classtensor4d_1_1nn_1_1Layer.html#a5046b1e468f41cc660af5f541be017d6">training_</a>; }</div>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00073">73</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   73</span>{ <span class="keywordflow">return</span> <a class="code hl_variable" href="classtensor4d_1_1nn_1_1Layer.html#a5046b1e468f41cc660af5f541be017d6">training_</a>; }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -441,10 +441,10 @@ template&lt;typename T&gt; </div>
 
 <p>Reimplemented from <a class="el" href="classtensor4d_1_1nn_1_1Layer.html#a5a29143edf7136c7a3d944846f23d05d">tensor4d::nn::Layer&lt; T &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00419">419</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  419</span>                                                   {</div>
-<div class="line"><span class="lineno">  420</span>        <span class="keywordflow">return</span> {&amp;<a class="code hl_variable" href="#a311f849757fe8d8f70cfd55ce896b5da">gamma_</a>, &amp;<a class="code hl_variable" href="#a06aa43a886c3349131e4cec95a847a5e">beta_</a>};</div>
-<div class="line"><span class="lineno">  421</span>    }</div>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00424">424</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  424</span>                                                   {</div>
+<div class="line"><span class="lineno">  425</span>        <span class="keywordflow">return</span> {&amp;<a class="code hl_variable" href="#a311f849757fe8d8f70cfd55ce896b5da">gamma_</a>, &amp;<a class="code hl_variable" href="#a06aa43a886c3349131e4cec95a847a5e">beta_</a>};</div>
+<div class="line"><span class="lineno">  426</span>    }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -481,9 +481,9 @@ template&lt;typename T&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00063">63</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   63</span>{ <a class="code hl_variable" href="classtensor4d_1_1nn_1_1Layer.html#a5046b1e468f41cc660af5f541be017d6">training_</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1Layer.html">mode</a>; }</div>
-<div class="ttc" id="aclasstensor4d_1_1nn_1_1Layer_html"><div class="ttname"><a href="classtensor4d_1_1nn_1_1Layer.html">tensor4d::nn::Layer</a></div><div class="ttdoc">Base class for all neural network layers.</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00035">nn_layers.h:35</a></div></div>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00068">68</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   68</span>{ <a class="code hl_variable" href="classtensor4d_1_1nn_1_1Layer.html#a5046b1e468f41cc660af5f541be017d6">training_</a> = <a class="code hl_class" href="classtensor4d_1_1nn_1_1Layer.html">mode</a>; }</div>
+<div class="ttc" id="aclasstensor4d_1_1nn_1_1Layer_html"><div class="ttname"><a href="classtensor4d_1_1nn_1_1Layer.html">tensor4d::nn::Layer</a></div><div class="ttdoc">Base class for all neural network layers.</div><div class="ttdef"><b>Definition</b> <a href="nn__layers_8h_source.html#l00040">nn_layers.h:40</a></div></div>
 </div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -522,7 +522,7 @@ template&lt;typename T&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00432">432</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00437">437</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
 
 </div>
 </div>
@@ -548,7 +548,7 @@ template&lt;typename T&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00433">433</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00438">438</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
 
 </div>
 </div>
@@ -574,7 +574,7 @@ template&lt;typename T&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00429">429</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00434">434</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
 
 </div>
 </div>
@@ -600,7 +600,7 @@ template&lt;typename T&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00425">425</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00430">430</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
 
 </div>
 </div>
@@ -626,7 +626,7 @@ template&lt;typename T&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00428">428</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00433">433</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
 
 </div>
 </div>
@@ -652,7 +652,7 @@ template&lt;typename T&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00437">437</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00442">442</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
 
 </div>
 </div>
@@ -678,7 +678,7 @@ template&lt;typename T&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00436">436</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00441">441</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
 
 </div>
 </div>
@@ -704,7 +704,7 @@ template&lt;typename T&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00434">434</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00439">439</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
 
 </div>
 </div>
@@ -730,7 +730,7 @@ template&lt;typename T&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00435">435</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00440">440</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
 
 </div>
 </div>
@@ -756,7 +756,7 @@ template&lt;typename T&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00426">426</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00431">431</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
 
 </div>
 </div>
@@ -782,7 +782,7 @@ template&lt;typename T&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00424">424</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00429">429</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
 
 </div>
 </div>
@@ -808,7 +808,7 @@ template&lt;typename T&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00430">430</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00435">435</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
 
 </div>
 </div>
@@ -834,7 +834,7 @@ template&lt;typename T&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00431">431</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00436">436</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
 
 </div>
 </div>
@@ -860,7 +860,7 @@ template&lt;typename T&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00071">71</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="nn__layers_8h_source.html#l00076">76</a> of file <a class="el" href="nn__layers_8h_source.html">nn_layers.h</a>.</p>
 
 </div>
 </div>

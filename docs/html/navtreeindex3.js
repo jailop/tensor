@@ -1,5 +1,6 @@
 var NAVTREEINDEX3 =
 {
+"namespacetensor4d_1_1nn.html#a684fa7cf2cac6ab7b8d62edc2b1da9d6":[11,0,2,0,20],
 "namespacetensor4d_1_1nn.html#a762e1706124db702d93be5bb8b18e629":[11,0,2,0,12],
 "namespacetensor4d_1_1nn.html#a7682f7b06565fe530c833139aa5c52cd":[11,0,2,0,23],
 "namespacetensor4d_1_1nn.html#a834567aedd488a7451d76fec1bbba55e":[11,0,2,0,27],
@@ -13,6 +14,9 @@ var NAVTREEINDEX3 =
 "namespacetensor4d_1_1nn.html#ad4dcbd0157fcb32c118ed38f1f40c58f":[11,0,2,0,14],
 "namespacetensor4d_1_1nn.html#add8e6f802c9d7c435a6c981f545a37f2":[11,0,2,0,9],
 "namespacetensor4d_1_1nn.html#af4ed0870610368776140c66a749f99ab":[11,0,2,0,25],
+"namespacetensor__ops.html":[11,0,3],
+"namespacetensor__ops.html#a87eb5eae2b166a08853e5b508524df72":[11,0,3,1],
+"namespacetensor__ops.html#ae3907cded9af095d0b31a0272dc0429a":[11,0,3,0],
 "nn__layers_8h.html":[13,0,1,3],
 "nn__layers_8h_source.html":[13,0,1,3],
 "optimizers_8h.html":[13,0,1,4],
@@ -30,10 +34,12 @@ var NAVTREEINDEX3 =
 "structFloat16.html#aa4245027e64cd2abf04f97f8ef553e1c":[12,0,4,4],
 "structFloat16.html#adad933174b74ac09442726a24b04a41b":[12,0,4,0],
 "structFloat16.html#ae615553575ed3ef5efb0f9c3faf6d9b9":[12,0,4,3],
-"structMemoryPool_1_1Block.html":[12,0,6,0],
-"structMemoryPool_1_1Block.html#a088cfe83e78cd2020ffee486278617fe":[12,0,6,0,1],
-"structMemoryPool_1_1Block.html#a5a4ed58c45cdfe7de4b4ac4302a245b4":[12,0,6,0,0],
-"structMemoryPool_1_1Block.html#a650019bb99492ddbcc57ebb0e5cfe0e1":[12,0,6,0,2],
+"structMatmulResultDims.html":[12,0,6],
+"structMatmulResultDims.html#aae135e1203aec35bbc3447c417f7da5d":[12,0,6,0],
+"structMemoryPool_1_1Block.html":[12,0,7,0],
+"structMemoryPool_1_1Block.html#a088cfe83e78cd2020ffee486278617fe":[12,0,7,0,1],
+"structMemoryPool_1_1Block.html#a5a4ed58c45cdfe7de4b4ac4302a245b4":[12,0,7,0,0],
+"structMemoryPool_1_1Block.html#a650019bb99492ddbcc57ebb0e5cfe0e1":[12,0,7,0,2],
 "tensor_8h.html":[13,0,1,5],
 "tensor_8h.html#a04c7965d0b8f08cfdb84580050e9e0b5":[13,0,1,5,25],
 "tensor_8h.html#a0d1116cdf6624cb52514979cd1869e55":[13,0,1,5,29],
@@ -243,11 +249,5 @@ var NAVTREEINDEX3 =
 "tensor__c_8cpp.html#a9116057b055e18e0e2519d3efcd4f666":[13,0,2,0,78],
 "tensor__c_8cpp.html#a95a8668e3a5f71d0a1d3ae28134391bc":[13,0,2,0,153],
 "tensor__c_8cpp.html#a95c93d5c49416ca78236c13928cd0037":[13,0,2,0,120],
-"tensor__c_8cpp.html#a97c225bc534ae63d2ea52d72fbe10c5a":[13,0,2,0,175],
-"tensor__c_8cpp.html#a986a2d450dd68de32ba10aca25c9e7ac":[13,0,2,0,71],
-"tensor__c_8cpp.html#a98b04b99110cced202cfa89c5560348f":[13,0,2,0,131],
-"tensor__c_8cpp.html#a997fb38a43f9a038bd6410b2b20b9a35":[13,0,2,0,188],
-"tensor__c_8cpp.html#a9a5f27aad034085a55dbf18d203a0b62":[13,0,2,0,146],
-"tensor__c_8cpp.html#a9a603f0a92bc4eedac4296187b7532e6":[13,0,2,0,65],
-"tensor__c_8cpp.html#a9abedcba8076984d32de6fd78e803f68":[13,0,2,0,84]
+"tensor__c_8cpp.html#a97c225bc534ae63d2ea52d72fbe10c5a":[13,0,2,0,175]
 };

@@ -28,6 +28,7 @@ var hierarchy =
       [ "tensor4d::nn::Tanh< T >", "classtensor4d_1_1nn_1_1Tanh.html", null ]
     ] ],
     [ "LazyOperation&lt; T, N &gt;", "classLazyOperation.html", null ],
+    [ "MatmulResultDims&lt; NA, NB &gt;", "structMatmulResultDims.html", null ],
     [ "MemoryPool&lt; T &gt;", "classMemoryPool.html", null ],
     [ "Optimizer&lt; T &gt;", "classOptimizer.html", [
       [ "Adam< T, N >", "classAdam.html", null ],

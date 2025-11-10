@@ -14,5 +14,6 @@ var searchData=
   ['block_11',['Block',['../structMemoryPool_1_1Block.html#a5a4ed58c45cdfe7de4b4ac4302a245b4',1,'MemoryPool::Block']]],
   ['block_12',['block',['../classTensorSlice.html#a1bd9b68295e8796f36452ba27a85e1fb',1,'TensorSlice::block()'],['../classTensor.html#a77397ac152988d5ed90941bac5a96c28',1,'Tensor::block()'],['../tensor_8h.html#adc912199dacbff108e0d2cadfae000df',1,'block():&#160;tensor.h']]],
   ['bottomrows_13',['bottomRows',['../classTensor.html#a8ecd760521443aca3613911d9af40d5a',1,'Tensor::bottomRows()'],['../tensor_8h.html#aa94ca571f8bc2b76cd1bdb6fd851c556',1,'bottomRows():&#160;tensor.h']]],
-  ['broadcast_5fto_14',['broadcast_to',['../classTensor.html#aebe2b244763904422344add448a0c597',1,'Tensor::broadcast_to()'],['../tensor_8h.html#a34fae58316c67748882059be5f1d153c',1,'broadcast_to():&#160;tensor.h']]]
+  ['broadcast_5fshape_14',['broadcast_shape',['../namespacetensor__ops.html#a87eb5eae2b166a08853e5b508524df72',1,'tensor_ops']]],
+  ['broadcast_5fto_15',['broadcast_to',['../classTensor.html#aebe2b244763904422344add448a0c597',1,'Tensor::broadcast_to()'],['../tensor_8h.html#a34fae58316c67748882059be5f1d153c',1,'broadcast_to():&#160;tensor.h']]]
 ];
