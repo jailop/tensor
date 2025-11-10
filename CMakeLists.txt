@@ -370,6 +370,10 @@ message(STATUS "Building C interface library: libtensor_c.so")
 add_executable(c_example examples/c_example.c)
 target_link_libraries(c_example tensor_c)
 
+# C MNIST demo program
+add_executable(mnist_demo_c examples/mnist_demo_c.c)
+target_link_libraries(mnist_demo_c tensor_c)
+
 # C test program
 add_executable(tensor_c_test tests/tensor_c_test.c)
 target_link_libraries(tensor_c_test tensor_c)

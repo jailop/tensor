@@ -24,7 +24,10 @@
 #define NUM_CLASSES 10
 
 /* Training hyperparameters */
-#define BATCH_SIZE 64
+/* NOTE: GPU operations involve CPU->GPU->CPU data transfers for each operation.
+ * Use larger batch sizes (128-256) to amortize transfer overhead and improve GPU utilization.
+ * Smaller batch sizes result in more frequent transfers, causing low GPU utilization. */
+#define BATCH_SIZE 256
 #define NUM_EPOCHS 10
 #define LEARNING_RATE 0.005f
 
@@ -168,14 +171,39 @@ float compute_accuracy(MatrixFloatHandle predictions, const uint8_t* labels, siz
 }
 
 /**
- * @brief Update layer weights with SGD
+ * @brief Compute softmax in-place for numerical stability
  */
-void update_linear_weights(LayerHandle layer, float learning_rate) {
-    MatrixFloatHandle weights, grad_weights;
+void compute_softmax(MatrixFloatHandle matrix) {
+    size_t rows, cols;
+    matrix_float_shape(matrix, &rows, &cols);
     
-    layer_linear_get_weights_float(layer, &weights);
-    /* Note: In full implementation, we'd need gradient accessors */
-    /* For now, this is a simplified placeholder */
+    for (size_t i = 0; i < rows; ++i) {
+        /* Find max for numerical stability */
+        float max_val;
+        matrix_float_get(matrix, i, 0, &max_val);
+        for (size_t j = 1; j < cols; ++j) {
+            float val;
+            matrix_float_get(matrix, i, j, &val);
+            if (val > max_val) max_val = val;
+        }
+        
+        /* Exp and sum */
+        float sum = 0.0f;
+        for (size_t j = 0; j < cols; ++j) {
+            float val;
+            matrix_float_get(matrix, i, j, &val);
+            val = expf(val - max_val);
+            matrix_float_set(matrix, i, j, val);
+            sum += val;
+        }
+        
+        /* Normalize */
+        for (size_t j = 0; j < cols; ++j) {
+            float val;
+            matrix_float_get(matrix, i, j, &val);
+            matrix_float_set(matrix, i, j, val / sum);
+        }
+    }
 }
 
 /**
