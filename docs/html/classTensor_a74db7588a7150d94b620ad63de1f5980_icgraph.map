@@ -1,0 +1,5 @@
+<map id="Tensor::relu" name="Tensor::relu">
+<area shape="rect" id="Node000001" title="Apply ReLU (Rectified Linear Unit) to all elements (creates new tensor)." alt="" coords="189,13,278,40"/>
+<area shape="rect" id="Node000002" href="$classtensor4d_1_1nn_1_1ReLU.html#a07b3b9bee90208e9510c4cc740639689" title=" " alt="" coords="5,5,141,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="173,29,141,29,141,24,173,24"/>
+</map>

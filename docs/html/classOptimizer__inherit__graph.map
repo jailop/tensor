@@ -1,0 +1,9 @@
+<map id="Optimizer&lt; T &gt;" name="Optimizer&lt; T &gt;">
+<area shape="rect" id="Node000001" title="Base class for optimization algorithms." alt="" coords="140,5,248,32"/>
+<area shape="rect" id="Node000002" href="$classAdam.html" title=" " alt="" coords="5,80,109,107"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="158,42,82,82,80,77,156,37"/>
+<area shape="rect" id="Node000003" href="$classRMSprop.html" title=" " alt="" coords="132,80,256,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="197,48,197,80,192,80,192,48"/>
+<area shape="rect" id="Node000004" href="$classSGD.html" title="SGD (Stochastic Gradient Descent) optimizer with optional momentum." alt="" coords="281,80,380,107"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="233,37,308,77,305,82,230,42"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="save_binary" name="save_binary">
+<area shape="rect" id="Node000001" title="Save a tensor to a file in binary format." alt="" coords="5,56,97,83"/>
+<area shape="rect" id="Node000002" href="$classTensor.html#a07bf856a863505d2960b0bfad9c3b3f4" title=" " alt="" coords="160,5,254,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="94,53,148,35,150,40,95,58"/>
+<area shape="rect" id="Node000003" href="$classTensor.html#a03d314303958ffc5644796d8025cd012" title=" " alt="" coords="159,56,255,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="97,67,143,67,143,72,97,72"/>
+<area shape="rect" id="Node000004" href="$classTensor.html#aad6aeb4859940befd0c46f0b99388bd7" title=" " alt="" coords="145,107,269,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="95,81,150,99,148,104,94,86"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="TensorRandom::uniform" name="TensorRandom::uniform">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,56,166,83"/>
+<area shape="rect" id="Node000002" href="$classTensor.html#a07bf856a863505d2960b0bfad9c3b3f4" title=" " alt="" coords="265,5,358,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="148,53,249,30,250,35,149,58"/>
+<area shape="rect" id="Node000003" href="$classTensorRandom.html#adbb4b823e7ba81a7702af757a99cb7bf" title=" " alt="" coords="214,56,410,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="166,67,198,67,198,72,166,72"/>
+<area shape="rect" id="Node000004" href="$classTensor.html#aad6aeb4859940befd0c46f0b99388bd7" title=" " alt="" coords="250,107,374,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="149,81,235,100,234,105,148,86"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="matrix_double_matvec" name="matrix_double_matvec">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,56,158,83"/>
+<area shape="rect" id="Node000002" href="$namespacelinalg.html#a57a91e9770c813128f00c0a1ea674012" title=" " alt="" coords="206,56,308,83"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="158,67,190,67,190,72,158,72"/>
+<area shape="rect" id="Node000003" href="$classTensor.html#a3f3c97d177cb960a4423afc3dafc612a" title=" " alt="" coords="360,5,476,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="301,53,358,35,359,40,303,58"/>
+<area shape="rect" id="Node000004" href="$classTensor.html#a03d314303958ffc5644796d8025cd012" title=" " alt="" coords="370,56,466,83"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="308,67,355,67,355,72,308,72"/>
+<area shape="rect" id="Node000005" href="$classTensor.html#a83ae42925e21d2871d755407d7505c10" title=" " alt="" coords="356,107,480,133"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="303,81,359,99,358,104,301,86"/>
+</map>

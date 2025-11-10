@@ -1,0 +1,7 @@
+<map id="BFloat16::to_float" name="BFloat16::to_float">
+<area shape="rect" id="Node000001" title="Convert to float." alt="" coords="200,35,324,61"/>
+<area shape="rect" id="Node000002" href="$tensor__perf_8h.html#a866251af0f73ed0228b075f2856c29fb" title="Convert array from BF16 to FP32." alt="" coords="5,5,152,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="184,38,152,33,153,28,185,33"/>
+<area shape="rect" id="Node000003" href="$structBFloat16.html#a976fa61c13881481f927c012623fb358" title=" " alt="" coords="14,56,143,99"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="185,63,143,70,142,64,184,58"/>
+</map>

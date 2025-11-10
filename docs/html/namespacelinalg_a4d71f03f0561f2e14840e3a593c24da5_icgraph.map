@@ -1,0 +1,13 @@
+<map id="linalg::norm_inf" name="linalg::norm_inf">
+<area shape="rect" id="Node000001" title=" " alt="" coords="572,31,682,57"/>
+<area shape="rect" id="Node000002" href="$namespacelinalg.html#a5238785f1e2a88a5c99da1f586039ec0" title=" " alt="" coords="363,5,524,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="557,37,525,33,525,27,557,32"/>
+<area shape="rect" id="Node000003" href="$namespacelinalg.html#ad07d8335c6ed4ffb675492effc453771" title=" " alt="" coords="402,56,486,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="557,56,487,66,486,61,557,51"/>
+<area shape="rect" id="Node000004" href="$namespacelinalg.html#a0e459857cd625f66948d7ae48731b17a" title="Compute numerical rank of a matrix using SVD." alt="" coords="188,56,315,83"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="386,72,315,72,315,67,386,67"/>
+<area shape="rect" id="Node000005" href="$tensor__c_8cpp.html#af30504e8e051a714b7a0fdcae0f7c636" title=" " alt="" coords="5,31,140,57"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="172,61,139,56,140,51,173,56"/>
+<area shape="rect" id="Node000006" href="$tensor__c_8cpp.html#ab1f7ff7476a784a17149afa2fd100d07" title=" " alt="" coords="12,81,133,108"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="173,83,134,89,133,83,172,78"/>
+</map>

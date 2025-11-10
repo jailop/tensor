@@ -1,0 +1,7 @@
+<map id="block" name="block">
+<area shape="rect" id="Node000001" title="Extract a rectangular block from a 2D tensor." alt="" coords="237,31,289,57"/>
+<area shape="rect" id="Node000002" href="$classMemoryPool.html#a980db306a49ce0f4b149198a99b6d24e" title="Clear all pooled memory." alt="" coords="32,5,162,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="221,40,162,31,163,26,221,35"/>
+<area shape="rect" id="Node000003" href="$classMemoryPool.html#a842e63c49f94b807e42b8ed5897bd1bb" title="Destructor &#45; frees all pooled memory." alt="" coords="5,56,189,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="221,53,189,58,188,53,220,48"/>
+</map>

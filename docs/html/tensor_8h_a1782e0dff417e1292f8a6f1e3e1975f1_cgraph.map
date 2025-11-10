@@ -1,0 +1,11 @@
+<map id="normalize_minmax" name="normalize_minmax">
+<area shape="rect" id="Node000001" title="Min&#45;Max normalization: scales values to [min_val, max_val] range." alt="" coords="5,81,136,108"/>
+<area shape="rect" id="Node000002" href="$classTensor.html#a3f3c97d177cb960a4423afc3dafc612a" title=" " alt="" coords="188,5,304,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="101,78,183,42,196,36,198,41,185,46,103,83"/>
+<area shape="rect" id="Node000003" href="$classTensor.html#a03d314303958ffc5644796d8025cd012" title=" " alt="" coords="198,56,294,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="136,83,182,76,183,81,137,88"/>
+<area shape="rect" id="Node000004" href="$classTensor.html#aad6aeb4859940befd0c46f0b99388bd7" title=" " alt="" coords="184,107,308,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="137,101,169,106,168,111,136,107"/>
+<area shape="rect" id="Node000005" href="$classTensor.html#a83ae42925e21d2871d755407d7505c10" title=" " alt="" coords="184,157,308,184"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="103,106,185,143,198,149,196,153,183,148,101,111"/>
+</map>

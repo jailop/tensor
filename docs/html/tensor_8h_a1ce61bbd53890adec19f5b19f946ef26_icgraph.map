@@ -1,0 +1,5 @@
+<map id="argsort" name="argsort">
+<area shape="rect" id="Node000001" title="Return indices that would sort the tensor (1D only)." alt="" coords="100,5,161,32"/>
+<area shape="rect" id="Node000002" href="$tensor_8h.html#a952343525fb5d9376af0645793e8f1d4" title="Find k largest or smallest elements and their indices (1D only)." alt="" coords="5,5,52,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="84,21,52,21,52,16,84,16"/>
+</map>

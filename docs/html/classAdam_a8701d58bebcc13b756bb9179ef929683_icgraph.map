@@ -1,0 +1,5 @@
+<map id="Adam::zero_grad" name="Adam::zero_grad">
+<area shape="rect" id="Node000001" title="Zero out all gradients." alt="" coords="231,5,351,32"/>
+<area shape="rect" id="Node000002" href="$tensor__c_8cpp.html#a45cb0a5c7519320bd8d1b194288eef37" title=" " alt="" coords="5,5,183,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="215,21,183,21,183,16,215,16"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="load" name="load">
+<area shape="rect" id="Node000001" title="Load a tensor from a file (auto&#45;detects format)." alt="" coords="5,31,51,57"/>
+<area shape="rect" id="Node000002" href="$tensor__io_8h.html#a7e2cae1250696214044c322ac0bd4a1b" title="Load a tensor from a binary file." alt="" coords="99,31,186,57"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="51,41,83,41,83,47,51,47"/>
+<area shape="rect" id="Node000003" href="$classTensor.html#a07bf856a863505d2960b0bfad9c3b3f4" title=" " alt="" coords="250,5,343,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="186,34,234,26,235,31,187,39"/>
+<area shape="rect" id="Node000004" href="$classTensor.html#aad6aeb4859940befd0c46f0b99388bd7" title=" " alt="" coords="234,56,358,83"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="187,49,219,54,218,59,186,54"/>
+</map>

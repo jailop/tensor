@@ -1,0 +1,7 @@
+<map id="TensorSlice::block" name="TensorSlice::block">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,134,57"/>
+<area shape="rect" id="Node000002" href="$classTensor.html#a3f3c97d177cb960a4423afc3dafc612a" title=" " alt="" coords="182,5,297,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="134,32,166,27,167,32,134,37"/>
+<area shape="rect" id="Node000003" href="$classTensor.html#a03d314303958ffc5644796d8025cd012" title=" " alt="" coords="191,56,288,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="134,51,176,57,175,63,134,56"/>
+</map>

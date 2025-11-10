@@ -1,0 +1,9 @@
+<map id="head" name="head">
+<area shape="rect" id="Node000001" title="Extract first n elements from a 1D tensor." alt="" coords="5,56,55,83"/>
+<area shape="rect" id="Node000002" href="$classTensor.html#a3f3c97d177cb960a4423afc3dafc612a" title=" " alt="" coords="107,5,222,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="54,58,112,36,114,40,56,63"/>
+<area shape="rect" id="Node000003" href="$classTensor.html#a03d314303958ffc5644796d8025cd012" title=" " alt="" coords="117,56,213,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="55,67,102,67,102,72,55,72"/>
+<area shape="rect" id="Node000004" href="$classTensor.html#a83ae42925e21d2871d755407d7505c10" title=" " alt="" coords="103,107,227,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="56,76,114,98,112,103,54,81"/>
+</map>

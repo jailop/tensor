@@ -1,0 +1,7 @@
+<map id="linalg::inverse" name="linalg::inverse">
+<area shape="rect" id="Node000001" title="Compute inverse of a square matrix." alt="" coords="205,31,306,57"/>
+<area shape="rect" id="Node000002" href="$tensor__c_8cpp.html#a754f7e7480b2f39aaa21596868896d92" title=" " alt="" coords="5,5,157,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="189,37,156,32,157,27,190,32"/>
+<area shape="rect" id="Node000003" href="$tensor__c_8cpp.html#a95c93d5c49416ca78236c13928cd0037" title=" " alt="" coords="12,56,150,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="190,56,151,62,150,57,189,51"/>
+</map>

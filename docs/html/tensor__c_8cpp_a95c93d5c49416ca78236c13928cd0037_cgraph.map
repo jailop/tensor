@@ -1,0 +1,21 @@
+<map id="matrix_float_inverse" name="matrix_float_inverse">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,102,144,129"/>
+<area shape="rect" id="Node000002" href="$namespacelinalg.html#abc25aee98d873c690a7d8a88277e7219" title="Compute inverse of a square matrix." alt="" coords="192,102,293,129"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="144,113,176,113,176,118,144,118"/>
+<area shape="rect" id="Node000003" href="$classTensor.html#a3f3c97d177cb960a4423afc3dafc612a" title=" " alt="" coords="512,26,627,53"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="293,100,340,88,496,52,498,57,342,93,294,105"/>
+<area shape="rect" id="Node000004" href="$classTensor.html#a03d314303958ffc5644796d8025cd012" title=" " alt="" coords="690,77,786,103"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="262,99,297,77,340,56,424,26,511,12,570,3,596,4,629,12,676,35,714,65,711,69,673,40,627,17,596,9,570,9,512,17,425,31,342,61,300,82,265,104"/>
+<area shape="rect" id="Node000005" href="$namespacelinalg.html#a299049265c4cb34923444e82e56f381f" title="Compute LU decomposition with partial pivoting: P*A = L*U." alt="" coords="341,102,463,129"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="293,113,325,113,325,118,293,118"/>
+<area shape="rect" id="Node000006" href="$namespacelinalg.html#af0c07b2c6a745bcb68c10766032cc5e0" title=" " alt="" coords="511,178,628,205"/>
+<area shape="poly" id="edge11_Node000002_Node000006" title=" " alt="" coords="294,126,342,138,497,174,496,179,340,143,293,131"/>
+<area shape="rect" id="Node000007" href="$classTensor.html#a83ae42925e21d2871d755407d7505c10" title=" " alt="" coords="676,178,800,205"/>
+<area shape="poly" id="edge12_Node000002_Node000007" title=" " alt="" coords="265,127,300,149,342,170,425,200,512,214,569,219,627,214,672,206,673,212,628,219,569,224,511,219,424,205,340,175,297,154,262,132"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="433,99,523,57,526,62,435,104"/>
+<area shape="poly" id="edge6_Node000005_Node000004" title=" " alt="" coords="464,108,674,92,674,98,464,114"/>
+<area shape="poly" id="edge7_Node000005_Node000006" title=" " alt="" coords="435,127,526,169,523,174,433,132"/>
+<area shape="poly" id="edge10_Node000005_Node000007" title=" " alt="" coords="465,126,628,164,663,172,662,177,627,169,463,132"/>
+<area shape="poly" id="edge8_Node000006_Node000004" title=" " alt="" coords="592,175,700,110,703,114,595,180"/>
+<area shape="poly" id="edge9_Node000006_Node000007" title=" " alt="" coords="628,189,660,189,660,194,628,194"/>
+</map>

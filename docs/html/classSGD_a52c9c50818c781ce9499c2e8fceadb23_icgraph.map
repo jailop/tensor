@@ -1,0 +1,5 @@
+<map id="SGD::zero_grad" name="SGD::zero_grad">
+<area shape="rect" id="Node000001" title="Zero out all gradients." alt="" coords="220,5,335,32"/>
+<area shape="rect" id="Node000002" href="$tensor__c_8cpp.html#a55348fc0f59ab3a117f1a2d57aebcc67" title=" " alt="" coords="5,5,172,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="204,21,172,21,172,16,204,16"/>
+</map>

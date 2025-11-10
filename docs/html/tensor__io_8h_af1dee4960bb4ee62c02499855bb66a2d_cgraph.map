@@ -1,0 +1,21 @@
+<map id="save" name="save">
+<area shape="rect" id="Node000001" title="Save a tensor to a file with specified format." alt="" coords="5,56,55,83"/>
+<area shape="rect" id="Node000002" href="$tensor__io_8h.html#a8141782719cc7c7dc60b3043bbbc5366" title="Save a tensor to a file in binary format." alt="" coords="103,5,194,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="54,56,100,36,102,41,56,61"/>
+<area shape="rect" id="Node000006" href="$tensor__io_8h.html#ac622682f190796d532e11f0c7b597aa0" title="Save a tensor to NumPy .npy format (version 1.0)." alt="" coords="110,56,187,83"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="55,67,94,67,94,72,55,72"/>
+<area shape="rect" id="Node000007" href="$tensor__io_8h.html#add21f5804707b520f88e074026b258b3" title="Save a tensor to a text file (CSV&#45;like format)." alt="" coords="109,107,188,133"/>
+<area shape="poly" id="edge9_Node000001_Node000007" title=" " alt="" coords="56,77,102,98,100,102,54,82"/>
+<area shape="rect" id="Node000003" href="$classTensor.html#a07bf856a863505d2960b0bfad9c3b3f4" title=" " alt="" coords="258,5,351,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="194,16,242,16,242,21,194,21"/>
+<area shape="rect" id="Node000004" href="$classTensor.html#a03d314303958ffc5644796d8025cd012" title=" " alt="" coords="256,56,352,83"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="193,30,247,48,246,53,191,35"/>
+<area shape="rect" id="Node000005" href="$classTensor.html#aad6aeb4859940befd0c46f0b99388bd7" title=" " alt="" coords="242,107,366,133"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="178,30,196,42,220,68,229,80,244,93,251,97,248,102,240,97,225,84,216,72,192,46,175,35"/>
+<area shape="poly" id="edge6_Node000006_Node000003" title=" " alt="" coords="187,54,245,35,247,40,188,59"/>
+<area shape="poly" id="edge7_Node000006_Node000004" title=" " alt="" coords="188,67,240,67,240,72,188,72"/>
+<area shape="poly" id="edge8_Node000006_Node000005" title=" " alt="" coords="188,79,247,99,245,104,187,84"/>
+<area shape="poly" id="edge10_Node000007_Node000003" title=" " alt="" coords="175,104,192,93,216,67,225,55,240,42,248,37,251,42,244,46,229,59,220,70,196,97,178,108"/>
+<area shape="poly" id="edge11_Node000007_Node000004" title=" " alt="" coords="187,105,246,85,247,91,189,110"/>
+<area shape="poly" id="edge12_Node000007_Node000005" title=" " alt="" coords="188,117,227,117,227,123,188,123"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="leftCols" name="leftCols">
+<area shape="rect" id="Node000001" title="Extract leftmost n columns from a 2D tensor." alt="" coords="5,56,72,83"/>
+<area shape="rect" id="Node000002" href="$classTensor.html#a3f3c97d177cb960a4423afc3dafc612a" title=" " alt="" coords="124,5,240,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="71,55,127,35,129,40,73,60"/>
+<area shape="rect" id="Node000003" href="$classTensor.html#a03d314303958ffc5644796d8025cd012" title=" " alt="" coords="134,56,230,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="72,67,118,67,118,72,72,72"/>
+<area shape="rect" id="Node000004" href="$classTensor.html#a83ae42925e21d2871d755407d7505c10" title=" " alt="" coords="120,107,244,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="73,78,129,99,127,104,71,83"/>
+</map>

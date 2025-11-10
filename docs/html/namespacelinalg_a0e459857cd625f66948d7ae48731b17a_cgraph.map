@@ -1,0 +1,22 @@
+<map id="linalg::matrix_rank" name="linalg::matrix_rank">
+<area shape="rect" id="Node000001" title="Compute numerical rank of a matrix using SVD." alt="" coords="5,81,133,108"/>
+<area shape="rect" id="Node000002" href="$namespacelinalg.html#ad07d8335c6ed4ffb675492effc453771" title=" " alt="" coords="181,81,265,108"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="133,92,165,92,165,97,133,97"/>
+<area shape="rect" id="Node000003" href="$tensor_8h.html#a5f2a03f722ba5a985a3733e2ff823a74" title="Extract a single column from a 2D tensor." alt="" coords="348,5,387,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="246,79,312,42,333,31,335,36,314,46,249,83"/>
+<area shape="rect" id="Node000005" href="$classTensor.html#a03d314303958ffc5644796d8025cd012" title=" " alt="" coords="484,107,581,133"/>
+<area shape="poly" id="edge6_Node000002_Node000005" title=" " alt="" coords="266,95,469,112,469,118,265,101"/>
+<area shape="rect" id="Node000007" href="$namespacelinalg.html#a4d71f03f0561f2e14840e3a593c24da5" title=" " alt="" coords="313,157,422,184"/>
+<area shape="poly" id="edge7_Node000002_Node000007" title=" " alt="" coords="251,106,328,147,326,152,249,111"/>
+<area shape="rect" id="Node000008" href="$tensor_8h.html#adf94b1b28dd9932dd278abaa3cb7a9ee" title="Extract a single row from a 2D tensor." alt="" coords="346,56,389,83"/>
+<area shape="poly" id="edge9_Node000002_Node000008" title=" " alt="" coords="265,85,331,73,332,78,266,90"/>
+<area shape="rect" id="Node000004" href="$classTensor.html#a3f3c97d177cb960a4423afc3dafc612a" title=" " alt="" coords="475,56,590,83"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="388,22,473,48,471,53,386,27"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="388,23,424,42,439,55,448,68,458,80,472,93,479,97,476,102,469,97,454,84,444,71,435,59,421,46,386,28"/>
+<area shape="rect" id="Node000006" href="$classTensor.html#a83ae42925e21d2871d755407d7505c10" title=" " alt="" coords="470,5,595,32"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="387,16,455,16,455,21,387,21"/>
+<area shape="poly" id="edge8_Node000007_Node000005" title=" " alt="" coords="413,154,471,136,473,141,415,159"/>
+<area shape="poly" id="edge10_Node000008_Node000004" title=" " alt="" coords="389,67,459,67,459,72,389,72"/>
+<area shape="poly" id="edge11_Node000008_Node000005" title=" " alt="" coords="390,73,473,99,471,104,388,78"/>
+<area shape="poly" id="edge12_Node000008_Node000006" title=" " alt="" coords="388,61,471,35,473,40,390,66"/>
+</map>

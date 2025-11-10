@@ -1,0 +1,31 @@
+<map id="include/tensor.h" name="include/tensor.h">
+<area shape="rect" id="Node000001" title="High&#45;performance multi&#45;dimensional tensor library with GPU, BLAS, and autograd support." alt="" coords="495,5,608,32"/>
+<area shape="rect" id="Node000002" href="$linalg_8h.html" title="Linear algebra operations for vectors and matrices." alt="" coords="211,80,319,107"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="488,39,316,82,315,77,486,34"/>
+<area shape="rect" id="Node000004" href="$tensor__c_8cpp.html" title=" " alt="" coords="502,229,620,256"/>
+<area shape="poly" id="edge17_Node000001_Node000004" title=" " alt="" coords="479,22,319,28,228,36,143,49,72,70,44,83,24,97,12,114,8,133,15,155,32,179,55,191,99,202,228,218,377,230,502,236,501,242,376,235,228,224,98,207,53,196,29,183,10,157,3,133,7,112,20,94,42,78,70,65,142,44,228,30,318,22,479,17"/>
+<area shape="rect" id="Node000005" href="$tensor__instantiations_8cc.html" title="Explicit template instantiations for Matrix and Tensor types." alt="" coords="42,155,224,181"/>
+<area shape="poly" id="edge18_Node000001_Node000005" title=" " alt="" coords="480,29,324,48,251,64,201,82,181,98,164,118,141,156,137,153,160,115,177,95,198,78,250,59,323,43,480,23"/>
+<area shape="rect" id="Node000006" href="$loss__functions_8h.html" title="Loss functions for training neural networks." alt="" coords="352,80,514,107"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="520,43,455,82,453,77,517,38"/>
+<area shape="rect" id="Node000007" href="$nn__layers_8h.html" title="Common neural network layer implementations." alt="" coords="654,155,788,181"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="572,42,598,73,629,105,665,131,699,152,696,156,662,135,626,109,594,77,568,46"/>
+<area shape="rect" id="Node000008" href="$optimizers_8h.html" title="Optimization algorithms for training neural networks." alt="" coords="492,155,630,181"/>
+<area shape="poly" id="edge9_Node000001_Node000008" title=" " alt="" coords="556,47,563,154,558,154,551,48"/>
+<area shape="rect" id="Node000009" href="$tensor__io_8h.html" title="I/O operations for tensors (save/load/print)." alt="" coords="896,155,1026,181"/>
+<area shape="poly" id="edge11_Node000001_Node000009" title=" " alt="" coords="624,17,717,20,821,29,869,36,913,47,947,61,971,78,980,97,981,118,970,155,965,154,975,118,975,98,967,82,945,65,911,52,868,42,820,34,717,25,624,22"/>
+<area shape="rect" id="Node000010" href="$tensor__ops_8h.html" title="Core neural network operations with broadcasting and autograd." alt="" coords="816,80,957,107"/>
+<area shape="poly" id="edge13_Node000001_Node000010" title=" " alt="" coords="624,33,828,77,827,82,623,38"/>
+<area shape="rect" id="Node000011" href="$tensor__types_8h.html" title="Type aliases for common Tensor specializations." alt="" coords="640,80,792,107"/>
+<area shape="poly" id="edge14_Node000001_Node000011" title=" " alt="" coords="595,36,688,77,686,82,593,41"/>
+<area shape="rect" id="Node000003" href="$linalg__advanced_8h.html" title="Advanced linear algebra operations with LAPACK/cuSOLVER support." alt="" coords="299,155,469,181"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="300,113,364,152,362,156,297,117"/>
+<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="267,122,273,153,279,167,288,179,303,189,324,199,379,214,502,233,501,238,378,219,322,204,300,194,285,183,274,170,268,154,262,123"/>
+<area shape="poly" id="edge5_Node000002_Node000005" title=" " alt="" coords="231,117,158,156,155,152,228,112"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="430,185,531,226,529,231,428,190"/>
+<area shape="poly" id="edge8_Node000007_Node000004" title=" " alt="" coords="680,191,590,231,588,226,678,186"/>
+<area shape="poly" id="edge10_Node000008_Node000004" title=" " alt="" coords="564,197,564,229,558,229,558,197"/>
+<area shape="poly" id="edge12_Node000009_Node000004" title=" " alt="" coords="881,186,621,233,620,228,880,181"/>
+<area shape="poly" id="edge16_Node000011_Node000004" title=" " alt="" coords="758,112,781,126,799,143,808,162,807,173,802,183,790,194,773,203,726,218,621,237,620,232,725,213,770,198,787,189,798,180,802,171,803,163,795,146,777,130,756,116"/>
+<area shape="poly" id="edge15_Node000011_Node000007" title=" " alt="" coords="720,122,723,154,718,154,715,123"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="linalg::matrix_rank" name="linalg::matrix_rank">
+<area shape="rect" id="Node000001" title="Compute numerical rank of a matrix using SVD." alt="" coords="188,31,315,57"/>
+<area shape="rect" id="Node000002" href="$tensor__c_8cpp.html#af30504e8e051a714b7a0fdcae0f7c636" title=" " alt="" coords="5,5,140,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="172,35,139,31,140,26,173,30"/>
+<area shape="rect" id="Node000003" href="$tensor__c_8cpp.html#ab1f7ff7476a784a17149afa2fd100d07" title=" " alt="" coords="12,56,133,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="173,58,134,63,133,58,172,53"/>
+</map>

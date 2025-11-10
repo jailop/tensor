@@ -1,0 +1,11 @@
+<map id="matrix_float_get_col" name="matrix_float_get_col">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,56,144,83"/>
+<area shape="rect" id="Node000002" href="$tensor_8h.html#a5f2a03f722ba5a985a3733e2ff823a74" title="Extract a single column from a 2D tensor." alt="" coords="192,56,230,83"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="144,67,176,67,176,72,144,72"/>
+<area shape="rect" id="Node000003" href="$classTensor.html#a3f3c97d177cb960a4423afc3dafc612a" title=" " alt="" coords="283,5,398,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="229,60,289,36,291,41,231,65"/>
+<area shape="rect" id="Node000004" href="$classTensor.html#a03d314303958ffc5644796d8025cd012" title=" " alt="" coords="292,56,388,83"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="230,67,276,67,276,72,230,72"/>
+<area shape="rect" id="Node000005" href="$classTensor.html#a83ae42925e21d2871d755407d7505c10" title=" " alt="" coords="278,107,402,133"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="231,74,291,98,289,103,229,79"/>
+</map>

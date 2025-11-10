@@ -1,0 +1,7 @@
+<map id="matrix_double_norm" name="matrix_double_norm">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,144,32"/>
+<area shape="rect" id="Node000002" href="$namespacelinalg.html#ad8e7656cd25d2342040ecb53cc331657" title=" " alt="" coords="192,5,340,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="144,16,176,16,176,21,144,21"/>
+<area shape="rect" id="Node000003" href="$classTensor.html#a03d314303958ffc5644796d8025cd012" title=" " alt="" coords="388,5,484,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="340,16,373,16,373,21,340,21"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="col" name="col">
+<area shape="rect" id="Node000001" title="Extract a single column from a 2D tensor." alt="" coords="5,56,44,83"/>
+<area shape="rect" id="Node000002" href="$classTensor.html#a3f3c97d177cb960a4423afc3dafc612a" title=" " alt="" coords="96,5,212,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="43,60,103,36,105,41,45,65"/>
+<area shape="rect" id="Node000003" href="$classTensor.html#a03d314303958ffc5644796d8025cd012" title=" " alt="" coords="106,56,202,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="44,67,90,67,90,72,44,72"/>
+<area shape="rect" id="Node000004" href="$classTensor.html#a83ae42925e21d2871d755407d7505c10" title=" " alt="" coords="92,107,216,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="45,74,105,98,103,103,43,79"/>
+</map>

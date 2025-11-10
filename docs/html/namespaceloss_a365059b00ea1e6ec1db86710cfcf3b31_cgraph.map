@@ -1,0 +1,15 @@
+<map id="loss::binary_cross_entropy" name="loss::binary_cross_entropy">
+<area shape="rect" id="Node000001" title="Binary cross entropy loss for binary classification." alt="" coords="5,124,133,167"/>
+<area shape="rect" id="Node000002" href="$classTensor.html#a07bf856a863505d2960b0bfad9c3b3f4" title=" " alt="" coords="207,5,300,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="87,122,127,81,179,42,192,35,194,40,182,46,131,85,91,125"/>
+<area shape="rect" id="Node000003" href="$classTensor.html#ae5b52299c11f3ba81e781cb008542285" title=" " alt="" coords="200,56,308,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="114,121,180,92,196,86,198,91,182,97,117,126"/>
+<area shape="rect" id="Node000004" href="$classTensor.html#a03d314303958ffc5644796d8025cd012" title=" " alt="" coords="206,107,302,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="133,134,190,126,191,131,133,139"/>
+<area shape="rect" id="Node000005" href="$classTensor.html#a947326cf96b1bf3423b40861e1213ab8" title=" " alt="" coords="181,157,327,184"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="133,151,165,156,165,161,133,157"/>
+<area shape="rect" id="Node000006" href="$classTensor.html#aad6aeb4859940befd0c46f0b99388bd7" title=" " alt="" coords="192,208,316,235"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="117,165,182,194,198,200,196,205,180,198,114,170"/>
+<area shape="rect" id="Node000007" href="$classTensor.html#a83ae42925e21d2871d755407d7505c10" title=" " alt="" coords="192,259,316,285"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="91,165,131,205,182,244,192,250,190,254,179,249,127,209,87,169"/>
+</map>

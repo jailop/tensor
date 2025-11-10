@@ -1,0 +1,5 @@
+<map id="SGD::step" name="SGD::step">
+<area shape="rect" id="Node000001" title="Perform one optimization step." alt="" coords="188,5,271,32"/>
+<area shape="rect" id="Node000002" href="$tensor__c_8cpp.html#a5a00d0d73d053246e09bef1f70b831f6" title=" " alt="" coords="5,5,140,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="172,21,140,21,140,16,172,16"/>
+</map>

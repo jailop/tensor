@@ -1,0 +1,5 @@
+<map id="Tensor::exp" name="Tensor::exp">
+<area shape="rect" id="Node000001" title="Apply exponential function to all elements (creates new tensor)." alt="" coords="188,13,277,40"/>
+<area shape="rect" id="Node000002" href="$classTensor.html#aadc56fba91e522ff5de95202106be9db" title=" " alt="" coords="5,5,140,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="172,29,140,29,140,24,172,24"/>
+</map>

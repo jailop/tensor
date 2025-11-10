@@ -1,0 +1,13 @@
+<map id="Tensor&lt; T, N &gt;" name="Tensor&lt; T, N &gt;">
+<area shape="rect" id="Node000001" title="Forward declaration for autograd." alt="" coords="493,64,601,91"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="173,5,315,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="331,24,399,34,470,48,511,61,510,66,468,53,398,39,330,30"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,64,44,91"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="56,53,67,48,120,32,172,23,173,28,121,37,69,53,58,58"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="165,56,323,99"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="60,75,165,75,165,80,60,80"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="153,123,335,165"/>
+<area shape="poly" id="edge6_Node000005_Node000003" title=" " alt="" coords="56,97,69,104,110,119,153,129,152,134,109,124,67,109,54,102"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="338,75,493,75,493,80,338,80"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="350,128,468,104,513,89,515,94,470,109,351,134"/>
+</map>

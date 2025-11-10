@@ -1,0 +1,5 @@
+<map id="layer_batchnorm_train" name="layer_batchnorm_train">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,13,155,40"/>
+<area shape="rect" id="Node000002" href="$classtensor4d_1_1nn_1_1Layer.html#a9f069156fc18ad5035bcfa99ddfdda83" title="Set training mode." alt="" coords="203,5,336,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="155,24,187,24,187,29,155,29"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="linalg::norm" name="linalg::norm">
+<area shape="rect" id="Node000001" title="Compute the L2 norm (Euclidean norm) of a vector." alt="" coords="192,56,280,83"/>
+<area shape="rect" id="Node000002" href="$namespacelinalg.html#afbe723a0bf8fb7dc2d98815c1ea724b2" title="Normalize a vector to unit length." alt="" coords="17,5,132,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="176,54,118,35,120,30,178,48"/>
+<area shape="rect" id="Node000003" href="$tensor__c_8cpp.html#a7d5b0b6e1f3294f76ea0a47ee9a458e6" title=" " alt="" coords="5,56,144,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="176,72,144,72,144,67,176,67"/>
+<area shape="rect" id="Node000004" href="$tensor__c_8cpp.html#a8cb885e97277046203442ad19c70c013" title=" " alt="" coords="12,107,137,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="178,90,120,109,118,104,176,85"/>
+</map>

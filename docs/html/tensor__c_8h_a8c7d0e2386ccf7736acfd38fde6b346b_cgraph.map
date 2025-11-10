@@ -1,0 +1,18 @@
+<map id="matrix_double_determinant" name="matrix_double_determinant">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,183,32"/>
+<area shape="rect" id="Node000002" href="$namespacelinalg.html#a397bea6a8d02533eae3c3eb837d0fd7a" title="Compute determinant of a square matrix." alt="" coords="231,5,358,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="183,16,215,16,215,21,183,21"/>
+<area shape="rect" id="Node000003" href="$classTensor.html#a03d314303958ffc5644796d8025cd012" title=" " alt="" coords="755,5,851,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="359,15,693,15,740,15,739,20,693,20,359,21"/>
+<area shape="rect" id="Node000004" href="$namespacelinalg.html#a299049265c4cb34923444e82e56f381f" title="Compute LU decomposition with partial pivoting: P*A = L*U." alt="" coords="406,56,528,83"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="343,30,405,49,404,54,342,35"/>
+<area shape="poly" id="edge5_Node000004_Node000003" title=" " alt="" coords="521,53,576,41,739,21,739,26,577,47,523,58"/>
+<area shape="rect" id="Node000005" href="$classTensor.html#a3f3c97d177cb960a4423afc3dafc612a" title=" " alt="" coords="577,56,692,83"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="529,67,561,67,561,72,529,72"/>
+<area shape="rect" id="Node000006" href="$namespacelinalg.html#af0c07b2c6a745bcb68c10766032cc5e0" title=" " alt="" coords="576,107,693,133"/>
+<area shape="poly" id="edge6_Node000004_Node000006" title=" " alt="" coords="515,81,574,99,573,104,513,86"/>
+<area shape="rect" id="Node000007" href="$classTensor.html#a83ae42925e21d2871d755407d7505c10" title=" " alt="" coords="741,132,865,159"/>
+<area shape="poly" id="edge9_Node000004_Node000007" title=" " alt="" coords="483,81,523,114,549,131,577,143,614,151,652,155,725,154,725,159,652,161,613,157,575,148,547,135,520,118,480,85"/>
+<area shape="poly" id="edge7_Node000006_Node000003" title=" " alt="" coords="669,104,691,92,771,39,773,44,694,97,671,108"/>
+<area shape="poly" id="edge8_Node000006_Node000007" title=" " alt="" coords="694,126,726,131,725,136,693,131"/>
+</map>

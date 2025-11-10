@@ -1,0 +1,15 @@
+<map id="matrix_double_svd" name="matrix_double_svd">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,81,136,108"/>
+<area shape="rect" id="Node000002" href="$namespacelinalg.html#a2e81c90534586128fa4bcae3bb042175" title="Singular Value Decomposition: A = U * Sigma * V^T." alt="" coords="184,81,317,108"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="136,92,168,92,168,97,136,97"/>
+<area shape="rect" id="Node000003" href="$classTensor.html#a3f3c97d177cb960a4423afc3dafc612a" title=" " alt="" coords="366,5,481,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="282,78,376,36,378,41,284,83"/>
+<area shape="rect" id="Node000004" href="$classTensor.html#a03d314303958ffc5644796d8025cd012" title=" " alt="" coords="543,81,640,108"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="317,92,527,92,527,97,317,97"/>
+<area shape="rect" id="Node000005" href="$namespacelinalg.html#af0c07b2c6a745bcb68c10766032cc5e0" title=" " alt="" coords="365,107,481,133"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="318,102,350,107,349,112,317,107"/>
+<area shape="rect" id="Node000006" href="$classTensor.html#a83ae42925e21d2871d755407d7505c10" title=" " alt="" coords="529,144,654,171"/>
+<area shape="poly" id="edge7_Node000002_Node000006" title=" " alt="" coords="277,106,317,126,366,143,441,154,514,157,514,163,441,160,364,148,315,131,274,111"/>
+<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="482,109,527,102,528,107,482,114"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="483,130,515,138,514,143,481,136"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="Tensor::log_softmax" name="Tensor::log_softmax">
+<area shape="rect" id="Node000001" title=" " alt="" coords="220,5,359,32"/>
+<area shape="rect" id="Node000002" href="$namespaceloss.html#a75edef9d102d2ab811b15c50f13c4eee" title="Cross entropy loss for multi&#45;class classification." alt="" coords="5,5,172,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="204,21,172,21,172,16,204,16"/>
+</map>

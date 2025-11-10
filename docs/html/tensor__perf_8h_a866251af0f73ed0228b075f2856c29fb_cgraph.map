@@ -1,0 +1,5 @@
+<map id="convert_bf16_to_fp32" name="convert_bf16_to_fp32">
+<area shape="rect" id="Node000001" title="Convert array from BF16 to FP32." alt="" coords="5,5,152,32"/>
+<area shape="rect" id="Node000002" href="$structBFloat16.html#aa0615d97d0b211fa5a2b96318c31c5f5" title="Convert to float." alt="" coords="200,5,324,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="152,16,184,16,184,21,152,21"/>
+</map>

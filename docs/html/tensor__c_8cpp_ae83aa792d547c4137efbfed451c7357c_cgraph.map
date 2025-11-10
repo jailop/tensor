@@ -1,0 +1,15 @@
+<map id="matrix_double_cholesky" name="matrix_double_cholesky">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,81,167,108"/>
+<area shape="rect" id="Node000002" href="$namespacelinalg.html#a12137fd985ff57d9e9396c8f6919383e" title="Cholesky decomposition: A = L * L^T for symmetric positive definite matrices." alt="" coords="215,81,379,108"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="167,92,199,92,199,97,167,97"/>
+<area shape="rect" id="Node000003" href="$classTensor.html#a3f3c97d177cb960a4423afc3dafc612a" title=" " alt="" coords="428,5,543,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="331,78,435,36,437,41,333,83"/>
+<area shape="rect" id="Node000004" href="$classTensor.html#a03d314303958ffc5644796d8025cd012" title=" " alt="" coords="605,81,702,108"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="379,92,590,92,590,97,379,97"/>
+<area shape="rect" id="Node000005" href="$namespacelinalg.html#af0c07b2c6a745bcb68c10766032cc5e0" title=" " alt="" coords="427,107,543,133"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="380,103,412,107,411,113,379,108"/>
+<area shape="rect" id="Node000006" href="$classTensor.html#a83ae42925e21d2871d755407d7505c10" title=" " alt="" coords="591,144,716,171"/>
+<area shape="poly" id="edge7_Node000002_Node000006" title=" " alt="" coords="327,106,373,126,428,143,503,154,576,157,576,162,503,159,426,148,372,131,325,111"/>
+<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="544,109,589,102,590,107,544,114"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="545,130,577,138,576,143,543,136"/>
+</map>

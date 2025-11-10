@@ -1,0 +1,99 @@
+/**
+ * @page instantiations Template Instantiations
+ * 
+ * @section inst_overview Overview
+ * 
+ * The tensor4d library provides explicit template instantiations for commonly
+ * used tensor types. These instantiations are compiled into the static and
+ * shared libraries, providing faster link times and smaller executable sizes
+ * for client code.
+ * 
+ * @section inst_available Available Instantiations
+ * 
+ * @subsection inst_matrices Matrix Types (Rank 2 Tensors)
+ * 
+ * The following matrix types are explicitly instantiated:
+ * - `Tensor<float, 2>` (aliased as `Matrixf`) - Single precision float matrix
+ * - `Tensor<double, 2>` (aliased as `Matrixd`) - Double precision float matrix
+ * 
+ * @subsection inst_3d 3D Tensor Types (Rank 3)
+ * 
+ * The following 3D tensor types are explicitly instantiated:
+ * - `Tensor<float, 3>` (aliased as `Tensor3f`) - Single precision 3D tensor
+ * - `Tensor<double, 3>` (aliased as `Tensor3d`) - Double precision 3D tensor
+ * 
+ * @subsection inst_4d 4D Tensor Types (Rank 4)
+ * 
+ * The following 4D tensor types are explicitly instantiated:
+ * - `Tensor<float, 4>` (aliased as `Tensor4f`) - Single precision 4D tensor
+ * - `Tensor<double, 4>` (aliased as `Tensor4d`) - Double precision 4D tensor
+ * 
+ * @section inst_vectors Vector Types (Rank 1 Tensors)
+ * 
+ * Vector types (`Tensor<T, 1>`) are **not** explicitly instantiated in the
+ * library because many operations such as transpose(), vstack(), and hstack()
+ * require tensors with rank >= 2 and would trigger static assertion failures
+ * for rank 1 tensors.
+ * 
+ * Vector types remain available as header-only templates. You can use the
+ * following type aliases:
+ * - `Vectorf` for `Tensor<float, 1>`
+ * - `Vectord` for `Tensor<double, 1>`
+ * - `Vectori` for `Tensor<int, 1>`
+ * - `Vectorl` for `Tensor<long, 1>`
+ * 
+ * @section inst_usage Usage
+ * 
+ * When linking against the tensor4d library (static or shared), the explicitly
+ * instantiated types are already compiled into the library. This means:
+ * 
+ * @code{.cpp}
+ * #include "tensor.h"
+ * #include "tensor_types.h"
+ * 
+ * using namespace tensor4d;
+ * 
+ * int main() {
+ *     // These types are pre-compiled in the library
+ *     Matrixf A({3, 3});      // Uses Tensor<float, 2> instantiation
+ *     Matrixd B({5, 5});      // Uses Tensor<double, 2> instantiation
+ *     Tensor3f C({2, 3, 4});  // Uses Tensor<float, 3> instantiation
+ *     
+ *     // Vectors work as header-only templates
+ *     Vectorf v({10});        // Compiled as needed, not pre-instantiated
+ *     
+ *     // Other types/ranks require header-only compilation
+ *     Tensor<int, 2> D({2, 2});     // Header-only
+ *     Tensor<float, 5> E({2,2,2,2,2}); // Header-only
+ * }
+ * @endcode
+ * 
+ * @section inst_benefits Benefits
+ * 
+ * Explicit instantiations provide several advantages:
+ * - **Faster compilation**: Client code doesn't need to recompile template code
+ * - **Smaller executables**: Template code is only compiled once in the library
+ * - **Better encapsulation**: Implementation details hidden in .cc files
+ * - **Library distribution**: Can distribute binary libraries without full source
+ * 
+ * @section inst_custom Custom Instantiations
+ * 
+ * If you need tensor types that aren't pre-instantiated (e.g., `Tensor<int, 2>`,
+ * `Tensor<float, 5>`, etc.), they will work as header-only templates. The compiler
+ * will generate the necessary code when you use them.
+ * 
+ * For frequently used custom types in your project, you may want to create your
+ * own explicit instantiation file to reduce compilation times:
+ * 
+ * @code{.cpp}
+ * // my_instantiations.cc
+ * #include "tensor.h"
+ * 
+ * // Explicitly instantiate custom types
+ * template class Tensor<int, 2>;
+ * template class Tensor<float, 5>;
+ * @endcode
+ * 
+ * @see tensor_types.h for type aliases
+ * @see tensor_instantiations.cc for implementation details
+ */

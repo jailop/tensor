@@ -1,0 +1,40 @@
+<map id="matrix_float_lstsq" name="matrix_float_lstsq">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,303,130,330"/>
+<area shape="rect" id="Node000002" href="$namespacelinalg.html#a8405b084d692b1fc7f685f40425a0970" title="Solve least squares problem: minimize ||Ax &#45; b||²" alt="" coords="178,303,265,330"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="130,314,162,314,162,319,130,319"/>
+<area shape="rect" id="Node000003" href="$classTensor.html#a3f3c97d177cb960a4423afc3dafc612a" title=" " alt="" coords="622,303,738,330"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="266,314,606,314,606,319,266,319"/>
+<area shape="rect" id="Node000004" href="$classTensor.html#a03d314303958ffc5644796d8025cd012" title=" " alt="" coords="800,244,896,271"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="229,301,262,254,311,201,389,135,453,87,525,51,621,19,682,4,709,6,739,20,765,40,786,65,803,93,817,122,836,180,846,228,841,229,831,182,812,124,799,95,782,68,761,44,737,24,708,11,682,9,622,24,527,56,456,91,392,139,315,205,266,257,233,304"/>
+<area shape="rect" id="Node000005" href="$namespacelinalg.html#a6ee776536e47c3e57b3b24ed6225bff2" title=" " alt="" coords="461,135,564,162"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="237,301,312,245,379,205,450,171,462,166,464,171,452,176,382,210,314,249,240,305"/>
+<area shape="rect" id="Node000007" href="$classTensor.html#a83ae42925e21d2871d755407d7505c10" title=" " alt="" coords="786,506,910,532"/>
+<area shape="poly" id="edge26_Node000002_Node000007" title=" " alt="" coords="230,329,260,397,284,438,315,476,348,507,377,527,409,542,452,555,531,573,594,578,657,572,737,558,772,549,804,536,806,541,774,554,739,563,658,577,594,583,530,578,451,560,407,547,374,532,344,511,311,480,280,441,255,399,225,331"/>
+<area shape="rect" id="Node000008" href="$namespacelinalg.html#a49a644f54af36b484886d433da564a1f" title="Solve linear system Ax = b." alt="" coords="313,354,403,380"/>
+<area shape="poly" id="edge9_Node000002_Node000008" title=" " alt="" coords="261,328,307,345,305,350,259,333"/>
+<area shape="rect" id="Node000012" href="$namespacelinalg.html#af0c07b2c6a745bcb68c10766032cc5e0" title=" " alt="" coords="622,506,738,532"/>
+<area shape="poly" id="edge25_Node000002_Node000012" title=" " alt="" coords="236,328,269,364,320,411,382,458,417,479,452,495,491,507,531,515,607,520,606,525,530,520,489,512,450,500,414,483,379,463,316,415,266,368,232,332"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="560,160,576,172,588,187,595,203,600,232,606,261,612,275,624,289,626,292,623,296,620,293,608,277,601,262,595,233,590,204,583,190,572,176,557,165"/>
+<area shape="poly" id="edge6_Node000005_Node000004" title=" " alt="" coords="564,153,647,170,739,197,778,214,814,234,811,238,776,219,737,202,646,175,563,158"/>
+<area shape="rect" id="Node000006" href="$classTensor.html#a234f74cd16bd13561f7963ba29efb163" title="Fill the tensor with a specified value." alt="" coords="639,34,720,60"/>
+<area shape="poly" id="edge7_Node000005_Node000006" title=" " alt="" coords="533,132,620,77,639,66,642,71,623,81,536,137"/>
+<area shape="poly" id="edge8_Node000005_Node000007" title=" " alt="" coords="563,160,669,193,715,210,740,222,766,253,788,288,806,325,820,362,838,434,847,490,842,491,833,435,815,364,801,327,784,290,762,256,736,227,713,214,668,198,561,165"/>
+<area shape="poly" id="edge10_Node000008_Node000003" title=" " alt="" coords="403,355,451,346,606,323,607,328,452,351,404,360"/>
+<area shape="poly" id="edge11_Node000008_Node000004" title=" " alt="" coords="404,370,471,374,555,373,647,363,693,353,737,339,761,328,784,313,822,280,825,284,787,317,764,332,739,344,694,358,648,368,555,378,470,379,404,375"/>
+<area shape="poly" id="edge24_Node000008_Node000007" title=" " alt="" coords="368,380,399,436,423,468,453,496,490,519,524,536,555,546,586,552,654,551,738,542,783,534,784,539,738,547,654,556,586,557,554,552,522,541,487,524,450,500,419,472,394,439,363,382"/>
+<area shape="rect" id="Node000009" href="$namespacelinalg_1_1detail.html#aa01152ed1ca1dc6cdf2ceb75eb1c2334" title=" " alt="" coords="451,186,574,228"/>
+<area shape="poly" id="edge12_Node000008_Node000009" title=" " alt="" coords="370,352,478,238,482,242,374,355"/>
+<area shape="rect" id="Node000011" href="$namespacelinalg.html#a299049265c4cb34923444e82e56f381f" title="Compute LU decomposition with partial pivoting: P*A = L*U." alt="" coords="451,404,574,431"/>
+<area shape="poly" id="edge16_Node000008_Node000011" title=" " alt="" coords="402,379,456,396,454,402,401,384"/>
+<area shape="poly" id="edge23_Node000008_Node000012" title=" " alt="" coords="374,379,408,410,453,441,531,476,607,500,606,505,529,481,450,445,405,414,371,383"/>
+<area shape="poly" id="edge13_Node000009_Node000004" title=" " alt="" coords="574,206,653,210,739,222,795,237,794,242,737,227,652,216,574,211"/>
+<area shape="rect" id="Node000010" href="$namespacelinalg_1_1detail.html#ae27253e1f235523164ab348ddd5fbe5b" title=" " alt="" coords="626,236,734,279"/>
+<area shape="poly" id="edge14_Node000009_Node000010" title=" " alt="" coords="575,223,612,234,610,239,573,228"/>
+<area shape="poly" id="edge15_Node000010_Node000004" title=" " alt="" coords="734,255,784,255,784,260,734,260"/>
+<area shape="poly" id="edge17_Node000011_Node000003" title=" " alt="" coords="535,402,642,336,645,340,538,406"/>
+<area shape="poly" id="edge18_Node000011_Node000004" title=" " alt="" coords="574,418,654,411,697,400,737,383,767,362,792,336,830,283,834,286,796,339,770,366,739,388,699,405,655,416,574,423"/>
+<area shape="poly" id="edge22_Node000011_Node000007" title=" " alt="" coords="561,429,788,498,786,503,559,434"/>
+<area shape="poly" id="edge19_Node000011_Node000012" title=" " alt="" coords="543,429,575,448,623,485,640,495,637,500,620,489,572,452,540,434"/>
+<area shape="poly" id="edge20_Node000012_Node000004" title=" " alt="" coords="689,504,736,435,829,283,834,286,740,438,693,507"/>
+<area shape="poly" id="edge21_Node000012_Node000007" title=" " alt="" coords="739,516,771,516,771,522,739,522"/>
+</map>

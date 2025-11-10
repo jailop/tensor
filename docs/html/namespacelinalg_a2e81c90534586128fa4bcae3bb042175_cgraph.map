@@ -1,0 +1,13 @@
+<map id="linalg::svd_decomp" name="linalg::svd_decomp">
+<area shape="rect" id="Node000001" title="Singular Value Decomposition: A = U * Sigma * V^T." alt="" coords="5,81,139,108"/>
+<area shape="rect" id="Node000002" href="$classTensor.html#a3f3c97d177cb960a4423afc3dafc612a" title=" " alt="" coords="187,5,302,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="103,78,198,36,200,41,106,83"/>
+<area shape="rect" id="Node000003" href="$classTensor.html#a03d314303958ffc5644796d8025cd012" title=" " alt="" coords="365,81,461,108"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="139,92,349,92,349,97,139,97"/>
+<area shape="rect" id="Node000004" href="$namespacelinalg.html#af0c07b2c6a745bcb68c10766032cc5e0" title=" " alt="" coords="187,107,303,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="140,102,172,107,171,112,139,107"/>
+<area shape="rect" id="Node000005" href="$classTensor.html#a83ae42925e21d2871d755407d7505c10" title=" " alt="" coords="351,144,475,171"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="98,106,139,126,187,143,263,154,336,157,336,163,263,160,186,148,137,131,96,111"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="303,109,349,102,350,107,304,114"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="304,130,336,138,335,143,303,136"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="block" name="block">
+<area shape="rect" id="Node000001" title="Extract a rectangular block from a 2D tensor." alt="" coords="5,56,58,83"/>
+<area shape="rect" id="Node000002" href="$classTensor.html#a3f3c97d177cb960a4423afc3dafc612a" title=" " alt="" coords="110,5,226,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="57,57,115,35,117,40,59,62"/>
+<area shape="rect" id="Node000003" href="$classTensor.html#a03d314303958ffc5644796d8025cd012" title=" " alt="" coords="120,56,216,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="58,67,104,67,104,72,58,72"/>
+<area shape="rect" id="Node000004" href="$classTensor.html#a83ae42925e21d2871d755407d7505c10" title=" " alt="" coords="106,107,230,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="59,76,117,98,115,103,57,81"/>
+</map>

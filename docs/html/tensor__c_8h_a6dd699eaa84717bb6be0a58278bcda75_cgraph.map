@@ -1,0 +1,15 @@
+<map id="matrix_double_eig" name="matrix_double_eig">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,81,132,108"/>
+<area shape="rect" id="Node000002" href="$namespacelinalg.html#a7141076f8e6b39635853e8368a13c4ea" title="Compute eigenvalues and eigenvectors for symmetric matrices." alt="" coords="180,81,309,108"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="132,92,164,92,164,97,132,97"/>
+<area shape="rect" id="Node000003" href="$classTensor.html#a3f3c97d177cb960a4423afc3dafc612a" title=" " alt="" coords="358,5,473,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="275,78,368,36,371,41,278,83"/>
+<area shape="rect" id="Node000004" href="$classTensor.html#a03d314303958ffc5644796d8025cd012" title=" " alt="" coords="535,81,632,108"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="309,92,520,92,520,97,309,97"/>
+<area shape="rect" id="Node000005" href="$namespacelinalg.html#af0c07b2c6a745bcb68c10766032cc5e0" title=" " alt="" coords="357,107,473,133"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="310,102,342,107,341,112,309,107"/>
+<area shape="rect" id="Node000006" href="$classTensor.html#a83ae42925e21d2871d755407d7505c10" title=" " alt="" coords="521,144,646,171"/>
+<area shape="poly" id="edge7_Node000002_Node000006" title=" " alt="" coords="270,106,310,126,358,143,433,155,506,158,506,163,433,160,356,148,308,131,268,111"/>
+<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="474,109,519,102,520,107,474,114"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="475,130,507,138,506,143,473,136"/>
+</map>

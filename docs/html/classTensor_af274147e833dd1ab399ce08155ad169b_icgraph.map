@@ -1,0 +1,41 @@
+<map id="Tensor::register_backward" name="Tensor::register_backward">
+<area shape="rect" id="Node000001" title=" " alt="" coords="462,427,636,453"/>
+<area shape="rect" id="Node000002" href="$classTensor.html#a265342749ca5f239466cb467bbf73277" title=" " alt="" coords="255,5,388,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="544,411,537,338,517,239,500,187,477,135,448,88,412,46,387,31,390,26,416,42,453,85,482,133,505,185,522,238,542,337,550,411"/>
+<area shape="rect" id="Node000003" href="$classTensor.html#a7a0af0b59b00d2f2623609ff3562f087" title=" " alt="" coords="230,56,414,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="543,411,532,346,510,261,493,217,472,173,445,132,412,97,395,85,398,81,416,93,449,129,476,170,498,214,515,260,538,345,548,411"/>
+<area shape="rect" id="Node000004" href="$classTensor.html#a834720ab65874a6c5503f7670c4f22fe" title=" " alt="" coords="257,107,387,149"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="539,412,524,360,499,293,462,224,439,192,412,163,386,147,389,142,416,159,443,188,467,221,504,291,530,358,544,411"/>
+<area shape="rect" id="Node000005" href="$namespaceloss.html#aff5180b0c38ddd16d08f058205c01ef7" title="Mean Squared Error (MSE) Loss." alt="" coords="267,173,376,200"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="537,413,520,369,494,315,458,260,437,236,412,214,395,204,376,197,378,192,397,199,416,210,440,232,462,257,498,312,525,367,542,411"/>
+<area shape="rect" id="Node000006" href="$classTensor.html#a808dc758321fc810256e3efd13042c98" title=" " alt="" coords="239,224,404,251"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="532,414,513,380,486,339,452,299,413,265,391,254,393,249,415,260,456,295,490,336,518,377,537,411"/>
+<area shape="rect" id="Node000007" href="$classTensor.html#af352346a629f774750b12c97234979a9" title=" " alt="" coords="239,275,404,301"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="526,416,477,365,446,338,413,316,387,304,389,300,415,311,450,334,481,361,530,413"/>
+<area shape="rect" id="Node000008" href="$classTensor.html#aab73fe3969bc9ab6b35a89c3787f2a22" title=" " alt="" coords="238,325,406,352"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="513,420,467,393,413,366,380,355,382,350,415,362,469,388,516,416"/>
+<area shape="rect" id="Node000009" href="$classTensor.html#a1947fa453cc8c0a746b26d2481bb6b39" title=" " alt="" coords="238,376,406,403"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="470,425,384,406,386,401,472,420"/>
+<area shape="rect" id="Node000010" href="$classTensor.html#a2429005aeaabb920c7cc943f044dd9d8" title=" " alt="" coords="242,427,402,453"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="446,443,403,443,403,437,446,437"/>
+<area shape="rect" id="Node000011" href="$classTensor.html#a74db7588a7150d94b620ad63de1f5980" title=" " alt="" coords="255,477,389,504"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="472,460,386,479,384,474,470,455"/>
+<area shape="rect" id="Node000012" href="$classTensor.html#af7f0645bcaf472ac0f6214d2b1effd40" title=" " alt="" coords="242,528,402,555"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="516,464,469,492,415,518,382,530,380,525,413,514,467,487,513,460"/>
+<area shape="rect" id="Node000013" href="$classTensor.html#afff455663faa35d6cfa72aa03f689e94" title=" " alt="" coords="243,579,401,605"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="530,467,481,519,450,546,415,569,389,580,387,576,413,564,446,542,477,515,526,464"/>
+<area shape="rect" id="Node000014" href="$classTensor.html#a4ae322784a9d62e8db2c073f5e2395f7" title=" " alt="" coords="242,629,402,656"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="537,469,518,503,490,544,456,585,415,620,393,631,391,626,413,615,452,581,486,541,513,500,532,466"/>
+<area shape="rect" id="Node000015" href="$classTensor.html#a46d44bb69fc3f0b7376ea35e21903b97" title=" " alt="" coords="241,680,403,707"/>
+<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="542,469,525,513,498,568,462,623,440,648,416,670,396,682,393,677,412,666,437,644,458,620,494,565,520,511,537,467"/>
+<area shape="rect" id="Node000016" href="$classTensor.html#ac20a4679e14de6f68e148b447496adfc" title=" " alt="" coords="237,731,406,757"/>
+<area shape="poly" id="edge15_Node000001_Node000016" title=" " alt="" coords="545,469,531,522,506,590,468,661,444,693,416,721,397,732,394,728,412,717,440,689,464,658,501,588,526,521,540,468"/>
+<area shape="rect" id="Node000019" href="$classTensor.html#aed9419fabd015e2c1c35ff6723c1600a" title=" " alt="" coords="237,781,407,808"/>
+<area shape="poly" id="edge18_Node000001_Node000019" title=" " alt="" coords="547,469,536,532,513,613,496,656,474,698,448,737,416,771,398,783,395,779,412,767,444,734,470,695,491,654,508,611,531,531,542,468"/>
+<area shape="rect" id="Node000020" href="$classTensor.html#ac953ca944380b138ad1e524a1124070f" title=" " alt="" coords="234,832,410,859"/>
+<area shape="poly" id="edge19_Node000001_Node000020" title=" " alt="" coords="549,469,541,540,520,635,503,686,480,735,451,781,416,822,399,834,396,829,412,818,447,778,476,733,498,684,515,634,536,539,544,469"/>
+<area shape="rect" id="Node000017" href="$classTensor.html#adf1fcb0ddd0ef2db3003401db519ec1c" title=" " alt="" coords="5,705,182,732"/>
+<area shape="poly" id="edge16_Node000016_Node000017" title=" " alt="" coords="222,736,182,731,182,726,222,730"/>
+<area shape="rect" id="Node000018" href="$classTensor.html#aeb3f6a9bf8ee28d46a887238a9d3d460" title=" " alt="" coords="5,756,182,783"/>
+<area shape="poly" id="edge17_Node000016_Node000018" title=" " alt="" coords="222,758,182,762,182,757,222,752"/>
+</map>

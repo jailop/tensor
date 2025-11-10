@@ -1,0 +1,25 @@
+var searchData=
+[
+  ['data_0',['data',['../structMemoryPool_1_1Block.html#a088cfe83e78cd2020ffee486278617fe',1,'MemoryPool::Block::data'],['../structFloat16.html#aa4245027e64cd2abf04f97f8ef553e1c',1,'Float16::data'],['../structBFloat16.html#a96b126bef625a32373e4411d6dddd124',1,'BFloat16::data'],['../classTensor.html#a07bf856a863505d2960b0bfad9c3b3f4',1,'Tensor::data() const'],['../classTensor.html#ad8befdfb5ad9c3f2a69f8bdccc9a3787',1,'Tensor::data()']]],
+  ['data_5f_1',['data_',['../classTensorView.html#a478093ab48ecc2b933523039a72353be',1,'TensorView::data_'],['../classTensor.html#acf7ced620891506216fc0112a743e04b',1,'Tensor::data_']]],
+  ['data_5fptr_2',['data_ptr',['../classTensor.html#a3f3c97d177cb960a4423afc3dafc612a',1,'Tensor::data_ptr() const'],['../classTensor.html#ad74772ea04c239f0878e8ad8653dce5d',1,'Tensor::data_ptr()']]],
+  ['deallocate_3',['deallocate',['../classMemoryPool.html#adf50e59a6efd1dbeb6025faab114a94b',1,'MemoryPool']]],
+  ['detach_4',['detach',['../classTensor.html#ae5b52299c11f3ba81e781cb008542285',1,'Tensor']]],
+  ['determinant_5',['determinant',['../namespacelinalg.html#a397bea6a8d02533eae3c3eb837d0fd7a',1,'linalg']]],
+  ['diag_6',['diag',['../classTensor.html#af46e252ac24e0557b28c177bd9070596',1,'Tensor::diag()'],['../namespacelinalg.html#ad030750ea599dfc970dc357fd319ebea',1,'linalg::diag(const Matrix&lt; T &gt; &amp;mat)'],['../namespacelinalg.html#a1df90002eef905350589edef7a4ace1b',1,'linalg::diag(const Vector&lt; T &gt; &amp;vec)'],['../tensor_8h.html#a43014e3309494c3851da86be3a162194',1,'diag(const Tensor&lt; T, 2 &gt; &amp;matrix):&#160;tensor.h']]],
+  ['diag_5fmatrix_7',['diag_matrix',['../tensor_8h.html#ae66ddfcd20907014f524982e01698d82',1,'tensor.h']]],
+  ['differentiation_8',['Automatic Differentiation',['../classTensor.html#autograd',1,'']]],
+  ['dimension_5fmismatch_9',['DIMENSION_MISMATCH',['../tensor__io_8h.html#a7a7b4b4c9dc2a7acfbcdbb53c08e8907a1fb38e5a8e38d5c70d448277c3aa6670',1,'tensor_io.h']]],
+  ['dimensionmismatch_10',['DimensionMismatch',['../tensor_8h.html#a2db6a67f5b95f95cb23a9d7b28deceaaa2664c241558d7674e8ed4d5f63d2e463',1,'tensor.h']]],
+  ['dims_11',['dims',['../classTensorView.html#ada5120a139add97f5df12444f00e2f08',1,'TensorView::dims()'],['../classTensor.html#a03d314303958ffc5644796d8025cd012',1,'Tensor::dims()']]],
+  ['dims_5f_12',['dims_',['../classTensorView.html#ac5bb89edf2a0225fc3a85b8846e9eef9',1,'TensorView::dims_'],['../classTensor.html#a43fadce1ce3dd9ddb47c8b82168edb52',1,'Tensor::dims_']]],
+  ['divide_13',['Divide',['../tensor__perf_8h.html#a9a2c9c31d675b34f6ec35cc1ca89e047a0b914e196182d02615487e9793ecff3d',1,'tensor_perf.h']]],
+  ['documentation_14',['Tensor4D Library Documentation',['../index.html',1,'']]],
+  ['documentation_20pages_15',['Documentation Pages',['../index.html#main_documentation',1,'']]],
+  ['dot_16',['dot',['../classTensor.html#adfb14d7fcd29dddd0d1a790719f57b6d',1,'Tensor::dot(const Tensor&lt; T, 1 &gt; &amp;other) const'],['../classTensor.html#a2f852881c836e20e6a16469980d7f9b0',1,'Tensor::dot(const Tensor&lt; T, 2 &gt; &amp;other) const'],['../classTensor.html#ae29eec9ab673b7d33a191f9e18b57f6b',1,'Tensor::dot(const Tensor&lt; T, P &gt; &amp;other) const'],['../namespacelinalg.html#a4f401211bb16058dcce20c796bda8dd2',1,'linalg::dot()']]],
+  ['dropout_17',['Dropout',['../classtensor4d_1_1nn_1_1Dropout.html',1,'tensor4d::nn::Dropout&lt; T &gt;'],['../classtensor4d_1_1nn_1_1Dropout.html#aea77c1d5fe4c7acaa55174fde51883c5',1,'tensor4d::nn::Dropout::Dropout()']]],
+  ['dropout_3c_20double_20_3e_18',['Dropout&lt; double &gt;',['../classtensor4d_1_1nn_1_1Dropout.html',1,'tensor4d::nn']]],
+  ['dropout_3c_20float_20_3e_19',['Dropout&lt; float &gt;',['../classtensor4d_1_1nn_1_1Dropout.html',1,'tensor4d::nn']]],
+  ['dropoutd_20',['Dropoutd',['../namespacetensor4d_1_1nn.html#ac2f3327e85a4c471ec2f30634bde0928',1,'tensor4d::nn']]],
+  ['dropoutf_21',['Dropoutf',['../namespacetensor4d_1_1nn.html#a3315ab248317bf7d71c75b77ccc5f985',1,'tensor4d::nn']]]
+];

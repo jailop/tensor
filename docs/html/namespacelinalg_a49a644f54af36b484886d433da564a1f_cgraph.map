@@ -1,0 +1,25 @@
+<map id="linalg::solve" name="linalg::solve">
+<area shape="rect" id="Node000001" title="Solve linear system Ax = b." alt="" coords="5,155,96,182"/>
+<area shape="rect" id="Node000002" href="$classTensor.html#a3f3c97d177cb960a4423afc3dafc612a" title=" " alt="" coords="314,130,430,157"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="96,162,298,146,299,152,96,168"/>
+<area shape="rect" id="Node000003" href="$classTensor.html#a03d314303958ffc5644796d8025cd012" title=" " alt="" coords="492,71,589,98"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="56,153,87,101,112,72,142,49,182,29,217,15,250,6,282,3,349,9,431,27,472,42,508,61,505,65,470,47,430,32,348,15,282,9,251,12,219,20,184,33,145,53,116,76,91,104,60,156"/>
+<area shape="rect" id="Node000004" href="$namespacelinalg_1_1detail.html#aa01152ed1ca1dc6cdf2ceb75eb1c2334" title=" " alt="" coords="144,63,266,106"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="76,152,150,111,152,116,78,157"/>
+<area shape="rect" id="Node000006" href="$namespacelinalg.html#a299049265c4cb34923444e82e56f381f" title="Compute LU decomposition with partial pivoting: P*A = L*U." alt="" coords="144,181,266,207"/>
+<area shape="poly" id="edge7_Node000001_Node000006" title=" " alt="" coords="97,173,129,179,128,184,96,179"/>
+<area shape="rect" id="Node000007" href="$namespacelinalg.html#af0c07b2c6a745bcb68c10766032cc5e0" title=" " alt="" coords="314,282,430,309"/>
+<area shape="poly" id="edge14_Node000001_Node000007" title=" " alt="" coords="76,180,145,217,229,249,307,275,306,280,227,254,143,222,73,185"/>
+<area shape="rect" id="Node000008" href="$classTensor.html#a83ae42925e21d2871d755407d7505c10" title=" " alt="" coords="478,282,603,309"/>
+<area shape="poly" id="edge15_Node000001_Node000008" title=" " alt="" coords="63,181,96,224,119,247,145,268,189,292,225,304,314,318,372,323,430,318,475,310,476,315,431,323,372,328,314,323,224,309,186,296,142,272,115,251,92,227,58,184"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="265,60,314,49,372,43,431,49,490,63,489,69,430,54,372,48,314,54,266,65"/>
+<area shape="rect" id="Node000005" href="$namespacelinalg_1_1detail.html#ae27253e1f235523164ab348ddd5fbe5b" title=" " alt="" coords="318,63,426,106"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="267,82,302,82,302,87,267,87"/>
+<area shape="poly" id="edge6_Node000005_Node000003" title=" " alt="" coords="427,82,477,82,477,87,427,87"/>
+<area shape="poly" id="edge8_Node000006_Node000002" title=" " alt="" coords="251,177,310,159,312,164,252,182"/>
+<area shape="poly" id="edge9_Node000006_Node000003" title=" " alt="" coords="266,193,346,187,388,179,429,166,476,139,514,107,518,111,479,143,431,171,390,184,346,193,267,198"/>
+<area shape="poly" id="edge10_Node000006_Node000007" title=" " alt="" coords="228,206,315,261,334,272,331,276,313,266,226,210"/>
+<area shape="poly" id="edge13_Node000006_Node000008" title=" " alt="" coords="253,205,480,274,478,280,251,210"/>
+<area shape="poly" id="edge11_Node000007_Node000003" title=" " alt="" coords="382,280,517,108,521,112,386,283"/>
+<area shape="poly" id="edge12_Node000007_Node000008" title=" " alt="" coords="431,293,463,293,463,298,431,298"/>
+</map>

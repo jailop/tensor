@@ -1,0 +1,7 @@
+<map id="save_text" name="save_text">
+<area shape="rect" id="Node000001" title="Save a tensor to a text file (CSV&#45;like format)." alt="" coords="178,31,256,57"/>
+<area shape="rect" id="Node000002" href="$tensor__io_8h.html#af1dee4960bb4ee62c02499855bb66a2d" title="Save a tensor to a file with specified format." alt="" coords="43,5,92,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="162,37,92,25,93,20,163,32"/>
+<area shape="rect" id="Node000003" href="$tensor__io_8h.html#a9e03fa16492ffad78aee9cc9f84073d9" title=" " alt="" coords="5,56,130,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="163,56,131,61,130,56,162,51"/>
+</map>

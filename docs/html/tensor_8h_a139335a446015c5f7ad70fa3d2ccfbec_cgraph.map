@@ -1,0 +1,15 @@
+<map id="split" name="split">
+<area shape="rect" id="Node000001" title="Split tensor into chunks along specified axis." alt="" coords="5,80,51,107"/>
+<area shape="rect" id="Node000002" href="$tensor_8h.html#a64dfa8c2475ed50ae00ef1d4e1c12fd2" title="Divide tensor into equal&#45;sized chunks (last chunk may be smaller)." alt="" coords="99,55,155,82"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="50,85,83,77,84,82,52,91"/>
+<area shape="rect" id="Node000003" href="$classTensor.html#a07bf856a863505d2960b0bfad9c3b3f4" title=" " alt="" coords="218,6,312,32"/>
+<area shape="poly" id="edge6_Node000001_Node000003" title=" " alt="" coords="35,78,59,46,77,29,98,17,123,8,151,4,203,5,203,10,151,9,125,13,100,21,80,33,63,49,39,82"/>
+<area shape="rect" id="Node000004" href="$classTensor.html#a03d314303958ffc5644796d8025cd012" title=" " alt="" coords="217,80,313,107"/>
+<area shape="poly" id="edge7_Node000001_Node000004" title=" " alt="" coords="51,91,202,91,202,96,51,96"/>
+<area shape="rect" id="Node000005" href="$classTensor.html#a83ae42925e21d2871d755407d7505c10" title=" " alt="" coords="203,143,327,170"/>
+<area shape="poly" id="edge8_Node000001_Node000005" title=" " alt="" coords="52,97,198,136,196,141,50,102"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="109,55,106,46,108,37,115,31,127,28,139,31,146,37,142,41,137,36,127,34,117,35,112,40,111,46,114,54"/>
+<area shape="poly" id="edge3_Node000002_Node000003" title=" " alt="" coords="155,56,211,36,212,41,157,61"/>
+<area shape="poly" id="edge4_Node000002_Node000004" title=" " alt="" coords="156,71,202,80,201,85,155,76"/>
+<area shape="poly" id="edge5_Node000002_Node000005" title=" " alt="" coords="149,80,204,117,229,132,226,137,202,121,146,84"/>
+</map>

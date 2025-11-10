@@ -1,0 +1,14 @@
+<map id="SGD&lt; T, N &gt;" name="SGD&lt; T, N &gt;">
+<area shape="rect" id="Node000001" title="SGD (Stochastic Gradient Descent) optimizer with optional momentum." alt="" coords="173,221,271,248"/>
+<area shape="rect" id="Node000002" href="$classOptimizer.html" title="Base class for optimization algorithms." alt="" coords="123,113,231,140"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="191,153,219,220,214,222,186,155"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="224,5,263,32"/>
+<area shape="poly" id="edge7_Node000001_Node000003" title=" " alt="" coords="209,24,163,29,110,43,58,67,36,84,17,105,9,127,13,146,27,164,51,179,111,205,174,221,172,226,110,210,48,184,24,168,8,149,3,127,13,103,32,81,55,63,108,38,162,24,208,19"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="214,42,199,57,186,86,181,114,175,113,181,85,195,55,210,38"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="255,105,389,148"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="275,40,288,54,305,80,317,104,312,106,300,82,284,58,271,44"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="413,105,546,148"/>
+<area shape="poly" id="edge6_Node000005_Node000003" title=" " alt="" coords="278,25,322,36,369,54,414,77,453,103,450,107,411,82,366,58,320,42,277,30"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="294,161,236,223,232,219,291,157"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="439,159,404,181,364,200,318,216,272,227,271,222,316,211,362,195,401,176,437,154"/>
+</map>

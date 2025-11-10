@@ -1,0 +1,5 @@
+<map id="Tensor::tanh" name="Tensor::tanh">
+<area shape="rect" id="Node000001" title="Apply hyperbolic tangent (tanh) to all elements (creates new tensor)." alt="" coords="183,13,276,40"/>
+<area shape="rect" id="Node000002" href="$classtensor4d_1_1nn_1_1Tanh.html#a5bf1911c8b5865f171c90efbefbbe437" title=" " alt="" coords="5,5,135,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="167,29,135,29,135,24,167,24"/>
+</map>

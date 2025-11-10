@@ -1,0 +1,7 @@
+<map id="linalg::determinant" name="linalg::determinant">
+<area shape="rect" id="Node000001" title="Compute determinant of a square matrix." alt="" coords="231,31,358,57"/>
+<area shape="rect" id="Node000002" href="$tensor__c_8cpp.html#a8c7d0e2386ccf7736acfd38fde6b346b" title=" " alt="" coords="5,5,183,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="215,37,183,33,183,27,216,31"/>
+<area shape="rect" id="Node000003" href="$tensor__c_8cpp.html#a42edf6fc1ead7dfe415d6182180f2852" title=" " alt="" coords="12,56,176,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="216,57,177,62,176,56,215,51"/>
+</map>

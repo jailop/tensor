@@ -1,0 +1,7 @@
+<map id="linalg::pinv" name="linalg::pinv">
+<area shape="rect" id="Node000001" title="Compute Moore&#45;Penrose pseudo&#45;inverse using SVD." alt="" coords="187,31,270,57"/>
+<area shape="rect" id="Node000002" href="$tensor__c_8cpp.html#ad0eab2342bda5d725085476abc7c50b6" title=" " alt="" coords="5,5,139,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="171,37,139,32,140,27,172,32"/>
+<area shape="rect" id="Node000003" href="$tensor__c_8cpp.html#acf74b6d7b42a82859c1fbec640125775" title=" " alt="" coords="12,56,132,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="172,56,133,62,132,57,171,51"/>
+</map>

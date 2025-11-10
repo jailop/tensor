@@ -1,0 +1,9 @@
+<map id="diag" name="diag">
+<area shape="rect" id="Node000001" title="Extract the diagonal of a 2D tensor." alt="" coords="5,56,51,83"/>
+<area shape="rect" id="Node000002" href="$classTensor.html#a3f3c97d177cb960a4423afc3dafc612a" title=" " alt="" coords="103,5,218,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="50,58,108,36,110,41,52,63"/>
+<area shape="rect" id="Node000003" href="$classTensor.html#a03d314303958ffc5644796d8025cd012" title=" " alt="" coords="113,56,209,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="51,67,97,67,97,72,51,72"/>
+<area shape="rect" id="Node000004" href="$classTensor.html#a83ae42925e21d2871d755407d7505c10" title=" " alt="" coords="99,107,223,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="52,75,110,98,108,103,50,80"/>
+</map>

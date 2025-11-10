@@ -1,0 +1,14 @@
+<map id="TensorRandom::gamma" name="TensorRandom::gamma">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,68,166,95"/>
+<area shape="rect" id="Node000002" href="$classTensorRandom.html#a4ab3dafd07fad48c51646b18f3941d2d" title=" " alt="" coords="214,43,356,69"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="166,68,198,64,199,70,167,74"/>
+<area shape="rect" id="Node000003" href="$classTensor.html#a07bf856a863505d2960b0bfad9c3b3f4" title=" " alt="" coords="456,5,549,32"/>
+<area shape="poly" id="edge5_Node000001_Node000003" title=" " alt="" coords="113,65,159,45,213,28,273,18,333,13,440,13,440,18,334,19,273,24,214,33,161,50,115,70"/>
+<area shape="rect" id="Node000004" href="$classTensorRandom.html#adbb4b823e7ba81a7702af757a99cb7bf" title=" " alt="" coords="404,68,600,95"/>
+<area shape="poly" id="edge6_Node000001_Node000004" title=" " alt="" coords="166,79,388,79,388,84,166,84"/>
+<area shape="rect" id="Node000005" href="$classTensor.html#aad6aeb4859940befd0c46f0b99388bd7" title=" " alt="" coords="440,131,564,157"/>
+<area shape="poly" id="edge7_Node000001_Node000005" title=" " alt="" coords="167,91,425,130,424,135,166,96"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="356,41,440,27,441,32,357,46"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="357,62,389,65,388,71,356,67"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="319,67,405,104,451,122,449,127,403,109,316,72"/>
+</map>

@@ -1,0 +1,19 @@
+<map id="linalg::inverse" name="linalg::inverse">
+<area shape="rect" id="Node000001" title="Compute inverse of a square matrix." alt="" coords="5,102,107,129"/>
+<area shape="rect" id="Node000002" href="$classTensor.html#a3f3c97d177cb960a4423afc3dafc612a" title=" " alt="" coords="326,26,441,53"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="107,100,154,88,310,52,311,57,155,93,108,105"/>
+<area shape="rect" id="Node000003" href="$classTensor.html#a03d314303958ffc5644796d8025cd012" title=" " alt="" coords="503,77,600,103"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="76,99,111,77,154,56,237,26,325,12,384,3,410,4,442,12,490,35,528,65,524,69,487,40,440,17,409,9,384,9,325,17,239,31,156,61,114,82,78,104"/>
+<area shape="rect" id="Node000004" href="$namespacelinalg.html#a299049265c4cb34923444e82e56f381f" title="Compute LU decomposition with partial pivoting: P*A = L*U." alt="" coords="155,102,277,129"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="107,113,139,113,139,118,107,118"/>
+<area shape="rect" id="Node000005" href="$namespacelinalg.html#af0c07b2c6a745bcb68c10766032cc5e0" title=" " alt="" coords="325,178,441,205"/>
+<area shape="poly" id="edge10_Node000001_Node000005" title=" " alt="" coords="108,126,155,138,311,174,310,179,154,143,107,131"/>
+<area shape="rect" id="Node000006" href="$classTensor.html#a83ae42925e21d2871d755407d7505c10" title=" " alt="" coords="489,178,614,205"/>
+<area shape="poly" id="edge11_Node000001_Node000006" title=" " alt="" coords="78,127,114,149,156,170,239,200,325,214,383,219,441,214,486,206,487,212,442,219,383,224,325,219,237,205,154,175,111,154,76,132"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="246,99,337,57,339,62,248,104"/>
+<area shape="poly" id="edge5_Node000004_Node000003" title=" " alt="" coords="277,108,487,92,488,98,278,114"/>
+<area shape="poly" id="edge6_Node000004_Node000005" title=" " alt="" coords="248,127,339,169,337,174,246,132"/>
+<area shape="poly" id="edge9_Node000004_Node000006" title=" " alt="" coords="278,126,442,164,477,172,476,177,441,169,277,132"/>
+<area shape="poly" id="edge7_Node000005_Node000003" title=" " alt="" coords="406,175,513,110,516,114,409,180"/>
+<area shape="poly" id="edge8_Node000005_Node000006" title=" " alt="" coords="442,189,474,189,474,194,442,194"/>
+</map>

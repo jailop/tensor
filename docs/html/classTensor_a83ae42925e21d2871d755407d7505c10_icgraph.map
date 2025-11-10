@@ -1,0 +1,122 @@
+<map id="Tensor::uses_gpu" name="Tensor::uses_gpu">
+<area shape="rect" id="Node000001" title=" " alt="" coords="799,1185,923,1212"/>
+<area shape="rect" id="Node000002" href="$tensor_8h.html#a912e291f7a42f325c111def58ac98acf" title="Cast tensor to a different data type (NumPy&#45;compatible astype)." alt="" coords="637,5,698,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="856,1170,847,935,828,577,813,395,795,235,774,112,761,71,749,46,738,36,726,30,698,22,699,17,727,25,741,32,753,42,766,69,779,111,800,234,818,395,833,577,853,935,861,1170"/>
+<area shape="rect" id="Node000003" href="$namespaceloss.html#a365059b00ea1e6ec1db86710cfcf3b31" title="Binary cross entropy loss for binary classification." alt="" coords="604,56,731,99"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="856,1170,845,948,824,612,809,441,791,290,771,175,760,136,749,112,730,96,733,92,753,109,765,134,776,174,797,290,814,441,829,611,851,947,861,1170"/>
+<area shape="rect" id="Node000004" href="$tensor_8h.html#adc912199dacbff108e0d2cadfae000df" title="Extract a rectangular block from a 2D tensor." alt="" coords="641,123,694,149"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="856,1170,845,957,824,636,809,474,792,331,771,222,760,185,749,163,737,153,723,146,694,139,695,134,725,141,740,149,753,160,765,183,777,221,797,330,815,474,829,636,851,956,861,1170"/>
+<area shape="rect" id="Node000007" href="$tensor_8h.html#aa94ca571f8bc2b76cd1bdb6fd851c556" title="Extract bottom n rows from a 2D tensor." alt="" coords="620,173,715,200"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="856,1170,844,966,823,662,808,508,790,372,770,269,760,235,749,214,734,201,715,194,717,189,736,197,753,210,765,233,776,268,796,372,813,507,828,661,850,966,861,1170"/>
+<area shape="rect" id="Node000008" href="$namespacelinalg.html#a12137fd985ff57d9e9396c8f6919383e" title="Cholesky decomposition: A = L * L^T for symmetric positive definite matrices." alt="" coords="362,477,527,504"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="856,1170,848,1043,831,865,817,774,799,691,776,622,763,596,749,577,734,565,713,554,657,534,591,518,527,506,528,500,592,513,658,529,715,549,737,560,753,573,767,594,781,620,804,689,822,773,836,864,854,1043,861,1170"/>
+<area shape="rect" id="Node000011" href="$tensor_8h.html#a64dfa8c2475ed50ae00ef1d4e1c12fd2" title="Divide tensor into equal&#45;sized chunks (last chunk may be smaller)." alt="" coords="639,1008,696,1035"/>
+<area shape="poly" id="edge9_Node000001_Node000011" title=" " alt="" coords="845,1173,807,1110,781,1077,749,1049,723,1035,696,1028,697,1023,725,1030,752,1044,785,1073,812,1107,849,1170"/>
+<area shape="rect" id="Node000012" href="$tensor_8h.html#a139335a446015c5f7ad70fa3d2ccfbec" title="Split tensor into chunks along specified axis." alt="" coords="422,996,467,1023"/>
+<area shape="poly" id="edge56_Node000001_Node000012" title=" " alt="" coords="853,1171,843,1125,824,1070,793,1016,773,993,749,974,714,958,675,951,635,951,595,956,523,977,469,1000,467,995,521,972,594,951,635,945,676,945,715,953,752,970,777,989,798,1013,829,1068,848,1124,858,1170"/>
+<area shape="rect" id="Node000013" href="$tensor_8h.html#a5f2a03f722ba5a985a3733e2ff823a74" title="Extract a single column from a 2D tensor." alt="" coords="648,224,687,251"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="857,1170,857,990,853,862,845,722,832,581,813,452,785,345,768,303,749,271,735,259,719,250,686,242,688,237,721,245,738,254,753,268,773,301,790,343,818,451,838,581,851,721,858,861,862,990,863,1170"/>
+<area shape="rect" id="Node000014" href="$namespacelinalg.html#a6b7af062b5a9642d788fcc084335b39c" title=" " alt="" coords="374,275,515,301"/>
+<area shape="poly" id="edge27_Node000001_Node000014" title=" " alt="" coords="855,1170,844,983,823,710,808,573,791,453,771,362,760,333,749,315,722,295,692,281,660,272,627,267,560,268,501,277,501,271,559,263,627,262,661,267,694,276,725,291,753,312,765,330,776,361,796,452,813,572,828,709,850,982,861,1169"/>
+<area shape="rect" id="Node000025" href="$namespacelinalg.html#a61b846dd17050c602c624ff0a898d617" title=" " alt="" coords="5,376,96,403"/>
+<area shape="poly" id="edge54_Node000001_Node000025" title=" " alt="" coords="857,1170,853,1024,839,815,826,708,807,610,781,531,766,500,749,478,736,470,715,462,649,447,461,422,254,404,96,394,97,389,254,399,462,417,650,442,716,457,739,465,752,474,770,498,786,529,812,609,831,707,844,815,859,1024,862,1170"/>
+<area shape="rect" id="Node000026" href="$tensor_8h.html#a3331b6cf4ac182d022336e4d068a0e58" title="Create a copy of a tensor (NumPy&#45;compatible)." alt="" coords="643,1059,692,1085"/>
+<area shape="poly" id="edge15_Node000001_Node000026" title=" " alt="" coords="836,1175,798,1136,749,1100,720,1087,692,1079,693,1074,722,1082,752,1095,802,1132,840,1171"/>
+<area shape="rect" id="Node000027" href="$namespaceloss.html#a75edef9d102d2ab811b15c50f13c4eee" title="Cross entropy loss for multi&#45;class classification." alt="" coords="584,1109,751,1136"/>
+<area shape="poly" id="edge16_Node000001_Node000027" title=" " alt="" coords="817,1180,750,1150,717,1139,719,1134,752,1146,820,1176"/>
+<area shape="rect" id="Node000028" href="$tensor_8h.html#a43014e3309494c3851da86be3a162194" title="Extract the diagonal of a 2D tensor." alt="" coords="645,1160,690,1187"/>
+<area shape="poly" id="edge17_Node000001_Node000028" title=" " alt="" coords="783,1191,690,1179,691,1174,783,1186"/>
+<area shape="rect" id="Node000029" href="$namespacelinalg.html#ad030750ea599dfc970dc357fd319ebea" title=" " alt="" coords="626,1211,709,1237"/>
+<area shape="poly" id="edge18_Node000001_Node000029" title=" " alt="" coords="784,1211,710,1221,709,1216,783,1206"/>
+<area shape="rect" id="Node000030" href="$namespacelinalg.html#a1df90002eef905350589edef7a4ace1b" title=" " alt="" coords="626,1261,709,1288"/>
+<area shape="poly" id="edge19_Node000001_Node000030" title=" " alt="" coords="820,1222,752,1252,710,1266,709,1261,750,1247,817,1217"/>
+<area shape="rect" id="Node000031" href="$tensor_8h.html#ae66ddfcd20907014f524982e01698d82" title="Create a diagonal matrix from a 1D tensor." alt="" coords="623,1312,712,1339"/>
+<area shape="poly" id="edge20_Node000001_Node000031" title=" " alt="" coords="840,1226,802,1265,752,1302,713,1318,711,1313,749,1298,798,1261,836,1222"/>
+<area shape="rect" id="Node000032" href="$namespacelinalg.html#a4f401211bb16058dcce20c796bda8dd2" title="Compute dot product of two vectors." alt="" coords="629,1363,706,1389"/>
+<area shape="poly" id="edge21_Node000001_Node000032" title=" " alt="" coords="849,1227,812,1290,785,1324,752,1353,730,1365,707,1372,706,1367,728,1360,749,1348,781,1320,807,1287,845,1224"/>
+<area shape="rect" id="Node000033" href="$namespacelinalg.html#a7141076f8e6b39635853e8368a13c4ea" title="Compute eigenvalues and eigenvectors for symmetric matrices." alt="" coords="380,731,509,757"/>
+<area shape="poly" id="edge22_Node000001_Node000033" title=" " alt="" coords="854,1170,843,1077,822,954,807,892,790,837,771,793,749,765,721,746,690,733,658,726,624,722,557,724,500,733,499,727,557,718,624,717,658,720,692,728,724,742,752,761,775,790,795,835,812,891,827,953,848,1076,859,1170"/>
+<area shape="rect" id="Node000036" href="$tensor_8h.html#a04c7965d0b8f08cfdb84580050e9e0b5" title="Extract first n elements from a 1D tensor." alt="" coords="643,1413,692,1440"/>
+<area shape="poly" id="edge23_Node000001_Node000036" title=" " alt="" coords="854,1228,841,1267,820,1314,791,1362,752,1403,723,1419,693,1427,692,1422,721,1414,749,1399,786,1359,815,1312,836,1265,849,1226"/>
+<area shape="rect" id="Node000037" href="$namespacelinalg.html#abc25aee98d873c690a7d8a88277e7219" title="Compute inverse of a square matrix." alt="" coords="174,629,275,656"/>
+<area shape="poly" id="edge24_Node000001_Node000037" title=" " alt="" coords="857,1170,853,1107,838,1026,824,984,806,945,781,909,749,879,723,863,698,853,674,848,650,848,603,856,556,871,509,888,459,898,434,899,407,895,380,887,352,873,323,851,298,824,277,793,261,761,237,701,226,657,231,656,243,699,266,759,282,791,302,820,326,847,354,868,382,882,408,890,434,893,459,893,507,883,554,866,601,851,649,842,674,843,700,848,726,859,752,875,785,905,810,942,829,982,843,1025,858,1106,862,1170"/>
+<area shape="rect" id="Node000040" href="$namespacelinalg.html#a7b56c15653bd4614605326c1ced1a36d" title="Compute Kronecker product of two matrices." alt="" coords="625,1464,710,1491"/>
+<area shape="poly" id="edge25_Node000001_Node000040" title=" " alt="" coords="858,1228,847,1277,827,1338,797,1400,776,1429,752,1454,733,1467,711,1474,709,1469,730,1462,749,1450,772,1425,792,1397,822,1336,842,1276,853,1227"/>
+<area shape="rect" id="Node000043" href="$namespaceloss.html#ab7fbd0200f34e3d12f66d20b681a948f" title="L1 loss (Mean Absolute Error)." alt="" coords="620,1515,715,1541"/>
+<area shape="poly" id="edge26_Node000001_Node000043" title=" " alt="" coords="860,1228,852,1286,834,1360,821,1399,803,1437,780,1473,752,1505,735,1517,716,1524,714,1519,733,1512,749,1501,776,1470,798,1435,816,1397,829,1358,847,1285,855,1227"/>
+<area shape="rect" id="Node000044" href="$tensor_8h.html#a0d1116cdf6624cb52514979cd1869e55" title="Extract leftmost n columns from a 2D tensor." alt="" coords="634,1565,701,1592"/>
+<area shape="poly" id="edge28_Node000001_Node000044" title=" " alt="" coords="862,1228,857,1294,841,1382,827,1428,808,1474,784,1517,752,1555,728,1571,702,1578,701,1573,726,1566,749,1551,779,1514,804,1472,822,1427,836,1381,852,1293,857,1227"/>
+<area shape="rect" id="Node000045" href="$namespacelinalg.html#a8405b084d692b1fc7f685f40425a0970" title="Solve least squares problem: minimize ||Ax &#45; b||²" alt="" coords="7,604,94,631"/>
+<area shape="poly" id="edge29_Node000001_Node000045" title=" " alt="" coords="854,1171,845,1120,827,1057,813,1025,796,994,775,967,749,943,723,927,698,915,651,904,605,904,559,912,513,921,463,927,410,923,352,904,300,875,251,841,206,802,165,762,99,686,59,633,63,630,103,683,169,758,209,798,254,837,303,871,354,899,411,917,463,921,512,916,558,907,604,899,651,898,700,910,726,922,752,939,779,963,800,991,818,1023,832,1055,850,1119,859,1170"/>
+<area shape="rect" id="Node000048" href="$namespacelinalg.html#a299049265c4cb34923444e82e56f381f" title="Compute LU decomposition with partial pivoting: P*A = L*U." alt="" coords="384,579,506,605"/>
+<area shape="poly" id="edge30_Node000001_Node000048" title=" " alt="" coords="856,1170,849,1050,832,882,818,798,800,721,777,659,763,636,749,619,722,600,693,587,661,578,628,573,562,573,504,581,504,575,562,568,628,568,662,572,694,581,725,596,752,615,768,633,781,657,805,720,823,797,837,882,854,1049,861,1170"/>
+<area shape="rect" id="Node000054" href="$namespacelinalg.html#a49a644f54af36b484886d433da564a1f" title="Solve linear system Ax = b." alt="" coords="179,528,270,555"/>
+<area shape="poly" id="edge55_Node000001_Node000054" title=" " alt="" coords="856,1170,850,1034,833,842,819,743,801,653,778,579,764,550,749,529,719,506,674,486,620,471,560,460,499,454,442,453,392,458,354,468,339,478,330,491,322,505,306,518,271,534,269,529,304,514,318,501,326,488,335,474,352,463,391,452,441,448,499,449,561,455,621,466,676,481,721,501,753,525,768,547,783,577,806,651,825,742,839,841,855,1034,861,1170"/>
+<area shape="rect" id="Node000060" href="$namespacelinalg.html#a6ee776536e47c3e57b3b24ed6225bff2" title=" " alt="" coords="616,376,719,403"/>
+<area shape="poly" id="edge35_Node000001_Node000060" title=" " alt="" coords="857,1170,852,1017,837,794,823,678,805,572,780,484,765,449,749,423,735,411,718,402,720,397,738,406,753,420,770,447,785,482,810,570,829,677,842,793,858,1017,862,1170"/>
+<area shape="rect" id="Node000061" href="$namespacelinalg.html#a57a91e9770c813128f00c0a1ea674012" title=" " alt="" coords="616,1616,719,1643"/>
+<area shape="poly" id="edge38_Node000001_Node000061" title=" " alt="" coords="863,1228,861,1303,848,1404,834,1458,814,1511,787,1561,753,1606,737,1617,720,1625,718,1620,735,1613,749,1602,783,1558,809,1509,829,1456,842,1402,856,1302,858,1228"/>
+<area shape="rect" id="Node000064" href="$namespaceloss.html#aff5180b0c38ddd16d08f058205c01ef7" title="Mean Squared Error (MSE) Loss." alt="" coords="613,1667,722,1693"/>
+<area shape="poly" id="edge39_Node000001_Node000064" title=" " alt="" coords="859,1228,846,1323,824,1451,810,1516,793,1575,774,1623,753,1656,739,1667,724,1674,722,1670,736,1663,749,1653,769,1621,788,1573,805,1515,819,1450,841,1323,854,1227"/>
+<area shape="rect" id="Node000065" href="$namespacelinalg.html#a16562e1c4018bf2a58455158a8022fb9" title="Compute the L2 norm (Euclidean norm) of a vector." alt="" coords="623,1768,712,1795"/>
+<area shape="poly" id="edge40_Node000001_Node000065" title=" " alt="" coords="860,1228,850,1341,829,1497,815,1576,797,1649,777,1709,753,1751,734,1766,713,1776,711,1771,732,1762,749,1748,772,1707,792,1647,810,1575,824,1496,844,1340,855,1227"/>
+<area shape="rect" id="Node000066" href="$namespacelinalg.html#afbe723a0bf8fb7dc2d98815c1ea724b2" title="Normalize a vector to unit length." alt="" coords="387,1743,502,1769"/>
+<area shape="poly" id="edge42_Node000001_Node000066" title=" " alt="" coords="860,1228,850,1334,830,1478,816,1551,798,1617,777,1671,753,1707,734,1719,709,1729,643,1743,570,1752,503,1757,503,1751,569,1747,643,1738,707,1724,732,1714,749,1703,773,1668,793,1615,811,1550,825,1477,845,1334,855,1227"/>
+<area shape="rect" id="Node000069" href="$tensor_8h.html#aa8d30c4d06f085bf8078c8644030c633" title="Normalize tensor using L1 norm (sum of absolute values)." alt="" coords="620,1819,715,1845"/>
+<area shape="poly" id="edge43_Node000001_Node000069" title=" " alt="" coords="861,1228,853,1352,834,1525,820,1614,802,1695,780,1762,767,1788,753,1809,736,1822,716,1829,714,1824,733,1817,749,1805,762,1785,775,1760,797,1694,815,1613,829,1524,847,1351,856,1227"/>
+<area shape="rect" id="Node000070" href="$tensor_8h.html#a7718d2096a1190de7777bc65f9a86deb" title="Normalize tensor using L2 norm (Euclidean norm)." alt="" coords="620,1869,715,1896"/>
+<area shape="poly" id="edge44_Node000001_Node000070" title=" " alt="" coords="861,1227,855,1360,837,1549,823,1646,805,1735,782,1808,768,1837,753,1859,736,1872,716,1880,714,1875,733,1868,749,1856,763,1834,777,1806,800,1734,818,1645,832,1549,849,1360,856,1227"/>
+<area shape="rect" id="Node000071" href="$tensor_8h.html#a1782e0dff417e1292f8a6f1e3e1975f1" title="Min&#45;Max normalization: scales values to [min_val, max_val] range." alt="" coords="602,1920,733,1947"/>
+<area shape="poly" id="edge45_Node000001_Node000071" title=" " alt="" coords="862,1227,856,1369,840,1573,827,1678,808,1775,784,1855,769,1886,753,1910,735,1924,731,1919,749,1906,764,1883,779,1853,803,1774,821,1678,835,1573,851,1369,856,1227"/>
+<area shape="rect" id="Node000072" href="$tensor_8h.html#a57c931d0d77f610850f315fdd9acef39" title="Z&#45;score normalization (standardization): (x &#45; mean) / std." alt="" coords="606,1971,729,1997"/>
+<area shape="poly" id="edge46_Node000001_Node000072" title=" " alt="" coords="862,1228,858,1379,843,1598,830,1711,811,1815,785,1901,770,1935,753,1961,731,1976,728,1972,749,1957,765,1932,780,1899,806,1814,824,1710,838,1597,853,1379,857,1228"/>
+<area shape="rect" id="Node000073" href="$namespacelinalg.html#a8a8d04b2734fdcad37cc861687fbb6fc" title=" " alt="" coords="623,2021,712,2048"/>
+<area shape="poly" id="edge47_Node000001_Node000073" title=" " alt="" coords="862,1228,860,1387,846,1622,833,1743,814,1855,787,1947,771,1983,753,2011,734,2025,713,2033,711,2028,732,2021,749,2008,766,1981,782,1945,808,1854,828,1742,841,1621,854,1387,857,1227"/>
+<area shape="rect" id="Node000074" href="$namespacelinalg.html#a3395139856f5efebaa58f3bc9c4ed3bd" title="QR decomposition: A = QR." alt="" coords="383,781,506,808"/>
+<area shape="poly" id="edge48_Node000001_Node000074" title=" " alt="" coords="853,1170,841,1084,819,972,805,917,788,868,770,828,749,803,719,785,687,773,652,767,616,765,548,771,491,783,490,778,547,766,616,760,653,762,688,768,722,780,752,799,774,826,793,866,810,916,824,971,846,1083,859,1169"/>
+<area shape="rect" id="Node000077" href="$tensor_8h.html#ad71687cadd6e7bdae0f2d66fc9f437e1" title="Construct tensor by repeating along specified axis." alt="" coords="604,2072,731,2099"/>
+<area shape="poly" id="edge49_Node000001_Node000077" title=" " alt="" coords="863,1228,861,1396,857,1516,849,1646,836,1775,817,1895,789,1993,772,2032,753,2062,733,2077,730,2072,749,2058,768,2029,784,1992,811,1894,831,1775,844,1645,852,1516,856,1396,857,1228"/>
+<area shape="rect" id="Node000078" href="$tensor_8h.html#a3798be100af6c60da8c8489ba3ac808a" title="Extract rightmost n columns from a 2D tensor." alt="" coords="631,2123,704,2149"/>
+<area shape="poly" id="edge50_Node000001_Node000078" title=" " alt="" coords="861,1228,848,1418,826,1698,811,1840,793,1964,774,2059,764,2092,753,2112,731,2128,706,2136,704,2131,728,2124,749,2109,759,2090,769,2058,788,1964,805,1839,820,1698,843,1418,855,1227"/>
+<area shape="rect" id="Node000079" href="$tensor_8h.html#adf94b1b28dd9932dd278abaa3cb7a9ee" title="Extract a single row from a 2D tensor." alt="" coords="646,325,689,352"/>
+<area shape="poly" id="edge51_Node000001_Node000079" title=" " alt="" coords="857,1169,855,1005,842,764,829,639,810,525,783,430,767,394,749,366,736,355,721,348,689,342,690,336,722,343,739,351,753,362,772,391,788,428,815,523,834,639,848,764,860,1005,862,1169"/>
+<area shape="rect" id="Node000082" href="$namespaceloss.html#a2d2c1dacdb37d834f7dc10e85cd1a742" title="Smooth L1 loss (Huber loss)." alt="" coords="595,2173,740,2200"/>
+<area shape="poly" id="edge53_Node000001_Node000082" title=" " alt="" coords="861,1228,849,1428,827,1724,812,1874,795,2006,775,2107,764,2141,753,2163,739,2175,735,2171,749,2160,759,2139,770,2106,790,2005,807,1873,822,1724,844,1427,855,1227"/>
+<area shape="rect" id="Node000083" href="$namespacelinalg.html#a2e81c90534586128fa4bcae3bb042175" title="Singular Value Decomposition: A = U * Sigma * V^T." alt="" coords="378,832,511,859"/>
+<area shape="poly" id="edge57_Node000001_Node000083" title=" " alt="" coords="853,1170,840,1089,817,985,787,888,769,852,749,829,732,821,709,817,647,816,577,824,512,834,511,829,577,818,647,811,709,811,734,816,752,825,773,849,792,886,822,984,845,1088,858,1170"/>
+<area shape="rect" id="Node000086" href="$tensor_8h.html#a90d629271a42d730c36b7be1f66deae8" title="Extract last n elements from a 1D tensor." alt="" coords="648,2224,687,2251"/>
+<area shape="poly" id="edge58_Node000001_Node000086" title=" " alt="" coords="861,1228,850,1437,829,1750,814,1908,796,2048,776,2154,765,2191,753,2214,738,2226,721,2234,688,2240,687,2235,720,2229,736,2221,749,2210,760,2189,771,2153,791,2047,809,1907,823,1749,845,1437,856,1228"/>
+<area shape="rect" id="Node000087" href="$tensor_8h.html#ac2791cd88647d71068c02d8824a38ff2" title="Repeat tensor multiple times along each dimension." alt="" coords="648,2275,687,2301"/>
+<area shape="poly" id="edge59_Node000001_Node000087" title=" " alt="" coords="861,1228,851,1446,830,1775,815,1942,798,2089,777,2202,765,2240,753,2264,738,2277,721,2284,688,2290,687,2285,720,2279,736,2272,749,2261,760,2238,772,2201,792,2089,810,1941,825,1775,846,1446,856,1227"/>
+<area shape="rect" id="Node000088" href="$tensor_8h.html#a1cb2cae503ca515b1780c72fd05b21db" title="Extract top n rows from a 2D tensor." alt="" coords="631,2325,704,2352"/>
+<area shape="poly" id="edge60_Node000001_Node000088" title=" " alt="" coords="861,1227,852,1455,832,1800,817,1976,799,2131,778,2249,766,2290,753,2315,731,2331,705,2339,704,2334,728,2327,749,2312,761,2288,773,2248,794,2130,812,1975,826,1800,847,1455,856,1227"/>
+<area shape="rect" id="Node000089" href="$namespacelinalg.html#af0c07b2c6a745bcb68c10766032cc5e0" title=" " alt="" coords="609,629,726,656"/>
+<area shape="poly" id="edge61_Node000001_Node000089" title=" " alt="" coords="854,1170,843,1062,822,915,808,840,791,771,771,715,749,676,724,659,728,654,753,673,776,713,796,770,813,839,828,914,849,1062,860,1170"/>
+<area shape="rect" id="Node000005" href="$classMemoryPool.html#a980db306a49ce0f4b149198a99b6d24e" title="Clear all pooled memory." alt="" coords="380,148,510,175"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="626,143,511,157,510,151,626,138"/>
+<area shape="rect" id="Node000006" href="$classMemoryPool.html#a842e63c49f94b807e42b8ed5897bd1bb" title="Destructor &#45; frees all pooled memory." alt="" coords="353,97,536,124"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="625,134,536,124,537,118,626,129"/>
+<area shape="rect" id="Node000009" href="$tensor__c_8cpp.html#ae83aa792d547c4137efbfed451c7357c" title=" " alt="" coords="144,477,305,504"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="347,493,305,493,305,488,347,488"/>
+<area shape="poly" id="edge10_Node000011_Node000011" title=" " alt="" coords="702,998,692,990,667,987,647,989,636,994,634,1000,641,1007,637,1011,629,1001,632,990,645,984,668,981,694,985,705,994"/>
+<area shape="poly" id="edge11_Node000011_Node000012" title=" " alt="" coords="623,1022,468,1013,468,1008,624,1016"/>
+<area shape="poly" id="edge13_Node000013_Node000014" title=" " alt="" coords="634,248,507,277,506,271,632,242"/>
+<area shape="poly" id="edge14_Node000013_Node000025" title=" " alt="" coords="633,239,544,239,420,249,351,259,280,274,211,295,145,322,102,350,68,378,65,374,99,345,142,318,209,290,279,269,350,254,419,243,544,234,633,233"/>
+<area shape="poly" id="edge31_Node000048_Node000037" title=" " alt="" coords="369,612,276,634,275,628,368,607"/>
+<area shape="poly" id="edge32_Node000048_Node000054" title=" " alt="" coords="368,577,269,554,271,549,369,572"/>
+<area shape="poly" id="edge34_Node000054_Node000025" title=" " alt="" coords="163,530,142,518,112,491,87,459,56,404,60,402,92,456,116,487,145,514,166,525"/>
+<area shape="poly" id="edge33_Node000054_Node000045" title=" " alt="" coords="179,564,84,606,82,601,177,559"/>
+<area shape="poly" id="edge36_Node000060_Node000014" title=" " alt="" coords="600,375,583,366,568,355,558,344,549,333,535,322,495,304,497,299,538,318,553,329,562,340,572,351,586,362,603,370"/>
+<area shape="poly" id="edge37_Node000060_Node000045" title=" " alt="" coords="601,384,504,379,446,380,385,385,322,395,260,412,200,435,145,467,112,499,87,538,69,575,59,604,54,602,64,573,82,535,108,496,142,463,198,431,258,407,321,390,384,380,446,375,504,374,601,378"/>
+<area shape="poly" id="edge41_Node000065_Node000066" title=" " alt="" coords="607,1777,502,1765,503,1760,608,1772"/>
+<area shape="poly" id="edge52_Node000079_Node000014" title=" " alt="" coords="630,333,506,305,507,299,632,328"/>
+<area shape="poly" id="edge62_Node000089_Node000008" title=" " alt="" coords="640,620,585,566,535,525,496,507,498,502,538,520,588,562,644,616"/>
+<area shape="poly" id="edge65_Node000089_Node000014" title=" " alt="" coords="647,617,452,303,457,300,652,615"/>
+<area shape="poly" id="edge63_Node000089_Node000033" title=" " alt="" coords="611,664,586,677,562,696,538,714,495,733,493,728,535,710,559,691,583,672,609,660"/>
+<area shape="poly" id="edge64_Node000089_Node000037" title=" " alt="" coords="594,645,275,645,275,640,594,640"/>
+<area shape="poly" id="edge66_Node000089_Node000045" title=" " alt="" coords="594,662,503,678,389,689,328,691,266,689,203,683,143,671,102,654,69,634,72,629,105,649,144,665,204,677,266,684,328,686,389,684,502,673,594,657"/>
+<area shape="poly" id="edge67_Node000089_Node000048" title=" " alt="" coords="593,629,506,609,507,603,595,623"/>
+<area shape="poly" id="edge69_Node000089_Node000054" title=" " alt="" coords="635,622,589,593,535,569,464,553,392,544,325,541,270,542,270,536,325,536,392,539,465,547,537,564,592,589,638,618"/>
+<area shape="poly" id="edge68_Node000089_Node000074" title=" " alt="" coords="643,669,538,772,508,785,506,780,535,767,640,665"/>
+<area shape="poly" id="edge70_Node000089_Node000083" title=" " alt="" coords="652,671,596,755,565,796,538,822,513,835,511,830,535,818,561,792,591,752,647,668"/>
+</map>

@@ -1,0 +1,25 @@
+var namespacetensor4d_1_1nn =
+[
+    [ "Layer", "classtensor4d_1_1nn_1_1Layer.html", "classtensor4d_1_1nn_1_1Layer" ],
+    [ "Linear", "classtensor4d_1_1nn_1_1Linear.html", "classtensor4d_1_1nn_1_1Linear" ],
+    [ "ReLU", "classtensor4d_1_1nn_1_1ReLU.html", "classtensor4d_1_1nn_1_1ReLU" ],
+    [ "Sigmoid", "classtensor4d_1_1nn_1_1Sigmoid.html", "classtensor4d_1_1nn_1_1Sigmoid" ],
+    [ "Tanh", "classtensor4d_1_1nn_1_1Tanh.html", "classtensor4d_1_1nn_1_1Tanh" ],
+    [ "Dropout", "classtensor4d_1_1nn_1_1Dropout.html", "classtensor4d_1_1nn_1_1Dropout" ],
+    [ "BatchNorm1d", "classtensor4d_1_1nn_1_1BatchNorm1d.html", "classtensor4d_1_1nn_1_1BatchNorm1d" ],
+    [ "Softmax", "classtensor4d_1_1nn_1_1Softmax.html", "classtensor4d_1_1nn_1_1Softmax" ],
+    [ "BatchNorm1dd", "namespacetensor4d_1_1nn.html#a676f9d19eb47312f01a5c2ef0262e300", null ],
+    [ "BatchNorm1df", "namespacetensor4d_1_1nn.html#add8e6f802c9d7c435a6c981f545a37f2", null ],
+    [ "Dropoutd", "namespacetensor4d_1_1nn.html#ac2f3327e85a4c471ec2f30634bde0928", null ],
+    [ "Dropoutf", "namespacetensor4d_1_1nn.html#a3315ab248317bf7d71c75b77ccc5f985", null ],
+    [ "Lineard", "namespacetensor4d_1_1nn.html#a762e1706124db702d93be5bb8b18e629", null ],
+    [ "Linearf", "namespacetensor4d_1_1nn.html#aaf2467899756d1b58455dff42f976904", null ],
+    [ "ReLUd", "namespacetensor4d_1_1nn.html#ad4dcbd0157fcb32c118ed38f1f40c58f", null ],
+    [ "ReLUf", "namespacetensor4d_1_1nn.html#ac63545216aad7e4be2c45c0b70509653", null ],
+    [ "Sigmoidd", "namespacetensor4d_1_1nn.html#a4d5c82c731007a58002b1973150bb7e5", null ],
+    [ "Sigmoidf", "namespacetensor4d_1_1nn.html#a83ad7bb2795465463d3684533657dc45", null ],
+    [ "Softmaxd", "namespacetensor4d_1_1nn.html#a35558d36da40b43a93f6743d3aaf91eb", null ],
+    [ "Softmaxf", "namespacetensor4d_1_1nn.html#a227492f3cd887244ddf283565d4f5327", null ],
+    [ "Tanhd", "namespacetensor4d_1_1nn.html#a684fa7cf2cac6ab7b8d62edc2b1da9d6", null ],
+    [ "Tanhf", "namespacetensor4d_1_1nn.html#a322020c52ad6d285a72c09a50ea4b467", null ]
+];

@@ -1,0 +1,9 @@
+<map id="matrix_double_kron" name="matrix_double_kron">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,140,57"/>
+<area shape="rect" id="Node000002" href="$namespacelinalg.html#a7b56c15653bd4614605326c1ced1a36d" title="Compute Kronecker product of two matrices." alt="" coords="188,31,272,57"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="140,41,172,41,172,47,140,47"/>
+<area shape="rect" id="Node000003" href="$classTensor.html#a03d314303958ffc5644796d8025cd012" title=" " alt="" coords="334,5,430,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="272,34,319,26,320,32,273,40"/>
+<area shape="rect" id="Node000004" href="$classTensor.html#a83ae42925e21d2871d755407d7505c10" title=" " alt="" coords="320,56,444,83"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="273,48,305,54,304,59,272,54"/>
+</map>

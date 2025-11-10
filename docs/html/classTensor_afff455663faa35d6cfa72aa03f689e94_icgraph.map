@@ -1,0 +1,5 @@
+<map id="Tensor::sigmoid" name="Tensor::sigmoid">
+<area shape="rect" id="Node000001" title="Apply sigmoid function to all elements (creates new tensor)." alt="" coords="202,13,315,40"/>
+<area shape="rect" id="Node000002" href="$classtensor4d_1_1nn_1_1Sigmoid.html#a5bde4d78573f5ea7c6c5e4d624bda3fb" title=" " alt="" coords="5,5,154,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="186,29,154,29,154,24,186,24"/>
+</map>

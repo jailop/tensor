@@ -1,0 +1,14 @@
+<map id="Adam&lt; T, N &gt;" name="Adam&lt; T, N &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="177,285,280,312"/>
+<area shape="rect" id="Node000002" href="$classOptimizer.html" title="Base class for optimization algorithms." alt="" coords="129,135,237,161"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="194,175,227,284,222,286,189,177"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="231,5,269,32"/>
+<area shape="poly" id="edge7_Node000001_Node000003" title=" " alt="" coords="215,24,169,29,116,43,64,67,42,84,24,106,12,127,8,147,12,168,24,191,55,226,94,253,137,272,177,284,176,290,135,277,92,257,51,230,19,193,7,170,3,148,7,126,19,102,38,81,62,63,114,38,168,24,215,19"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="220,42,206,57,196,77,190,98,186,135,181,134,185,97,191,75,201,55,216,38"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="262,127,395,169"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="282,40,295,54,314,91,326,125,321,127,309,93,290,58,278,44"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="419,127,553,169"/>
+<area shape="poly" id="edge6_Node000005_Node000003" title=" " alt="" coords="285,24,328,35,374,54,426,88,467,124,464,128,423,93,371,58,327,40,284,29"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="308,184,239,286,235,283,304,181"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="462,183,421,225,396,246,368,264,325,282,281,293,280,288,323,277,366,259,392,242,417,221,458,180"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="save_npy" name="save_npy">
+<area shape="rect" id="Node000001" title="Save a tensor to NumPy .npy format (version 1.0)." alt="" coords="103,5,180,32"/>
+<area shape="rect" id="Node000002" href="$tensor__io_8h.html#af1dee4960bb4ee62c02499855bb66a2d" title="Save a tensor to a file with specified format." alt="" coords="5,5,55,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="87,21,55,21,55,16,87,16"/>
+</map>

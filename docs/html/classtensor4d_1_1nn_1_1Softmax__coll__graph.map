@@ -1,0 +1,7 @@
+<map id="tensor4d::nn::Softmax&lt; T &gt;" name="tensor4d::nn::Softmax&lt; T &gt;">
+<area shape="rect" id="Node000001" title="Softmax activation layer." alt="" coords="76,104,257,131"/>
+<area shape="rect" id="Node000002" href="$classtensor4d_1_1nn_1_1Layer.html" title="Base class for all neural network layers." alt="" coords="5,5,170,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="110,43,158,102,154,105,105,46"/>
+<area shape="rect" id="Node000003" href="$classTensor.html" title=" " alt="" coords="194,5,299,32"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="228,46,178,105,174,102,224,42"/>
+</map>

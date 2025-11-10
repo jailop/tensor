@@ -1,0 +1,117 @@
+/**
+ * @mainpage Tensor4D Library Documentation
+ * 
+ * @section main_intro Introduction
+ * 
+ * The tensor4d library is a high-performance C++ tensor computation library
+ * with support for automatic differentiation, GPU acceleration, and BLAS
+ * integration. It provides a NumPy-like API for C++ developers.
+ * 
+ * @section main_features Key Features
+ * 
+ * - **Multi-dimensional Tensors**: Support for tensors of arbitrary rank
+ * - **Automatic Differentiation**: Built-in autograd for gradient computation
+ * - **GPU Acceleration**: CUDA support for tensor operations
+ * - **BLAS Integration**: Optimized matrix operations via BLAS
+ * - **NumPy-like API**: Familiar interface for Python developers
+ * - **Type Safety**: Compile-time shape checking for fixed-rank tensors
+ * - **Pre-compiled Types**: Common tensor types available as libraries
+ * 
+ * @section main_getting_started Getting Started
+ * 
+ * @subsection main_install Installation
+ * 
+ * Build the library using CMake:
+ * @code{.sh}
+ * mkdir build && cd build
+ * cmake .. -DCMAKE_BUILD_TYPE=Release
+ * make
+ * make install
+ * @endcode
+ * 
+ * @subsection main_usage Basic Usage
+ * 
+ * @code{.cpp}
+ * #include "tensor.h"
+ * #include "tensor_types.h"
+ * 
+ * using namespace tensor4d;
+ * 
+ * int main() {
+ *     // Create a 3x3 matrix
+ *     Matrixf A({3, 3});
+ *     A.fill(1.0f);
+ *     
+ *     // Create a vector
+ *     Vectorf v({3});
+ *     v.fill(2.0f);
+ *     
+ *     // Matrix-vector multiplication
+ *     auto result = A.matmul(v);
+ *     
+ *     // Access elements
+ *     std::cout << result[{0}] << std::endl;
+ * }
+ * @endcode
+ * 
+ * @section main_documentation Documentation Pages
+ * 
+ * - @ref instantiations - Information about pre-compiled tensor types
+ * - @ref TypeAliases - Type aliases for common tensor types
+ * 
+ * @section main_classes Main Classes
+ * 
+ * - tensor4d::Tensor - Main tensor class template
+ * - tensor4d::TensorView - View into tensor data
+ * - tensor4d::Optimizer - Base class for optimization algorithms
+ * - tensor4d::MSELoss, tensor4d::CrossEntropyLoss - Loss functions
+ * 
+ * @section main_namespaces Namespaces
+ * 
+ * - tensor4d - Main library namespace
+ * - tensor4d::linalg - Linear algebra operations
+ * - tensor4d::stats - Statistical functions
+ * 
+ * @section main_backends Backends
+ * 
+ * The library automatically selects the best available backend:
+ * 1. **GPU (CUDA)** - If CUDA is available
+ * 2. **BLAS** - If BLAS/OpenBLAS is available
+ * 3. **CPU** - Fallback implementation
+ * 
+ * @section main_libraries Library Files
+ * 
+ * Two library files are built:
+ * - **libtensor4d_static.a** - Static library
+ * - **libtensor4d.so** - Shared library
+ * 
+ * Both contain pre-compiled instantiations of common tensor types.
+ * See @ref instantiations for details.
+ * 
+ * @section main_examples Examples
+ * 
+ * Example programs are included:
+ * - `library_usage_demo.cc` - Basic library usage
+ * - `backend_demo.cc` - Backend selection examples
+ * - `tensor_io_demo.cc` - I/O operations
+ * - `numpy_interop_demo.py` - NumPy interoperability
+ * 
+ * @section main_testing Testing
+ * 
+ * Run tests with:
+ * @code{.sh}
+ * cd build
+ * ctest --output-on-failure
+ * @endcode
+ * 
+ * @section main_performance Performance
+ * 
+ * Benchmark the library with:
+ * @code{.sh}
+ * ./build/tensor_perf
+ * @endcode
+ * 
+ * @section main_license License
+ * 
+ * See LICENSE file in the repository.
+ */

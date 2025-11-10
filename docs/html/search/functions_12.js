@@ -1,0 +1,28 @@
+var searchData=
+[
+  ['tail_0',['tail',['../classTensor.html#a44953b617ae85b4e9cc7906454bee59d',1,'Tensor::tail()'],['../tensor_8h.html#a90d629271a42d730c36b7be1f66deae8',1,'tail():&#160;tensor.h']]],
+  ['take_1',['take',['../classTensor.html#ab71358eec191f202a2e95ce375133c28',1,'Tensor']]],
+  ['tan_2',['tan',['../classTensor.html#a0ccbe9aa15ebe52d33cb890388bdf1ca',1,'Tensor']]],
+  ['tan_5fderivative_3',['tan_derivative',['../classTensor.html#a7cc09049ddf2fb131becaefe19b7725a',1,'Tensor']]],
+  ['tanh_4',['Tanh',['../classtensor4d_1_1nn_1_1Tanh.html#a0e1b8dd43bc9599b91da6a6beba02e22',1,'tensor4d::nn::Tanh']]],
+  ['tanh_5',['tanh',['../classTensor.html#adcc5341aa2156f24c0f4069543c958e1',1,'Tensor']]],
+  ['tanh_5fderivative_6',['tanh_derivative',['../classTensor.html#ab400f3516df53eb4e6547a850335571e',1,'Tensor']]],
+  ['tanh_5fderivative_5ffrom_5finput_7',['tanh_derivative_from_input',['../classTensor.html#afa485f1ec713acb3499de0a08659fc4a',1,'Tensor']]],
+  ['tensor_8',['Tensor',['../classTensor.html#a8a85c4bf5ad38b0ba4a3d8665dfce486',1,'Tensor::Tensor(const TensorIndices&lt; N &gt; &amp;dimensions, bool use_gpu=true, bool requires_grad=false)'],['../classTensor.html#a905559324e349a17f2530a9b5ce067ee',1,'Tensor::Tensor(const Tensor &amp;other)']]],
+  ['tensor_5fc_5fget_5fdevice_9',['tensor_c_get_device',['../tensor__c_8h.html#a7315d7ce868f26a7259a34b0d511535e',1,'tensor_c_get_device(TensorDevice *out_device):&#160;tensor_c.cpp'],['../tensor__c_8cpp.html#a7315d7ce868f26a7259a34b0d511535e',1,'tensor_c_get_device(TensorDevice *out_device):&#160;tensor_c.cpp']]],
+  ['tensor_5fc_5flast_5ferror_10',['tensor_c_last_error',['../tensor__c_8h.html#ab3d9181185e3fb96252d24e36620836c',1,'tensor_c_last_error(void):&#160;tensor_c.cpp'],['../tensor__c_8cpp.html#ab3d9181185e3fb96252d24e36620836c',1,'tensor_c_last_error(void):&#160;tensor_c.cpp']]],
+  ['tensor_5fc_5fset_5fdevice_11',['tensor_c_set_device',['../tensor__c_8h.html#a10dd62055fae90d31c4708d91d2d6f00',1,'tensor_c_set_device(TensorDevice device):&#160;tensor_c.cpp'],['../tensor__c_8cpp.html#a10dd62055fae90d31c4708d91d2d6f00',1,'tensor_c_set_device(TensorDevice device):&#160;tensor_c.cpp']]],
+  ['tensor_5fc_5fversion_12',['tensor_c_version',['../tensor__c_8h.html#a869473857968abddcd5504d47cbb6a37',1,'tensor_c_version(void):&#160;tensor_c.cpp'],['../tensor__c_8cpp.html#a869473857968abddcd5504d47cbb6a37',1,'tensor_c_version(void):&#160;tensor_c.cpp']]],
+  ['tensorview_13',['TensorView',['../classTensorView.html#a93ff79d1d029e3795f0dcf70a09287d0',1,'TensorView']]],
+  ['threadpool_14',['ThreadPool',['../classThreadPool.html#a3e1d64928f5a7d15765a0d647c143994',1,'ThreadPool']]],
+  ['tile_15',['tile',['../classTensor.html#a84007917e116ae1e79622ca804360146',1,'Tensor::tile()'],['../tensor_8h.html#ac2791cd88647d71068c02d8824a38ff2',1,'tile():&#160;tensor.h']]],
+  ['to_5ffloat_16',['to_float',['../structFloat16.html#ae615553575ed3ef5efb0f9c3faf6d9b9',1,'Float16::to_float()'],['../structBFloat16.html#aa0615d97d0b211fa5a2b96318c31c5f5',1,'BFloat16::to_float()']]],
+  ['to_5fstring_17',['to_string',['../tensor_8h.html#a8003198c60408cf62b8a805020f1a749',1,'to_string(TensorError error):&#160;tensor.h'],['../tensor__io_8h.html#a278d10cd95a2b11a414ecd8eda1b665e',1,'to_string(const Tensor&lt; T, N &gt; &amp;tensor, int precision=4, size_t max_items=6):&#160;tensor_io.h']]],
+  ['to_5ftensor_18',['to_tensor',['../classTensorView.html#af7f97fa91ba1975aee37af16b1574695',1,'TensorView']]],
+  ['topk_19',['topk',['../tensor_8h.html#a952343525fb5d9376af0645793e8f1d4',1,'tensor.h']]],
+  ['toprows_20',['topRows',['../classTensor.html#af09f3224c551629f43c48c18a1fe87ee',1,'Tensor::topRows()'],['../tensor_8h.html#a1cb2cae503ca515b1780c72fd05b21db',1,'topRows():&#160;tensor.h']]],
+  ['total_5fsize_21',['total_size',['../classTensor.html#aad6aeb4859940befd0c46f0b99388bd7',1,'Tensor']]],
+  ['trace_22',['trace',['../namespacelinalg.html#a42b83ecf931f8079418e5aeff5445040',1,'linalg']]],
+  ['train_23',['train',['../classtensor4d_1_1nn_1_1Layer.html#a9f069156fc18ad5035bcfa99ddfdda83',1,'tensor4d::nn::Layer']]],
+  ['transpose_24',['transpose',['../classTensor.html#aed9419fabd015e2c1c35ff6723c1600a',1,'Tensor::transpose()'],['../namespacelinalg.html#af0c07b2c6a745bcb68c10766032cc5e0',1,'linalg::transpose()']]]
+];

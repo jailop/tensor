@@ -1,25 +1,11 @@
-# Build directories
 build/
-zig-out/
-.zig-cache/
-
-# Documentation output
-docs/
-
-# IDE and editor files
-.vscode/
-.idea/
 *.swp
 *.swo
 *~
-
-# Compiled files
 *.o
 *.a
 *.so
 *.dll
 *.dylib
-
-# Test and benchmark outputs
 *.test
 *.perf

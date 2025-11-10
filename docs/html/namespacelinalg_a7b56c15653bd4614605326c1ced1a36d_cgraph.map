@@ -1,0 +1,7 @@
+<map id="linalg::kron" name="linalg::kron">
+<area shape="rect" id="Node000001" title="Compute Kronecker product of two matrices." alt="" coords="5,31,90,57"/>
+<area shape="rect" id="Node000002" href="$classTensor.html#a03d314303958ffc5644796d8025cd012" title=" " alt="" coords="152,5,248,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="90,34,136,26,137,32,91,40"/>
+<area shape="rect" id="Node000003" href="$classTensor.html#a83ae42925e21d2871d755407d7505c10" title=" " alt="" coords="138,56,262,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="91,48,123,54,122,59,90,54"/>
+</map>

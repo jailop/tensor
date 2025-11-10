@@ -1,0 +1,20 @@
+<map id="linalg::rank" name="linalg::rank">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,81,90,108"/>
+<area shape="rect" id="Node000002" href="$tensor_8h.html#a5f2a03f722ba5a985a3733e2ff823a74" title="Extract a single column from a 2D tensor." alt="" coords="173,5,212,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="71,79,136,42,158,31,160,36,139,46,73,83"/>
+<area shape="rect" id="Node000004" href="$classTensor.html#a03d314303958ffc5644796d8025cd012" title=" " alt="" coords="309,107,405,133"/>
+<area shape="poly" id="edge5_Node000001_Node000004" title=" " alt="" coords="90,95,294,112,293,118,90,101"/>
+<area shape="rect" id="Node000006" href="$namespacelinalg.html#a4d71f03f0561f2e14840e3a593c24da5" title=" " alt="" coords="138,157,247,184"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="76,106,153,147,151,152,74,111"/>
+<area shape="rect" id="Node000007" href="$tensor_8h.html#adf94b1b28dd9932dd278abaa3cb7a9ee" title="Extract a single row from a 2D tensor." alt="" coords="171,56,214,83"/>
+<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="89,85,156,73,157,78,90,90"/>
+<area shape="rect" id="Node000003" href="$classTensor.html#a3f3c97d177cb960a4423afc3dafc612a" title=" " alt="" coords="300,56,415,83"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="212,22,298,48,296,53,211,27"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="213,23,249,42,263,55,273,68,282,80,297,93,304,97,301,102,293,97,278,84,269,71,260,59,245,46,211,28"/>
+<area shape="rect" id="Node000005" href="$classTensor.html#a83ae42925e21d2871d755407d7505c10" title=" " alt="" coords="295,5,419,32"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="212,16,279,16,279,21,212,21"/>
+<area shape="poly" id="edge7_Node000006_Node000004" title=" " alt="" coords="238,154,296,136,298,141,239,159"/>
+<area shape="poly" id="edge9_Node000007_Node000003" title=" " alt="" coords="214,67,284,67,284,72,214,72"/>
+<area shape="poly" id="edge10_Node000007_Node000004" title=" " alt="" coords="214,73,298,99,296,104,213,78"/>
+<area shape="poly" id="edge11_Node000007_Node000005" title=" " alt="" coords="213,61,296,35,298,40,214,66"/>
+</map>

@@ -1,0 +1,19 @@
+<map id="loss::mse_loss" name="loss::mse_loss">
+<area shape="rect" id="Node000001" title="Mean Squared Error (MSE) Loss." alt="" coords="5,183,115,209"/>
+<area shape="rect" id="Node000002" href="$classTensor.html#a07bf856a863505d2960b0bfad9c3b3f4" title=" " alt="" coords="203,5,296,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="64,181,98,115,126,75,161,42,187,28,189,33,164,46,130,79,102,117,69,184"/>
+<area shape="rect" id="Node000003" href="$classTensor.html#ae5b52299c11f3ba81e781cb008542285" title=" " alt="" coords="196,56,304,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="70,180,107,137,132,113,161,92,181,83,183,88,164,97,136,117,111,141,74,184"/>
+<area shape="rect" id="Node000004" href="$classTensor.html#a03d314303958ffc5644796d8025cd012" title=" " alt="" coords="202,107,298,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="85,180,162,143,186,134,188,139,164,148,87,184"/>
+<area shape="rect" id="Node000005" href="$classTensor.html#a234f74cd16bd13561f7963ba29efb163" title="Fill the tensor with a specified value." alt="" coords="209,157,290,184"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="115,186,193,175,194,181,115,191"/>
+<area shape="rect" id="Node000006" href="$classTensor.html#af274147e833dd1ab399ce08155ad169b" title=" " alt="" coords="163,208,337,235"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="115,201,148,205,147,210,115,206"/>
+<area shape="rect" id="Node000007" href="$classTensor.html#a947326cf96b1bf3423b40861e1213ab8" title=" " alt="" coords="177,259,323,285"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="87,208,164,244,183,251,181,256,162,249,85,212"/>
+<area shape="rect" id="Node000008" href="$classTensor.html#aad6aeb4859940befd0c46f0b99388bd7" title=" " alt="" coords="188,309,312,336"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="74,208,111,251,136,275,164,295,175,301,172,305,161,300,132,279,107,255,70,212"/>
+<area shape="rect" id="Node000009" href="$classTensor.html#a83ae42925e21d2871d755407d7505c10" title=" " alt="" coords="188,360,312,387"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="69,208,102,275,130,313,164,346,175,353,172,357,161,350,126,317,98,277,64,211"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="include/linalg_advanced.h" name="include/linalg_advanced.h">
+<area shape="rect" id="Node000001" title="Advanced linear algebra operations with LAPACK/cuSOLVER support." alt="" coords="5,5,176,32"/>
+<area shape="rect" id="Node000002" href="$tensor__c_8cpp.html" title=" " alt="" coords="31,80,150,107"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="93,48,93,80,88,80,88,48"/>
+</map>

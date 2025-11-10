@@ -1,0 +1,5 @@
+<map id="Tensor::variance" name="Tensor::variance">
+<area shape="rect" id="Node000001" title="Compute variance of all elements." alt="" coords="185,5,302,32"/>
+<area shape="rect" id="Node000002" href="$classTensor.html#a0cda55fce732dcb563b598ff636d8758" title=" " alt="" coords="5,5,137,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="169,21,137,21,137,16,169,16"/>
+</map>

@@ -1,0 +1,6 @@
+<map id="chunk" name="chunk">
+<area shape="rect" id="Node000001" title="Divide tensor into equal&#45;sized chunks (last chunk may be smaller)." alt="" coords="99,29,155,56"/>
+<area shape="poly" id="edge1_Node000001_Node000001" title=" " alt="" coords="142,16,137,10,127,8,117,10,112,14,111,20,114,28,109,30,106,20,108,11,115,5,127,3,139,5,146,12"/>
+<area shape="rect" id="Node000002" href="$tensor_8h.html#a139335a446015c5f7ad70fa3d2ccfbec" title="Split tensor into chunks along specified axis." alt="" coords="5,29,51,56"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="83,45,51,45,51,40,83,40"/>
+</map>

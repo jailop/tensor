@@ -1,0 +1,7 @@
+<map id="matrix_float_norm" name="matrix_float_norm">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,131,32"/>
+<area shape="rect" id="Node000002" href="$namespacelinalg.html#ad8e7656cd25d2342040ecb53cc331657" title=" " alt="" coords="179,5,327,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="131,16,163,16,163,21,131,21"/>
+<area shape="rect" id="Node000003" href="$classTensor.html#a03d314303958ffc5644796d8025cd012" title=" " alt="" coords="375,5,471,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="327,16,360,16,360,21,327,21"/>
+</map>

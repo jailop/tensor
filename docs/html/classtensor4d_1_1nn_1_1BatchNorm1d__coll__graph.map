@@ -1,0 +1,9 @@
+<map id="tensor4d::nn::BatchNorm1d&lt; T &gt;" name="tensor4d::nn::BatchNorm1d&lt; T &gt;">
+<area shape="rect" id="Node000001" title="Batch Normalization layer." alt="" coords="107,381,319,408"/>
+<area shape="rect" id="Node000002" href="$classtensor4d_1_1nn_1_1Layer.html" title="Base class for all neural network layers." alt="" coords="5,5,170,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="99,46,211,380,206,382,94,48"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="194,5,232,32"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="216,47,216,381,210,381,210,47"/>
+<area shape="rect" id="Node000004" href="$classTensor.html" title=" " alt="" coords="271,5,376,32"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="332,47,342,108,345,190,341,234,333,278,318,320,296,359,282,373,265,383,262,378,279,369,292,356,313,318,328,277,336,233,340,190,336,109,327,48"/>
+</map>

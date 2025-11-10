@@ -1,0 +1,27 @@
+<map id="col" name="col">
+<area shape="rect" id="Node000001" title="Extract a single column from a 2D tensor." alt="" coords="562,208,601,235"/>
+<area shape="rect" id="Node000002" href="$namespacelinalg.html#a6b7af062b5a9642d788fcc084335b39c" title=" " alt="" coords="368,5,509,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="575,193,568,159,557,120,539,80,512,46,497,35,500,30,516,42,543,77,562,118,573,158,580,192"/>
+<area shape="rect" id="Node000003" href="$tensor__c_8cpp.html#a1d2268dec0e2609a5de6ddad0045383e" title=" " alt="" coords="375,56,502,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="570,194,549,144,533,119,513,97,495,86,498,81,516,93,537,115,554,142,575,192"/>
+<area shape="rect" id="Node000004" href="$tensor__c_8cpp.html#a6caf88ca765b604eab7b9bab9f47ee10" title=" " alt="" coords="363,107,514,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="561,197,540,171,513,148,491,136,494,132,516,143,543,167,565,193"/>
+<area shape="rect" id="Node000005" href="$tensor__c_8cpp.html#a876c89ce000825fa6255ea8c7649aefe" title=" " alt="" coords="375,157,502,184"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="547,211,513,199,481,187,483,182,515,193,549,206"/>
+<area shape="rect" id="Node000006" href="$tensor__c_8cpp.html#a5a98f19069ba7a51f436659c6a6941b7" title=" " alt="" coords="382,208,496,235"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="547,224,496,224,496,219,547,219"/>
+<area shape="rect" id="Node000007" href="$tensor__c_8cpp.html#a036fdfc552daa9f0aa2030e56775d327" title=" " alt="" coords="370,259,508,285"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="549,237,515,249,483,261,481,256,513,244,547,232"/>
+<area shape="rect" id="Node000008" href="$tensor__c_8cpp.html#aafb2ff8a91dff85dbf7c6d8a91297a31" title=" " alt="" coords="382,309,496,336"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="565,249,543,276,516,300,494,311,491,306,513,295,540,272,561,246"/>
+<area shape="rect" id="Node000009" href="$namespacelinalg.html#ad07d8335c6ed4ffb675492effc453771" title=" " alt="" coords="396,360,481,387"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="575,251,554,301,537,327,516,350,500,361,483,368,480,363,498,356,513,346,533,324,549,299,570,249"/>
+<area shape="rect" id="Node000013" href="$namespacelinalg.html#a61b846dd17050c602c624ff0a898d617" title=" " alt="" coords="394,411,484,437"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="580,251,573,285,562,325,543,365,516,401,502,411,486,418,483,413,499,407,512,397,539,362,557,323,568,283,575,250"/>
+<area shape="rect" id="Node000010" href="$namespacelinalg.html#a0e459857cd625f66948d7ae48731b17a" title="Compute numerical rank of a matrix using SVD." alt="" coords="188,360,315,387"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="381,376,315,376,315,371,381,371"/>
+<area shape="rect" id="Node000011" href="$tensor__c_8cpp.html#af30504e8e051a714b7a0fdcae0f7c636" title=" " alt="" coords="5,335,140,361"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="172,365,139,360,140,355,173,360"/>
+<area shape="rect" id="Node000012" href="$tensor__c_8cpp.html#ab1f7ff7476a784a17149afa2fd100d07" title=" " alt="" coords="12,385,133,412"/>
+<area shape="poly" id="edge11_Node000010_Node000012" title=" " alt="" coords="173,387,134,393,133,387,172,382"/>
+</map>

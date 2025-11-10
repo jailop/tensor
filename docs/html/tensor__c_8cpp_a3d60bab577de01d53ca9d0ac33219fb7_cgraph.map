@@ -1,0 +1,15 @@
+<map id="matrix_float_qr" name="matrix_float_qr">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,81,113,108"/>
+<area shape="rect" id="Node000002" href="$namespacelinalg.html#a3395139856f5efebaa58f3bc9c4ed3bd" title="QR decomposition: A = QR." alt="" coords="161,81,284,108"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="113,92,145,92,145,97,113,97"/>
+<area shape="rect" id="Node000003" href="$classTensor.html#a3f3c97d177cb960a4423afc3dafc612a" title=" " alt="" coords="332,5,448,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="253,78,344,36,346,41,255,83"/>
+<area shape="rect" id="Node000004" href="$classTensor.html#a03d314303958ffc5644796d8025cd012" title=" " alt="" coords="510,81,607,108"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="284,92,495,92,495,97,284,97"/>
+<area shape="rect" id="Node000005" href="$namespacelinalg.html#af0c07b2c6a745bcb68c10766032cc5e0" title=" " alt="" coords="332,107,448,133"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="285,101,317,106,316,112,284,107"/>
+<area shape="rect" id="Node000006" href="$classTensor.html#a83ae42925e21d2871d755407d7505c10" title=" " alt="" coords="496,144,621,171"/>
+<area shape="poly" id="edge7_Node000002_Node000006" title=" " alt="" coords="248,106,287,126,333,143,408,155,481,158,481,163,408,160,331,148,284,131,245,111"/>
+<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="449,109,494,102,495,107,449,114"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="450,130,482,138,481,143,448,136"/>
+</map>

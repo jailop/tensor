@@ -1,0 +1,7 @@
+<map id="are_broadcastable" name="are_broadcastable">
+<area shape="rect" id="Node000001" title="Check if two tensor shapes are broadcastable." alt="" coords="231,31,358,57"/>
+<area shape="rect" id="Node000002" href="$tensor_8h.html#a34fae58316c67748882059be5f1d153c" title="Broadcast a tensor to a new shape." alt="" coords="46,5,142,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="215,37,142,27,143,22,216,31"/>
+<area shape="rect" id="Node000003" href="$tensor_8h.html#a9c62fb825b47530c2ec213d305b7c1d9" title="Compute the broadcast shape of two tensors." alt="" coords="5,56,183,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="216,57,183,61,183,55,215,51"/>
+</map>

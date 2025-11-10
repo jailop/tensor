@@ -1,0 +1,5 @@
+<map id="optimizer_sgd_step" name="optimizer_sgd_step">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,140,32"/>
+<area shape="rect" id="Node000002" href="$classSGD.html#a4b21935e4475eadf0ab7802349ee6255" title="Perform one optimization step." alt="" coords="188,5,271,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="140,16,172,16,172,21,140,21"/>
+</map>
