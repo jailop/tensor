@@ -753,6 +753,9 @@ public:
      * @return A reference to the element at the specified indices.
      */
     T& operator[](const TensorIndices<N>& indices) {
+#ifdef USE_GPU
+        ensure_on_cpu();  // Sync from GPU if needed
+#endif
         return data_[offset(indices)];
     }
 
@@ -762,6 +765,9 @@ public:
      * @return A const reference to the element at the specified indices.
      */
     const T& operator[](const TensorIndices<N>& indices) const {
+#ifdef USE_GPU
+        ensure_on_cpu();  // Sync from GPU if needed
+#endif
         return data_[offset(indices)];
     }
 
@@ -780,6 +786,10 @@ public:
      */
     void fill(const T& value) {
         std::fill(data_.get(), data_.get() + total_size(), value);
+#ifdef USE_GPU
+        data_on_gpu_ = false;  // CPU data is now authoritative
+        gpu_needs_sync_ = false;
+#endif
     }
 
     /**
@@ -967,6 +977,9 @@ public:
     Tensor<T, N> detach() const {
         Tensor<T, N> result(dims_, use_gpu_, false);
         size_t total = total_size();
+#ifdef USE_GPU
+        ensure_on_cpu();  // Critical: Sync from GPU before copying!
+#endif
         std::copy(data_.get(), data_.get() + total, result.data_.get());
         return result;
     }
@@ -1919,7 +1932,10 @@ public:
         
 #ifdef USE_GPU
         if (use_gpu_) {
-            TensorGPU::exp_gpu(data_.get(), result.data_.get(), total);
+                ensure_on_gpu();
+                result.ensure_on_gpu();
+                TensorGPU::exp_gpu_direct(d_data_, result.d_data_, total);
+                result.mark_gpu_modified();
         } else
 #endif
         {
@@ -1956,7 +1972,10 @@ public:
         
 #ifdef USE_GPU
         if (use_gpu_) {
-            TensorGPU::log_gpu(data_.get(), result.data_.get(), total);
+                ensure_on_gpu();
+                result.ensure_on_gpu();
+                TensorGPU::log_gpu_direct(d_data_, result.d_data_, total);
+                result.mark_gpu_modified();
         } else
 #endif
         {
@@ -1994,7 +2013,10 @@ public:
         
 #ifdef USE_GPU
         if (use_gpu_) {
-            TensorGPU::sqrt_gpu(data_.get(), result.data_.get(), total);
+                ensure_on_gpu();
+                result.ensure_on_gpu();
+                TensorGPU::sqrt_gpu_direct(d_data_, result.d_data_, total);
+                result.mark_gpu_modified();
         } else
 #endif
         {
@@ -2038,7 +2060,10 @@ public:
         
 #ifdef USE_GPU
         if (use_gpu_) {
-            TensorGPU::pow_gpu(data_.get(), exponent, result.data_.get(), total);
+                ensure_on_gpu();
+                result.ensure_on_gpu();
+                TensorGPU::pow_gpu_direct(d_data_, exponent, result.d_data_, total);
+                result.mark_gpu_modified();
         } else
 #endif
         {
@@ -2068,7 +2093,10 @@ public:
         
 #ifdef USE_GPU
         if (use_gpu_) {
-            TensorGPU::sin_gpu(data_.get(), result.data_.get(), total);
+                ensure_on_gpu();
+                result.ensure_on_gpu();
+                TensorGPU::sin_gpu_direct(d_data_, result.d_data_, total);
+                result.mark_gpu_modified();
         } else
 #endif
         {
@@ -2090,7 +2118,10 @@ public:
         
 #ifdef USE_GPU
         if (use_gpu_) {
-            TensorGPU::cos_gpu(data_.get(), result.data_.get(), total);
+                ensure_on_gpu();
+                result.ensure_on_gpu();
+                TensorGPU::cos_gpu_direct(d_data_, result.d_data_, total);
+                result.mark_gpu_modified();
         } else
 #endif
         {
@@ -2141,7 +2172,10 @@ public:
         
 #ifdef USE_GPU
         if (use_gpu_) {
-            TensorGPU::tanh_gpu(data_.get(), result.data_.get(), total);
+                ensure_on_gpu();
+                result.ensure_on_gpu();
+                TensorGPU::tanh_gpu_direct(d_data_, result.d_data_, total);
+                result.mark_gpu_modified();
         } else
 #endif
         {
@@ -2186,7 +2220,10 @@ public:
         
 #ifdef USE_GPU
         if (use_gpu_) {
-            TensorGPU::sigmoid_gpu(data_.get(), result.data_.get(), total);
+                ensure_on_gpu();
+                result.ensure_on_gpu();
+                TensorGPU::sigmoid_gpu_direct(d_data_, result.d_data_, total);
+                result.mark_gpu_modified();
         } else
 #endif
         {
@@ -2274,7 +2311,10 @@ public:
         
 #ifdef USE_GPU
         if (use_gpu_) {
-            TensorGPU::relu_gpu(data_.get(), result.data_.get(), total);
+                ensure_on_gpu();
+                result.ensure_on_gpu();
+                TensorGPU::relu_gpu_direct(d_data_, result.d_data_, total);
+                result.mark_gpu_modified();
         } else
 #endif
         {
