@@ -12,7 +12,7 @@
 // Memory Pool Tests
 // ============================================
 
-TEST(TensorPerfTest, MemoryPoolBasic) {
+TEST(TensorPerfBasicTest, MemoryPoolBasic) {
     MemoryPool<float> pool;
     
     // Allocate memory
@@ -34,7 +34,7 @@ TEST(TensorPerfTest, MemoryPoolBasic) {
     pool.deallocate(ptr2, 1000);
 }
 
-TEST(TensorPerfTest, MemoryPoolReuse) {
+TEST(TensorPerfBasicTest, MemoryPoolReuse) {
     MemoryPool<double> pool;
     
     std::vector<double*> ptrs;
@@ -60,7 +60,7 @@ TEST(TensorPerfTest, MemoryPoolReuse) {
     pool.deallocate(new_ptr, 100);
 }
 
-TEST(TensorPerfTest, MemoryPoolClear) {
+TEST(TensorPerfBasicTest, MemoryPoolClear) {
     MemoryPool<int> pool;
     
     int* ptr1 = pool.allocate(500);
@@ -79,7 +79,7 @@ TEST(TensorPerfTest, MemoryPoolClear) {
     pool.deallocate(ptr3, 200);
 }
 
-TEST(TensorPerfTest, GlobalMemoryPool) {
+TEST(TensorPerfBasicTest, GlobalMemoryPool) {
     auto& pool1 = get_memory_pool<float>();
     auto& pool2 = get_memory_pool<float>();
     
@@ -96,7 +96,7 @@ TEST(TensorPerfTest, GlobalMemoryPool) {
 // Thread Pool Tests
 // ============================================
 
-TEST(TensorPerfTest, ThreadPoolBasic) {
+TEST(TensorPerfBasicTest, ThreadPoolBasic) {
     ThreadPool pool(4);
     
     auto future = pool.enqueue([]() {
@@ -106,7 +106,7 @@ TEST(TensorPerfTest, ThreadPoolBasic) {
     EXPECT_EQ(future.get(), 42);
 }
 
-TEST(TensorPerfTest, ThreadPoolMultipleTasks) {
+TEST(TensorPerfBasicTest, ThreadPoolMultipleTasks) {
     ThreadPool pool(4);
     
     std::vector<std::future<int>> futures;
@@ -122,12 +122,12 @@ TEST(TensorPerfTest, ThreadPoolMultipleTasks) {
     }
 }
 
-TEST(TensorPerfTest, ThreadPoolSize) {
+TEST(TensorPerfBasicTest, ThreadPoolSize) {
     ThreadPool pool(8);
     EXPECT_EQ(pool.size(), 8);
 }
 
-TEST(TensorPerfTest, GlobalThreadPool) {
+TEST(TensorPerfBasicTest, GlobalThreadPool) {
     auto& pool1 = get_thread_pool();
     auto& pool2 = get_thread_pool();
     
@@ -135,7 +135,7 @@ TEST(TensorPerfTest, GlobalThreadPool) {
     EXPECT_EQ(&pool1, &pool2);
 }
 
-TEST(TensorPerfTest, ParallelFor) {
+TEST(TensorPerfBasicTest, ParallelFor) {
     const size_t size = 10000;
     std::vector<int> data(size, 0);
     
@@ -148,7 +148,7 @@ TEST(TensorPerfTest, ParallelFor) {
     }
 }
 
-TEST(TensorPerfTest, ParallelForSmallRange) {
+TEST(TensorPerfBasicTest, ParallelForSmallRange) {
     // Small range should execute serially
     std::vector<int> data(10, 0);
     
@@ -165,7 +165,7 @@ TEST(TensorPerfTest, ParallelForSmallRange) {
 // Mixed Precision Tests
 // ============================================
 
-TEST(TensorPerfTest, Float16Construction) {
+TEST(TensorPerfBasicTest, Float16Construction) {
     Float16 half(3.14f);
     float result = half.to_float();
     
@@ -173,7 +173,7 @@ TEST(TensorPerfTest, Float16Construction) {
     EXPECT_NEAR(result, 3.14f, 0.01f);
 }
 
-TEST(TensorPerfTest, Float16Conversion) {
+TEST(TensorPerfBasicTest, Float16Conversion) {
     float original = 42.5f;
     Float16 half(original);
     float converted = static_cast<float>(half);
@@ -181,17 +181,17 @@ TEST(TensorPerfTest, Float16Conversion) {
     EXPECT_NEAR(converted, original, 0.1f);
 }
 
-TEST(TensorPerfTest, Float16Zero) {
+TEST(TensorPerfBasicTest, Float16Zero) {
     Float16 half(0.0f);
     EXPECT_EQ(half.to_float(), 0.0f);
 }
 
-TEST(TensorPerfTest, Float16Negative) {
+TEST(TensorPerfBasicTest, Float16Negative) {
     Float16 half(-10.5f);
     EXPECT_NEAR(half.to_float(), -10.5f, 0.1f);
 }
 
-TEST(TensorPerfTest, BFloat16Construction) {
+TEST(TensorPerfBasicTest, BFloat16Construction) {
     BFloat16 bf16(3.14f);
     float result = bf16.to_float();
     
@@ -199,7 +199,7 @@ TEST(TensorPerfTest, BFloat16Construction) {
     EXPECT_NEAR(result, 3.14f, 0.02f);
 }
 
-TEST(TensorPerfTest, BFloat16Conversion) {
+TEST(TensorPerfBasicTest, BFloat16Conversion) {
     float original = 123.456f;
     BFloat16 bf16(original);
     float converted = static_cast<float>(bf16);
@@ -207,17 +207,17 @@ TEST(TensorPerfTest, BFloat16Conversion) {
     EXPECT_NEAR(converted, original, 0.5f);
 }
 
-TEST(TensorPerfTest, BFloat16Zero) {
+TEST(TensorPerfBasicTest, BFloat16Zero) {
     BFloat16 bf16(0.0f);
     EXPECT_EQ(bf16.to_float(), 0.0f);
 }
 
-TEST(TensorPerfTest, BFloat16Negative) {
+TEST(TensorPerfBasicTest, BFloat16Negative) {
     BFloat16 bf16(-99.9f);
     EXPECT_NEAR(bf16.to_float(), -99.9f, 0.5f);
 }
 
-TEST(TensorPerfTest, ArrayConversionFP16) {
+TEST(TensorPerfBasicTest, ArrayConversionFP16) {
     const size_t count = 100;
     float src[count];
     Float16 mid[count];
@@ -240,7 +240,7 @@ TEST(TensorPerfTest, ArrayConversionFP16) {
     }
 }
 
-TEST(TensorPerfTest, ArrayConversionBF16) {
+TEST(TensorPerfBasicTest, ArrayConversionBF16) {
     const size_t count = 100;
     float src[count];
     BFloat16 mid[count];
@@ -269,7 +269,7 @@ TEST(TensorPerfTest, ArrayConversionBF16) {
 // Lazy Evaluation Tests
 // ============================================
 
-TEST(TensorPerfTest, LazyOperationBasic) {
+TEST(TensorPerfBasicTest, LazyOperationBasic) {
     LazyOperation<float, 2> op;
     
     op.op_type = OperationType::Add;
@@ -277,7 +277,7 @@ TEST(TensorPerfTest, LazyOperationBasic) {
     EXPECT_FALSE(op.is_fused);
 }
 
-TEST(TensorPerfTest, LazyOperationCanFuse) {
+TEST(TensorPerfBasicTest, LazyOperationCanFuse) {
     LazyOperation<float, 2> op1;
     op1.op_type = OperationType::Add;
     
@@ -287,7 +287,7 @@ TEST(TensorPerfTest, LazyOperationCanFuse) {
     EXPECT_TRUE(op1.can_fuse_with(op2));
 }
 
-TEST(TensorPerfTest, LazyOperationCannotFuseIfFused) {
+TEST(TensorPerfBasicTest, LazyOperationCannotFuseIfFused) {
     LazyOperation<float, 2> op1;
     op1.op_type = OperationType::Add;
     op1.is_fused = true;
@@ -298,7 +298,7 @@ TEST(TensorPerfTest, LazyOperationCannotFuseIfFused) {
     EXPECT_FALSE(op1.can_fuse_with(op2));
 }
 
-TEST(TensorPerfTest, FuseOperationsExp) {
+TEST(TensorPerfBasicTest, FuseOperationsExp) {
     std::vector<OperationType> ops = {OperationType::Exp};
     auto fused = fuse_operations<float>(ops);
     
@@ -313,7 +313,7 @@ TEST(TensorPerfTest, FuseOperationsExp) {
     }
 }
 
-TEST(TensorPerfTest, FuseOperationsTanh) {
+TEST(TensorPerfBasicTest, FuseOperationsTanh) {
     std::vector<OperationType> ops = {OperationType::Tanh};
     auto fused = fuse_operations<float>(ops);
     
@@ -328,7 +328,7 @@ TEST(TensorPerfTest, FuseOperationsTanh) {
     }
 }
 
-TEST(TensorPerfTest, FuseOperationsSigmoid) {
+TEST(TensorPerfBasicTest, FuseOperationsSigmoid) {
     std::vector<OperationType> ops = {OperationType::Sigmoid};
     auto fused = fuse_operations<float>(ops);
     
@@ -344,7 +344,7 @@ TEST(TensorPerfTest, FuseOperationsSigmoid) {
     }
 }
 
-TEST(TensorPerfTest, FuseOperationsReLU) {
+TEST(TensorPerfBasicTest, FuseOperationsReLU) {
     std::vector<OperationType> ops = {OperationType::ReLU};
     auto fused = fuse_operations<float>(ops);
     
@@ -359,7 +359,7 @@ TEST(TensorPerfTest, FuseOperationsReLU) {
     }
 }
 
-TEST(TensorPerfTest, FuseMultipleOperations) {
+TEST(TensorPerfBasicTest, FuseMultipleOperations) {
     // Test exp followed by tanh
     std::vector<OperationType> ops = {OperationType::Exp, OperationType::Tanh};
     auto fused = fuse_operations<float>(ops);
@@ -380,7 +380,7 @@ TEST(TensorPerfTest, FuseMultipleOperations) {
 // Integration Tests
 // ============================================
 
-TEST(TensorPerfTest, MemoryPoolThreadSafety) {
+TEST(TensorPerfBasicTest, MemoryPoolThreadSafety) {
     MemoryPool<float> pool;
     const int num_threads = 8;
     const int allocations_per_thread = 100;
@@ -419,7 +419,7 @@ TEST(TensorPerfTest, MemoryPoolThreadSafety) {
     EXPECT_EQ(stats.second, num_threads * allocations_per_thread);
 }
 
-TEST(TensorPerfTest, ParallelForPerformance) {
+TEST(TensorPerfBasicTest, ParallelForPerformance) {
     const size_t size = 1000000;
     std::vector<double> data(size);
     

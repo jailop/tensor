@@ -1089,13 +1089,17 @@ void test_full_training_step() {
     err = layer_linear_backward_float(fc1, grad_h1, &grad_input);
     ASSERT_SUCCESS(err);
     
-    // Get weights before update
-    MatrixFloatHandle w1_before;
-    err = layer_linear_get_weights_float(fc1, &w1_before);
+    // Get weights before update - save a copy of values
+    MatrixFloatHandle w1_before_ref;
+    err = layer_linear_get_weights_float(fc1, &w1_before_ref);
     ASSERT_SUCCESS(err);
-    float w1_val_before;
-    err = matrix_float_get(w1_before, 0, 0, &w1_val_before);
-    ASSERT_SUCCESS(err);
+    float w1_vals_before[12]; // 3x4 matrix
+    for (size_t i = 0; i < 3; ++i) {
+        for (size_t j = 0; j < 4; ++j) {
+            err = matrix_float_get(w1_before_ref, i, j, &w1_vals_before[i*4 + j]);
+            ASSERT_SUCCESS(err);
+        }
+    }
     
     // Update weights
     float lr = 0.01f;
@@ -1105,15 +1109,24 @@ void test_full_training_step() {
     ASSERT_SUCCESS(err);
     
     // Get weights after update
-    MatrixFloatHandle w1_after;
-    err = layer_linear_get_weights_float(fc1, &w1_after);
-    ASSERT_SUCCESS(err);
-    float w1_val_after;
-    err = matrix_float_get(w1_after, 0, 0, &w1_val_after);
+    MatrixFloatHandle w1_after_ref;
+    err = layer_linear_get_weights_float(fc1, &w1_after_ref);
     ASSERT_SUCCESS(err);
     
-    // Weights should have changed
-    assert(fabsf(w1_val_before - w1_val_after) > 1e-8f);
+    // Check that at least one weight changed significantly
+    bool weights_changed = false;
+    for (size_t i = 0; i < 3 && !weights_changed; ++i) {
+        for (size_t j = 0; j < 4 && !weights_changed; ++j) {
+            float val_after;
+            err = matrix_float_get(w1_after_ref, i, j, &val_after);
+            ASSERT_SUCCESS(err);
+            float val_before = w1_vals_before[i*4 + j];
+            if (fabsf(val_before - val_after) > 1e-6f) {
+                weights_changed = true;
+            }
+        }
+    }
+    assert(weights_changed);
     
     // Cleanup
     matrix_float_destroy(input);

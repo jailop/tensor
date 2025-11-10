@@ -18,8 +18,6 @@
  * 
  * 3. Place the extracted files in a 'data/mnist/' directory relative to
  *    the executable, or specify the path as a command line argument.
- * 
- * Alternative: Use the provided download script (see below)
  */
 
 #include "nn_layers.h"
@@ -45,25 +43,8 @@ constexpr size_t NUM_CLASSES = 10;
  */
 void print_system_info() {
     std::cout << "\n=== System Information ===" << std::endl;
-    
-#ifdef USE_GPU
-    std::cout << "GPU Support: Enabled" << std::endl;
-    if (is_gpu_available()) {
-        std::cout << "GPU Status: Available and will be used" << std::endl;
-    } else {
-        std::cout << "GPU Status: Compiled with GPU support but no GPU detected" << std::endl;
-    }
-#else
-    std::cout << "GPU Support: Disabled (not compiled with USE_GPU)" << std::endl;
-#endif
-
-#ifdef USE_BLAS
-    std::cout << "BLAS Support: Enabled" << std::endl;
-#else
-    std::cout << "BLAS Support: Disabled" << std::endl;
-#endif
-    
-    std::cout << "Active Backend: " << backend_name(get_active_backend()) << std::endl;
+    std::cout << "Active Backend: " << backend_name(get_active_backend())
+              << std::endl;
 }
 
 /**
@@ -153,8 +134,6 @@ void sgd_update(std::vector<Tensor<float, 2>*>& params,
 
 /**
  * @brief Improved Neural Network for MNIST
- * 
- * Automatically uses GPU if available, otherwise falls back to BLAS or CPU.
  */
 class MNISTNet {
 public:
@@ -225,41 +204,6 @@ private:
     Softmax<float> softmax_;
 };
 
-/**
- * @brief Print download instructions
- */
-void print_download_instructions() {
-    std::cout << "\n=== MNIST Dataset Download Instructions ===\n" << std::endl;
-    std::cout << "Option 1: Manual Download" << std::endl;
-    std::cout << "--------------------------" << std::endl;
-    std::cout << "1. Visit: http://yann.lecun.com/exdb/mnist/" << std::endl;
-    std::cout << "2. Download these files:" << std::endl;
-    std::cout << "   - train-images-idx3-ubyte.gz" << std::endl;
-    std::cout << "   - train-labels-idx1-ubyte.gz" << std::endl;
-    std::cout << "   - t10k-images-idx3-ubyte.gz" << std::endl;
-    std::cout << "   - t10k-labels-idx1-ubyte.gz" << std::endl;
-    std::cout << "3. Extract: gunzip *.gz" << std::endl;
-    std::cout << "4. Place in: data/mnist/" << std::endl;
-    
-    std::cout << "\nOption 2: Using wget/curl" << std::endl;
-    std::cout << "-------------------------" << std::endl;
-    std::cout << "mkdir -p data/mnist && cd data/mnist" << std::endl;
-    std::cout << "wget http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz" << std::endl;
-    std::cout << "wget http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz" << std::endl;
-    std::cout << "wget http://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz" << std::endl;
-    std::cout << "wget http://yann.lecun.com/exdb/mnist/t10k-labels-idx1-ubyte.gz" << std::endl;
-    std::cout << "gunzip *.gz" << std::endl;
-    std::cout << "cd ../.." << std::endl;
-    
-    std::cout << "\nOption 3: One-line script" << std::endl;
-    std::cout << "------------------------" << std::endl;
-    std::cout << "mkdir -p data/mnist && cd data/mnist && \\" << std::endl;
-    std::cout << "for file in train-images-idx3-ubyte train-labels-idx1-ubyte t10k-images-idx3-ubyte t10k-labels-idx1-ubyte; do \\" << std::endl;
-    std::cout << "  wget http://yann.lecun.com/exdb/mnist/${file}.gz && gunzip ${file}.gz; \\" << std::endl;
-    std::cout << "done && cd ../.." << std::endl;
-    std::cout << "\n==========================================\n" << std::endl;
-}
-
 int main(int argc, char* argv[]) {
     std::cout << "=== MNIST Digit Classification Demo ===" << std::endl;
     std::cout << "Using nn_layers.h neural network implementation\n" << std::endl;
@@ -284,11 +228,9 @@ int main(int argc, char* argv[]) {
     
     std::cout << "\n--- Loading Training Data ---" << std::endl;
     if (!load_mnist_images(data_path + "train-images-idx3-ubyte", train_images)) {
-        print_download_instructions();
         return 1;
     }
     if (!load_mnist_labels(data_path + "train-labels-idx1-ubyte", train_labels)) {
-        print_download_instructions();
         return 1;
     }
     
@@ -298,29 +240,15 @@ int main(int argc, char* argv[]) {
     
     std::cout << "\n--- Loading Test Data ---" << std::endl;
     if (!load_mnist_images(data_path + "t10k-images-idx3-ubyte", test_images)) {
-        print_download_instructions();
         return 1;
     }
     if (!load_mnist_labels(data_path + "t10k-labels-idx1-ubyte", test_labels)) {
-        print_download_instructions();
         return 1;
     }
     
     std::cout << "\nDataset loaded successfully!" << std::endl;
     std::cout << "Training samples: " << train_images.size() << std::endl;
     std::cout << "Test samples: " << test_images.size() << std::endl;
-    
-    // Display backend information
-#ifdef USE_GPU
-    if (is_gpu_available()) {
-        std::cout << "\n*** GPU acceleration available! ***" << std::endl;
-        std::cout << "Backend: GPU → BLAS → CPU (automatic selection)" << std::endl;
-    } else {
-        std::cout << "\nGPU not available, using BLAS or CPU" << std::endl;
-    }
-#else
-    std::cout << "\nCompiled without GPU support, using BLAS or CPU" << std::endl;
-#endif
     
     // Network architecture
     std::cout << "\n--- Network Architecture ---" << std::endl;
@@ -331,11 +259,13 @@ int main(int argc, char* argv[]) {
     std::cout << "Output: " << NUM_CLASSES << " classes (Softmax)" << std::endl;
     std::cout << "Total parameters: ~561K" << std::endl;
     
-    // Create network (automatically uses GPU if available)
     MNISTNet net;
     
     // Training hyperparameters
-    const size_t batch_size = 64;
+    // NOTE: GPU operations involve CPU->GPU->CPU data transfers for each operation.
+    // Use larger batch sizes (128-256) to amortize transfer overhead and improve GPU utilization.
+    // Smaller batch sizes result in more frequent transfers, causing low GPU utilization.
+    const size_t batch_size = 256;  // Increased from 64 for better GPU efficiency
     const size_t num_epochs = 10;
     const float learning_rate = 0.005f;
     const size_t num_batches = train_images.size() / batch_size;
@@ -350,12 +280,6 @@ int main(int argc, char* argv[]) {
     std::cout << "\n=== Training Started ===" << std::endl;
     net.train(true);
     
-#ifdef USE_GPU
-    // Create a test tensor to verify which backend is being used
-    Tensor<float, 2> test_tensor({1, 1});
-    std::cout << "Tensor backend in use: " << backend_name(test_tensor.backend()) << std::endl;
-#endif
-    
     for (size_t epoch = 0; epoch < num_epochs; ++epoch) {
         float epoch_loss = 0.0f;
         float epoch_accuracy = 0.0f;
@@ -363,14 +287,8 @@ int main(int argc, char* argv[]) {
         for (size_t batch = 0; batch < num_batches; ++batch) {
             size_t start_idx = batch * batch_size;
             
-#ifdef USE_GPU
-            // Explicitly enable GPU (default is true, but being explicit per tensor_perf.cc schema)
             Tensor<float, 2> batch_input({batch_size, IMAGE_PIXELS});
             Tensor<float, 2> batch_targets({batch_size, NUM_CLASSES});
-#else
-            Tensor<float, 2> batch_input({batch_size, IMAGE_PIXELS});
-            Tensor<float, 2> batch_targets({batch_size, NUM_CLASSES});
-#endif
             
             // Optimized batch preparation using row-wise copy
             for (size_t i = 0; i < batch_size; ++i) {
@@ -391,8 +309,10 @@ int main(int argc, char* argv[]) {
             epoch_loss += loss;
             epoch_accuracy += acc;
             
-            // Backward pass: compute gradient of loss w.r.t. output using optimized tensor operations
-            // For cross-entropy + softmax: grad = (predictions - targets) / batch_size
+            // Backward pass: compute gradient of loss w.r.t. output
+            // using optimized tensor operations
+            // For cross-entropy + softmax: grad = (predictions -
+            // targets) / batch_size
             auto grad_diff_var = predictions - batch_targets;
             auto grad_diff = std::get<Tensor<float, 2>>(grad_diff_var);
             auto grad_output = grad_diff / static_cast<float>(batch_size);
@@ -417,8 +337,15 @@ int main(int argc, char* argv[]) {
         epoch_accuracy /= num_batches;
         
         std::cout << "\n>>> Epoch " << (epoch + 1) << " Summary:" << std::endl;
-        std::cout << "    Average Loss: " << std::fixed << std::setprecision(4) << epoch_loss << std::endl;
-        std::cout << "    Average Accuracy: " << std::setprecision(2) << (epoch_accuracy * 100) << "%\n" << std::endl;
+        std::cout << "    Average Loss: "
+                  << std::fixed << std::setprecision(4)
+                  << epoch_loss
+                  << std::endl;
+        std::cout << "    Average Accuracy: "
+                  << std::setprecision(2)
+                  << (epoch_accuracy * 100)
+                  << "%\n"
+                  << std::endl;
     }
     
     // Evaluation on test set
@@ -431,13 +358,7 @@ int main(int argc, char* argv[]) {
     
     for (size_t batch = 0; batch < num_test_batches; ++batch) {
         size_t start_idx = batch * test_batch_size;
-        
-#ifdef USE_GPU
         Tensor<float, 2> batch_input({test_batch_size, IMAGE_PIXELS});
-#else
-        Tensor<float, 2> batch_input({test_batch_size, IMAGE_PIXELS});
-#endif
-        
         // Optimized test batch preparation using row-wise copy
         for (size_t i = 0; i < test_batch_size; ++i) {
             size_t idx = start_idx + i;
@@ -457,12 +378,7 @@ int main(int argc, char* argv[]) {
     
     // Display a few predictions
     std::cout << "\n=== Sample Predictions ===" << std::endl;
-#ifdef USE_GPU
     Tensor<float, 2> sample_input({1, IMAGE_PIXELS});
-#else
-    Tensor<float, 2> sample_input({1, IMAGE_PIXELS});
-#endif
-    
     for (size_t i = 0; i < 5; ++i) {
         // Optimized input preparation using std::copy
         float* input_row = sample_input.data_ptr();

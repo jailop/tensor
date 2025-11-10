@@ -40,12 +40,6 @@
  * @endcode
  */
 
-#ifndef TENSOR_OPS_H
-#define TENSOR_OPS_H
-
-#include "tensor.h"
-#include <numeric>
-
 /// @brief Forward declarations
 template <typename T, size_t N>
 class Tensor;
@@ -105,8 +99,9 @@ auto broadcast_shape(const TensorIndices<N1>& shape1, const TensorIndices<N2>& s
     TensorIndices<max_dims> result;
     
     for (size_t i = 0; i < max_dims; ++i) {
-        size_t idx1 = (max_dims - 1 - i < N1) ? (N1 - 1 - (max_dims - 1 - i)) : SIZE_MAX;
-        size_t idx2 = (max_dims - 1 - i < N2) ? (N2 - 1 - (max_dims - 1 - i)) : SIZE_MAX;
+        // Align from the right: rightmost dimensions are aligned first
+        size_t idx1 = (i < N1) ? (N1 - 1 - i) : SIZE_MAX;
+        size_t idx2 = (i < N2) ? (N2 - 1 - i) : SIZE_MAX;
         
         size_t dim1 = (idx1 != SIZE_MAX) ? shape1[idx1] : 1;
         size_t dim2 = (idx2 != SIZE_MAX) ? shape2[idx2] : 1;

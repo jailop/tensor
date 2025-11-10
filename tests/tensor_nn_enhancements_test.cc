@@ -474,12 +474,3 @@ TEST_F(TensorNNEnhancementsTest, Integration_SGDUpdate) {
         delete p;
     }
 }
-
-// ============================================
-// Main Function
-// ============================================
-
-int main(int argc, char **argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
