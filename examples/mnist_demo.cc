@@ -33,7 +33,6 @@
 using namespace tensor4d;
 using namespace tensor4d::nn;
 
-// MNIST dataset dimensions
 constexpr size_t IMAGE_SIZE = 28;
 constexpr size_t IMAGE_PIXELS = IMAGE_SIZE * IMAGE_SIZE;  // 784
 constexpr size_t NUM_CLASSES = 10;
@@ -125,19 +124,6 @@ bool load_mnist_labels(const std::string& filename, std::vector<uint8_t>& labels
 }
 
 /**
- * @brief Simple SGD optimizer - update weights using optimized fused operation
- */
-void sgd_update(std::vector<Tensor<float, 2>*>& params, 
-                std::vector<Tensor<float, 2>>& grads,
-                float learning_rate) {
-    for (size_t i = 0; i < params.size(); ++i) {
-        // Use fused operation: params -= learning_rate * grads
-        // Avoids temporary tensor allocation
-        params[i]->fused_scalar_mul_sub(learning_rate, grads[i]);
-    }
-}
-
-/**
  * @brief Improved Neural Network for MNIST
  */
 class MNISTNet {
@@ -169,7 +155,6 @@ public:
     }
     
     void backward(const Tensor<float, 2>& grad_output) {
-        // Backward through network - computes gradients for all layers
         auto grad = softmax_.backward(grad_output);
         grad = fc4_.backward(grad);
         grad = relu3_.backward(grad);
@@ -181,7 +166,6 @@ public:
     }
     
     void update_weights(float lr) {
-        // SGD update: param -= lr * grad
         update_linear_layer(fc1_, lr);
         update_linear_layer(fc2_, lr);
         update_linear_layer(fc3_, lr);
@@ -211,11 +195,9 @@ private:
 
 int main(int argc, char* argv[]) {
     std::cout << "=== MNIST Digit Classification Demo ===" << std::endl;
-    std::cout << "Using nn_layers.h neural network implementation\n" << std::endl;
     
     print_system_info();
     
-    // Default data path
     std::string data_path = "data/mnist/";
     if (argc > 1) {
         data_path = argv[1];
@@ -225,13 +207,9 @@ int main(int argc, char* argv[]) {
     }
     
     std::cout << "\n=== Loading Dataset ===" << std::endl;
-    std::cout << "Data path: " << data_path << std::endl;
-    
-    // Load training data directly into tensors
     Tensor<float, 2> train_images({1, 1}); // Placeholder, will be reassigned
     std::vector<uint8_t> train_labels;
     
-    std::cout << "\n--- Loading Training Data ---" << std::endl;
     if (!load_mnist_images(data_path + "train-images-idx3-ubyte", train_images)) {
         return 1;
     }
@@ -239,11 +217,9 @@ int main(int argc, char* argv[]) {
         return 1;
     }
     
-    // Load test data directly into tensors
     Tensor<float, 2> test_images({1, 1}); // Placeholder, will be reassigned
     std::vector<uint8_t> test_labels;
     
-    std::cout << "\n--- Loading Test Data ---" << std::endl;
     if (!load_mnist_images(data_path + "t10k-images-idx3-ubyte", test_images)) {
         return 1;
     }
@@ -255,93 +231,58 @@ int main(int argc, char* argv[]) {
     std::cout << "Training samples: " << train_images.dims()[0] << std::endl;
     std::cout << "Test samples: " << test_images.dims()[0] << std::endl;
     
-    // Network architecture
-    std::cout << "\n--- Network Architecture ---" << std::endl;
-    std::cout << "Input: " << IMAGE_PIXELS << " (28x28 flattened)" << std::endl;
-    std::cout << "Hidden Layer 1: 512 neurons + ReLU" << std::endl;
-    std::cout << "Hidden Layer 2: 256 neurons + ReLU" << std::endl;
-    std::cout << "Hidden Layer 3: 128 neurons + ReLU" << std::endl;
-    std::cout << "Output: " << NUM_CLASSES << " classes (Softmax)" << std::endl;
-    std::cout << "Total parameters: ~561K" << std::endl;
-    
     MNISTNet net;
     
     // Training hyperparameters
-    // NOTE: GPU operations involve CPU->GPU->CPU data transfers for each operation.
-    // Use larger batch sizes (128-256) to amortize transfer overhead and improve GPU utilization.
-    // Smaller batch sizes result in more frequent transfers, causing low GPU utilization.
-    const size_t batch_size = 256;  // Increased from 64 for better GPU efficiency
-    const size_t num_epochs = 10;
+    const size_t batch_size = 32;
+    const size_t max_epochs = 100;
     const float learning_rate = 0.005f;
+    const float target_accuracy = 0.95f;
+    const size_t patience = 5;
     const size_t num_batches = train_images.dims()[0] / batch_size;
     
-    std::cout << "\n--- Training Configuration ---" << std::endl;
-    std::cout << "Batch size: " << batch_size << std::endl;
-    std::cout << "Number of epochs: " << num_epochs << std::endl;
-    std::cout << "Learning rate: " << learning_rate << std::endl;
-    std::cout << "Batches per epoch: " << num_batches << std::endl;
-    std::cout << "Images per epoch: " << (num_batches * batch_size) 
-              << " (" << std::fixed << std::setprecision(2) 
-              << ((num_batches * batch_size) * 100.0 / train_images.dims()[0]) 
-              << "% of dataset)" << std::endl;
-    if (train_images.dims()[0] % batch_size != 0) {
-        std::cout << "Note: " << (train_images.dims()[0] % batch_size) 
-                  << " images dropped per epoch (incomplete last batch)" << std::endl;
-    }
-    
-    // Training loop
     std::cout << "\n=== Training Started ===" << std::endl;
     net.train(true);
+    float best_accuracy = 0.0f;
+    size_t epochs_without_improvement = 0;
+    size_t epoch;
+    float epoch_loss = 0.0f;
+    float epoch_accuracy = 0.0f;
     
-    for (size_t epoch = 0; epoch < num_epochs; ++epoch) {
-        float epoch_loss = 0.0f;
-        float epoch_accuracy = 0.0f;
+    for (epoch = 0; epoch < max_epochs; ++epoch) {
+        epoch_loss = 0.0f;
+        epoch_accuracy = 0.0f;
         
         for (size_t batch = 0; batch < num_batches; ++batch) {
             size_t start_idx = batch * batch_size;
             
-            // Extract batch using efficient memory copy
             Tensor<float, 2> batch_input({batch_size, IMAGE_PIXELS});
             Tensor<float, 2> batch_targets({batch_size, NUM_CLASSES});
             
-            // Copy batch rows from train_images tensor
             const float* src = train_images.data_ptr() + start_idx * IMAGE_PIXELS;
             float* dst = batch_input.data_ptr();
             std::copy_n(src, batch_size * IMAGE_PIXELS, dst);
             
-            // Fill one-hot targets
             for (size_t i = 0; i < batch_size; ++i) {
                 size_t idx = start_idx + i;
                 label_to_onehot(train_labels[idx], batch_targets, i, NUM_CLASSES);
             }
             
-            // Forward pass
             auto predictions = net.forward(batch_input);
-            
-            // Compute loss
             float loss = cross_entropy_loss(predictions, batch_targets);
             float acc = compute_accuracy(predictions, train_labels, start_idx);
-            
             epoch_loss += loss;
             epoch_accuracy += acc;
-            
-            // Backward pass: compute gradient of loss w.r.t. output
-            // using optimized tensor operations
-            // For cross-entropy + softmax: grad = (predictions -
-            // targets) / batch_size
+
             auto grad_diff_var = predictions - batch_targets;
             auto grad_diff = std::get<Tensor<float, 2>>(grad_diff_var);
             auto grad_output = grad_diff / static_cast<float>(batch_size);
             
-            // Backpropagate gradients through network
             net.backward(grad_output);
-            
-            // Update weights with SGD
             net.update_weights(learning_rate);
             
-            // Print progress every 100 batches
             if ((batch + 1) % 100 == 0) {
-                std::cout << "Epoch " << (epoch + 1) << "/" << num_epochs 
+                std::cout << "Epoch " << (epoch + 1) << "/" << max_epochs 
                          << ", Batch " << (batch + 1) << "/" << num_batches
                          << ", Loss: " << std::fixed << std::setprecision(4) << loss
                          << ", Acc: " << std::setprecision(2) << (acc * 100) << "%"
@@ -359,13 +300,37 @@ int main(int argc, char* argv[]) {
                   << std::endl;
         std::cout << "    Average Accuracy: "
                   << std::setprecision(2)
-                  << (epoch_accuracy * 100)
-                  << "%\n"
-                  << std::endl;
+                  << (epoch_accuracy * 100) << "%";
+        
+        if (epoch_accuracy > best_accuracy) {
+            float improvement = epoch_accuracy - best_accuracy;
+            best_accuracy = epoch_accuracy;
+            epochs_without_improvement = 0;
+            std::cout << " ✓ New best! (+" << std::setprecision(2) << (improvement * 100) << "%)" << std::endl;
+        } else {
+            epochs_without_improvement++;
+            std::cout << " (no improvement for " << epochs_without_improvement 
+                     << " epoch" << (epochs_without_improvement > 1 ? "s" : "") << ")" << std::endl;
+        }
+        std::cout << std::endl;
+        
+        if (epoch_accuracy >= target_accuracy) {
+            std::cout << "🎉 Target accuracy " << std::setprecision(2) << (target_accuracy * 100) 
+                     << "% reached! Stopping training." << std::endl;
+            break;
+        }
+        
+        if (epochs_without_improvement >= patience) {
+            std::cout << "⏹️  No improvement for " << patience << " epochs. Early stopping." << std::endl;
+            break;
+        }
     }
     
-    // Evaluation on test set
-    std::cout << "\n=== Evaluating on Test Set ===" << std::endl;
+    std::cout << "\n=== Training Complete ===" << std::endl;
+    std::cout << "Final training accuracy: " << std::setprecision(2) << (epoch_accuracy * 100) << "%" << std::endl;
+    std::cout << "Total epochs: " << (epoch + 1) << "\n" << std::endl;
+    
+    std::cout << "=== Evaluating on Test Set ===" << std::endl;
     net.train(false);
     
     const size_t test_batch_size = 100;
@@ -376,7 +341,6 @@ int main(int argc, char* argv[]) {
         size_t start_idx = batch * test_batch_size;
         Tensor<float, 2> batch_input({test_batch_size, IMAGE_PIXELS});
         
-        // Copy batch rows from test_images tensor
         const float* src = test_images.data_ptr() + start_idx * IMAGE_PIXELS;
         float* dst = batch_input.data_ptr();
         std::copy_n(src, test_batch_size * IMAGE_PIXELS, dst);
@@ -391,7 +355,6 @@ int main(int argc, char* argv[]) {
     std::cout << "Test Accuracy: " << std::fixed << std::setprecision(2) 
               << (test_accuracy * 100) << "%" << std::endl;
     
-    // Display a few predictions
     std::cout << "\n=== Sample Predictions ===" << std::endl;
     Tensor<float, 2> sample_input({1, IMAGE_PIXELS});
     for (size_t i = 0; i < 5; ++i) {
