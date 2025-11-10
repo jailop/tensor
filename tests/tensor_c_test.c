@@ -1317,6 +1317,186 @@ void test_mini_training_loop() {
     printf("  ✓ Mini training loop passed\n");
 }
 
+void test_cross_entropy_loss() {
+    printf("Testing cross-entropy loss...\n");
+    
+    // Create predictions (softmax outputs) - batch_size=2, num_classes=3
+    MatrixFloatHandle predictions, targets;
+    
+    // Predictions: [[0.7, 0.2, 0.1], [0.1, 0.8, 0.1]]
+    float pred_data[] = {0.7f, 0.2f, 0.1f, 0.1f, 0.8f, 0.1f};
+    matrix_float_create(2, 3, pred_data, &predictions);
+    
+    // Targets (one-hot): [[1, 0, 0], [0, 1, 0]]
+    float target_data[] = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f};
+    matrix_float_create(2, 3, target_data, &targets);
+    
+    // Compute loss
+    float loss;
+    TensorErrorCode err = matrix_float_cross_entropy_loss(predictions, targets, &loss);
+    ASSERT_SUCCESS(err);
+    
+    // Expected: -(log(0.7) + log(0.8)) / 2 ≈ 0.267
+    assert(loss > 0.0f);
+    assert(loss < 1.0f);
+    
+    matrix_float_destroy(predictions);
+    matrix_float_destroy(targets);
+    
+    printf("  ✓ Cross-entropy loss passed (loss = %.4f)\n", loss);
+}
+
+void test_compute_accuracy() {
+    printf("Testing compute accuracy...\n");
+    
+    // Create predictions - batch_size=4, num_classes=3
+    // Predictions (after argmax): [0, 1, 2, 1]
+    float pred_data[] = {
+        0.8f, 0.1f, 0.1f,  // argmax = 0
+        0.1f, 0.7f, 0.2f,  // argmax = 1
+        0.1f, 0.2f, 0.7f,  // argmax = 2
+        0.2f, 0.6f, 0.2f   // argmax = 1
+    };
+    MatrixFloatHandle predictions;
+    matrix_float_create(4, 3, pred_data, &predictions);
+    
+    // True labels: [0, 1, 2, 0] - 3 out of 4 correct
+    uint8_t labels[] = {0, 1, 2, 0};
+    
+    // Compute accuracy
+    float accuracy;
+    TensorErrorCode err = matrix_float_compute_accuracy(predictions, labels, 4, &accuracy);
+    ASSERT_SUCCESS(err);
+    
+    // Expected accuracy: 3/4 = 0.75
+    ASSERT_EQ(accuracy, 0.75f);
+    
+    matrix_float_destroy(predictions);
+    
+    printf("  ✓ Compute accuracy passed (accuracy = %.2f%%)\n", accuracy * 100);
+}
+
+void test_softmax() {
+    printf("Testing softmax operation...\n");
+    
+    // Create input - batch_size=2, num_classes=3
+    float input_data[] = {1.0f, 2.0f, 3.0f, 1.0f, 1.0f, 1.0f};
+    MatrixFloatHandle input, output;
+    matrix_float_create(2, 3, input_data, &input);
+    
+    // Compute softmax
+    TensorErrorCode err = matrix_float_softmax(input, &output);
+    ASSERT_SUCCESS(err);
+    
+    // Check that each row sums to 1
+    size_t rows, cols;
+    matrix_float_shape(output, &rows, &cols);
+    assert(rows == 2);
+    assert(cols == 3);
+    
+    for (size_t i = 0; i < rows; ++i) {
+        float sum = 0.0f;
+        for (size_t j = 0; j < cols; ++j) {
+            float val;
+            matrix_float_get(output, i, j, &val);
+            assert(val >= 0.0f && val <= 1.0f);
+            sum += val;
+        }
+        ASSERT_EQ(sum, 1.0f);
+    }
+    
+    // Check that second row has equal probabilities (all inputs are 1)
+    float val0, val1, val2;
+    matrix_float_get(output, 1, 0, &val0);
+    matrix_float_get(output, 1, 1, &val1);
+    matrix_float_get(output, 1, 2, &val2);
+    ASSERT_EQ(val0, 0.333333f);
+    ASSERT_EQ(val1, 0.333333f);
+    ASSERT_EQ(val2, 0.333333f);
+    
+    matrix_float_destroy(input);
+    matrix_float_destroy(output);
+    
+    printf("  ✓ Softmax operation passed\n");
+}
+
+void test_argmax_rows() {
+    printf("Testing argmax rows...\n");
+    
+    // Create matrix - batch_size=3, num_classes=4
+    float data[] = {
+        0.1f, 0.8f, 0.05f, 0.05f,  // argmax = 1
+        0.6f, 0.1f, 0.2f, 0.1f,     // argmax = 0
+        0.1f, 0.1f, 0.1f, 0.7f      // argmax = 3
+    };
+    MatrixFloatHandle matrix;
+    matrix_float_create(3, 4, data, &matrix);
+    
+    // Compute argmax
+    size_t indices[3];
+    TensorErrorCode err = matrix_float_argmax_rows(matrix, indices, 3);
+    ASSERT_SUCCESS(err);
+    
+    // Check results
+    assert(indices[0] == 1);
+    assert(indices[1] == 0);
+    assert(indices[2] == 3);
+    
+    matrix_float_destroy(matrix);
+    
+    printf("  ✓ Argmax rows passed\n");
+}
+
+void test_loss_functions_integration() {
+    printf("Testing loss functions integration...\n");
+    
+    // Simulate a mini classification task
+    // Input: logits -> softmax -> predictions
+    // Compare with targets and compute loss and accuracy
+    
+    float logits_data[] = {
+        2.0f, 1.0f, 0.1f,
+        0.5f, 2.5f, 0.2f,
+        0.1f, 0.3f, 3.0f
+    };
+    MatrixFloatHandle logits;
+    matrix_float_create(3, 3, logits_data, &logits);
+    
+    // Compute softmax
+    MatrixFloatHandle predictions;
+    matrix_float_softmax(logits, &predictions);
+    
+    // Create targets (one-hot)
+    float target_data[] = {
+        1.0f, 0.0f, 0.0f,  // class 0
+        0.0f, 1.0f, 0.0f,  // class 1
+        0.0f, 0.0f, 1.0f   // class 2
+    };
+    MatrixFloatHandle targets;
+    matrix_float_create(3, 3, target_data, &targets);
+    
+    // Compute loss
+    float loss;
+    matrix_float_cross_entropy_loss(predictions, targets, &loss);
+    assert(loss > 0.0f);
+    printf("    Loss: %.4f\n", loss);
+    
+    // Compute accuracy
+    uint8_t labels[] = {0, 1, 2};
+    float accuracy;
+    matrix_float_compute_accuracy(predictions, labels, 3, &accuracy);
+    
+    // With these logits, predictions should be correct for all samples
+    ASSERT_EQ(accuracy, 1.0f);
+    printf("    Accuracy: %.2f%%\n", accuracy * 100);
+    
+    matrix_float_destroy(logits);
+    matrix_float_destroy(predictions);
+    matrix_float_destroy(targets);
+    
+    printf("  ✓ Loss functions integration passed\n");
+}
+
 int main() {
     printf("=== Running C Interface Tests ===\n\n");
     
@@ -1362,6 +1542,14 @@ int main() {
     test_full_training_step();
     test_gradient_accumulation();
     test_mini_training_loop();
+    
+    // Loss and accuracy function tests
+    printf("\n--- Loss and Accuracy Tests ---\n");
+    test_cross_entropy_loss();
+    test_compute_accuracy();
+    test_softmax();
+    test_argmax_rows();
+    test_loss_functions_integration();
     
     // Error handling and version
     test_error_handling();

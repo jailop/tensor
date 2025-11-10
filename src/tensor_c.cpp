@@ -3081,4 +3081,164 @@ TensorErrorCode layer_batchnorm_destroy(LayerHandle handle) {
     TENSOR_TRY_END
 }
 
+// ===== Loss Functions =====
+
+TensorErrorCode matrix_float_cross_entropy_loss(MatrixFloatHandle predictions, 
+                                                 MatrixFloatHandle targets, 
+                                                 float* out_loss) {
+    if (!predictions || !targets || !out_loss) return TENSOR_ERROR_NULL_POINTER;
+    
+    TENSOR_TRY_BEGIN
+    auto* pred_mat = static_cast<Matrixf*>(predictions);
+    auto* target_mat = static_cast<Matrixf*>(targets);
+    
+    auto pred_shape = pred_mat->shape();
+    auto target_shape = target_mat->shape();
+    
+    size_t rows = pred_shape[0];
+    size_t cols = pred_shape[1];
+    
+    if (pred_shape[0] != target_shape[0] || pred_shape[1] != target_shape[1]) {
+        snprintf(g_last_error, sizeof(g_last_error), "Shape mismatch: predictions and targets must have same shape");
+        return TENSOR_ERROR_SHAPE;
+    }
+    
+    // Compute cross-entropy loss using optimized operations
+    // L = -sum(targets * log(predictions + epsilon)) / batch_size
+    float epsilon = 1e-7f;
+    float loss = 0.0f;
+    
+    // Element-wise: targets * log(predictions + epsilon)
+    for (size_t i = 0; i < rows; ++i) {
+        for (size_t j = 0; j < cols; ++j) {
+            float pred = (*pred_mat)[{i, j}] + epsilon;
+            float target = (*target_mat)[{i, j}];
+            loss -= target * std::log(pred);
+        }
+    }
+    
+    *out_loss = loss / static_cast<float>(rows);
+    TENSOR_TRY_END
+}
+
+TensorErrorCode matrix_float_compute_accuracy(MatrixFloatHandle predictions,
+                                               const uint8_t* labels,
+                                               size_t batch_size,
+                                               float* out_accuracy) {
+    if (!predictions || !labels || !out_accuracy) return TENSOR_ERROR_NULL_POINTER;
+    
+    TENSOR_TRY_BEGIN
+    auto* pred_mat = static_cast<Matrixf*>(predictions);
+    
+    auto shape = pred_mat->shape();
+    size_t rows = shape[0];
+    size_t cols = shape[1];
+    
+    if (rows != batch_size) {
+        snprintf(g_last_error, sizeof(g_last_error), "Shape mismatch: predictions rows (%zu) != batch_size (%zu)", rows, batch_size);
+        return TENSOR_ERROR_SHAPE;
+    }
+    
+    size_t correct = 0;
+    
+    // For each sample, find argmax of predictions and compare with true label
+    for (size_t i = 0; i < rows; ++i) {
+        size_t pred_class = 0;
+        float max_val = (*pred_mat)[{i, 0}];
+        
+        for (size_t j = 1; j < cols; ++j) {
+            float val = (*pred_mat)[{i, j}];
+            if (val > max_val) {
+                max_val = val;
+                pred_class = j;
+            }
+        }
+        
+        if (pred_class == labels[i]) {
+            correct++;
+        }
+    }
+    
+    *out_accuracy = static_cast<float>(correct) / static_cast<float>(batch_size);
+    TENSOR_TRY_END
+}
+
+TensorErrorCode matrix_float_softmax(MatrixFloatHandle input, MatrixFloatHandle* output) {
+    if (!input || !output) return TENSOR_ERROR_NULL_POINTER;
+    
+    TENSOR_TRY_BEGIN
+    auto* input_mat = static_cast<Matrixf*>(input);
+    
+    auto shape = input_mat->shape();
+    size_t rows = shape[0];
+    size_t cols = shape[1];
+    
+    // Create output matrix
+    auto* result = new Matrixf({rows, cols}, input_mat->uses_gpu());
+    
+    // Numerically stable softmax: softmax(x_i) = exp(x_i - max(x)) / sum(exp(x - max(x)))
+    for (size_t i = 0; i < rows; ++i) {
+        // Find max in row for numerical stability
+        float max_val = (*input_mat)[{i, 0}];
+        for (size_t j = 1; j < cols; ++j) {
+            float val = (*input_mat)[{i, j}];
+            if (val > max_val) {
+                max_val = val;
+            }
+        }
+        
+        // Compute exp(x - max) and sum
+        float sum = 0.0f;
+        for (size_t j = 0; j < cols; ++j) {
+            float exp_val = std::exp((*input_mat)[{i, j}] - max_val);
+            (*result)[{i, j}] = exp_val;
+            sum += exp_val;
+        }
+        
+        // Normalize
+        for (size_t j = 0; j < cols; ++j) {
+            (*result)[{i, j}] /= sum;
+        }
+    }
+    
+    *output = result;
+    TENSOR_TRY_END
+}
+
+TensorErrorCode matrix_float_argmax_rows(MatrixFloatHandle matrix,
+                                         size_t* out_indices,
+                                         size_t batch_size) {
+    if (!matrix || !out_indices) return TENSOR_ERROR_NULL_POINTER;
+    
+    TENSOR_TRY_BEGIN
+    auto* mat = static_cast<Matrixf*>(matrix);
+    
+    auto shape = mat->shape();
+    size_t rows = shape[0];
+    size_t cols = shape[1];
+    
+    if (rows != batch_size) {
+        snprintf(g_last_error, sizeof(g_last_error), "Shape mismatch: matrix rows (%zu) != batch_size (%zu)", rows, batch_size);
+        return TENSOR_ERROR_SHAPE;
+    }
+    
+    // Find argmax for each row
+    for (size_t i = 0; i < rows; ++i) {
+        size_t argmax = 0;
+        float max_val = (*mat)[{i, 0}];
+        
+        for (size_t j = 1; j < cols; ++j) {
+            float val = (*mat)[{i, j}];
+            if (val > max_val) {
+                max_val = val;
+                argmax = j;
+            }
+        }
+        
+        out_indices[i] = argmax;
+    }
+    
+    TENSOR_TRY_END
+}
+
 } // extern "C"

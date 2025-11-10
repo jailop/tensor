@@ -7,6 +7,7 @@ extern "C" {
 
 #include <stddef.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 /**
  * @file tensor_c.h
@@ -515,6 +516,62 @@ TensorErrorCode layer_batchnorm_backward_float(LayerHandle handle, MatrixFloatHa
 TensorErrorCode layer_batchnorm_backward_double(LayerHandle handle, MatrixDoubleHandle grad_output, MatrixDoubleHandle* grad_input);
 TensorErrorCode layer_batchnorm_train(LayerHandle handle, bool training);
 TensorErrorCode layer_batchnorm_destroy(LayerHandle handle);
+
+/* ===== Loss Functions ===== */
+
+/**
+ * @brief Compute cross-entropy loss using optimized tensor operations
+ * @param predictions Softmax predictions (batch_size x num_classes)
+ * @param targets One-hot encoded targets (batch_size x num_classes)
+ * @param out_loss Pointer to store the computed loss value
+ * @return Error code
+ * 
+ * Computes: L = -sum(targets * log(predictions + epsilon)) / batch_size
+ * Uses optimized element-wise multiply, log, and sum operations.
+ */
+TensorErrorCode matrix_float_cross_entropy_loss(MatrixFloatHandle predictions, 
+                                                 MatrixFloatHandle targets, 
+                                                 float* out_loss);
+
+/**
+ * @brief Compute accuracy by comparing predictions with labels
+ * @param predictions Softmax predictions (batch_size x num_classes)
+ * @param labels True class labels (array of size batch_size)
+ * @param batch_size Number of samples
+ * @param out_accuracy Pointer to store the computed accuracy (0.0 to 1.0)
+ * @return Error code
+ * 
+ * Computes: accuracy = (number of correct predictions) / batch_size
+ * Uses optimized argmax to find predicted classes.
+ */
+TensorErrorCode matrix_float_compute_accuracy(MatrixFloatHandle predictions,
+                                               const uint8_t* labels,
+                                               size_t batch_size,
+                                               float* out_accuracy);
+
+/**
+ * @brief Compute softmax activation using optimized operations
+ * @param input Input matrix (batch_size x num_classes)
+ * @param output Pointer to store the output softmax matrix
+ * @return Error code
+ * 
+ * Computes numerically stable softmax: softmax(x_i) = exp(x_i - max(x)) / sum(exp(x - max(x)))
+ * Uses optimized exp and sum operations.
+ */
+TensorErrorCode matrix_float_softmax(MatrixFloatHandle input, MatrixFloatHandle* output);
+
+/**
+ * @brief Find argmax along rows (most likely class for each sample)
+ * @param matrix Input matrix (batch_size x num_classes)
+ * @param out_indices Output array to store argmax indices (size batch_size)
+ * @param batch_size Number of rows
+ * @return Error code
+ * 
+ * For each row, finds the column index with maximum value.
+ */
+TensorErrorCode matrix_float_argmax_rows(MatrixFloatHandle matrix,
+                                         size_t* out_indices,
+                                         size_t batch_size);
 
 #ifdef __cplusplus
 }

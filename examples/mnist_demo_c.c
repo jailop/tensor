@@ -41,9 +41,13 @@ int32_t read_int32(FILE* file) {
 }
 
 /**
- * @brief Load MNIST images from IDX file format
+ * @brief Load MNIST images directly into a Tensor (matrix)
+ * @param filename Path to MNIST images file
+ * @param images_tensor Output tensor handle (num_images x IMAGE_PIXELS)
+ * @param num_images Output number of images loaded
+ * @return 1 on success, 0 on failure
  */
-int load_mnist_images(const char* filename, float** images, size_t* num_images) {
+int load_mnist_images(const char* filename, MatrixFloatHandle* images_tensor, size_t* num_images) {
     FILE* file = fopen(filename, "rb");
     if (!file) {
         fprintf(stderr, "Error: Cannot open file %s\n", filename);
@@ -64,14 +68,18 @@ int load_mnist_images(const char* filename, float** images, size_t* num_images) 
     printf("Loading %d images (%dx%d)...\n", count, rows, cols);
     
     *num_images = count;
-    *images = (float*)malloc(count * IMAGE_PIXELS * sizeof(float));
     
+    /* Create tensor to hold all images: (num_images x 784) */
+    matrix_float_zeros(count, IMAGE_PIXELS, images_tensor);
+    
+    /* Load images directly into tensor */
     unsigned char pixel;
     for (int32_t i = 0; i < count; ++i) {
         for (size_t j = 0; j < IMAGE_PIXELS; ++j) {
             fread(&pixel, 1, 1, file);
-            /* Normalize to [0, 1] */
-            (*images)[i * IMAGE_PIXELS + j] = pixel / 255.0f;
+            /* Normalize to [0, 1] and store directly in tensor */
+            float normalized = pixel / 255.0f;
+            matrix_float_set(*images_tensor, i, j, normalized);
         }
     }
     
@@ -118,92 +126,47 @@ void label_to_onehot(uint8_t label, MatrixFloatHandle onehot, size_t batch_idx) 
 }
 
 /**
- * @brief Compute cross-entropy loss
+ * @brief Compute cross-entropy loss using optimized tensor operations
  */
 float cross_entropy_loss(MatrixFloatHandle predictions, MatrixFloatHandle targets) {
-    size_t rows, cols;
-    matrix_float_shape(predictions, &rows, &cols);
-    
-    float loss = 0.0f;
-    float epsilon = 1e-7f;
-    
-    for (size_t i = 0; i < rows; ++i) {
-        for (size_t j = 0; j < cols; ++j) {
-            float pred, target;
-            matrix_float_get(predictions, i, j, &pred);
-            matrix_float_get(targets, i, j, &target);
-            loss -= target * logf(pred + epsilon);
-        }
-    }
-    
-    return loss / rows;
+    float loss;
+    matrix_float_cross_entropy_loss(predictions, targets, &loss);
+    return loss;
 }
 
 /**
- * @brief Compute accuracy
+ * @brief Compute accuracy using optimized tensor operations
  */
 float compute_accuracy(MatrixFloatHandle predictions, const uint8_t* labels, size_t start_idx) {
     size_t rows, cols;
     matrix_float_shape(predictions, &rows, &cols);
     
-    size_t correct = 0;
-    for (size_t i = 0; i < rows; ++i) {
-        /* Find predicted class (argmax) */
-        size_t pred_class = 0;
-        float max_val;
-        matrix_float_get(predictions, i, 0, &max_val);
-        
-        for (size_t j = 1; j < cols; ++j) {
-            float val;
-            matrix_float_get(predictions, i, j, &val);
-            if (val > max_val) {
-                max_val = val;
-                pred_class = j;
-            }
-        }
-        
-        if (pred_class == labels[start_idx + i]) {
-            correct++;
-        }
-    }
-    
-    return (float)correct / rows;
+    float accuracy;
+    matrix_float_compute_accuracy(predictions, &labels[start_idx], rows, &accuracy);
+    return accuracy;
 }
 
 /**
- * @brief Compute softmax in-place for numerical stability
+ * @brief Compute softmax using optimized tensor operations
+ * Note: This creates a new matrix. For in-place operation, use layer_softmax_forward.
  */
 void compute_softmax(MatrixFloatHandle matrix) {
-    size_t rows, cols;
-    matrix_float_shape(matrix, &rows, &cols);
+    /* For backward compatibility, we compute in-place using the C API's optimized softmax.
+     * This is less efficient than using layer_softmax_forward_float but maintains the same interface. */
+    MatrixFloatHandle result;
+    matrix_float_softmax(matrix, &result);
     
+    /* Copy result back to original matrix */
+    size_t rows, cols;
+    matrix_float_shape(result, &rows, &cols);
     for (size_t i = 0; i < rows; ++i) {
-        /* Find max for numerical stability */
-        float max_val;
-        matrix_float_get(matrix, i, 0, &max_val);
-        for (size_t j = 1; j < cols; ++j) {
-            float val;
-            matrix_float_get(matrix, i, j, &val);
-            if (val > max_val) max_val = val;
-        }
-        
-        /* Exp and sum */
-        float sum = 0.0f;
         for (size_t j = 0; j < cols; ++j) {
             float val;
-            matrix_float_get(matrix, i, j, &val);
-            val = expf(val - max_val);
+            matrix_float_get(result, i, j, &val);
             matrix_float_set(matrix, i, j, val);
-            sum += val;
-        }
-        
-        /* Normalize */
-        for (size_t j = 0; j < cols; ++j) {
-            float val;
-            matrix_float_get(matrix, i, j, &val);
-            matrix_float_set(matrix, i, j, val / sum);
         }
     }
+    matrix_float_destroy(result);
 }
 
 /**
@@ -238,39 +201,39 @@ int main(int argc, char* argv[]) {
     snprintf(test_images_path, sizeof(test_images_path), "%st10k-images-idx3-ubyte", data_path);
     snprintf(test_labels_path, sizeof(test_labels_path), "%st10k-labels-idx1-ubyte", data_path);
     
-    /* Load training data */
-    float* train_images = NULL;
+    /* Load training data directly into tensors */
+    MatrixFloatHandle train_images_tensor = NULL;
     uint8_t* train_labels = NULL;
     size_t num_train_images, num_train_labels;
     
     printf("\n--- Loading Training Data ---\n");
-    if (!load_mnist_images(train_images_path, &train_images, &num_train_images)) {
+    if (!load_mnist_images(train_images_path, &train_images_tensor, &num_train_images)) {
         print_download_instructions();
         return 1;
     }
     if (!load_mnist_labels(train_labels_path, &train_labels, &num_train_labels)) {
         print_download_instructions();
-        free(train_images);
+        matrix_float_destroy(train_images_tensor);
         return 1;
     }
     
-    /* Load test data */
-    float* test_images = NULL;
+    /* Load test data directly into tensors */
+    MatrixFloatHandle test_images_tensor = NULL;
     uint8_t* test_labels = NULL;
     size_t num_test_images, num_test_labels;
     
     printf("\n--- Loading Test Data ---\n");
-    if (!load_mnist_images(test_images_path, &test_images, &num_test_images)) {
+    if (!load_mnist_images(test_images_path, &test_images_tensor, &num_test_images)) {
         print_download_instructions();
-        free(train_images);
+        matrix_float_destroy(train_images_tensor);
         free(train_labels);
         return 1;
     }
     if (!load_mnist_labels(test_labels_path, &test_labels, &num_test_labels)) {
         print_download_instructions();
-        free(train_images);
+        matrix_float_destroy(train_images_tensor);
         free(train_labels);
-        free(test_images);
+        matrix_float_destroy(test_images_tensor);
         return 1;
     }
     
@@ -334,6 +297,13 @@ int main(int argc, char* argv[]) {
     printf("Number of epochs: %d\n", NUM_EPOCHS);
     printf("Learning rate: %.4f\n", LEARNING_RATE);
     printf("Batches per epoch: %zu\n", num_train_images / BATCH_SIZE);
+    printf("Images per epoch: %zu (%.2f%% of dataset)\n", 
+           (num_train_images / BATCH_SIZE) * BATCH_SIZE,
+           ((num_train_images / BATCH_SIZE) * BATCH_SIZE) * 100.0f / num_train_images);
+    if (num_train_images % BATCH_SIZE != 0) {
+        printf("Note: %zu images dropped per epoch (incomplete last batch)\n", 
+               num_train_images % BATCH_SIZE);
+    }
     
     /* Training loop */
     printf("\n=== Training Started ===\n");
@@ -347,15 +317,15 @@ int main(int argc, char* argv[]) {
             size_t start_idx = batch * BATCH_SIZE;
             
             /* Prepare batch */
+            /* Extract batch using submatrix (efficient tensor slicing) */
             MatrixFloatHandle batch_input, batch_targets;
-            matrix_float_zeros(BATCH_SIZE, IMAGE_PIXELS, &batch_input);
+            matrix_float_submatrix(train_images_tensor, start_idx, start_idx + BATCH_SIZE, 
+                                  0, IMAGE_PIXELS, &batch_input);
             matrix_float_zeros(BATCH_SIZE, NUM_CLASSES, &batch_targets);
             
+            /* Fill one-hot targets */
             for (size_t i = 0; i < BATCH_SIZE; ++i) {
                 size_t idx = start_idx + i;
-                for (size_t j = 0; j < IMAGE_PIXELS; ++j) {
-                    matrix_float_set(batch_input, i, j, train_images[idx * IMAGE_PIXELS + j]);
-                }
                 label_to_onehot(train_labels[idx], batch_targets, i);
             }
             
@@ -496,15 +466,10 @@ int main(int argc, char* argv[]) {
     for (size_t batch = 0; batch < num_test_batches; ++batch) {
         size_t start_idx = batch * test_batch_size;
         
+        /* Extract batch using submatrix */
         MatrixFloatHandle batch_input;
-        matrix_float_zeros(test_batch_size, IMAGE_PIXELS, &batch_input);
-        
-        for (size_t i = 0; i < test_batch_size; ++i) {
-            size_t idx = start_idx + i;
-            for (size_t j = 0; j < IMAGE_PIXELS; ++j) {
-                matrix_float_set(batch_input, i, j, test_images[idx * IMAGE_PIXELS + j]);
-            }
-        }
+        matrix_float_submatrix(test_images_tensor, start_idx, start_idx + test_batch_size,
+                              0, IMAGE_PIXELS, &batch_input);
         
         /* Forward pass */
         MatrixFloatHandle h1, a1, h2, a2, h3, a3, h4, predictions;
@@ -537,13 +502,10 @@ int main(int argc, char* argv[]) {
     
     /* Display a few predictions */
     printf("\n=== Sample Predictions ===\n");
-    MatrixFloatHandle sample_input;
-    matrix_float_zeros(1, IMAGE_PIXELS, &sample_input);
-    
     for (size_t i = 0; i < 5; ++i) {
-        for (size_t j = 0; j < IMAGE_PIXELS; ++j) {
-            matrix_float_set(sample_input, 0, j, test_images[i * IMAGE_PIXELS + j]);
-        }
+        /* Extract single image using submatrix */
+        MatrixFloatHandle sample_input;
+        matrix_float_submatrix(test_images_tensor, i, i + 1, 0, IMAGE_PIXELS, &sample_input);
         
         MatrixFloatHandle h1, a1, h2, a2, h3, a3, h4, pred;
         layer_linear_forward_float(fc1, sample_input, &h1);
@@ -570,6 +532,7 @@ int main(int argc, char* argv[]) {
         printf("Image %zu: True label = %d, Predicted = %zu, Confidence = %.2f%%\n",
                i, test_labels[i], pred_class, max_val * 100);
         
+        matrix_float_destroy(sample_input);
         matrix_float_destroy(h1);
         matrix_float_destroy(a1);
         matrix_float_destroy(h2);
@@ -579,8 +542,6 @@ int main(int argc, char* argv[]) {
         matrix_float_destroy(h4);
         matrix_float_destroy(pred);
     }
-    
-    matrix_float_destroy(sample_input);
     
     printf("\n=== Training and Evaluation Completed Successfully ===\n");
     printf("\nThis demo demonstrates:\n");
@@ -602,9 +563,9 @@ cleanup:
     layer_softmax_destroy(softmax);
     
     /* Clean up data */
-    free(train_images);
+    matrix_float_destroy(train_images_tensor);
     free(train_labels);
-    free(test_images);
+    matrix_float_destroy(test_images_tensor);
     free(test_labels);
     
     return 0;

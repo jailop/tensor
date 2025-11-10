@@ -57,9 +57,12 @@ int32_t read_int32(std::ifstream& file) {
 }
 
 /**
- * @brief Load MNIST images from IDX file format
+ * @brief Load MNIST images directly into a Tensor (matrix)
+ * @param filename Path to MNIST images file
+ * @param images_tensor Output tensor (num_images x IMAGE_PIXELS)
+ * @return True on success, false on failure
  */
-bool load_mnist_images(const std::string& filename, std::vector<std::vector<float>>& images) {
+bool load_mnist_images(const std::string& filename, Tensor<float, 2>& images_tensor) {
     std::ifstream file(filename, std::ios::binary);
     if (!file.is_open()) {
         std::cerr << "Error: Cannot open file " << filename << std::endl;
@@ -78,14 +81,16 @@ bool load_mnist_images(const std::string& filename, std::vector<std::vector<floa
     
     std::cout << "Loading " << num_images << " images (" << rows << "x" << cols << ")..." << std::endl;
     
-    images.resize(num_images);
+    // Create tensor to hold all images: (num_images x 784)
+    images_tensor = Tensor<float, 2>({static_cast<size_t>(num_images), IMAGE_PIXELS});
+    
+    // Load images directly into tensor
+    unsigned char pixel;
     for (int32_t i = 0; i < num_images; ++i) {
-        images[i].resize(IMAGE_PIXELS);
-        unsigned char pixel;
         for (size_t j = 0; j < IMAGE_PIXELS; ++j) {
             file.read(reinterpret_cast<char*>(&pixel), 1);
-            // Normalize to [0, 1]
-            images[i][j] = pixel / 255.0f;
+            // Normalize to [0, 1] and store directly in tensor
+            images_tensor[{static_cast<size_t>(i), j}] = pixel / 255.0f;
         }
     }
     
@@ -222,8 +227,8 @@ int main(int argc, char* argv[]) {
     std::cout << "\n=== Loading Dataset ===" << std::endl;
     std::cout << "Data path: " << data_path << std::endl;
     
-    // Load training data
-    std::vector<std::vector<float>> train_images;
+    // Load training data directly into tensors
+    Tensor<float, 2> train_images({1, 1}); // Placeholder, will be reassigned
     std::vector<uint8_t> train_labels;
     
     std::cout << "\n--- Loading Training Data ---" << std::endl;
@@ -234,8 +239,8 @@ int main(int argc, char* argv[]) {
         return 1;
     }
     
-    // Load test data
-    std::vector<std::vector<float>> test_images;
+    // Load test data directly into tensors
+    Tensor<float, 2> test_images({1, 1}); // Placeholder, will be reassigned
     std::vector<uint8_t> test_labels;
     
     std::cout << "\n--- Loading Test Data ---" << std::endl;
@@ -247,8 +252,8 @@ int main(int argc, char* argv[]) {
     }
     
     std::cout << "\nDataset loaded successfully!" << std::endl;
-    std::cout << "Training samples: " << train_images.size() << std::endl;
-    std::cout << "Test samples: " << test_images.size() << std::endl;
+    std::cout << "Training samples: " << train_images.dims()[0] << std::endl;
+    std::cout << "Test samples: " << test_images.dims()[0] << std::endl;
     
     // Network architecture
     std::cout << "\n--- Network Architecture ---" << std::endl;
@@ -268,13 +273,21 @@ int main(int argc, char* argv[]) {
     const size_t batch_size = 256;  // Increased from 64 for better GPU efficiency
     const size_t num_epochs = 10;
     const float learning_rate = 0.005f;
-    const size_t num_batches = train_images.size() / batch_size;
+    const size_t num_batches = train_images.dims()[0] / batch_size;
     
     std::cout << "\n--- Training Configuration ---" << std::endl;
     std::cout << "Batch size: " << batch_size << std::endl;
     std::cout << "Number of epochs: " << num_epochs << std::endl;
     std::cout << "Learning rate: " << learning_rate << std::endl;
     std::cout << "Batches per epoch: " << num_batches << std::endl;
+    std::cout << "Images per epoch: " << (num_batches * batch_size) 
+              << " (" << std::fixed << std::setprecision(2) 
+              << ((num_batches * batch_size) * 100.0 / train_images.dims()[0]) 
+              << "% of dataset)" << std::endl;
+    if (train_images.dims()[0] % batch_size != 0) {
+        std::cout << "Note: " << (train_images.dims()[0] % batch_size) 
+                  << " images dropped per epoch (incomplete last batch)" << std::endl;
+    }
     
     // Training loop
     std::cout << "\n=== Training Started ===" << std::endl;
@@ -287,15 +300,18 @@ int main(int argc, char* argv[]) {
         for (size_t batch = 0; batch < num_batches; ++batch) {
             size_t start_idx = batch * batch_size;
             
+            // Extract batch using efficient memory copy
             Tensor<float, 2> batch_input({batch_size, IMAGE_PIXELS});
             Tensor<float, 2> batch_targets({batch_size, NUM_CLASSES});
             
-            // Optimized batch preparation using row-wise copy
+            // Copy batch rows from train_images tensor
+            const float* src = train_images.data_ptr() + start_idx * IMAGE_PIXELS;
+            float* dst = batch_input.data_ptr();
+            std::copy_n(src, batch_size * IMAGE_PIXELS, dst);
+            
+            // Fill one-hot targets
             for (size_t i = 0; i < batch_size; ++i) {
                 size_t idx = start_idx + i;
-                // Use std::copy for efficient row copy
-                float* batch_row = batch_input.data_ptr() + i * IMAGE_PIXELS;
-                std::copy(train_images[idx].begin(), train_images[idx].end(), batch_row);
                 label_to_onehot(train_labels[idx], batch_targets, i, NUM_CLASSES);
             }
             
@@ -353,18 +369,17 @@ int main(int argc, char* argv[]) {
     net.train(false);
     
     const size_t test_batch_size = 100;
-    const size_t num_test_batches = test_images.size() / test_batch_size;
+    const size_t num_test_batches = test_images.dims()[0] / test_batch_size;
     float test_accuracy = 0.0f;
     
     for (size_t batch = 0; batch < num_test_batches; ++batch) {
         size_t start_idx = batch * test_batch_size;
         Tensor<float, 2> batch_input({test_batch_size, IMAGE_PIXELS});
-        // Optimized test batch preparation using row-wise copy
-        for (size_t i = 0; i < test_batch_size; ++i) {
-            size_t idx = start_idx + i;
-            float* batch_row = batch_input.data_ptr() + i * IMAGE_PIXELS;
-            std::copy(test_images[idx].begin(), test_images[idx].end(), batch_row);
-        }
+        
+        // Copy batch rows from test_images tensor
+        const float* src = test_images.data_ptr() + start_idx * IMAGE_PIXELS;
+        float* dst = batch_input.data_ptr();
+        std::copy_n(src, test_batch_size * IMAGE_PIXELS, dst);
         
         auto predictions = net.forward(batch_input);
         float acc = compute_accuracy(predictions, test_labels, start_idx);
@@ -380,9 +395,10 @@ int main(int argc, char* argv[]) {
     std::cout << "\n=== Sample Predictions ===" << std::endl;
     Tensor<float, 2> sample_input({1, IMAGE_PIXELS});
     for (size_t i = 0; i < 5; ++i) {
-        // Optimized input preparation using std::copy
-        float* input_row = sample_input.data_ptr();
-        std::copy(test_images[i].begin(), test_images[i].end(), input_row);
+        // Copy single image from test_images tensor
+        const float* src = test_images.data_ptr() + i * IMAGE_PIXELS;
+        float* dst = sample_input.data_ptr();
+        std::copy_n(src, IMAGE_PIXELS, dst);
         
         auto pred = net.forward(sample_input);
         
