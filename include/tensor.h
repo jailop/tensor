@@ -1020,7 +1020,11 @@ public:
             
 #ifdef USE_GPU
             if (use_gpu_ && other.use_gpu_) {
-                TensorGPU::add_gpu(data_.get(), other.data_.get(), result.data_.get(), total);
+                ensure_on_gpu();
+                other.ensure_on_gpu();
+                result.ensure_on_gpu();
+                TensorGPU::add_gpu_direct(d_data_, other.d_data_, result.d_data_, total);
+                result.mark_gpu_modified();
             } else
 #endif
             {
@@ -1281,7 +1285,11 @@ public:
             
 #ifdef USE_GPU
             if (use_gpu_ && other.use_gpu_) {
-                TensorGPU::sub_gpu(data_.get(), other.data_.get(), result.data_.get(), total);
+                ensure_on_gpu();
+                other.ensure_on_gpu();
+                result.ensure_on_gpu();
+                TensorGPU::sub_gpu_direct(d_data_, other.d_data_, result.d_data_, total);
+                result.mark_gpu_modified();
             } else
 #endif
             {
@@ -1425,7 +1433,11 @@ public:
             
 #ifdef USE_GPU
             if (use_gpu_ && other.use_gpu_) {
-                TensorGPU::mul_gpu(data_.get(), other.data_.get(), result.data_.get(), total);
+                ensure_on_gpu();
+                other.ensure_on_gpu();
+                result.ensure_on_gpu();
+                TensorGPU::mul_gpu_direct(d_data_, other.d_data_, result.d_data_, total);
+                result.mark_gpu_modified();
             } else
 #endif
             {
@@ -1648,7 +1660,11 @@ public:
             
 #ifdef USE_GPU
             if (use_gpu_ && other.use_gpu_) {
-                TensorGPU::div_gpu(data_.get(), other.data_.get(), result.data_.get(), total);
+                ensure_on_gpu();
+                other.ensure_on_gpu();
+                result.ensure_on_gpu();
+                TensorGPU::div_gpu_direct(d_data_, other.d_data_, result.d_data_, total);
+                result.mark_gpu_modified();
             } else
 #endif
             {
