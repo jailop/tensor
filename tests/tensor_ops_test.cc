@@ -2,6 +2,9 @@
 #include "../include/tensor.h"
 #include "../include/tensor_ops.h"
 
+using namespace tensor;
+using namespace tensor_ops;
+
 class TensorOpsTest : public ::testing::Test {
 protected:
     void SetUp() override {}
@@ -17,7 +20,7 @@ TEST_F(TensorOpsTest, AreBroadcastable_EqualShapes) {
     TensorIndices<2> shape1 = {3, 4};
     TensorIndices<2> shape2 = {3, 4};
     
-    EXPECT_TRUE(tensor_ops::are_broadcastable(shape1, shape2));
+    EXPECT_TRUE(are_broadcastable(shape1, shape2));
 }
 
 TEST_F(TensorOpsTest, AreBroadcastable_OneIsScalar) {
@@ -25,8 +28,8 @@ TEST_F(TensorOpsTest, AreBroadcastable_OneIsScalar) {
     TensorIndices<1> shape1 = {1};
     TensorIndices<2> shape2 = {3, 4};
     
-    EXPECT_TRUE(tensor_ops::are_broadcastable(shape1, shape2));
-    EXPECT_TRUE(tensor_ops::are_broadcastable(shape2, shape1));
+    EXPECT_TRUE(are_broadcastable(shape1, shape2));
+    EXPECT_TRUE(are_broadcastable(shape2, shape1));
 }
 
 TEST_F(TensorOpsTest, AreBroadcastable_TrailingDimensionOne) {
@@ -34,7 +37,7 @@ TEST_F(TensorOpsTest, AreBroadcastable_TrailingDimensionOne) {
     TensorIndices<2> shape1 = {3, 1};
     TensorIndices<2> shape2 = {3, 4};
     
-    EXPECT_TRUE(tensor_ops::are_broadcastable(shape1, shape2));
+    EXPECT_TRUE(are_broadcastable(shape1, shape2));
 }
 
 TEST_F(TensorOpsTest, AreBroadcastable_LeadingDimensionOne) {
@@ -42,7 +45,7 @@ TEST_F(TensorOpsTest, AreBroadcastable_LeadingDimensionOne) {
     TensorIndices<2> shape1 = {1, 4};
     TensorIndices<2> shape2 = {3, 4};
     
-    EXPECT_TRUE(tensor_ops::are_broadcastable(shape1, shape2));
+    EXPECT_TRUE(are_broadcastable(shape1, shape2));
 }
 
 TEST_F(TensorOpsTest, AreBroadcastable_DifferentRanks) {
@@ -50,7 +53,7 @@ TEST_F(TensorOpsTest, AreBroadcastable_DifferentRanks) {
     TensorIndices<1> shape1 = {4};
     TensorIndices<2> shape2 = {3, 4};
     
-    EXPECT_TRUE(tensor_ops::are_broadcastable(shape1, shape2));
+    EXPECT_TRUE(are_broadcastable(shape1, shape2));
 }
 
 TEST_F(TensorOpsTest, AreBroadcastable_NotBroadcastable_DifferentSizes) {
@@ -58,7 +61,7 @@ TEST_F(TensorOpsTest, AreBroadcastable_NotBroadcastable_DifferentSizes) {
     TensorIndices<2> shape1 = {3, 4};
     TensorIndices<2> shape2 = {3, 5};
     
-    EXPECT_FALSE(tensor_ops::are_broadcastable(shape1, shape2));
+    EXPECT_FALSE(are_broadcastable(shape1, shape2));
 }
 
 TEST_F(TensorOpsTest, AreBroadcastable_NotBroadcastable_IncompatibleDims) {
@@ -66,7 +69,7 @@ TEST_F(TensorOpsTest, AreBroadcastable_NotBroadcastable_IncompatibleDims) {
     TensorIndices<2> shape1 = {3, 4};
     TensorIndices<2> shape2 = {2, 4};
     
-    EXPECT_FALSE(tensor_ops::are_broadcastable(shape1, shape2));
+    EXPECT_FALSE(are_broadcastable(shape1, shape2));
 }
 
 TEST_F(TensorOpsTest, AreBroadcastable_3D_Compatible) {
@@ -74,7 +77,7 @@ TEST_F(TensorOpsTest, AreBroadcastable_3D_Compatible) {
     TensorIndices<3> shape1 = {1, 3, 4};
     TensorIndices<3> shape2 = {2, 3, 4};
     
-    EXPECT_TRUE(tensor_ops::are_broadcastable(shape1, shape2));
+    EXPECT_TRUE(are_broadcastable(shape1, shape2));
 }
 
 TEST_F(TensorOpsTest, AreBroadcastable_3D_NotCompatible) {
@@ -82,7 +85,7 @@ TEST_F(TensorOpsTest, AreBroadcastable_3D_NotCompatible) {
     TensorIndices<3> shape1 = {2, 3, 4};
     TensorIndices<3> shape2 = {2, 3, 5};
     
-    EXPECT_FALSE(tensor_ops::are_broadcastable(shape1, shape2));
+    EXPECT_FALSE(are_broadcastable(shape1, shape2));
 }
 
 TEST_F(TensorOpsTest, AreBroadcastable_MixedRanks_Compatible) {
@@ -90,7 +93,7 @@ TEST_F(TensorOpsTest, AreBroadcastable_MixedRanks_Compatible) {
     TensorIndices<1> shape1 = {5};
     TensorIndices<3> shape2 = {3, 4, 5};
     
-    EXPECT_TRUE(tensor_ops::are_broadcastable(shape1, shape2));
+    EXPECT_TRUE(are_broadcastable(shape1, shape2));
 }
 
 TEST_F(TensorOpsTest, AreBroadcastable_MixedRanks_NotCompatible) {
@@ -98,7 +101,7 @@ TEST_F(TensorOpsTest, AreBroadcastable_MixedRanks_NotCompatible) {
     TensorIndices<1> shape1 = {4};
     TensorIndices<3> shape2 = {3, 4, 5};
     
-    EXPECT_FALSE(tensor_ops::are_broadcastable(shape1, shape2));
+    EXPECT_FALSE(are_broadcastable(shape1, shape2));
 }
 
 // =============================================================================
@@ -109,7 +112,7 @@ TEST_F(TensorOpsTest, BroadcastShape_EqualShapes) {
     TensorIndices<2> shape1 = {3, 4};
     TensorIndices<2> shape2 = {3, 4};
     
-    auto result = tensor_ops::broadcast_shape(shape1, shape2);
+    auto result = broadcast_shape(shape1, shape2);
     
     EXPECT_EQ(result[0], 3);
     EXPECT_EQ(result[1], 4);
@@ -119,7 +122,7 @@ TEST_F(TensorOpsTest, BroadcastShape_OneWithSizeOne) {
     TensorIndices<2> shape1 = {3, 1};
     TensorIndices<2> shape2 = {3, 4};
     
-    auto result = tensor_ops::broadcast_shape(shape1, shape2);
+    auto result = broadcast_shape(shape1, shape2);
     
     EXPECT_EQ(result[0], 3);
     EXPECT_EQ(result[1], 4);
@@ -129,7 +132,7 @@ TEST_F(TensorOpsTest, BroadcastShape_BothWithSizeOne) {
     TensorIndices<2> shape1 = {1, 4};
     TensorIndices<2> shape2 = {3, 1};
     
-    auto result = tensor_ops::broadcast_shape(shape1, shape2);
+    auto result = broadcast_shape(shape1, shape2);
     
     EXPECT_EQ(result[0], 3);
     EXPECT_EQ(result[1], 4);
@@ -139,7 +142,7 @@ TEST_F(TensorOpsTest, BroadcastShape_DifferentRanks) {
     TensorIndices<1> shape1 = {4};
     TensorIndices<2> shape2 = {3, 4};
     
-    auto result = tensor_ops::broadcast_shape(shape1, shape2);
+    auto result = broadcast_shape(shape1, shape2);
     
     EXPECT_EQ(result[0], 3);
     EXPECT_EQ(result[1], 4);
@@ -149,7 +152,7 @@ TEST_F(TensorOpsTest, BroadcastShape_DifferentRanks_Reverse) {
     TensorIndices<2> shape1 = {3, 4};
     TensorIndices<1> shape2 = {4};
     
-    auto result = tensor_ops::broadcast_shape(shape1, shape2);
+    auto result = broadcast_shape(shape1, shape2);
     
     EXPECT_EQ(result[0], 3);
     EXPECT_EQ(result[1], 4);
@@ -159,7 +162,7 @@ TEST_F(TensorOpsTest, BroadcastShape_3D_WithOnes) {
     TensorIndices<3> shape1 = {1, 3, 4};
     TensorIndices<3> shape2 = {2, 1, 4};
     
-    auto result = tensor_ops::broadcast_shape(shape1, shape2);
+    auto result = broadcast_shape(shape1, shape2);
     
     EXPECT_EQ(result[0], 2);
     EXPECT_EQ(result[1], 3);
@@ -170,7 +173,7 @@ TEST_F(TensorOpsTest, BroadcastShape_MixedRanks_1D_to_3D) {
     TensorIndices<1> shape1 = {5};
     TensorIndices<3> shape2 = {2, 3, 5};
     
-    auto result = tensor_ops::broadcast_shape(shape1, shape2);
+    auto result = broadcast_shape(shape1, shape2);
     
     EXPECT_EQ(result[0], 2);
     EXPECT_EQ(result[1], 3);

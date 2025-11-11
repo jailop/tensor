@@ -30,8 +30,7 @@
 #include <cmath>
 #include <cstring>
 
-using namespace tensor4d;
-using namespace tensor4d::nn;
+using namespace tensor;
 
 constexpr size_t IMAGE_SIZE = 28;
 constexpr size_t IMAGE_PIXELS = IMAGE_SIZE * IMAGE_SIZE;  // 784

@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 #include "../include/tensor.h"
 
+using namespace tensor;
+
 class TensorStackingExtensionsTest : public ::testing::Test {
 protected:
 };

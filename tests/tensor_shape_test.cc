@@ -8,6 +8,8 @@
 #include "tensor.h"
 #include <cmath>
 
+using namespace tensor;
+
 class TensorShapeTest : public ::testing::Test {
 protected:
     void SetUp() override {}

@@ -3,6 +3,7 @@
 #include <cmath>
 
 using namespace tensor;
+using namespace linalg;
 
 TEST(LinalgTest, VectorNorm) {
     Vector<float> v({3});

@@ -11,10 +11,9 @@
 #include <cmath>
 #include <vector>
 
-// ============================================
-// Benchmark Configuration Parameters
-// ============================================
 #define ITERATIONS 20
+
+using namespace tensor;
 
 // Vector dot product sizes
 constexpr size_t VECTOR_SIZES[] = {100, 1000, 10000, 100000};

@@ -1,27 +1,9 @@
 /**
- * @file linalg_advanced.h
- * @brief Advanced linear algebra operations with LAPACK/cuSOLVER support
- * 
  * This header provides high-priority linear algebra operations that leverage
  * optimized libraries:
  * - GPU: cuBLAS/cuSOLVER (when USE_GPU is defined)
  * - CPU: LAPACK (when USE_LAPACK is defined)
  * - Fallback: Pure C++ implementations
- * 
- * Features:
- * - LU Decomposition with partial pivoting
- * - Linear system solvers (general, symmetric positive definite)
- * - Least squares solvers (QR-based, SVD-based)
- * - Matrix rank computation
- * - Pseudo-inverse (Moore-Penrose)
- * - Kronecker product
- * - Matrix inverse and determinant (LAPACK-accelerated)
- * - Eigenvalue/eigenvector computation
- * - QR, Cholesky, SVD decompositions
- * 
- * @author Tensor Library Team
- * @version 1.5
- * @date 2024
  */
 
 #ifndef _LINALG_ADVANCED_H
@@ -35,7 +17,6 @@
 #include <limits>
 
 #ifdef USE_LAPACK
-// LAPACK function declarations for Fortran interface
 extern "C" {
     // LU decomposition
     void sgetrf_(int* M, int* N, float* A, int* LDA, int* IPIV, int* INFO);
@@ -105,6 +86,7 @@ extern "C" {
 #include "tensor_gpu.cuh"
 #endif
 
+namespace tensor {
 namespace linalg {
 
 // ============================================
@@ -1295,5 +1277,6 @@ auto eig_decomp(const Matrix<T>& A)
 }
 
 } // namespace linalg
+} // namespace tensor
 
 #endif // _LINALG_ADVANCED_H

@@ -2,6 +2,8 @@
 #include "../include/tensor.h"
 #include <algorithm>
 
+using namespace tensor;
+
 class TensorSortingTest : public ::testing::Test {
 protected:
 };

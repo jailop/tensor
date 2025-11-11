@@ -7,6 +7,7 @@
 #include "linalg_advanced.h"
 #include <cmath>
 
+using namespace tensor;
 using namespace linalg;
 
 class LinalgAdvancedTest : public ::testing::Test {

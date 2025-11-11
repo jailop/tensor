@@ -15,8 +15,7 @@
 #include <iostream>
 #include <random>
 
-using namespace tensor4d;
-using namespace tensor4d::nn;
+using namespace tensor;
 using namespace linalg;
 
 // Thread-local error message storage

@@ -17,8 +17,7 @@
 #include <cmath>
 #include <vector>
 
-using namespace tensor4d;
-using namespace tensor4d::nn;
+using namespace tensor;
 
 // ============================================
 // Test Fixture for NN Enhancements

@@ -7,6 +7,8 @@
 #include "tensor.h"
 #include <cmath>
 
+using namespace tensor;
+
 class TensorNormalizationTest : public ::testing::Test {
 protected:
     void SetUp() override {

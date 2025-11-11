@@ -1,6 +1,8 @@
 #include "tensor.h"
 #include <gtest/gtest.h>
 
+using namespace tensor;
+
 class TensorReductionTest : public ::testing::Test {
 protected:
     void SetUp() override {}

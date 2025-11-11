@@ -3,6 +3,8 @@
 #include "loss_functions.h"
 #include <gtest/gtest.h>
 
+using namespace tensor;
+
 class TensorTest : public ::testing::Test {
 protected:
     void SetUp() override {}

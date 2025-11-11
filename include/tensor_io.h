@@ -15,8 +15,7 @@
 #include <sstream>
 #include <cstring>
 
-using namespace tensor;
-
+namespace tensor {
 /**
  * @brief Tensor file format types.
  */
