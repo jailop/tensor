@@ -5,6 +5,7 @@
 
 #include <gtest/gtest.h>
 #include "tensor.h"
+#include "linalg.h"
 #include <variant>
 #include <cmath>
 

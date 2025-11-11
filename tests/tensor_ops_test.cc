@@ -3,7 +3,6 @@
 #include "../include/tensor_ops.h"
 
 using namespace tensor;
-using namespace tensor_ops;
 
 class TensorOpsTest : public ::testing::Test {
 protected:

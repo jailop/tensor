@@ -2,7 +2,7 @@
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
 
-namespace TensorGPU {
+namespace tensor {
 
 // Device-compatible limit helpers - specializations for different types
 template<typename T>
@@ -1239,7 +1239,7 @@ template void fill_gpu_direct<double>(double*, double, size_t);
 template void fill_gpu_direct<size_t>(size_t*, size_t, size_t);
 template void fill_gpu_direct<bool>(bool*, bool, size_t);
 
-} // namespace TensorGPU
+} // namespace tensor
 
 // C wrapper functions for CUDA API (for use in non-CUDA files)
 extern "C" {

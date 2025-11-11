@@ -87,7 +87,6 @@ extern "C" {
 #endif
 
 namespace tensor {
-namespace linalg {
 
 // ============================================
 // Solver Method Enums
@@ -115,8 +114,6 @@ enum class LstsqMethod {
 // ============================================
 // Helper Functions
 // ============================================
-
-namespace detail {
 
 // Helper to check if matrix is symmetric
 template <typename T>
@@ -150,8 +147,6 @@ bool is_positive_definite(const Matrix<T>& A) {
     return is_symmetric(A);
 }
 
-} // namespace detail
-
 // ============================================
 // 1. LU Decomposition with Partial Pivoting
 // ============================================
@@ -172,7 +167,7 @@ bool is_positive_definite(const Matrix<T>& A) {
  * @section example_lu Example
  * @code
  * Matrix<float> A({{4, 3}, {6, 3}});
- * auto result = linalg::lu_decomp(A);
+ * auto result = tensor::lu_decomp(A);
  * if (auto* lu_data = std::get_if<std::pair<Matrix<float>, std::vector<int>>>(&result)) {
  *     Matrix<float>& LU = lu_data->first;
  *     std::vector<int>& pivots = lu_data->second;
@@ -300,7 +295,7 @@ TensorResult<std::pair<Matrix<T>, std::vector<int>>> lu_decomp(const Matrix<T>& 
  * Matrix<float> A({{4, -1}, {-1, 4}});
  * Vector<float> b({10, 5});
  * 
- * auto x_result = linalg::solve(A, b);
+ * auto x_result = tensor::solve(A, b);
  * if (auto* x = std::get_if<Vector<float>>(&x_result)) {
  *     // Solution found
  * }
@@ -322,7 +317,7 @@ TensorResult<Vector<T>> solve(const Matrix<T>& A, const Vector<T>& b,
     if (method == SolverMethod::Auto) {
         if (m == n) {
             // Square system
-            if (detail::is_positive_definite(A)) {
+            if (is_positive_definite(A)) {
                 method = SolverMethod::Cholesky;
             } else {
                 method = SolverMethod::LU;
@@ -490,7 +485,7 @@ TensorResult<Matrix<T>> solve(const Matrix<T>& A, const Matrix<T>& B,
  * Matrix<float> A({{1, 1}, {2, 1}, {3, 1}, {4, 1}});  // [x, 1]
  * Vector<float> y({2.1, 3.9, 6.2, 7.9});
  * 
- * auto params = linalg::lstsq(A, y);  // Returns [m, b]
+ * auto params = tensor::lstsq(A, y);  // Returns [m, b]
  * @endcode
  */
 template <typename T>
@@ -606,7 +601,7 @@ TensorResult<Vector<T>> lstsq(const Matrix<T>& A, const Vector<T>& b,
  * @section example_rank Example
  * @code
  * Matrix<float> A({{1, 2}, {2, 4}});  // Rank-1 matrix
- * size_t r = linalg::matrix_rank(A);  // Returns 1
+ * size_t r = tensor::matrix_rank(A);  // Returns 1
  * @endcode
  */
 template <typename T>
@@ -635,7 +630,7 @@ size_t matrix_rank(const Matrix<T>& A, T tol = T(-1)) {
  * @section example_pinv Example
  * @code
  * Matrix<float> A({{1, 2}, {3, 4}, {5, 6}});
- * auto Ainv_result = linalg::pinv(A);
+ * auto Ainv_result = tensor::pinv(A);
  * if (auto* Ainv = std::get_if<Matrix<float>>(&Ainv_result)) {
  *     // Ainv is 2x3 pseudo-inverse
  * }
@@ -712,7 +707,7 @@ TensorResult<Matrix<T>> pinv(const Matrix<T>& A, T rcond = T(-1)) {
  * @code
  * Matrix<float> A({{1, 2}, {3, 4}});
  * Matrix<float> B({{0, 5}, {6, 7}});
- * auto C = linalg::kron(A, B);  // 4x4 matrix
+ * auto C = tensor::kron(A, B);  // 4x4 matrix
  * @endcode
  */
 template <typename T>
@@ -758,7 +753,7 @@ TensorResult<Matrix<T>> kron(const Matrix<T>& A, const Matrix<T>& B) {
  * @section example_det Example
  * @code
  * Matrix<float> A({{4, -2}, {-1, 3}});
- * auto det_result = linalg::determinant(A);
+ * auto det_result = tensor::determinant(A);
  * if (auto* det = std::get_if<float>(&det_result)) {
  *     // det = 10
  * }
@@ -832,7 +827,7 @@ TensorResult<T> determinant(const Matrix<T>& A) {
  * @section example_inv Example
  * @code
  * Matrix<float> A({{4, 7}, {2, 6}});
- * auto Ainv_result = linalg::inverse(A);
+ * auto Ainv_result = tensor::inverse(A);
  * if (auto* Ainv = std::get_if<Matrix<float>>(&Ainv_result)) {
  *     // Verify: A * Ainv ≈ I
  * }
@@ -1276,7 +1271,6 @@ auto eig_decomp(const Matrix<T>& A)
     return TensorError::NotImplemented;
 }
 
-} // namespace linalg
 } // namespace tensor
 
 #endif // _LINALG_ADVANCED_H

@@ -5,6 +5,7 @@
 
 #include <gtest/gtest.h>
 #include "tensor.h"
+#include "linalg.h"
 #include <cmath>
 
 using namespace tensor;
@@ -120,7 +121,7 @@ TEST_F(TensorNormalizationTest, DiagCreateMatrix) {
     Tensor<float, 1> vec({3}, false);
     vec[{0}] = 1.0f; vec[{1}] = 2.0f; vec[{2}] = 3.0f;
     
-    auto matrix = diag_matrix(vec);
+    auto matrix = diag(vec);
     
     ASSERT_EQ(matrix.dims()[0], 3);
     ASSERT_EQ(matrix.dims()[1], 3);

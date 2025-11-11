@@ -16,7 +16,6 @@
 #include <random>
 
 using namespace tensor;
-using namespace linalg;
 
 // Thread-local error message storage
 thread_local char g_last_error[256] = {0};
@@ -190,7 +189,7 @@ TensorErrorCode vector_float_norm(VectorFloatHandle handle, float* out_value) {
     
     TENSOR_TRY_BEGIN
     auto* vec = static_cast<Vectorf*>(handle);
-    *out_value = linalg::norm(*vec);
+    *out_value = tensor::norm(*vec);
     TENSOR_TRY_END
 }
 
@@ -343,7 +342,7 @@ TensorErrorCode vector_double_norm(VectorDoubleHandle handle, double* out_value)
     
     TENSOR_TRY_BEGIN
     auto* vec = static_cast<Vectord*>(handle);
-    *out_value = linalg::norm(*vec);
+    *out_value = tensor::norm(*vec);
     TENSOR_TRY_END
 }
 
@@ -405,7 +404,7 @@ TensorErrorCode matrix_float_eye(size_t n, MatrixFloatHandle* out_handle) {
     if (!out_handle) return TENSOR_ERROR_NULL_POINTER;
     
     TENSOR_TRY_BEGIN
-    *out_handle = new Matrixf(linalg::eye<float>(n));
+    *out_handle = new Matrixf(tensor::eye<float>(n));
     TENSOR_TRY_END
 }
 
@@ -539,7 +538,7 @@ TensorErrorCode matrix_float_inverse(MatrixFloatHandle handle, MatrixFloatHandle
     
     TENSOR_TRY_BEGIN
     auto* mat = static_cast<Matrixf*>(handle);
-    auto result = linalg::inverse(*mat);
+    auto result = tensor::inverse(*mat);
     if (std::holds_alternative<Matrixf>(result)) {
         *out_handle = new Matrixf(std::get<Matrixf>(result));
     } else {
@@ -553,7 +552,7 @@ TensorErrorCode matrix_float_determinant(MatrixFloatHandle handle, float* out_va
     
     TENSOR_TRY_BEGIN
     auto* mat = static_cast<Matrixf*>(handle);
-    auto result = linalg::determinant(*mat);
+    auto result = tensor::determinant(*mat);
     if (std::holds_alternative<float>(result)) {
         *out_value = std::get<float>(result);
     } else {
@@ -629,7 +628,7 @@ TensorErrorCode matrix_double_eye(size_t n, MatrixDoubleHandle* out_handle) {
     if (!out_handle) return TENSOR_ERROR_NULL_POINTER;
     
     TENSOR_TRY_BEGIN
-    *out_handle = new Matrixd(linalg::eye<double>(n));
+    *out_handle = new Matrixd(tensor::eye<double>(n));
     TENSOR_TRY_END
 }
 
@@ -744,7 +743,7 @@ TensorErrorCode matrix_double_inverse(MatrixDoubleHandle handle, MatrixDoubleHan
     
     TENSOR_TRY_BEGIN
     auto* mat = static_cast<Matrixd*>(handle);
-    auto result = linalg::inverse(*mat);
+    auto result = tensor::inverse(*mat);
     if (std::holds_alternative<Matrixd>(result)) {
         *out_handle = new Matrixd(std::get<Matrixd>(result));
     } else {
@@ -758,7 +757,7 @@ TensorErrorCode matrix_double_determinant(MatrixDoubleHandle handle, double* out
     
     TENSOR_TRY_BEGIN
     auto* mat = static_cast<Matrixd*>(handle);
-    auto result = linalg::determinant(*mat);
+    auto result = tensor::determinant(*mat);
     if (std::holds_alternative<double>(result)) {
         *out_value = std::get<double>(result);
     } else {
@@ -1182,7 +1181,7 @@ TensorErrorCode matrix_float_lu(MatrixFloatHandle handle, MatrixFloatHandle* out
     
     TENSOR_TRY_BEGIN
     auto* mat = static_cast<Matrixf*>(handle);
-    auto result = linalg::lu_decomp(*mat);
+    auto result = tensor::lu_decomp(*mat);
     
     if (auto* lu_data = std::get_if<std::pair<Matrixf, std::vector<int>>>(&result)) {
         const Matrixf& LU = lu_data->first;
@@ -1246,7 +1245,7 @@ TensorErrorCode matrix_double_lu(MatrixDoubleHandle handle, MatrixDoubleHandle* 
     
     TENSOR_TRY_BEGIN
     auto* mat = static_cast<Matrixd*>(handle);
-    auto result = linalg::lu_decomp(*mat);
+    auto result = tensor::lu_decomp(*mat);
     
     if (auto* lu_data = std::get_if<std::pair<Matrixd, std::vector<int>>>(&result)) {
         const Matrixd& LU = lu_data->first;
@@ -1310,7 +1309,7 @@ TensorErrorCode matrix_float_qr(MatrixFloatHandle handle, MatrixFloatHandle* out
     
     TENSOR_TRY_BEGIN
     auto* mat = static_cast<Matrixf*>(handle);
-    auto result = linalg::qr_decomp(*mat);
+    auto result = tensor::qr_decomp(*mat);
     
     if (auto* qr_data = std::get_if<std::pair<Matrixf, Matrixf>>(&result)) {
         *out_Q = new Matrixf(qr_data->first);
@@ -1327,7 +1326,7 @@ TensorErrorCode matrix_double_qr(MatrixDoubleHandle handle, MatrixDoubleHandle* 
     
     TENSOR_TRY_BEGIN
     auto* mat = static_cast<Matrixd*>(handle);
-    auto result = linalg::qr_decomp(*mat);
+    auto result = tensor::qr_decomp(*mat);
     
     if (auto* qr_data = std::get_if<std::pair<Matrixd, Matrixd>>(&result)) {
         *out_Q = new Matrixd(qr_data->first);
@@ -1344,7 +1343,7 @@ TensorErrorCode matrix_float_cholesky(MatrixFloatHandle handle, MatrixFloatHandl
     
     TENSOR_TRY_BEGIN
     auto* mat = static_cast<Matrixf*>(handle);
-    auto result = linalg::cholesky_decomp(*mat);
+    auto result = tensor::cholesky_decomp(*mat);
     
     if (std::holds_alternative<Matrixf>(result)) {
         *out_handle = new Matrixf(std::get<Matrixf>(result));
@@ -1360,7 +1359,7 @@ TensorErrorCode matrix_double_cholesky(MatrixDoubleHandle handle, MatrixDoubleHa
     
     TENSOR_TRY_BEGIN
     auto* mat = static_cast<Matrixd*>(handle);
-    auto result = linalg::cholesky_decomp(*mat);
+    auto result = tensor::cholesky_decomp(*mat);
     
     if (std::holds_alternative<Matrixd>(result)) {
         *out_handle = new Matrixd(std::get<Matrixd>(result));
@@ -1376,7 +1375,7 @@ TensorErrorCode matrix_float_svd(MatrixFloatHandle handle, MatrixFloatHandle* ou
     
     TENSOR_TRY_BEGIN
     auto* mat = static_cast<Matrixf*>(handle);
-    auto result = linalg::svd_decomp(*mat);
+    auto result = tensor::svd_decomp(*mat);
     
     if (auto* svd_data = std::get_if<std::tuple<Matrixf, Vectorf, Matrixf>>(&result)) {
         *out_U = new Matrixf(std::get<0>(*svd_data));
@@ -1394,7 +1393,7 @@ TensorErrorCode matrix_double_svd(MatrixDoubleHandle handle, MatrixDoubleHandle*
     
     TENSOR_TRY_BEGIN
     auto* mat = static_cast<Matrixd*>(handle);
-    auto result = linalg::svd_decomp(*mat);
+    auto result = tensor::svd_decomp(*mat);
     
     if (auto* svd_data = std::get_if<std::tuple<Matrixd, Vectord, Matrixd>>(&result)) {
         *out_U = new Matrixd(std::get<0>(*svd_data));
@@ -1412,7 +1411,7 @@ TensorErrorCode matrix_float_eig(MatrixFloatHandle handle, VectorFloatHandle* ou
     
     TENSOR_TRY_BEGIN
     auto* mat = static_cast<Matrixf*>(handle);
-    auto result = linalg::eig_decomp(*mat);
+    auto result = tensor::eig_decomp(*mat);
     
     if (auto* eig_data = std::get_if<std::pair<Vectorf, Matrixf>>(&result)) {
         *out_eigenvalues = new Vectorf(eig_data->first);
@@ -1429,7 +1428,7 @@ TensorErrorCode matrix_double_eig(MatrixDoubleHandle handle, VectorDoubleHandle*
     
     TENSOR_TRY_BEGIN
     auto* mat = static_cast<Matrixd*>(handle);
-    auto result = linalg::eig_decomp(*mat);
+    auto result = tensor::eig_decomp(*mat);
     
     if (auto* eig_data = std::get_if<std::pair<Vectord, Matrixd>>(&result)) {
         *out_eigenvalues = new Vectord(eig_data->first);
@@ -1447,7 +1446,7 @@ TensorErrorCode matrix_float_solve(MatrixFloatHandle A, VectorFloatHandle b, Vec
     TENSOR_TRY_BEGIN
     auto* mat_A = static_cast<Matrixf*>(A);
     auto* vec_b = static_cast<Vectorf*>(b);
-    auto result = linalg::solve(*mat_A, *vec_b);
+    auto result = tensor::solve(*mat_A, *vec_b);
     if (std::holds_alternative<Vectorf>(result)) {
         *out_x = new Vectorf(std::get<Vectorf>(result));
     } else {
@@ -1462,7 +1461,7 @@ TensorErrorCode matrix_double_solve(MatrixDoubleHandle A, VectorDoubleHandle b, 
     TENSOR_TRY_BEGIN
     auto* mat_A = static_cast<Matrixd*>(A);
     auto* vec_b = static_cast<Vectord*>(b);
-    auto result = linalg::solve(*mat_A, *vec_b);
+    auto result = tensor::solve(*mat_A, *vec_b);
     if (std::holds_alternative<Vectord>(result)) {
         *out_x = new Vectord(std::get<Vectord>(result));
     } else {
@@ -1491,7 +1490,7 @@ TensorErrorCode matrix_float_lstsq(MatrixFloatHandle A, VectorFloatHandle b, Vec
     TENSOR_TRY_BEGIN
     auto* mat_A = static_cast<Matrixf*>(A);
     auto* vec_b = static_cast<Vectorf*>(b);
-    auto result = linalg::lstsq(*mat_A, *vec_b);
+    auto result = tensor::lstsq(*mat_A, *vec_b);
     if (std::holds_alternative<Vectorf>(result)) {
         *out_x = new Vectorf(std::get<Vectorf>(result));
     } else {
@@ -1506,7 +1505,7 @@ TensorErrorCode matrix_double_lstsq(MatrixDoubleHandle A, VectorDoubleHandle b, 
     TENSOR_TRY_BEGIN
     auto* mat_A = static_cast<Matrixd*>(A);
     auto* vec_b = static_cast<Vectord*>(b);
-    auto result = linalg::lstsq(*mat_A, *vec_b);
+    auto result = tensor::lstsq(*mat_A, *vec_b);
     if (std::holds_alternative<Vectord>(result)) {
         *out_x = new Vectord(std::get<Vectord>(result));
     } else {
@@ -1520,7 +1519,7 @@ TensorErrorCode matrix_float_pinv(MatrixFloatHandle handle, MatrixFloatHandle* o
     
     TENSOR_TRY_BEGIN
     auto* mat = static_cast<Matrixf*>(handle);
-    auto result = linalg::pinv(*mat);
+    auto result = tensor::pinv(*mat);
     if (std::holds_alternative<Matrixf>(result)) {
         *out_handle = new Matrixf(std::get<Matrixf>(result));
     } else {
@@ -1534,7 +1533,7 @@ TensorErrorCode matrix_double_pinv(MatrixDoubleHandle handle, MatrixDoubleHandle
     
     TENSOR_TRY_BEGIN
     auto* mat = static_cast<Matrixd*>(handle);
-    auto result = linalg::pinv(*mat);
+    auto result = tensor::pinv(*mat);
     if (std::holds_alternative<Matrixd>(result)) {
         *out_handle = new Matrixd(std::get<Matrixd>(result));
     } else {
@@ -1548,7 +1547,7 @@ TensorErrorCode matrix_float_rank(MatrixFloatHandle handle, size_t* out_rank) {
     
     TENSOR_TRY_BEGIN
     auto* mat = static_cast<Matrixf*>(handle);
-    *out_rank = linalg::matrix_rank(*mat);
+    *out_rank = tensor::matrix_rank(*mat);
     TENSOR_TRY_END
 }
 
@@ -1557,7 +1556,7 @@ TensorErrorCode matrix_double_rank(MatrixDoubleHandle handle, size_t* out_rank) 
     
     TENSOR_TRY_BEGIN
     auto* mat = static_cast<Matrixd*>(handle);
-    *out_rank = linalg::matrix_rank(*mat);
+    *out_rank = tensor::matrix_rank(*mat);
     TENSOR_TRY_END
 }
 
@@ -1567,7 +1566,7 @@ TensorErrorCode matrix_float_kron(MatrixFloatHandle lhs, MatrixFloatHandle rhs, 
     TENSOR_TRY_BEGIN
     auto* mat_lhs = static_cast<Matrixf*>(lhs);
     auto* mat_rhs = static_cast<Matrixf*>(rhs);
-    auto result = linalg::kron(*mat_lhs, *mat_rhs);
+    auto result = tensor::kron(*mat_lhs, *mat_rhs);
     if (std::holds_alternative<Matrixf>(result)) {
         *out_handle = new Matrixf(std::get<Matrixf>(result));
     } else {
@@ -1582,7 +1581,7 @@ TensorErrorCode matrix_double_kron(MatrixDoubleHandle lhs, MatrixDoubleHandle rh
     TENSOR_TRY_BEGIN
     auto* mat_lhs = static_cast<Matrixd*>(lhs);
     auto* mat_rhs = static_cast<Matrixd*>(rhs);
-    auto result = linalg::kron(*mat_lhs, *mat_rhs);
+    auto result = tensor::kron(*mat_lhs, *mat_rhs);
     if (std::holds_alternative<Matrixd>(result)) {
         *out_handle = new Matrixd(std::get<Matrixd>(result));
     } else {

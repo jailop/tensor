@@ -28,6 +28,7 @@
 #include "tensor_blas.h"
 #include "tensor_error.h"
 #ifdef USE_GPU
+#include "tensor_gpu.h"
 #include "tensor_gpu.cuh"
 #endif
 
@@ -79,17 +80,15 @@ inline Backend get_active_backend() {
     return Backend::CPU;
 }
 
+#ifndef USE_GPU
 /**
  * @brief Check if GPU backend is available
  * @return true if GPU support is compiled in and GPU is available
  */
 inline bool is_gpu_available() {
-#ifdef USE_GPU
-    return is_gpu_available();
-#else
     return false;
-#endif
 }
+#endif
 
 /**
  * @brief Check if BLAS backend is available
@@ -148,8 +147,7 @@ template <typename T, size_t N>
 using BackwardFunc = std::function<void(const Tensor<T, N>&)>;
 
 /**
- * @namespace loss
- * @brief Loss functions for training neural networks
+ * Loss functions for training neural networks
  * 
  * Provides common loss functions used in machine learning:
  * - Mean Squared Error (MSE)
@@ -160,27 +158,26 @@ using BackwardFunc = std::function<void(const Tensor<T, N>&)>;
  * 
  * All loss functions support automatic differentiation.
  */
-namespace loss {
-    /// @brief Mean squared error loss
-    template<typename T, size_t N>
-    Tensor<T, N> mse_loss(const Tensor<T, N>&, const Tensor<T, N>&, const std::string& = "mean");
-    
-    /// @brief Cross entropy loss for multi-class classification
-    template<typename T, size_t N>
-    Tensor<T, 1> cross_entropy_loss(const Tensor<T, N>&, const Tensor<T, N>&, const std::string& = "mean");
-    
-    /// @brief Binary cross entropy loss for binary classification
-    template<typename T, size_t N>
-    Tensor<T, 1> binary_cross_entropy(const Tensor<T, N>&, const Tensor<T, N>&, const std::string& = "mean");
-    
-    /// @brief L1 loss (Mean Absolute Error)
-    template<typename T, size_t N>
-    Tensor<T, 1> l1_loss(const Tensor<T, N>&, const Tensor<T, N>&, const std::string& = "mean");
-    
-    /// @brief Smooth L1 loss (Huber loss)
-    template<typename T, size_t N>
-    Tensor<T, 1> smooth_l1_loss(const Tensor<T, N>&, const Tensor<T, N>&, T = T(1), const std::string& = "mean");
-}
+
+/// @brief Mean squared error loss
+template<typename T, size_t N>
+Tensor<T, N> mse_loss(const Tensor<T, N>&, const Tensor<T, N>&, const std::string& = "mean");
+
+/// @brief Cross entropy loss for multi-class classification
+template<typename T, size_t N>
+Tensor<T, 1> cross_entropy_loss(const Tensor<T, N>&, const Tensor<T, N>&, const std::string& = "mean");
+
+/// @brief Binary cross entropy loss for binary classification
+template<typename T, size_t N>
+Tensor<T, 1> binary_cross_entropy(const Tensor<T, N>&, const Tensor<T, N>&, const std::string& = "mean");
+
+/// @brief L1 loss (Mean Absolute Error)
+template<typename T, size_t N>
+Tensor<T, 1> l1_loss(const Tensor<T, N>&, const Tensor<T, N>&, const std::string& = "mean");
+
+/// @brief Smooth L1 loss (Huber loss)
+template<typename T, size_t N>
+Tensor<T, 1> smooth_l1_loss(const Tensor<T, N>&, const Tensor<T, N>&, T = T(1), const std::string& = "mean");
 
 // Forward declarations for broadcasting functions
 template <typename T, size_t N, size_t M>
@@ -228,46 +225,7 @@ template <typename T>
 Tensor<T, 2> rightCols(const Tensor<T, 2>& matrix, size_t n);
 
 /**
- * @class Tensor
  * @brief Multi-dimensional array with GPU, BLAS, and autograd support
- * @tparam T Data type (float, double, int, etc.)
- * @tparam N Number of dimensions
- * 
- * A powerful tensor class supporting:
- * - Arbitrary dimensions (compile-time fixed)
- * - GPU acceleration (CUDA)
- * - Optimized BLAS operations
- * - Automatic differentiation (autograd)
- * - Element-wise operations with broadcasting
- * - Mathematical functions (exp, log, sin, etc.)
- * - Statistical operations (mean, variance, correlation)
- * - Linear algebra operations
- * - Tensor views and slicing
- * 
- * @section memory Memory Layout
- * Data is stored in row-major order in a flat array. Strides are computed
- * automatically to enable efficient multi-dimensional indexing.
- * 
- * @section autograd Automatic Differentiation
- * When `requires_grad` is true, the tensor participates in gradient computation.
- * Operations build a computational graph that can be traversed via backward().
- * 
- * @section example Example Usage
- * @code
- * // Create a 2x3 matrix
- * Tensor<float, 2> A({2, 3});
- * A.fill(1.0f);
- * 
- * // Element-wise operations
- * auto B = A + 2.0f;
- * auto C = A * B;
- * 
- * // With autograd
- * Tensor<float, 1> x({10}, true, true);  // GPU=true, requires_grad=true
- * auto y = x.exp().sum();
- * y.backward();
- * auto gradients = x.grad();  // Get computed gradients
- * @endcode
  */
 template <typename T, size_t N>
 class Tensor {
@@ -664,21 +622,21 @@ public:
     template<typename U, size_t M>
     friend class RMSprop;
     
-    // Forward declare loss namespace functions as friends
+    // Forward declare loss functions as friends
     template<typename U, size_t M>
-    friend Tensor<U, M> loss::mse_loss(const Tensor<U, M>&, const Tensor<U, M>&, const std::string&);
+    friend Tensor<U, M> mse_loss(const Tensor<U, M>&, const Tensor<U, M>&, const std::string&);
     
     template<typename U, size_t M>
-    friend Tensor<U, 1> loss::cross_entropy_loss(const Tensor<U, M>&, const Tensor<U, M>&, const std::string&);
+    friend Tensor<U, 1> cross_entropy_loss(const Tensor<U, M>&, const Tensor<U, M>&, const std::string&);
     
     template<typename U, size_t M>
-    friend Tensor<U, 1> loss::binary_cross_entropy(const Tensor<U, M>&, const Tensor<U, M>&, const std::string&);
+    friend Tensor<U, 1> binary_cross_entropy(const Tensor<U, M>&, const Tensor<U, M>&, const std::string&);
     
     template<typename U, size_t M>
-    friend Tensor<U, 1> loss::l1_loss(const Tensor<U, M>&, const Tensor<U, M>&, const std::string&);
+    friend Tensor<U, 1> l1_loss(const Tensor<U, M>&, const Tensor<U, M>&, const std::string&);
     
     template<typename U, size_t M>
-    friend Tensor<U, 1> loss::smooth_l1_loss(const Tensor<U, M>&, const Tensor<U, M>&, U, const std::string&);
+    friend Tensor<U, 1> smooth_l1_loss(const Tensor<U, M>&, const Tensor<U, M>&, U, const std::string&);
     
     // ============================================
     // Autograd Methods
@@ -2028,7 +1986,7 @@ public:
      * auto probs = logits.sigmoid();  // Convert to probabilities in (0, 1)
      * 
      * // With autograd:
-     * auto loss = loss::binary_cross_entropy(probs, targets);
+     * auto loss = binary_cross_entropy(probs, targets);
      * loss.backward();  // Computes gradient through sigmoid
      * 
      * // Gating mechanism (like in LSTM)
@@ -2122,7 +2080,7 @@ public:
      * auto output = layer2.matmul(W3) + b3;
      * 
      * // With autograd:
-     * auto loss = loss::mse_loss(output, target);
+     * auto loss = mse_loss(output, target);
      * loss.backward();  // Gradients flow through ReLU layers
      * @endcode
      */
@@ -3676,7 +3634,7 @@ public:
      * auto output = h2 + b2;
      * 
      * // Compute gradients:
-     * auto loss = loss::mse_loss(output, targets);
+     * auto loss = mse_loss(output, targets);
      * loss.backward();
      * // Now W1.grad(), W2.grad(), etc. contain gradients
      * @endcode
@@ -4012,7 +3970,7 @@ public:
      * // Each row now sums to 1.0 and represents class probabilities
      * 
      * // With loss computation:
-     * auto loss = loss::cross_entropy_loss(logits, targets);
+     * auto loss = cross_entropy_loss(logits, targets);
      * loss.backward();  // Gradient flows through softmax
      * 
      * // Attention mechanism example:
@@ -6830,26 +6788,6 @@ Tensor<T, 1> logspace(T start, T stop, size_t num = 50, T base = T(10),
 }
 
 /**
- * @brief Create an identity matrix (NumPy eye-compatible)
- * @tparam T The data type
- * @param n Size of the square matrix
- * @param use_gpu Whether to use GPU
- * @return An n×n identity matrix
- */
-template <typename T>
-Tensor<T, 2> eye(size_t n, bool use_gpu = true) {
-    Tensor<T, 2> result({n, n}, use_gpu);
-    result.fill(T(0));
-    T* data = result.data_ptr();
-    
-    for (size_t i = 0; i < n; ++i) {
-        data[i * n + i] = T(1);
-    }
-    
-    return result;
-}
-
-/**
  * @brief Reshape a tensor (returns variant for error handling)
  * @tparam T The data type
  * @tparam N Original number of dimensions
@@ -7292,16 +7230,10 @@ Tensor<T, 1> col(const Tensor<T, 2>& matrix, size_t col_idx) {
 }
 
 /**
- * @brief Extract the diagonal of a 2D tensor
+ * @brief Extract diagonal elements from a 2D tensor
  * @tparam T Data type
  * @param matrix 2D tensor
  * @return 1D tensor containing diagonal elements
- * 
- * For non-square matrices, extracts min(rows, cols) diagonal elements.
- * @code
- * Tensor<float, 2> mat({3, 3});
- * auto diagonal = mat.diag();
- * @endcode
  */
 template <typename T>
 Tensor<T, 1> diag(const Tensor<T, 2>& matrix) {
@@ -7327,14 +7259,9 @@ Tensor<T, 1> diag(const Tensor<T, 2>& matrix) {
  * @tparam T Data type
  * @param vec 1D tensor containing diagonal values
  * @return 2D square matrix with vec on diagonal, zeros elsewhere
- * 
- * @code
- * Tensor<float, 1> vec({3});
- * auto mat = diag_matrix(vec);  // Creates 3x3 diagonal matrix
- * @endcode
  */
 template <typename T>
-Tensor<T, 2> diag_matrix(const Tensor<T, 1>& vec) {
+Tensor<T, 2> diag(const Tensor<T, 1>& vec) {
     size_t n = vec.dims()[0];
     Tensor<T, 2> result({n, n}, vec.uses_gpu());
     result.fill(T(0));

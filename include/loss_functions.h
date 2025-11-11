@@ -15,7 +15,6 @@
  */
 
 namespace tensor {
-namespace loss {
 
 /**
  * @brief Mean Squared Error (MSE) Loss
@@ -40,7 +39,7 @@ namespace loss {
  * Tensor<float, 2> targets({32, 10});
  * 
  * // Compute MSE loss
- * auto loss = loss::mse_loss(predictions, targets, "mean");
+ * auto loss = mse_loss(predictions, targets, "mean");
  * 
  * // Backward pass
  * loss.backward();
@@ -49,8 +48,8 @@ namespace loss {
  * // Gradient: d/dx[(x-y)^2] = 2(x-y)/n
  * 
  * // Different reduction modes:
- * auto loss_sum = loss::mse_loss(pred, target, "sum");     // No averaging
- * auto loss_none = loss::mse_loss(pred, target, "none");   // Element-wise
+ * auto loss_sum = mse_loss(pred, target, "sum");     // No averaging
+ * auto loss_none = mse_loss(pred, target, "none");   // Element-wise
  * @endcode
  */
 template<typename T, size_t N>
@@ -409,7 +408,6 @@ Tensor<T, 1> smooth_l1_loss(const Tensor<T, N>& predictions,
     return loss;
 }
 
-} // namespace loss
 } // namespace tensor
 
 #endif // LOSS_FUNCTIONS_H

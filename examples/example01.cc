@@ -33,6 +33,17 @@
 // using namespace tensor4d;
 
 int main() {
+    // Check backend
+    std::cout << "Active backend: " << backend_name(get_active_backend()) << std::endl;
+    
+    bool use_gpu = is_gpu_available();
+    if (use_gpu) {
+        std::cout << "GPU acceleration: ENABLED" << std::endl;
+    } else {
+        std::cout << "GPU acceleration: NOT AVAILABLE" << std::endl;
+    }
+    std::cout << std::endl;
+    
     // TODO: There should a more idiomatic way to do this to create and
     // fill matrices.
     //
@@ -50,9 +61,9 @@ int main() {
     // Alternatively, use scalar multiplication:
     //
     //   auto B = ones<float, 2>({3, 3}) * 2.0f;
-    auto A = ones<float, 2>({3, 3});
+    auto A = ones<float, 2>({3, 3}, use_gpu);
     // auto B = Matrixf({3, 3});
-    auto B = Tensor<float, 2>({3, 3});
+    auto B = Tensor<float, 2>({3, 3}, use_gpu);
     B.fill(2.0f);
     // Add them together
     auto C_var = A + B;

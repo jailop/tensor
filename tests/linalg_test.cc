@@ -3,7 +3,6 @@
 #include <cmath>
 
 using namespace tensor;
-using namespace linalg;
 
 TEST(LinalgTest, VectorNorm) {
     Vector<float> v({3});
@@ -11,7 +10,7 @@ TEST(LinalgTest, VectorNorm) {
     v[{1}] = 4.0f;
     v[{2}] = 0.0f;
     
-    float norm_val = linalg::norm(v);
+    float norm_val = norm(v);
     EXPECT_NEAR(norm_val, 5.0f, 1e-5);
 }
 
@@ -26,7 +25,7 @@ TEST(LinalgTest, VectorDot) {
     b[{1}] = 5.0f;
     b[{2}] = 6.0f;
     
-    float dot_product = linalg::dot(a, b);
+    float dot_product = tensor::dot(a, b);
     EXPECT_NEAR(dot_product, 32.0f, 1e-5);
 }
 
@@ -40,7 +39,7 @@ TEST(LinalgTest, MatrixVectorMultiplication) {
     vec[{1}] = 2.0f;
     vec[{2}] = 3.0f;
     
-    auto result = linalg::matvec(mat, vec);
+    auto result = tensor::matvec(mat, vec);
     EXPECT_NEAR((result[{0}]), 14.0f, 1e-5);
     EXPECT_NEAR((result[{1}]), 32.0f, 1e-5);
 }
@@ -55,7 +54,7 @@ TEST(LinalgTest, MatrixMatrixMultiplication) {
     b[{1, 0}] = 9.0f;  b[{1, 1}] = 10.0f;
     b[{2, 0}] = 11.0f; b[{2, 1}] = 12.0f;
     
-    auto result = linalg::matmul(a, b);
+    auto result = tensor::matmul(a, b);
     EXPECT_NEAR((result[{0, 0}]), 58.0f, 1e-5);
     EXPECT_NEAR((result[{0, 1}]), 64.0f, 1e-5);
     EXPECT_NEAR((result[{1, 0}]), 139.0f, 1e-5);
@@ -67,13 +66,13 @@ TEST(LinalgTest, MatrixTranspose) {
     mat[{0, 0}] = 1.0f; mat[{0, 1}] = 2.0f; mat[{0, 2}] = 3.0f;
     mat[{1, 0}] = 4.0f; mat[{1, 1}] = 5.0f; mat[{1, 2}] = 6.0f;
     
-    auto result = linalg::transpose(mat);
+    auto result = tensor::transpose(mat);
     EXPECT_NEAR((result[{0, 0}]), 1.0f, 1e-5);
     EXPECT_NEAR((result[{1, 1}]), 5.0f, 1e-5);
 }
 
 TEST(LinalgTest, IdentityMatrix) {
-    auto eye_mat = linalg::eye<float>(3);
+    auto eye_mat = tensor::eye<float>(3);
     EXPECT_NEAR((eye_mat[{0, 0}]), 1.0f, 1e-5);
     EXPECT_NEAR((eye_mat[{1, 1}]), 1.0f, 1e-5);
     EXPECT_NEAR((eye_mat[{0, 1}]), 0.0f, 1e-5);
@@ -138,7 +137,7 @@ TEST(LinalgTest, MatrixTrace) {
     mat[{1, 0}] = 4.0f; mat[{1, 1}] = 5.0f; mat[{1, 2}] = 6.0f;
     mat[{2, 0}] = 7.0f; mat[{2, 1}] = 8.0f; mat[{2, 2}] = 9.0f;
     
-    float trace_val = linalg::trace(mat);
+    float trace_val = tensor::trace(mat);
     EXPECT_NEAR(trace_val, 15.0f, 1e-5); // 1 + 5 + 9
 }
 
@@ -148,7 +147,7 @@ TEST(LinalgTest, MatrixDiagonal) {
     mat[{1, 0}] = 4.0f; mat[{1, 1}] = 5.0f; mat[{1, 2}] = 6.0f;
     mat[{2, 0}] = 7.0f; mat[{2, 1}] = 8.0f; mat[{2, 2}] = 9.0f;
     
-    auto diag_vec = linalg::diag(mat);
+    auto diag_vec = tensor::diag(mat);
     EXPECT_NEAR((diag_vec[{0}]), 1.0f, 1e-5);
     EXPECT_NEAR((diag_vec[{1}]), 5.0f, 1e-5);
     EXPECT_NEAR((diag_vec[{2}]), 9.0f, 1e-5);
@@ -160,7 +159,7 @@ TEST(LinalgTest, DiagonalMatrixFromVector) {
     vec[{1}] = 3.0f;
     vec[{2}] = 4.0f;
     
-    auto diag_mat = linalg::diag(vec);
+    auto diag_mat = tensor::diag(vec);
     EXPECT_NEAR((diag_mat[{0, 0}]), 2.0f, 1e-5);
     EXPECT_NEAR((diag_mat[{1, 1}]), 3.0f, 1e-5);
     EXPECT_NEAR((diag_mat[{2, 2}]), 4.0f, 1e-5);
@@ -172,7 +171,7 @@ TEST(LinalgTest, FrobeniusNorm) {
     mat[{0, 0}] = 1.0f; mat[{0, 1}] = 2.0f;
     mat[{1, 0}] = 3.0f; mat[{1, 1}] = 4.0f;
     
-    float norm_val = linalg::frobenius_norm(mat);
+    float norm_val = tensor::frobenius_norm(mat);
     float expected = std::sqrt(1.0f + 4.0f + 9.0f + 16.0f); // sqrt(30)
     EXPECT_NEAR(norm_val, expected, 1e-5);
 }
@@ -182,7 +181,7 @@ TEST(LinalgTest, L1Norm) {
     mat[{0, 0}] = 1.0f; mat[{0, 1}] = -2.0f;
     mat[{1, 0}] = -3.0f; mat[{1, 1}] = 4.0f;
     
-    float norm_val = linalg::norm_l1(mat);
+    float norm_val = tensor::norm_l1(mat);
     EXPECT_NEAR(norm_val, 6.0f, 1e-5); // max(|1|+|-3|, |-2|+|4|) = max(4, 6) = 6
 }
 
@@ -191,7 +190,7 @@ TEST(LinalgTest, InfinityNorm) {
     mat[{0, 0}] = 1.0f; mat[{0, 1}] = -2.0f;
     mat[{1, 0}] = -3.0f; mat[{1, 1}] = 4.0f;
     
-    float norm_val = linalg::norm_inf(mat);
+    float norm_val = tensor::norm_inf(mat);
     EXPECT_NEAR(norm_val, 7.0f, 1e-5); // max(|1|+|-2|, |-3|+|4|) = max(3, 7) = 7
 }
 
@@ -201,7 +200,7 @@ TEST(LinalgTest, MatrixRank) {
     mat[{1, 0}] = 2.0f; mat[{1, 1}] = 4.0f; mat[{1, 2}] = 6.0f; // 2 * row 1
     mat[{2, 0}] = 0.0f; mat[{2, 1}] = 1.0f; mat[{2, 2}] = 2.0f;
     
-    size_t rank_val = linalg::rank(mat);
+    size_t rank_val = tensor::rank(mat);
     EXPECT_EQ(rank_val, 2); // Second row is dependent
 }
 
@@ -217,7 +216,7 @@ TEST(LinalgTest, LeastSquares) {
     b[{1}] = 3.0f;
     b[{2}] = 4.0f;
     
-    auto x = linalg::least_squares(A, b);
+    auto x = tensor::least_squares(A, b);
     
     // Verify solution by checking residual
     // x should be approximately [1, 1]

@@ -7,6 +7,8 @@
 #include "tensor.h"
 #include "tensor_io.h"
 
+using namespace tensor;
+
 int main() {
     std::cout << "=== Tensor I/O Operations Demo ===\n\n";
     

@@ -21,15 +21,14 @@ template <typename T>
 using Vector = Tensor<T, 1>;
 
 /**
- * @brief Type alias for 2D matrices
+ * @brief Type alias for 2D matrices  
  * @tparam T Data type (float, double, etc.)
  * 
  * A Matrix is simply a 2D Tensor, provided for clarity in linear algebra contexts.
+ * Note: For additional matrix-specific operations, see the Matrix<T> class in tensor_matrix.h
  */
 template <typename T>
 using Matrix = Tensor<T, 2>;
-
-namespace linalg {
 
 /**
  * @brief Compute the L2 norm (Euclidean norm) of a vector
@@ -297,44 +296,6 @@ T trace(const Matrix<T>& mat) {
         sum += mat[{i, i}];
     }
     return sum;
-}
-
-/**
- * Extract diagonal elements from a matrix.
- * @param mat Input matrix (m x n)
- * @return Vector of diagonal elements (length min(m,n))
- */
-template <typename T>
-Vector<T> diag(const Matrix<T>& mat) {
-    auto dims = mat.dims();
-    size_t m = dims[0];
-    size_t n = dims[1];
-    size_t k = std::min(m, n);
-    
-    Vector<T> result({k}, mat.uses_gpu());
-    for (size_t i = 0; i < k; ++i) {
-        result[{i}] = mat[{i, i}];
-    }
-    return result;
-}
-
-/**
- * Create diagonal matrix from vector.
- * @param vec Input vector of length n
- * @return Diagonal matrix of shape (n, n)
- */
-template <typename T>
-Matrix<T> diag(const Vector<T>& vec) {
-    auto dims = vec.dims();
-    size_t n = dims[0];
-    
-    Matrix<T> result({n, n}, vec.uses_gpu());
-    result.fill(T(0));
-    
-    for (size_t i = 0; i < n; ++i) {
-        result[{i, i}] = vec[{i}];
-    }
-    return result;
 }
 
 /**
@@ -615,8 +576,6 @@ Vector<T> least_squares(const Matrix<T>& A, const Vector<T>& b) {
     
     return x;
 }
-
-} // namespace linalg
 
 // ============================================
 // Tmensor View Operations

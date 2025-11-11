@@ -5,6 +5,8 @@
 #include <iostream>
 #include <iomanip>
 
+using namespace tensor;
+
 int main() {
     std::cout << "========================================\n";
     std::cout << "  GPU and BLAS Feature Demonstration\n";

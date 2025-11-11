@@ -20,8 +20,7 @@ template <typename T, size_t N>
 class Tensor;
 
 /**
- * @namespace tensor_ops
- * @brief Core tensor operations for neural networks
+ * Core tensor operations for neural networks
  * 
  * Provides high-level operations with:
  * - Automatic broadcasting
@@ -29,7 +28,6 @@ class Tensor;
  * - GPU and BLAS acceleration
  * - Numerical stability (e.g., for softmax)
  */
-namespace tensor_ops {
 
 /**
  * @brief Check if two tensor shapes are broadcastable
@@ -86,8 +84,6 @@ auto broadcast_shape(const TensorIndices<N1>& shape1, const TensorIndices<N2>& s
     
     return result;
 }
-
-} // namespace tensor_ops
 
 // Add these methods to Tensor class (will be inserted into tensor.h)
 

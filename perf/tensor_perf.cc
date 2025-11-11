@@ -594,7 +594,7 @@ void benchmark_loss_functions() {
         fill_random(targets);
         
         benchmark("MSE Loss (64x10)", "Loss_Functions", [&]() {
-            auto loss = loss::mse_loss(predictions, targets, "mean");
+            auto loss = mse_loss(predictions, targets, "mean");
             volatile float val = loss[{0, 0}];
             (void)val;
         }, ITERATIONS_FAST, batch_size * num_classes);
@@ -608,7 +608,7 @@ void benchmark_loss_functions() {
         fill_random(targets, 0.0f, 1.0f);
         
         benchmark("Cross Entropy Loss (64x10)", "Loss_Functions", [&]() {
-            auto loss = loss::cross_entropy_loss(logits, targets, "mean");
+            auto loss = cross_entropy_loss(logits, targets, "mean");
             volatile float val = loss[{0}];
             (void)val;
         }, ITERATIONS_FAST, batch_size * num_classes);
@@ -622,7 +622,7 @@ void benchmark_loss_functions() {
         fill_random(targets, 0.0f, 1.0f);
         
         benchmark("Binary Cross Entropy (64x1)", "Loss_Functions", [&]() {
-            auto loss = loss::binary_cross_entropy(predictions, targets, "mean");
+            auto loss = binary_cross_entropy(predictions, targets, "mean");
             volatile float val = loss[{0}];
             (void)val;
         }, ITERATIONS_FAST, batch_size);
@@ -636,7 +636,7 @@ void benchmark_loss_functions() {
         fill_random(targets);
         
         benchmark("L1 Loss (64x10)", "Loss_Functions", [&]() {
-            auto loss = loss::l1_loss(predictions, targets, "mean");
+            auto loss = l1_loss(predictions, targets, "mean");
             volatile float val = loss[{0}];
             (void)val;
         }, ITERATIONS_FAST, batch_size * num_classes);
@@ -650,7 +650,7 @@ void benchmark_loss_functions() {
         fill_random(targets);
         
         benchmark("Smooth L1 Loss (64x10)", "Loss_Functions", [&]() {
-            auto loss = loss::smooth_l1_loss(predictions, targets, 1.0f, "mean");
+            auto loss = smooth_l1_loss(predictions, targets, 1.0f, "mean");
             volatile float val = loss[{0}];
             (void)val;
         }, ITERATIONS_FAST, batch_size * num_classes);
@@ -1369,7 +1369,7 @@ void benchmark_linalg_vector_ops() {
             [&]() {
                 Vector<float> v({size}, false);
                 fill_random(v);
-                volatile float result = linalg::norm(v);
+                volatile float result = norm(v);
                 (void)result;
             }, ITERATIONS_FAST, size);
         
@@ -1382,7 +1382,7 @@ void benchmark_linalg_vector_ops() {
                 Vector<float> b({size}, false);
                 fill_random(a);
                 fill_random(b);
-                volatile float result = linalg::dot(a, b);
+                volatile float result = dot(a, b);
                 (void)result;
             }, ITERATIONS_FAST, size);
         
@@ -1396,7 +1396,7 @@ void benchmark_linalg_vector_ops() {
                     Vector<float> b({size}, false);
                     fill_random(a);
                     fill_random(b);
-                    auto result = linalg::outer(a, b);
+                    auto result = outer(a, b);
                 }, ITERATIONS_FAST, size * size);
         }
     }
@@ -1415,7 +1415,7 @@ void benchmark_linalg_matrix_ops() {
                 Vector<float> vec({size}, false);
                 fill_random(mat);
                 fill_random(vec);
-                auto result = linalg::matvec(mat, vec);
+                auto result = matvec(mat, vec);
             }, ITERATIONS_MEDIUM, size * size);
     }
     
@@ -1429,7 +1429,7 @@ void benchmark_linalg_matrix_ops() {
                 Matrix<float> b({size, size}, false);
                 fill_random(a);
                 fill_random(b);
-                auto result = linalg::matmul(a, b);
+                auto result = matmul(a, b);
             }, ITERATIONS_MEDIUM, size * size * size);
     }
     
@@ -1441,7 +1441,7 @@ void benchmark_linalg_matrix_ops() {
             [&]() {
                 Matrix<float> mat({size, size}, false);
                 fill_random(mat);
-                auto result = linalg::transpose(mat);
+                auto result = transpose(mat);
             }, ITERATIONS_FAST, size * size);
     }
 }
@@ -1506,7 +1506,7 @@ void benchmark_linalg_gpu() {
                 Matrix<float> b({size, size}, true);
                 fill_random(a);
                 fill_random(b);
-                auto result = linalg::matmul(a, b);
+                auto result = matmul(a, b);
             }, ITERATIONS_MEDIUM, size * size * size);
         
         // GPU vector dot
@@ -1518,7 +1518,7 @@ void benchmark_linalg_gpu() {
                 Vector<float> b({size * 10}, true);
                 fill_random(a);
                 fill_random(b);
-                volatile float result = linalg::dot(a, b);
+                volatile float result = dot(a, b);
                 (void)result;
             }, ITERATIONS_FAST, size * 10);
     }
@@ -1539,7 +1539,7 @@ void benchmark_linalg_blas() {
                 Matrix<float> b({size, size}, false);
                 fill_random(a);
                 fill_random(b);
-                auto result = linalg::matmul(a, b);
+                auto result = matmul(a, b);
             }, ITERATIONS_MEDIUM, size * size * size);
         
         // BLAS vector dot
@@ -1551,7 +1551,7 @@ void benchmark_linalg_blas() {
                 Vector<float> b({size * 100}, false);
                 fill_random(a);
                 fill_random(b);
-                volatile float result = linalg::dot(a, b);
+                volatile float result = dot(a, b);
                 (void)result;
             }, ITERATIONS_FAST, size * 100);
     }
