@@ -38,15 +38,6 @@ constexpr size_t IMAGE_PIXELS = IMAGE_SIZE * IMAGE_SIZE;  // 784
 constexpr size_t NUM_CLASSES = 10;
 
 /**
- * @brief Print system and backend information
- */
-void print_system_info() {
-    std::cout << "\n=== System Information ===" << std::endl;
-    std::cout << "Active Backend: " << backend_name(get_active_backend())
-              << std::endl;
-}
-
-/**
  * @brief Read 32-bit big-endian integer from file
  */
 int32_t read_int32(std::ifstream& file) {
@@ -140,49 +131,48 @@ public:
     }
     
     Tensor<float, 2> forward(const Tensor<float, 2>& input) {
-        auto h1 = fc1_.forward(input);
-        auto a1 = relu1_.forward(h1);
-        
-        auto h2 = fc2_.forward(a1);
-        auto a2 = relu2_.forward(h2);
-        
-        auto h3 = fc3_.forward(a2);
-        auto a3 = relu3_.forward(h3);
-        
-        auto h4 = fc4_.forward(a3);
-        auto output = softmax_.forward(h4);
-        return output;
+        auto x = input;
+        x = linear_relu_forward(fc1_, relu1_, x);
+        x = linear_relu_forward(fc2_, relu2_, x);
+        x = linear_relu_forward(fc3_, relu3_, x);
+        x = fc4_.forward(x);
+        return softmax_.forward(x);
     }
     
     void backward(const Tensor<float, 2>& grad_output) {
         auto grad = softmax_.backward(grad_output);
         grad = fc4_.backward(grad);
-        grad = relu3_.backward(grad);
-        grad = fc3_.backward(grad);
-        grad = relu2_.backward(grad);
-        grad = fc2_.backward(grad);
-        grad = relu1_.backward(grad);
-        grad = fc1_.backward(grad);
+        grad = relu_linear_backward(relu3_, fc3_, grad);
+        grad = relu_linear_backward(relu2_, fc2_, grad);
+        grad = relu_linear_backward(relu1_, fc1_, grad);
     }
     
     void update_weights(float lr) {
-        update_linear_layer(fc1_, lr);
-        update_linear_layer(fc2_, lr);
-        update_linear_layer(fc3_, lr);
-        update_linear_layer(fc4_, lr);
+        for (auto* layer : {&fc1_, &fc2_, &fc3_, &fc4_}) {
+            update_linear_layer(*layer, lr);
+        }
     }
     
     void train(bool mode = true) {
-        fc1_.train(mode);
-        fc2_.train(mode);
-        fc3_.train(mode);
-        fc4_.train(mode);
-        relu1_.train(mode);
-        relu2_.train(mode);
-        relu3_.train(mode);
+        for (auto* layer : {&fc1_, &fc2_, &fc3_, &fc4_}) {
+            layer->train(mode);
+        }
+        for (auto* relu : {&relu1_, &relu2_, &relu3_}) {
+            relu->train(mode);
+        }
     }
     
 private:
+    Tensor<float, 2> linear_relu_forward(Linear<float>& fc, ReLU<float>& relu, 
+                                         const Tensor<float, 2>& input) {
+        return relu.forward(fc.forward(input));
+    }
+    
+    Tensor<float, 2> relu_linear_backward(ReLU<float>& relu, Linear<float>& fc, 
+                                          const Tensor<float, 2>& grad) {
+        return fc.backward(relu.backward(grad));
+    }
+    
     Linear<float> fc1_;
     Linear<float> fc2_;
     Linear<float> fc3_;
@@ -195,9 +185,6 @@ private:
 
 int main(int argc, char* argv[]) {
     std::cout << "=== MNIST Digit Classification Demo ===" << std::endl;
-    
-    print_system_info();
-    
     std::string data_path = "data/mnist/";
     if (argc > 1) {
         data_path = argv[1];
@@ -209,14 +196,12 @@ int main(int argc, char* argv[]) {
     std::cout << "\n=== Loading Dataset ===" << std::endl;
     Tensor<float, 2> train_images({1, 1}); // Placeholder, will be reassigned
     std::vector<uint8_t> train_labels;
-    
     if (!load_mnist_images(data_path + "train-images-idx3-ubyte", train_images)) {
         return 1;
     }
     if (!load_mnist_labels(data_path + "train-labels-idx1-ubyte", train_labels)) {
         return 1;
     }
-    
     Tensor<float, 2> test_images({1, 1}); // Placeholder, will be reassigned
     std::vector<uint8_t> test_labels;
     
@@ -226,7 +211,6 @@ int main(int argc, char* argv[]) {
     if (!load_mnist_labels(data_path + "t10k-labels-idx1-ubyte", test_labels)) {
         return 1;
     }
-    
     std::cout << "\nDataset loaded successfully!" << std::endl;
     std::cout << "Training samples: " << train_images.dims()[0] << std::endl;
     std::cout << "Test samples: " << test_images.dims()[0] << std::endl;
@@ -377,6 +361,5 @@ int main(int argc, char* argv[]) {
     }
     
     std::cout << "\n=== Demo completed successfully ===" << std::endl;
-    
     return 0;
 }

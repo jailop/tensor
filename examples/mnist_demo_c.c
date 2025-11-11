@@ -34,30 +34,14 @@
  * 
  * Architecture: 784 -> 512 -> 256 -> 128 -> 10
  * Layers: Linear + ReLU (x3) + Linear + Softmax
+ * 
+ * Note: Layers internally cache activations/gradients needed for backpropagation,
+ * so we don't need to store them here.
  */
 typedef struct {
-    /* Layer handles */
-    LayerHandle fc1;      /* 784 -> 512 */
-    LayerHandle fc2;      /* 512 -> 256 */
-    LayerHandle fc3;      /* 256 -> 128 */
-    LayerHandle fc4;      /* 128 -> 10 */
-    LayerHandle relu1;
-    LayerHandle relu2;
-    LayerHandle relu3;
+    LayerHandle fc[4];      /* fc[0]=784->512, fc[1]=512->256, fc[2]=256->128, fc[3]=128->10 */
+    LayerHandle relu[3];    /* ReLU activations for first 3 layers */
     LayerHandle softmax;
-    
-    /* Cache for intermediate activations (forward pass) */
-    MatrixFloatHandle h1, a1;  /* First hidden layer */
-    MatrixFloatHandle h2, a2;  /* Second hidden layer */
-    MatrixFloatHandle h3, a3;  /* Third hidden layer */
-    MatrixFloatHandle h4;      /* Output logits */
-    MatrixFloatHandle predictions;  /* Softmax output */
-    
-    /* Cache for gradients (backward pass) */
-    MatrixFloatHandle grad_h4, grad_a3;
-    MatrixFloatHandle grad_h3, grad_a2;
-    MatrixFloatHandle grad_h2, grad_a1;
-    MatrixFloatHandle grad_h1, grad_input;
 } MNISTNetwork;
 
 /**
@@ -65,42 +49,15 @@ typedef struct {
  */
 void mnist_network_destroy(MNISTNetwork* net) {
     if (!net) return;
-    
-    /* Destroy layers */
-    if (net->fc1) layer_linear_destroy(net->fc1);
-    if (net->fc2) layer_linear_destroy(net->fc2);
-    if (net->fc3) layer_linear_destroy(net->fc3);
-    if (net->fc4) layer_linear_destroy(net->fc4);
-    if (net->relu1) layer_relu_destroy(net->relu1);
-    if (net->relu2) layer_relu_destroy(net->relu2);
-    if (net->relu3) layer_relu_destroy(net->relu3);
+    for (int i = 0; i < 4; i++) {
+        if (net->fc[i]) layer_linear_destroy(net->fc[i]);
+    }
+    for (int i = 0; i < 3; i++) {
+        if (net->relu[i]) layer_relu_destroy(net->relu[i]);
+    }
     if (net->softmax) layer_softmax_destroy(net->softmax);
-    
-    /* Destroy cached activations */
-    if (net->h1) matrix_float_destroy(net->h1);
-    if (net->a1) matrix_float_destroy(net->a1);
-    if (net->h2) matrix_float_destroy(net->h2);
-    if (net->a2) matrix_float_destroy(net->a2);
-    if (net->h3) matrix_float_destroy(net->h3);
-    if (net->a3) matrix_float_destroy(net->a3);
-    if (net->h4) matrix_float_destroy(net->h4);
-    if (net->predictions) matrix_float_destroy(net->predictions);
-    
-    /* Destroy cached gradients */
-    if (net->grad_h4) matrix_float_destroy(net->grad_h4);
-    if (net->grad_a3) matrix_float_destroy(net->grad_a3);
-    if (net->grad_h3) matrix_float_destroy(net->grad_h3);
-    if (net->grad_a2) matrix_float_destroy(net->grad_a2);
-    if (net->grad_h2) matrix_float_destroy(net->grad_h2);
-    if (net->grad_a1) matrix_float_destroy(net->grad_a1);
-    if (net->grad_h1) matrix_float_destroy(net->grad_h1);
-    if (net->grad_input) matrix_float_destroy(net->grad_input);
-    
-    /* Clear structure */
     memset(net, 0, sizeof(MNISTNetwork));
 }
-
-
 
 /**
  * @brief Create and initialize the MNIST network
@@ -108,72 +65,51 @@ void mnist_network_destroy(MNISTNetwork* net) {
 int mnist_network_create(MNISTNetwork* net) {
     if (!net) return 0;
     memset(net, 0, sizeof(MNISTNetwork));
-    if (layer_linear_create_float(IMAGE_PIXELS, 512, true, &net->fc1) != TENSOR_SUCCESS) {
-        fprintf(stderr, "Error creating fc1 layer\n");
-        return 0;
+    const size_t layer_sizes[5] = {IMAGE_PIXELS, 512, 256, 128, NUM_CLASSES};
+    for (int i = 0; i < 4; i++) {
+        if (layer_linear_create_float(layer_sizes[i], layer_sizes[i+1], true, &net->fc[i]) != TENSOR_SUCCESS) {
+            fprintf(stderr, "Error creating fc%d layer\n", i+1);
+            mnist_network_destroy(net);
+            return 0;
+        }
     }
-    if (layer_linear_create_float(512, 256, true, &net->fc2) != TENSOR_SUCCESS) {
-        fprintf(stderr, "Error creating fc2 layer\n");
-        mnist_network_destroy(net);
-        return 0;
+    for (int i = 0; i < 3; i++) {
+        if (layer_relu_create_float(&net->relu[i]) != TENSOR_SUCCESS) {
+            fprintf(stderr, "Error creating relu%d layer\n", i+1);
+            mnist_network_destroy(net);
+            return 0;
+        }
     }
-    if (layer_linear_create_float(256, 128, true, &net->fc3) != TENSOR_SUCCESS) {
-        fprintf(stderr, "Error creating fc3 layer\n");
-        mnist_network_destroy(net);
-        return 0;
-    }
-    if (layer_linear_create_float(128, NUM_CLASSES, true, &net->fc4) != TENSOR_SUCCESS) {
-        fprintf(stderr, "Error creating fc4 layer\n");
-        mnist_network_destroy(net);
-        return 0;
-    }
-    
-    if (layer_relu_create_float(&net->relu1) != TENSOR_SUCCESS ||
-        layer_relu_create_float(&net->relu2) != TENSOR_SUCCESS ||
-        layer_relu_create_float(&net->relu3) != TENSOR_SUCCESS) {
-        fprintf(stderr, "Error creating ReLU layers\n");
-        mnist_network_destroy(net);
-        return 0;
-    }
-    
     if (layer_softmax_create_float(&net->softmax) != TENSOR_SUCCESS) {
         fprintf(stderr, "Error creating softmax layer\n");
         mnist_network_destroy(net);
         return 0;
     }
-    
     return 1;
 }
 
 /**
  * @brief Forward pass through the network
+ * @param predictions Output parameter - caller must destroy this after use
  */
-int mnist_network_forward(MNISTNetwork* net, MatrixFloatHandle input) {
-    if (!net || !input) return 0;
-    
-    /* Clean up previous activations if they exist */
-    if (net->h1) matrix_float_destroy(net->h1);
-    if (net->a1) matrix_float_destroy(net->a1);
-    if (net->h2) matrix_float_destroy(net->h2);
-    if (net->a2) matrix_float_destroy(net->a2);
-    if (net->h3) matrix_float_destroy(net->h3);
-    if (net->a3) matrix_float_destroy(net->a3);
-    if (net->h4) matrix_float_destroy(net->h4);
-    if (net->predictions) matrix_float_destroy(net->predictions);
-    
-    /* Forward pass through network */
-    layer_linear_forward_float(net->fc1, input, &net->h1);
-    layer_relu_forward_float(net->relu1, net->h1, &net->a1);
-    
-    layer_linear_forward_float(net->fc2, net->a1, &net->h2);
-    layer_relu_forward_float(net->relu2, net->h2, &net->a2);
-    
-    layer_linear_forward_float(net->fc3, net->a2, &net->h3);
-    layer_relu_forward_float(net->relu3, net->h3, &net->a3);
-    
-    layer_linear_forward_float(net->fc4, net->a3, &net->h4);
-    layer_softmax_forward_float(net->softmax, net->h4, &net->predictions);
-    
+int mnist_network_forward(MNISTNetwork* net, MatrixFloatHandle input, MatrixFloatHandle* predictions) {
+    if (!net || !input || !predictions) return 0;
+    MatrixFloatHandle current = input;
+    /* Forward through first 3 Linear->ReLU layers */
+    for (int i = 0; i < 3; i++) {
+        MatrixFloatHandle h, a;
+        layer_linear_forward_float(net->fc[i], current, &h);
+        layer_relu_forward_float(net->relu[i], h, &a);
+        matrix_float_destroy(h);
+        if (i > 0) matrix_float_destroy(current);  /* Clean up previous activation (but not input) */
+        current = a;
+    }
+    /* Final linear and softmax */
+    MatrixFloatHandle h;
+    layer_linear_forward_float(net->fc[3], current, &h);
+    layer_softmax_forward_float(net->softmax, h, predictions);
+    matrix_float_destroy(h);
+    matrix_float_destroy(current);  /* Clean up last activation */
     return 1;
 }
 
@@ -182,27 +118,22 @@ int mnist_network_forward(MNISTNetwork* net, MatrixFloatHandle input) {
  */
 int mnist_network_backward(MNISTNetwork* net, MatrixFloatHandle grad_output) {
     if (!net || !grad_output) return 0;
-    
-    /* Clean up previous gradients if they exist */
-    if (net->grad_h4) matrix_float_destroy(net->grad_h4);
-    if (net->grad_a3) matrix_float_destroy(net->grad_a3);
-    if (net->grad_h3) matrix_float_destroy(net->grad_h3);
-    if (net->grad_a2) matrix_float_destroy(net->grad_a2);
-    if (net->grad_h2) matrix_float_destroy(net->grad_h2);
-    if (net->grad_a1) matrix_float_destroy(net->grad_a1);
-    if (net->grad_h1) matrix_float_destroy(net->grad_h1);
-    if (net->grad_input) matrix_float_destroy(net->grad_input);
-    
-    /* Backward pass through network */
-    layer_softmax_backward_float(net->softmax, grad_output, &net->grad_h4);
-    layer_linear_backward_float(net->fc4, net->grad_h4, &net->grad_a3);
-    layer_relu_backward_float(net->relu3, net->grad_a3, &net->grad_h3);
-    layer_linear_backward_float(net->fc3, net->grad_h3, &net->grad_a2);
-    layer_relu_backward_float(net->relu2, net->grad_a2, &net->grad_h2);
-    layer_linear_backward_float(net->fc2, net->grad_h2, &net->grad_a1);
-    layer_relu_backward_float(net->relu1, net->grad_a1, &net->grad_h1);
-    layer_linear_backward_float(net->fc1, net->grad_h1, &net->grad_input);
-    
+    /* Backward through softmax and final linear */
+    MatrixFloatHandle grad;
+    layer_softmax_backward_float(net->softmax, grad_output, &grad);
+    MatrixFloatHandle grad_prev = grad;
+    layer_linear_backward_float(net->fc[3], grad_prev, &grad);
+    matrix_float_destroy(grad_prev);
+    /* Backward through ReLU->Linear layers in reverse */
+    for (int i = 2; i >= 0; i--) {
+        grad_prev = grad;
+        layer_relu_backward_float(net->relu[i], grad_prev, &grad);
+        matrix_float_destroy(grad_prev);
+        grad_prev = grad;
+        layer_linear_backward_float(net->fc[i], grad_prev, &grad);
+        matrix_float_destroy(grad_prev);
+    }
+    matrix_float_destroy(grad);  /* Clean up final gradient */
     return 1;
 }
 
@@ -211,11 +142,9 @@ int mnist_network_backward(MNISTNetwork* net, MatrixFloatHandle grad_output) {
  */
 void mnist_network_update_weights(MNISTNetwork* net, float learning_rate) {
     if (!net) return;
-    
-    layer_linear_update_weights_float(net->fc1, learning_rate);
-    layer_linear_update_weights_float(net->fc2, learning_rate);
-    layer_linear_update_weights_float(net->fc3, learning_rate);
-    layer_linear_update_weights_float(net->fc4, learning_rate);
+    for (int i = 0; i < 4; i++) {
+        layer_linear_update_weights_float(net->fc[i], learning_rate);
+    }
 }
 
 
@@ -329,11 +258,9 @@ void label_to_onehot(uint8_t label, MatrixFloatHandle onehot, size_t batch_idx) 
 int main(int argc, char* argv[]) {
     printf("=== MNIST Digit Classification Demo (C API) ===\n");
     printf("Using tensor_c.h C interface\n\n");
-    
     /* Determine data path */
     const char* data_path = (argc > 1) ? argv[1] : "data/mnist/";
     printf("Data path: %s\n", data_path);
-    
     /* Build full file paths */
     char train_images_path[256], train_labels_path[256];
     char test_images_path[256], test_labels_path[256];
@@ -341,7 +268,6 @@ int main(int argc, char* argv[]) {
     snprintf(train_labels_path, sizeof(train_labels_path), "%strain-labels-idx1-ubyte", data_path);
     snprintf(test_images_path, sizeof(test_images_path), "%st10k-images-idx3-ubyte", data_path);
     snprintf(test_labels_path, sizeof(test_labels_path), "%st10k-labels-idx1-ubyte", data_path);
-    
     /* Load training data directly into tensors */
     MatrixFloatHandle train_images_tensor = NULL;
     uint8_t* train_labels = NULL;
@@ -356,7 +282,6 @@ int main(int argc, char* argv[]) {
         return 1;
     }
     
-    /* Load test data directly into tensors */
     MatrixFloatHandle test_images_tensor = NULL;
     uint8_t* test_labels = NULL;
     size_t num_test_images, num_test_labels;
@@ -378,7 +303,6 @@ int main(int argc, char* argv[]) {
     printf("Training samples: %zu\n", num_train_images);
     printf("Test samples: %zu\n", num_test_images);
     
-    /* Create neural network */
     MNISTNetwork net;
     if (!mnist_network_create(&net)) {
         fprintf(stderr, "Failed to create network\n");
@@ -412,15 +336,16 @@ int main(int argc, char* argv[]) {
                 label_to_onehot(train_labels[idx], batch_targets, i);
             }
             
-            mnist_network_forward(&net, batch_input);
+            MatrixFloatHandle predictions;
+            mnist_network_forward(&net, batch_input, &predictions);
             float loss;
-            matrix_float_cross_entropy_loss(net.predictions, batch_targets, &loss);
+            matrix_float_cross_entropy_loss(predictions, batch_targets, &loss);
             float acc;
-            matrix_float_compute_accuracy(net.predictions, &train_labels[start_idx], BATCH_SIZE, &acc);
+            matrix_float_compute_accuracy(predictions, &train_labels[start_idx], BATCH_SIZE, &acc);
             epoch_loss += loss;
             epoch_accuracy += acc;
             MatrixFloatHandle grad_output;
-            matrix_float_subtract(net.predictions, batch_targets, &grad_output);
+            matrix_float_subtract(predictions, batch_targets, &grad_output);
             size_t rows, cols;
             matrix_float_shape(grad_output, &rows, &cols);
             const float* diff_ptr;
@@ -439,7 +364,7 @@ int main(int argc, char* argv[]) {
                 
                 /* Check gradient magnitude using direct pointer access */
                 MatrixFloatHandle grad_w;
-                layer_linear_get_grad_weights_float(net.fc4, &grad_w);
+                layer_linear_get_grad_weights_float(net.fc[3], &grad_w);
                 size_t g_rows, g_cols;
                 matrix_float_shape(grad_w, &g_rows, &g_cols);
                 
@@ -458,7 +383,7 @@ int main(int argc, char* argv[]) {
                 
                 /* Check predictions stats using direct pointer access */
                 const float* pred_ptr;
-                matrix_float_data(net.predictions, &pred_ptr);
+                matrix_float_data(predictions, &pred_ptr);
                 
                 float pred_sum = 0.0f;
                 size_t pred_total = rows * cols;
@@ -471,6 +396,7 @@ int main(int argc, char* argv[]) {
             }
             
             /* Clean up temporary tensors */
+            matrix_float_destroy(predictions);
             matrix_float_destroy(batch_input);
             matrix_float_destroy(batch_targets);
             matrix_float_destroy(grad_output);
@@ -505,13 +431,13 @@ int main(int argc, char* argv[]) {
         
         /* Check early stopping conditions */
         if (epoch_accuracy >= TARGET_ACCURACY) {
-            printf("🎉 Target accuracy %.2f%% reached! Stopping training.\n", 
+            printf("Target accuracy %.2f%% reached! Stopping training.\n", 
                    TARGET_ACCURACY * 100);
             break;
         }
         
         if (epochs_without_improvement >= PATIENCE) {
-            printf("⏹️  No improvement for %d epochs. Early stopping.\n", PATIENCE);
+            printf("No improvement for %d epochs. Early stopping.\n", PATIENCE);
             break;
         }
     }
@@ -535,13 +461,15 @@ int main(int argc, char* argv[]) {
                               0, IMAGE_PIXELS, &batch_input);
         
         /* Forward pass through network */
-        mnist_network_forward(&net, batch_input);
+        MatrixFloatHandle predictions;
+        mnist_network_forward(&net, batch_input, &predictions);
         
         float acc;
-        matrix_float_compute_accuracy(net.predictions, &test_labels[start_idx], test_batch_size, &acc);
+        matrix_float_compute_accuracy(predictions, &test_labels[start_idx], test_batch_size, &acc);
         test_accuracy += acc;
         
         /* Clean up */
+        matrix_float_destroy(predictions);
         matrix_float_destroy(batch_input);
     }
     
@@ -556,18 +484,20 @@ int main(int argc, char* argv[]) {
         matrix_float_submatrix(test_images_tensor, i, i + 1, 0, IMAGE_PIXELS, &sample_input);
         
         /* Forward pass */
-        mnist_network_forward(&net, sample_input);
+        MatrixFloatHandle predictions;
+        mnist_network_forward(&net, sample_input, &predictions);
         
         /* Use direct API for argmax */
         size_t pred_class;
-        matrix_float_argmax_rows(net.predictions, &pred_class, 1);
+        matrix_float_argmax_rows(predictions, &pred_class, 1);
         
         float max_val;
-        matrix_float_get(net.predictions, 0, pred_class, &max_val);
+        matrix_float_get(predictions, 0, pred_class, &max_val);
         
         printf("Image %zu: True label = %d, Predicted = %zu, Confidence = %.2f%%\n",
                i, test_labels[i], pred_class, max_val * 100);
         
+        matrix_float_destroy(predictions);
         matrix_float_destroy(sample_input);
     }
     
