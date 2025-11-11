@@ -4,7 +4,7 @@
 //
 // To compile this program, use the following command:
 //
-// g++ -o test test.cc -std=c++20 -ltensor4d -ltbb
+// g++ -o example01 example01.cc -std=c++20 -ltensor4d -ltbb
 //
 // TODO: how to compile with gpu support?
 //
@@ -20,13 +20,17 @@
 //
 // The library automatically selects: GPU > BLAS > CPU based on
 // availability.
+//
+// TODO: This simple program is leaking memory when it is evaluated with
+// valgrind or valdring is not capable of tracking it properly?
+// TODO: Add a namespace for Tensor
 
-#include <tensor4d/tensor.h>
-#include <tensor4d/tensor_types.h>
+// #include <tensor4d/tensor.h>
+// #include <tensor4d/tensor_types.h>
 #include <tensor4d/tensor_io.h>
-#include <iostream>
+// #include <iostream>
 
-using namespace tensor4d;
+// using namespace tensor4d;
 
 int main() {
     // TODO: There should a more idiomatic way to do this to create and
@@ -47,7 +51,8 @@ int main() {
     //
     //   auto B = ones<float, 2>({3, 3}) * 2.0f;
     auto A = ones<float, 2>({3, 3});
-    auto B = Matrixf({3, 3});
+    // auto B = Matrixf({3, 3});
+    auto B = Tensor<float, 2>({3, 3});
     B.fill(2.0f);
     // Add them together
     auto C_var = A + B;
@@ -63,12 +68,14 @@ int main() {
     //   3. Monadic style: result.and_then([](auto& t) { /* use t */ });
     //   4. Pattern: if (auto* tensor = std::get_if<Matrixf>(&C_var)) { /* use tensor */ }
     // Current pattern is explicit and safe, but verbose for simple cases.
+    // TODO: It is really needed to have result values instead of throwing
+    // exceptions?
     if (std::holds_alternative<TensorError>(C_var)) {
         std::cerr << "Error!" << std::endl;
         return 1;
     }
     // Extract result
-    auto C = std::get<Matrixf>(C_var);
+    auto C = std::get<Tensor<float, 2>>(C_var);
     // Print the result
     std::cout << "A + B = " << std::endl;
     // TODO: the printing interface is ugly
