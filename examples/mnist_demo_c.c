@@ -317,6 +317,12 @@ int main(int argc, char* argv[]) {
     float epoch_loss = 0.0f;
     float epoch_accuracy = 0.0f;
     
+    /* Allocate all reusable tensors once to avoid repeated GPU allocations/deallocations */
+    MatrixFloatHandle batch_targets, predictions, grad_output;
+    matrix_float_zeros(BATCH_SIZE, NUM_CLASSES, &batch_targets);
+    matrix_float_zeros(BATCH_SIZE, NUM_CLASSES, &predictions);
+    matrix_float_zeros(BATCH_SIZE, NUM_CLASSES, &grad_output);
+    
     for (epoch = 0; epoch < MAX_EPOCHS; ++epoch) {
         epoch_loss = 0.0f;
         epoch_accuracy = 0.0f;
@@ -324,19 +330,19 @@ int main(int argc, char* argv[]) {
         for (size_t batch = 0; batch < num_batches; ++batch) {
             size_t start_idx = batch * BATCH_SIZE;
             
-            /* Prepare batch */
-            MatrixFloatHandle batch_input, batch_targets;
+            /* Prepare batch - submatrix creates a lightweight view */
+            MatrixFloatHandle batch_input;
             matrix_float_submatrix(train_images_tensor, start_idx, start_idx + BATCH_SIZE, 
                                   0, IMAGE_PIXELS, &batch_input);
-            matrix_float_zeros(BATCH_SIZE, NUM_CLASSES, &batch_targets);
             
-            /* Fill one-hot targets */
+            /* Reset and fill one-hot targets (reusing tensor) */
+            matrix_float_fill(batch_targets, 0.0f);
             for (size_t i = 0; i < BATCH_SIZE; ++i) {
                 size_t idx = start_idx + i;
                 label_to_onehot(train_labels[idx], batch_targets, i);
             }
             
-            MatrixFloatHandle predictions;
+            /* Forward pass - reuse predictions tensor */
             mnist_network_forward(&net, batch_input, &predictions);
             float loss;
             matrix_float_cross_entropy_loss(predictions, batch_targets, &loss);
@@ -344,7 +350,8 @@ int main(int argc, char* argv[]) {
             matrix_float_compute_accuracy(predictions, &train_labels[start_idx], BATCH_SIZE, &acc);
             epoch_loss += loss;
             epoch_accuracy += acc;
-            MatrixFloatHandle grad_output;
+            
+            /* Compute gradient - reuse grad_output tensor */
             matrix_float_subtract(predictions, batch_targets, &grad_output);
             size_t rows, cols;
             matrix_float_shape(grad_output, &rows, &cols);
@@ -395,11 +402,8 @@ int main(int argc, char* argv[]) {
                 printf("=====================================\n\n");
             }
             
-            /* Clean up temporary tensors */
-            matrix_float_destroy(predictions);
+            /* Clean up batch_input view only (reusable tensors kept) */
             matrix_float_destroy(batch_input);
-            matrix_float_destroy(batch_targets);
-            matrix_float_destroy(grad_output);
             
             /* Print progress every 100 batches */
             if ((batch + 1) % 100 == 0) {
@@ -445,6 +449,11 @@ int main(int argc, char* argv[]) {
     printf("\n=== Training Complete ===\n");
     printf("Final training accuracy: %.2f%%\n", epoch_accuracy * 100);
     printf("Total epochs: %zu\n\n", epoch + 1);
+    
+    /* Clean up reusable training tensors */
+    matrix_float_destroy(batch_targets);
+    matrix_float_destroy(predictions);
+    matrix_float_destroy(grad_output);
     
     /* Evaluation on test set */
     printf("=== Evaluating on Test Set ===\n");

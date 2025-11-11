@@ -233,6 +233,12 @@ int main(int argc, char* argv[]) {
     float epoch_loss = 0.0f;
     float epoch_accuracy = 0.0f;
     
+    // Allocate all tensors once to avoid repeated GPU allocations/deallocations
+    Tensor<float, 2> batch_input({batch_size, IMAGE_PIXELS});
+    Tensor<float, 2> batch_targets({batch_size, NUM_CLASSES});
+    Tensor<float, 2> predictions({batch_size, NUM_CLASSES});
+    Tensor<float, 2> grad_output({batch_size, NUM_CLASSES});
+    
     for (epoch = 0; epoch < max_epochs; ++epoch) {
         epoch_loss = 0.0f;
         epoch_accuracy = 0.0f;
@@ -240,27 +246,27 @@ int main(int argc, char* argv[]) {
         for (size_t batch = 0; batch < num_batches; ++batch) {
             size_t start_idx = batch * batch_size;
             
-            Tensor<float, 2> batch_input({batch_size, IMAGE_PIXELS});
-            Tensor<float, 2> batch_targets({batch_size, NUM_CLASSES});
+            // Copy input data into reusable tensor
             
             const float* src = train_images.data_ptr() + start_idx * IMAGE_PIXELS;
             float* dst = batch_input.data_ptr();
             std::copy_n(src, batch_size * IMAGE_PIXELS, dst);
             
+            // Reset and fill one-hot targets (reusing tensor)
+            batch_targets.fill(0.0f);
             for (size_t i = 0; i < batch_size; ++i) {
                 size_t idx = start_idx + i;
                 label_to_onehot(train_labels[idx], batch_targets, i, NUM_CLASSES);
             }
             
-            // Forward pass - predictions tensor is reused
+            // Forward pass - reuse predictions tensor
             predictions = net.forward(batch_input);
             float loss = cross_entropy_loss(predictions, batch_targets);
             float acc = compute_accuracy(predictions, train_labels, start_idx);
             epoch_loss += loss;
             epoch_accuracy += acc;
 
-            // Compute gradient: grad_output = (predictions - targets) / batch_size
-            // Reuse grad_output tensor
+            // Compute gradient - reuse grad_output tensor
             auto grad_diff_var = predictions - batch_targets;
             auto grad_diff = std::get<Tensor<float, 2>>(grad_diff_var);
             grad_output = grad_diff / static_cast<float>(batch_size);
