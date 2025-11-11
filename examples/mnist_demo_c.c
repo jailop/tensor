@@ -146,6 +146,17 @@ int mnist_network_create(MNISTNetwork* net) {
 }
 
 /**
+ * @brief Helper function for linear + relu forward pass
+ */
+static void forward_linear_relu(LayerHandle fc_layer, LayerHandle relu_layer,
+                                MatrixFloatHandle input, 
+                                MatrixFloatHandle* linear_out,
+                                MatrixFloatHandle* relu_out) {
+    layer_linear_forward_float(fc_layer, input, linear_out);
+    layer_relu_forward_float(relu_layer, *linear_out, relu_out);
+}
+
+/**
  * @brief Forward pass through the network
  */
 int mnist_network_forward(MNISTNetwork* net, MatrixFloatHandle input) {
@@ -161,20 +172,27 @@ int mnist_network_forward(MNISTNetwork* net, MatrixFloatHandle input) {
     if (net->h4) matrix_float_destroy(net->h4);
     if (net->predictions) matrix_float_destroy(net->predictions);
     
-    /* Forward pass through network */
-    layer_linear_forward_float(net->fc1, input, &net->h1);
-    layer_relu_forward_float(net->relu1, net->h1, &net->a1);
+    /* Forward pass through network: three linear+relu blocks */
+    forward_linear_relu(net->fc1, net->relu1, input, &net->h1, &net->a1);
+    forward_linear_relu(net->fc2, net->relu2, net->a1, &net->h2, &net->a2);
+    forward_linear_relu(net->fc3, net->relu3, net->a2, &net->h3, &net->a3);
     
-    layer_linear_forward_float(net->fc2, net->a1, &net->h2);
-    layer_relu_forward_float(net->relu2, net->h2, &net->a2);
-    
-    layer_linear_forward_float(net->fc3, net->a2, &net->h3);
-    layer_relu_forward_float(net->relu3, net->h3, &net->a3);
-    
+    /* Final linear + softmax */
     layer_linear_forward_float(net->fc4, net->a3, &net->h4);
     layer_softmax_forward_float(net->softmax, net->h4, &net->predictions);
     
     return 1;
+}
+
+/**
+ * @brief Helper function for relu + linear backward pass (reverse order)
+ */
+static void backward_relu_linear(LayerHandle relu_layer, LayerHandle fc_layer,
+                                 MatrixFloatHandle grad_input,
+                                 MatrixFloatHandle* grad_linear,
+                                 MatrixFloatHandle* grad_output) {
+    layer_relu_backward_float(relu_layer, grad_input, grad_linear);
+    layer_linear_backward_float(fc_layer, *grad_linear, grad_output);
 }
 
 /**
@@ -193,15 +211,14 @@ int mnist_network_backward(MNISTNetwork* net, MatrixFloatHandle grad_output) {
     if (net->grad_h1) matrix_float_destroy(net->grad_h1);
     if (net->grad_input) matrix_float_destroy(net->grad_input);
     
-    /* Backward pass through network */
+    /* Backward pass through network: softmax + final linear first */
     layer_softmax_backward_float(net->softmax, grad_output, &net->grad_h4);
     layer_linear_backward_float(net->fc4, net->grad_h4, &net->grad_a3);
-    layer_relu_backward_float(net->relu3, net->grad_a3, &net->grad_h3);
-    layer_linear_backward_float(net->fc3, net->grad_h3, &net->grad_a2);
-    layer_relu_backward_float(net->relu2, net->grad_a2, &net->grad_h2);
-    layer_linear_backward_float(net->fc2, net->grad_h2, &net->grad_a1);
-    layer_relu_backward_float(net->relu1, net->grad_a1, &net->grad_h1);
-    layer_linear_backward_float(net->fc1, net->grad_h1, &net->grad_input);
+    
+    /* Three relu+linear backward blocks */
+    backward_relu_linear(net->relu3, net->fc3, net->grad_a3, &net->grad_h3, &net->grad_a2);
+    backward_relu_linear(net->relu2, net->fc2, net->grad_a2, &net->grad_h2, &net->grad_a1);
+    backward_relu_linear(net->relu1, net->fc1, net->grad_a1, &net->grad_h1, &net->grad_input);
     
     return 1;
 }
