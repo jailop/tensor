@@ -1,58 +1,9 @@
 /**
- * @file tensor.h
  * @brief Multi-dimensional tensor library with GPU, BLAS, and autograd support
- * 
- * This header provides a comprehensive tensor library for scientific computing and machine learning.
- * It features:
- * - Multi-dimensional tensor operations with arbitrary dimensions
- * - GPU acceleration via CUDA (when USE_GPU is defined)
- * - Optimized CPU operations via BLAS (when USE_BLAS is defined)
- * - Automatic differentiation (autograd) for gradient computation
- * - Mathematical function mapping (exp, log, sin, cos, etc.)
- * - Statistical operations (mean, variance, correlation, etc.)
- * - Broadcasting for element-wise operations
- * - Tensor views and slicing for memory-efficient operations
- * 
- * @section backend Backend Selection
- * The library automatically selects the best available backend at runtime:
- * 1. **GPU (CUDA)**: Used by default if compiled with USE_GPU, GPU is available, and use_gpu=true
- * 2. **BLAS**: Used if GPU is not available but compiled with USE_BLAS
- * 3. **CPU**: Fallback implementation when neither GPU nor BLAS is available
- * 
- * You can check the active backend using:
- * @code
- * auto backend = get_active_backend();  // Returns Backend::GPU, Backend::BLAS, or Backend::CPU
- * if (is_gpu_available()) {
- *     // GPU operations are available
- * }
- * @endcode
- * 
  * @author Jaime Lopez
  * @version 1.0
  * @date 2025
- * 
- * @section usage_tensor Usage Example
- * @code
- * // Create a 2D tensor (matrix) - automatically uses GPU if available
- * Tensor<float, 2> matrix({3, 4});
- * matrix.fill(1.0f);
- * 
- * // Check which backend is being used
- * std::cout << "Using: " << backend_name(matrix.backend()) << std::endl;
- * 
- * // Enable gradient tracking
- * Tensor<float, 2> x({2, 2}, true, true);  // use_gpu=true, requires_grad=true
- * auto y = x * x;
- * y.backward();
- * @endcode
- * 
- * @section features Key Features
- * - **Type-safe**: Template-based compile-time dimension checking
- * - **High-performance**: Optimized with BLAS and GPU support
- * - **Autograd**: Automatic gradient computation for deep learning
- * - **Flexible**: Support for views, slicing, and broadcasting
- * - **Smart backend selection**: Automatically uses GPU → BLAS → CPU
- */
+  */
 
 #ifndef _TENSOR_H
 #define _TENSOR_H
@@ -76,59 +27,11 @@
 #include "tensor_perf.h"
 #include "tensor_blas.h"
 #include "tensor_error.h"
-
 #ifdef USE_GPU
-// Forward declarations for CUDA functions (implementation in tensor_gpu.cu)
-extern "C" {
-void* cuda_malloc_wrapper(size_t bytes);
-void cuda_free_wrapper(void* ptr);
-void cuda_memcpy_h2d_wrapper(void* dst, const void* src, size_t bytes);
-void cuda_memcpy_d2h_wrapper(void* dst, const void* src, size_t bytes);
-void cuda_memcpy_d2d_wrapper(void* dst, const void* src, size_t bytes);
-}
 #include "tensor_gpu.cuh"
 #endif
 
-#ifdef USE_CUBLAS
-#include <cublas_v2.h>
-
-namespace tensor4d {
-namespace detail {
-
-/// @brief Singleton class for managing cuBLAS handle
-class CublasHandle {
-private:
-    inline static cublasHandle_t handle_ = nullptr;
-    inline static bool initialized_ = false;
-    
-public:
-    /// @brief Get the global cuBLAS handle (creates it if needed)
-    static cublasHandle_t get() {
-        if (!initialized_) {
-            cublasStatus_t status = cublasCreate(&handle_);
-            if (status != CUBLAS_STATUS_SUCCESS) {
-                throw std::runtime_error("Failed to create cuBLAS handle");
-            }
-            // Use host pointers for alpha/beta parameters
-            cublasSetPointerMode(handle_, CUBLAS_POINTER_MODE_HOST);
-            initialized_ = true;
-        }
-        return handle_;
-    }
-    
-    /// @brief Clean up cuBLAS handle
-    static void cleanup() {
-        if (initialized_) {
-            cublasDestroy(handle_);
-            handle_ = nullptr;
-            initialized_ = false;
-        }
-    }
-};
-
-}  // namespace detail
-}  // namespace tensor4d
-#endif
+namespace tensor {
 
 /**
  * @enum Backend
@@ -166,7 +69,7 @@ inline std::string backend_name(Backend backend) {
  */
 inline Backend get_active_backend() {
 #ifdef USE_GPU
-    if (TensorGPU::is_gpu_available()) {
+    if (is_gpu_available()) {
         return Backend::GPU;
     }
 #endif
@@ -182,7 +85,7 @@ inline Backend get_active_backend() {
  */
 inline bool is_gpu_available() {
 #ifdef USE_GPU
-    return TensorGPU::is_gpu_available();
+    return is_gpu_available();
 #else
     return false;
 #endif
@@ -540,7 +443,7 @@ public:
         }
         data_ = std::make_unique<T[]>(total);
 #ifdef USE_GPU
-        use_gpu_ = use_gpu && TensorGPU::is_gpu_available();
+        use_gpu_ = use_gpu && is_gpu_available();
         d_data_ = nullptr;
         data_on_gpu_ = false;
         gpu_needs_sync_ = false;
@@ -695,7 +598,7 @@ public:
 #ifdef USE_GPU
         if (use_gpu_ && data_on_gpu_ && gpu_data()) {
             // Fill directly on GPU
-            TensorGPU::fill_gpu_direct(gpu_data(), value, total_size());
+            fill_gpu_direct(gpu_data(), value, total_size());
             data_on_gpu_ = true;   // GPU data is now authoritative
             gpu_needs_sync_ = false;
         } else {
@@ -953,7 +856,7 @@ public:
                 ensure_on_gpu();
                 other.ensure_on_gpu();
                 result.ensure_on_gpu();
-                TensorGPU::add_gpu_direct(d_data_, other.d_data_, result.d_data_, total);
+                add_gpu_direct(d_data_, other.d_data_, result.d_data_, total);
                 result.mark_gpu_modified();
             } else
 #endif
@@ -1118,7 +1021,7 @@ public:
 #ifdef USE_GPU
         if (use_gpu_) {
             ensure_on_cpu();  // Sync from GPU before scalar operations
-            TensorGPU::add_scalar_gpu(data_.get(), scalar, result.data_.get(), total);
+            add_scalar_gpu(data_.get(), scalar, result.data_.get(), total);
         } else
 #endif
         {
@@ -1170,7 +1073,7 @@ public:
         size_t total = total_size();
 #ifdef USE_GPU
         if (use_gpu_ && other.use_gpu_) {
-            TensorGPU::add_gpu(data_.get(), other.data_.get(), data_.get(), total);
+            add_gpu(data_.get(), other.data_.get(), data_.get(), total);
         } else
 #endif
         {
@@ -1191,7 +1094,7 @@ public:
         size_t total = total_size();
 #ifdef USE_GPU
         if (use_gpu_) {
-            TensorGPU::add_scalar_gpu(data_.get(), scalar, data_.get(), total);
+            add_scalar_gpu(data_.get(), scalar, data_.get(), total);
         } else
 #endif
         {
@@ -1219,7 +1122,7 @@ public:
                 ensure_on_gpu();
                 other.ensure_on_gpu();
                 result.ensure_on_gpu();
-                TensorGPU::sub_gpu_direct(d_data_, other.d_data_, result.d_data_, total);
+                sub_gpu_direct(d_data_, other.d_data_, result.d_data_, total);
                 result.mark_gpu_modified();
             } else
 #endif
@@ -1289,7 +1192,7 @@ public:
         
 #ifdef USE_GPU
         if (use_gpu_) {
-            TensorGPU::sub_scalar_gpu(data_.get(), scalar, result.data_.get(), total);
+            sub_scalar_gpu(data_.get(), scalar, result.data_.get(), total);
         } else
 #endif
         {
@@ -1315,7 +1218,7 @@ public:
         size_t total = total_size();
 #ifdef USE_GPU
         if (use_gpu_ && other.use_gpu_) {
-            TensorGPU::sub_gpu(data_.get(), other.data_.get(), data_.get(), total);
+            sub_gpu(data_.get(), other.data_.get(), data_.get(), total);
         } else
 #endif
         {
@@ -1336,7 +1239,7 @@ public:
         size_t total = total_size();
 #ifdef USE_GPU
         if (use_gpu_) {
-            TensorGPU::sub_scalar_gpu(data_.get(), scalar, data_.get(), total);
+            sub_scalar_gpu(data_.get(), scalar, data_.get(), total);
         } else
 #endif
         {
@@ -1367,7 +1270,7 @@ public:
                 ensure_on_gpu();
                 other.ensure_on_gpu();
                 result.ensure_on_gpu();
-                TensorGPU::mul_gpu_direct(d_data_, other.d_data_, result.d_data_, total);
+                mul_gpu_direct(d_data_, other.d_data_, result.d_data_, total);
                 result.mark_gpu_modified();
             } else
 #endif
@@ -1494,7 +1397,7 @@ public:
 #ifdef USE_GPU
         if (use_gpu_) {
             ensure_on_cpu();  // Sync from GPU before scalar operations
-            TensorGPU::mul_scalar_gpu(data_.get(), scalar, result.data_.get(), total);
+            mul_scalar_gpu(data_.get(), scalar, result.data_.get(), total);
         } else
 #endif
         {
@@ -1546,7 +1449,7 @@ public:
         size_t total = total_size();
 #ifdef USE_GPU
         if (use_gpu_ && other.use_gpu_) {
-            TensorGPU::mul_gpu(data_.get(), other.data_.get(), data_.get(), total);
+            mul_gpu(data_.get(), other.data_.get(), data_.get(), total);
         } else
 #endif
         {
@@ -1567,7 +1470,7 @@ public:
         size_t total = total_size();
 #ifdef USE_GPU
         if (use_gpu_) {
-            TensorGPU::mul_scalar_gpu(data_.get(), scalar, data_.get(), total);
+            mul_scalar_gpu(data_.get(), scalar, data_.get(), total);
         } else
 #endif
         {
@@ -1595,7 +1498,7 @@ public:
                 ensure_on_gpu();
                 other.ensure_on_gpu();
                 result.ensure_on_gpu();
-                TensorGPU::div_gpu_direct(d_data_, other.d_data_, result.d_data_, total);
+                div_gpu_direct(d_data_, other.d_data_, result.d_data_, total);
                 result.mark_gpu_modified();
             } else
 #endif
@@ -1665,7 +1568,7 @@ public:
         
 #ifdef USE_GPU
         if (use_gpu_) {
-            TensorGPU::div_scalar_gpu(data_.get(), scalar, result.data_.get(), total);
+            div_scalar_gpu(data_.get(), scalar, result.data_.get(), total);
         } else
 #endif
         {
@@ -1691,7 +1594,7 @@ public:
         size_t total = total_size();
 #ifdef USE_GPU
         if (use_gpu_ && other.use_gpu_) {
-            TensorGPU::div_gpu(data_.get(), other.data_.get(), data_.get(), total);
+            div_gpu(data_.get(), other.data_.get(), data_.get(), total);
         } else
 #endif
         {
@@ -1712,7 +1615,7 @@ public:
         size_t total = total_size();
 #ifdef USE_GPU
         if (use_gpu_) {
-            TensorGPU::div_scalar_gpu(data_.get(), scalar, data_.get(), total);
+            div_scalar_gpu(data_.get(), scalar, data_.get(), total);
         } else
 #endif
         {
@@ -1853,7 +1756,7 @@ public:
         if (use_gpu_) {
                 ensure_on_gpu();
                 result.ensure_on_gpu();
-                TensorGPU::exp_gpu_direct(d_data_, result.d_data_, total);
+                exp_gpu_direct(d_data_, result.d_data_, total);
                 result.mark_gpu_modified();
         } else
 #endif
@@ -1893,7 +1796,7 @@ public:
         if (use_gpu_) {
                 ensure_on_gpu();
                 result.ensure_on_gpu();
-                TensorGPU::log_gpu_direct(d_data_, result.d_data_, total);
+                log_gpu_direct(d_data_, result.d_data_, total);
                 result.mark_gpu_modified();
         } else
 #endif
@@ -1934,7 +1837,7 @@ public:
         if (use_gpu_) {
                 ensure_on_gpu();
                 result.ensure_on_gpu();
-                TensorGPU::sqrt_gpu_direct(d_data_, result.d_data_, total);
+                sqrt_gpu_direct(d_data_, result.d_data_, total);
                 result.mark_gpu_modified();
         } else
 #endif
@@ -1981,7 +1884,7 @@ public:
         if (use_gpu_) {
                 ensure_on_gpu();
                 result.ensure_on_gpu();
-                TensorGPU::pow_gpu_direct(d_data_, exponent, result.d_data_, total);
+                pow_gpu_direct(d_data_, exponent, result.d_data_, total);
                 result.mark_gpu_modified();
         } else
 #endif
@@ -2014,7 +1917,7 @@ public:
         if (use_gpu_) {
                 ensure_on_gpu();
                 result.ensure_on_gpu();
-                TensorGPU::sin_gpu_direct(d_data_, result.d_data_, total);
+                sin_gpu_direct(d_data_, result.d_data_, total);
                 result.mark_gpu_modified();
         } else
 #endif
@@ -2039,7 +1942,7 @@ public:
         if (use_gpu_) {
                 ensure_on_gpu();
                 result.ensure_on_gpu();
-                TensorGPU::cos_gpu_direct(d_data_, result.d_data_, total);
+                cos_gpu_direct(d_data_, result.d_data_, total);
                 result.mark_gpu_modified();
         } else
 #endif
@@ -2093,7 +1996,7 @@ public:
         if (use_gpu_) {
                 ensure_on_gpu();
                 result.ensure_on_gpu();
-                TensorGPU::tanh_gpu_direct(d_data_, result.d_data_, total);
+                tanh_gpu_direct(d_data_, result.d_data_, total);
                 result.mark_gpu_modified();
         } else
 #endif
@@ -2141,7 +2044,7 @@ public:
         if (use_gpu_) {
                 ensure_on_gpu();
                 result.ensure_on_gpu();
-                TensorGPU::sigmoid_gpu_direct(d_data_, result.d_data_, total);
+                sigmoid_gpu_direct(d_data_, result.d_data_, total);
                 result.mark_gpu_modified();
         } else
 #endif
@@ -2232,7 +2135,7 @@ public:
         if (use_gpu_) {
                 ensure_on_gpu();
                 result.ensure_on_gpu();
-                TensorGPU::relu_gpu_direct(d_data_, result.d_data_, total);
+                relu_gpu_direct(d_data_, result.d_data_, total);
                 result.mark_gpu_modified();
         } else
 #endif
@@ -3280,7 +3183,7 @@ public:
     template <size_t M>
     auto broadcast_to(const TensorIndices<M>& target_shape) const
         -> std::variant<Tensor<T, M>, TensorError> {
-        return ::broadcast_to(*this, target_shape);
+        return tensor::broadcast_to(*this, target_shape);
     }
     
     /**
@@ -3524,7 +3427,7 @@ public:
         
 #ifdef USE_GPU
         if (use_gpu_ && other.use_gpu_) {
-            TensorGPU::dot_1d_gpu(data_.get(), other.data_.get(), &result, dims_[0]);
+            dot_1d_gpu(data_.get(), other.data_.get(), &result, dims_[0]);
             return result;
         }
 #endif
@@ -3565,7 +3468,7 @@ public:
         
 #ifdef USE_GPU
         if (use_gpu_ && other.use_gpu_) {
-            TensorGPU::dot_2d_gpu(data_.get(), other.data_.get(), result.data_.get(), m, n, p);
+            dot_2d_gpu(data_.get(), other.data_.get(), result.data_.get(), m, n, p);
             return result;
         }
 #endif
@@ -3646,7 +3549,7 @@ public:
         
 #ifdef USE_GPU
         if (use_gpu_ && other.use_gpu_) {
-            TensorGPU::dot_nd_gpu(data_.get(), other.data_.get(), result.data_.get(),
+            dot_nd_gpu(data_.get(), other.data_.get(), result.data_.get(),
                                   outer_size, contract_dim, inner_size);
             return result;
         }
@@ -3719,7 +3622,7 @@ public:
         
 #ifdef USE_GPU
         if (use_gpu_ && other.use_gpu_) {
-            TensorGPU::cross_3d_gpu(data_.get(), other.data_.get(), result.data_.get());
+            cross_3d_gpu(data_.get(), other.data_.get(), result.data_.get());
             return result;
         }
 #endif
@@ -3812,7 +3715,7 @@ public:
             T alpha = T(1);
             T beta = T(0);
             
-            cublasHandle_t handle = tensor4d::detail::CublasHandle::get();
+            cublasHandle_t handle = CublasHandle::get();
             cublasStatus_t status;
             
             if constexpr (std::is_same_v<T, float>) {
@@ -4964,7 +4867,7 @@ public:
         
 #ifdef USE_GPU
         if (use_gpu_ && (std::is_same_v<T, float> || std::is_same_v<T, double>)) {
-            TensorGPU::reduce_sum_axis_gpu(data_.get(), result.data_ptr(),
+            reduce_sum_axis_gpu(data_.get(), result.data_ptr(),
                                            outer, axis_size, inner);
         } else
 #endif
@@ -5015,7 +4918,7 @@ public:
                 
 #ifdef USE_GPU
                 if (self_ptr->use_gpu_ && (std::is_same_v<T, float> || std::is_same_v<T, double>)) {
-                    TensorGPU::broadcast_add_axis_gpu(grad.data_ptr(), self_ptr->grad_->data_ptr(),
+                    broadcast_add_axis_gpu(grad.data_ptr(), self_ptr->grad_->data_ptr(),
                                                       outer, axis_size, inner);
                 } else
 #endif
@@ -5061,7 +4964,7 @@ public:
         
 #ifdef USE_GPU
         if (result.use_gpu_) {
-            TensorGPU::div_scalar_gpu(result.data_ptr(), divisor, result.data_ptr(), total);
+            div_scalar_gpu(result.data_ptr(), divisor, result.data_ptr(), total);
             return result;
         }
 #endif
@@ -5490,11 +5393,6 @@ public:
      * Similar to repeat() but with slightly different semantics matching NumPy's tile.
      * @param reps Number of repetitions along each dimension
      * @return A new tensor with tiled data
-     * 
-     * @code
-     * Tensor<float, 2> A({2, 3});
-     * auto B = A.tile({2, 2});  // Tile 2x in each dimension -> {4, 6}
-     * @endcode
      */
     Tensor<T, N> tile(const TensorIndices<N>& reps) const {
         return repeat(reps);
@@ -5511,7 +5409,7 @@ public:
      */
     template<size_t M = N, typename = std::enable_if_t<M == 2>>
     Tensor<T, 1> row(size_t row_idx) const {
-        return ::row(*static_cast<const Tensor<T, 2>*>(static_cast<const void*>(this)), row_idx);
+        return tensor::row(*static_cast<const Tensor<T, 2>*>(static_cast<const void*>(this)), row_idx);
     }
     
     /**
@@ -5521,7 +5419,7 @@ public:
      */
     template<size_t M = N, typename = std::enable_if_t<M == 2>>
     Tensor<T, 1> col(size_t col_idx) const {
-        return ::col(*static_cast<const Tensor<T, 2>*>(static_cast<const void*>(this)), col_idx);
+        return tensor::col(*static_cast<const Tensor<T, 2>*>(static_cast<const void*>(this)), col_idx);
     }
     
     /**
@@ -5530,7 +5428,7 @@ public:
      */
     template<size_t M = N, typename = std::enable_if_t<M == 2>>
     Tensor<T, 1> diag() const {
-        return ::diag(*static_cast<const Tensor<T, 2>*>(static_cast<const void*>(this)));
+        return tensor::diag(*static_cast<const Tensor<T, 2>*>(static_cast<const void*>(this)));
     }
     
     /**
@@ -5543,7 +5441,7 @@ public:
      */
     template<size_t M = N, typename = std::enable_if_t<M == 2>>
     Tensor<T, 2> block(size_t start_row, size_t start_col, size_t num_rows, size_t num_cols) const {
-        return ::block(*static_cast<const Tensor<T, 2>*>(static_cast<const void*>(this)), 
+        return tensor::block(*static_cast<const Tensor<T, 2>*>(static_cast<const void*>(this)), 
                        start_row, start_col, num_rows, num_cols);
     }
     
@@ -5554,7 +5452,7 @@ public:
      */
     template<size_t M = N, typename = std::enable_if_t<M == 1>>
     Tensor<T, 1> head(size_t n) const {
-        return ::head(*static_cast<const Tensor<T, 1>*>(static_cast<const void*>(this)), n);
+        return tensor::head(*static_cast<const Tensor<T, 1>*>(static_cast<const void*>(this)), n);
     }
     
     /**
@@ -5564,7 +5462,7 @@ public:
      */
     template<size_t M = N, typename = std::enable_if_t<M == 1>>
     Tensor<T, 1> tail(size_t n) const {
-        return ::tail(*static_cast<const Tensor<T, 1>*>(static_cast<const void*>(this)), n);
+        return tensor::tail(*static_cast<const Tensor<T, 1>*>(static_cast<const void*>(this)), n);
     }
     
     /**
@@ -5574,7 +5472,7 @@ public:
      */
     template<size_t M = N, typename = std::enable_if_t<M == 2>>
     Tensor<T, 2> topRows(size_t n) const {
-        return ::topRows(*static_cast<const Tensor<T, 2>*>(static_cast<const void*>(this)), n);
+        return tensor::topRows(*static_cast<const Tensor<T, 2>*>(static_cast<const void*>(this)), n);
     }
     
     /**
@@ -5584,7 +5482,7 @@ public:
      */
     template<size_t M = N, typename = std::enable_if_t<M == 2>>
     Tensor<T, 2> bottomRows(size_t n) const {
-        return ::bottomRows(*static_cast<const Tensor<T, 2>*>(static_cast<const void*>(this)), n);
+        return tensor::bottomRows(*static_cast<const Tensor<T, 2>*>(static_cast<const void*>(this)), n);
     }
     
     /**
@@ -5594,7 +5492,7 @@ public:
      */
     template<size_t M = N, typename = std::enable_if_t<M == 2>>
     Tensor<T, 2> leftCols(size_t n) const {
-        return ::leftCols(*static_cast<const Tensor<T, 2>*>(static_cast<const void*>(this)), n);
+        return tensor::leftCols(*static_cast<const Tensor<T, 2>*>(static_cast<const void*>(this)), n);
     }
     
     /**
@@ -5604,7 +5502,7 @@ public:
      */
     template<size_t M = N, typename = std::enable_if_t<M == 2>>
     Tensor<T, 2> rightCols(size_t n) const {
-        return ::rightCols(*static_cast<const Tensor<T, 2>*>(static_cast<const void*>(this)), n);
+        return tensor::rightCols(*static_cast<const Tensor<T, 2>*>(static_cast<const void*>(this)), n);
     }
     
     // ============================================
@@ -7647,4 +7545,5 @@ Tensor<T, 2> rightCols(const Tensor<T, 2>& matrix, size_t n) {
     return result;
 }
 
+} // namespace tensor
 #endif // _TENSOR_H

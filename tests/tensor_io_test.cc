@@ -10,6 +10,8 @@
 #include <fstream>
 #include <sstream>
 
+using namespace tensor;
+
 class TensorIOTest : public ::testing::Test {
 protected:
     void SetUp() override {

@@ -1,44 +1,8 @@
 /**
- * @file optimizers.h
- * @brief Optimization algorithms for training neural networks
- * 
  * Provides common optimizers for gradient-based optimization:
  * - SGD (Stochastic Gradient Descent) with momentum
  * - Adam (Adaptive Moment Estimation)
  * - RMSprop (Root Mean Square Propagation)
- * 
- * All optimizers support:
- * - Learning rate scheduling
- * - Weight decay (L2 regularization)
- * - Automatic gradient management
- * 
- * @section example_optimizers Usage Example
- * @code
- * #include "optimizers.h"
- * #include "loss_functions.h"
- * 
- * // Create parameters
- * Tensor<float, 2> weights({10, 5}, true, true);
- * Tensor<float, 1> bias({5}, true, true);
- * 
- * // Create optimizer
- * std::vector<Tensor<float, 2>*> params = {&weights};
- * SGD<float, 2> optimizer(params, 0.01f, 0.9f);  // lr=0.01, momentum=0.9
- * 
- * // Training loop
- * for (int epoch = 0; epoch < 100; ++epoch) {
- *     // Forward pass
- *     auto output = model(input);
- *     auto loss = loss::mse_loss(output, target);
- *     
- *     // Backward pass
- *     optimizer.zero_grad();
- *     loss.backward();
- *     
- *     // Update parameters
- *     optimizer.step();
- * }
- * @endcode
  */
 
 #ifndef OPTIMIZERS_H
@@ -47,6 +11,8 @@
 #include "tensor.h"
 #include <vector>
 #include <cmath>
+
+namespace tensor {
 
 /**
  * @class Optimizer
@@ -485,5 +451,7 @@ public:
         optimizer_->set_lr(initial_lr_);
     }
 };
+
+} // namespace tensor
 
 #endif // OPTIMIZERS_H

@@ -1,0 +1,4 @@
+0.2.0:
+
+- User guide cleanup
+- Using only one namespace: tensor (work in progress)

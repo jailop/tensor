@@ -2,6 +2,8 @@
 #include "linalg.h"
 #include <cmath>
 
+using namespace tensor;
+
 TEST(LinalgTest, VectorNorm) {
     Vector<float> v({3});
     v[{0}] = 3.0f;

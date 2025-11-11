@@ -20,8 +20,7 @@
 #include <cuda_runtime.h>
 #endif
 
-namespace tensor4d {
-namespace nn {
+namespace tensor {
 
 // Forward declarations
 template<typename T>
@@ -736,7 +735,6 @@ inline std::vector<Tensor<T, 2>> softmax_jacobian_batch(const Tensor<T, 2>& soft
     return jacobians;
 }
 
-} // namespace nn
-} // namespace tensor4d
+} // namespace tensor
 
 #endif // NN_LAYERS_H

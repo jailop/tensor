@@ -5,9 +5,6 @@
 #include <cmath>
 
 /**
- * @file loss_functions.h
- * @brief Loss functions for training neural networks
- * 
  * This header provides implementations of common loss functions
  * used in machine learning:
  * - MSE (Mean Squared Error) for regression
@@ -15,36 +12,9 @@
  * - Binary Cross Entropy for binary classification
  * - L1 Loss (MAE) for robust regression
  * - Smooth L1 Loss (Huber loss)
- * 
- * All loss functions:
- * - Support automatic differentiation
- * - Provide reduction options (mean, sum, none)
- * - Work with GPU and BLAS acceleration
- * 
- * @author Tensor Library Team
- * @version 1.0
- * @date 2024
- * 
- * @section usage_loss Usage Example
- * @code
- * Tensor<float, 2> predictions({10, 5}, true, true);
- * Tensor<float, 2> targets({10, 5});
- * 
- * // Compute loss with autograd
- * auto loss = loss::mse_loss(predictions, targets);
- * loss.backward();  // Compute gradients
- * @endcode
  */
 
-/**
- * @namespace loss
- * @brief Loss functions for neural network training
- * 
- * Provides differentiable loss functions with support for:
- * - Different reduction strategies (mean, sum, none)
- * - Automatic gradient computation
- * - Efficient GPU and BLAS implementations
- */
+namespace tensor {
 namespace loss {
 
 /**
@@ -440,5 +410,6 @@ Tensor<T, 1> smooth_l1_loss(const Tensor<T, N>& predictions,
 }
 
 } // namespace loss
+} // namespace tensor
 
 #endif // LOSS_FUNCTIONS_H
