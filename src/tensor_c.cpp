@@ -382,6 +382,26 @@ TensorErrorCode matrix_float_ones(size_t rows, size_t cols, MatrixFloatHandle* o
     TENSOR_TRY_END
 }
 
+TensorErrorCode matrix_float_fill(MatrixFloatHandle handle, float value) {
+    if (!handle) return TENSOR_ERROR_NULL_POINTER;
+    
+    TENSOR_TRY_BEGIN
+    auto* matrix = static_cast<Matrixf*>(handle);
+    matrix->fill(value);
+    return TENSOR_SUCCESS;
+    TENSOR_TRY_END
+}
+
+TensorErrorCode matrix_double_fill(MatrixDoubleHandle handle, double value) {
+    if (!handle) return TENSOR_ERROR_NULL_POINTER;
+    
+    TENSOR_TRY_BEGIN
+    auto* matrix = static_cast<Matrixd*>(handle);
+    matrix->fill(value);
+    return TENSOR_SUCCESS;
+    TENSOR_TRY_END
+}
+
 TensorErrorCode matrix_float_eye(size_t n, MatrixFloatHandle* out_handle) {
     if (!out_handle) return TENSOR_ERROR_NULL_POINTER;
     

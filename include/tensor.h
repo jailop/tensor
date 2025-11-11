@@ -692,10 +692,20 @@ public:
      * @endcode
      */
     void fill(const T& value) {
-        std::fill(data_.get(), data_.get() + total_size(), value);
 #ifdef USE_GPU
-        data_on_gpu_ = false;  // CPU data is now authoritative
-        gpu_needs_sync_ = false;
+        if (use_gpu_ && data_on_gpu_ && gpu_data()) {
+            // Fill directly on GPU
+            TensorGPU::fill_gpu_direct(gpu_data(), value, total_size());
+            data_on_gpu_ = true;   // GPU data is now authoritative
+            gpu_needs_sync_ = false;
+        } else {
+            // Fill on CPU
+            std::fill(data_.get(), data_.get() + total_size(), value);
+            data_on_gpu_ = false;  // CPU data is now authoritative
+            gpu_needs_sync_ = false;
+        }
+#else
+        std::fill(data_.get(), data_.get() + total_size(), value);
 #endif
     }
 

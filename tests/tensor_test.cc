@@ -3275,3 +3275,107 @@ TEST_F(TensorTest, HStack) {
     EXPECT_FLOAT_EQ((hstacked[{0, 0}]), 1.0f);
     EXPECT_FLOAT_EQ((hstacked[{0, 2}]), 2.0f);
 }
+
+// Tests for GPU-accelerated fill() functionality
+TEST_F(TensorTest, FillCPUTensor) {
+    TensorIndices<2> shape = {10, 10};
+    Tensor<float, 2> tensor(shape, false, false);  // CPU tensor
+    
+    tensor.fill(5.5f);
+    
+    // Verify all elements are filled
+    for (size_t i = 0; i < 10; ++i) {
+        for (size_t j = 0; j < 10; ++j) {
+            EXPECT_FLOAT_EQ((tensor[{i, j}]), 5.5f);
+        }
+    }
+}
+
+#ifdef USE_GPU
+TEST_F(TensorTest, FillGPUTensor) {
+    TensorIndices<2> shape = {10, 10};
+    Tensor<float, 2> tensor(shape, true, false);  // GPU tensor
+    
+    tensor.fill(7.7f);
+    
+    // Verify all elements are filled (triggers GPU->CPU sync)
+    for (size_t i = 0; i < 10; ++i) {
+        for (size_t j = 0; j < 10; ++j) {
+            EXPECT_FLOAT_EQ((tensor[{i, j}]), 7.7f);
+        }
+    }
+}
+
+TEST_F(TensorTest, FillGPUTensorLarge) {
+    TensorIndices<2> shape = {1000, 1000};
+    Tensor<float, 2> tensor(shape, true, false);  // GPU tensor
+    
+    tensor.fill(3.14f);
+    
+    // Spot check several elements
+    EXPECT_FLOAT_EQ((tensor[{0, 0}]), 3.14f);
+    EXPECT_FLOAT_EQ((tensor[{500, 500}]), 3.14f);
+    EXPECT_FLOAT_EQ((tensor[{999, 999}]), 3.14f);
+    EXPECT_FLOAT_EQ((tensor[{123, 456}]), 3.14f);
+}
+
+TEST_F(TensorTest, FillGPUTensorZero) {
+    TensorIndices<2> shape = {100, 50};
+    Tensor<double, 2> tensor(shape, true, false);  // GPU tensor, double precision
+    
+    // Set to non-zero first
+    tensor.fill(99.9);
+    
+    // Verify it's set
+    EXPECT_DOUBLE_EQ((tensor[{0, 0}]), 99.9);
+    
+    // Now fill with zero
+    tensor.fill(0.0);
+    
+    // Verify all zeros
+    EXPECT_DOUBLE_EQ((tensor[{0, 0}]), 0.0);
+    EXPECT_DOUBLE_EQ((tensor[{50, 25}]), 0.0);
+    EXPECT_DOUBLE_EQ((tensor[{99, 49}]), 0.0);
+}
+
+TEST_F(TensorTest, FillGPUTensorNegative) {
+    TensorIndices<1> shape = {1000};
+    Tensor<float, 1> tensor(shape, true, false);
+    
+    tensor.fill(-42.5f);
+    
+    // Check several elements
+    EXPECT_FLOAT_EQ((tensor[{0}]), -42.5f);
+    EXPECT_FLOAT_EQ((tensor[{500}]), -42.5f);
+    EXPECT_FLOAT_EQ((tensor[{999}]), -42.5f);
+}
+
+TEST_F(TensorTest, FillGPUTensorMultipleTimes) {
+    TensorIndices<2> shape = {50, 50};
+    Tensor<float, 2> tensor(shape, true, false);
+    
+    // Fill multiple times with different values
+    tensor.fill(1.0f);
+    EXPECT_FLOAT_EQ((tensor[{0, 0}]), 1.0f);
+    
+    tensor.fill(2.0f);
+    EXPECT_FLOAT_EQ((tensor[{0, 0}]), 2.0f);
+    EXPECT_FLOAT_EQ((tensor[{25, 25}]), 2.0f);
+    
+    tensor.fill(3.0f);
+    EXPECT_FLOAT_EQ((tensor[{49, 49}]), 3.0f);
+}
+
+TEST_F(TensorTest, FillGPUTensor3D) {
+    TensorIndices<3> shape = {10, 20, 30};
+    Tensor<float, 3> tensor(shape, true, false);
+    
+    tensor.fill(8.8f);
+    
+    // Check various elements
+    EXPECT_FLOAT_EQ((tensor[{0, 0, 0}]), 8.8f);
+    EXPECT_FLOAT_EQ((tensor[{5, 10, 15}]), 8.8f);
+    EXPECT_FLOAT_EQ((tensor[{9, 19, 29}]), 8.8f);
+}
+#endif
+

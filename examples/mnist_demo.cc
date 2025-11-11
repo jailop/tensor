@@ -252,15 +252,18 @@ int main(int argc, char* argv[]) {
                 label_to_onehot(train_labels[idx], batch_targets, i, NUM_CLASSES);
             }
             
-            auto predictions = net.forward(batch_input);
+            // Forward pass - predictions tensor is reused
+            predictions = net.forward(batch_input);
             float loss = cross_entropy_loss(predictions, batch_targets);
             float acc = compute_accuracy(predictions, train_labels, start_idx);
             epoch_loss += loss;
             epoch_accuracy += acc;
 
+            // Compute gradient: grad_output = (predictions - targets) / batch_size
+            // Reuse grad_output tensor
             auto grad_diff_var = predictions - batch_targets;
             auto grad_diff = std::get<Tensor<float, 2>>(grad_diff_var);
-            auto grad_output = grad_diff / static_cast<float>(batch_size);
+            grad_output = grad_diff / static_cast<float>(batch_size);
             
             net.backward(grad_output);
             net.update_weights(learning_rate);

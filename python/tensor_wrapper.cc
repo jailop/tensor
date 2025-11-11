@@ -920,8 +920,90 @@ PYBIND11_MODULE(tensor4d, m) {
         .def("train", &BatchNorm1d<double>::train, py::arg("mode") = true)
         .def("is_training", &BatchNorm1d<double>::is_training);
     
+    // Helper functions for neural networks
+    
+    // label_to_onehot - Float
+    nn_mod.def("label_to_onehot_f", 
+        [](uint8_t label, Matrixf& onehot, size_t batch_idx, size_t num_classes) {
+            label_to_onehot(label, onehot, batch_idx, num_classes);
+        },
+        py::arg("label"),
+        py::arg("onehot"),
+        py::arg("batch_idx"),
+        py::arg("num_classes"),
+        "Convert a single label to one-hot encoding in a batch tensor");
+    
+    // label_to_onehot - Double
+    nn_mod.def("label_to_onehot_d",
+        [](uint8_t label, Matrixd& onehot, size_t batch_idx, size_t num_classes) {
+            label_to_onehot(label, onehot, batch_idx, num_classes);
+        },
+        py::arg("label"),
+        py::arg("onehot"),
+        py::arg("batch_idx"),
+        py::arg("num_classes"),
+        "Convert a single label to one-hot encoding in a batch tensor");
+    
+    // cross_entropy_loss - Float
+    nn_mod.def("cross_entropy_loss_f",
+        [](const Matrixf& predictions, const Matrixf& targets, float epsilon) {
+            return cross_entropy_loss(predictions, targets, epsilon);
+        },
+        py::arg("predictions"),
+        py::arg("targets"),
+        py::arg("epsilon") = 1e-7f,
+        "Compute cross-entropy loss between predictions and targets");
+    
+    // cross_entropy_loss - Double
+    nn_mod.def("cross_entropy_loss_d",
+        [](const Matrixd& predictions, const Matrixd& targets, double epsilon) {
+            return cross_entropy_loss(predictions, targets, epsilon);
+        },
+        py::arg("predictions"),
+        py::arg("targets"),
+        py::arg("epsilon") = 1e-7,
+        "Compute cross-entropy loss between predictions and targets");
+    
+    // compute_accuracy - Float
+    nn_mod.def("compute_accuracy_f",
+        [](const Matrixf& predictions, const std::vector<uint8_t>& labels, size_t offset) {
+            return compute_accuracy(predictions, labels, offset);
+        },
+        py::arg("predictions"),
+        py::arg("labels"),
+        py::arg("offset") = 0,
+        "Compute classification accuracy");
+    
+    // compute_accuracy - Double
+    nn_mod.def("compute_accuracy_d",
+        [](const Matrixd& predictions, const std::vector<uint8_t>& labels, size_t offset) {
+            return compute_accuracy(predictions, labels, offset);
+        },
+        py::arg("predictions"),
+        py::arg("labels"),
+        py::arg("offset") = 0,
+        "Compute classification accuracy");
+    
+    // update_linear_layer - Float
+    nn_mod.def("update_linear_layer_f",
+        [](Linear<float>& layer, float lr) {
+            update_linear_layer(layer, lr);
+        },
+        py::arg("layer"),
+        py::arg("lr"),
+        "Update linear layer weights using SGD");
+    
+    // update_linear_layer - Double
+    nn_mod.def("update_linear_layer_d",
+        [](Linear<double>& layer, double lr) {
+            update_linear_layer(layer, lr);
+        },
+        py::arg("layer"),
+        py::arg("lr"),
+        "Update linear layer weights using SGD");
+    
     // Constants and enums
     
     // Version info
-    m.attr("__version__") = "1.5.0";
+    m.attr("__version__") = "1.6.0";
 }

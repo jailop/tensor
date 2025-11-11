@@ -573,6 +573,18 @@ TensorErrorCode matrix_float_argmax_rows(MatrixFloatHandle matrix,
                                          size_t* out_indices,
                                          size_t batch_size);
 
+/**
+ * @brief Fill matrix with a constant value
+ * @param handle Matrix handle
+ * @param value Value to fill with
+ * @return Error code
+ * 
+ * Fills all elements of the matrix with the specified value.
+ * Works efficiently on both CPU and GPU tensors.
+ */
+TensorErrorCode matrix_float_fill(MatrixFloatHandle handle, float value);
+TensorErrorCode matrix_double_fill(MatrixDoubleHandle handle, double value);
+
 #ifdef __cplusplus
 }
 #endif

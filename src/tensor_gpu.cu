@@ -1172,6 +1172,23 @@ void relu_gpu_direct(T* d_a, T* d_result, size_t n) {
     cudaDeviceSynchronize();
 }
 
+// Fill kernel - sets all elements to a constant value
+template<typename T>
+__global__ void fill_kernel(T* data, T value, size_t n) {
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    if (idx < n) {
+        data[idx] = value;
+    }
+}
+
+template<typename T>
+void fill_gpu_direct(T* d_data, T value, size_t n) {
+    int threads_per_block = 256;
+    int blocks = (n + threads_per_block - 1) / threads_per_block;
+    fill_kernel<<<blocks, threads_per_block>>>(d_data, value, n);
+    cudaDeviceSynchronize();
+}
+
 // Template instantiations for direct GPU operations
 template void add_gpu_direct<int>(int*, int*, int*, size_t);
 template void add_gpu_direct<float>(float*, float*, float*, size_t);
@@ -1215,6 +1232,12 @@ template void sigmoid_gpu_direct<double>(double*, double*, size_t);
 
 template void relu_gpu_direct<float>(float*, float*, size_t);
 template void relu_gpu_direct<double>(double*, double*, size_t);
+
+template void fill_gpu_direct<int>(int*, int, size_t);
+template void fill_gpu_direct<float>(float*, float, size_t);
+template void fill_gpu_direct<double>(double*, double, size_t);
+template void fill_gpu_direct<size_t>(size_t*, size_t, size_t);
+template void fill_gpu_direct<bool>(bool*, bool, size_t);
 
 } // namespace TensorGPU
 

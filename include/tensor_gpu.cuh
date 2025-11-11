@@ -148,6 +148,10 @@ void sigmoid_gpu_direct(T* d_a, T* d_result, size_t n);
 template<typename T>
 void relu_gpu_direct(T* d_a, T* d_result, size_t n);
 
+// Fill operation
+template<typename T>
+void fill_gpu_direct(T* d_data, T value, size_t n);
+
 } // namespace TensorGPU
 
 #endif // _TENSOR_GPU_CUH
