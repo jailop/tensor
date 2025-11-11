@@ -135,6 +135,8 @@ TensorErrorCode matrix_double_shape(MatrixDoubleHandle handle, size_t* out_rows,
 TensorErrorCode matrix_float_add(MatrixFloatHandle lhs, MatrixFloatHandle rhs, MatrixFloatHandle* out_handle);
 TensorErrorCode matrix_float_subtract(MatrixFloatHandle lhs, MatrixFloatHandle rhs, MatrixFloatHandle* out_handle);
 TensorErrorCode matrix_float_multiply(MatrixFloatHandle lhs, MatrixFloatHandle rhs, MatrixFloatHandle* out_handle);
+TensorErrorCode matrix_float_multiply_scalar(MatrixFloatHandle handle, float scalar, MatrixFloatHandle* out_handle);
+TensorErrorCode matrix_float_divide_scalar(MatrixFloatHandle handle, float scalar, MatrixFloatHandle* out_handle);
 TensorErrorCode matrix_float_matmul(MatrixFloatHandle lhs, MatrixFloatHandle rhs, MatrixFloatHandle* out_handle);
 TensorErrorCode matrix_float_transpose(MatrixFloatHandle handle, MatrixFloatHandle* out_handle);
 

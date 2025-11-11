@@ -492,6 +492,25 @@ TensorErrorCode matrix_float_multiply(MatrixFloatHandle lhs, MatrixFloatHandle r
     TENSOR_TRY_END
 }
 
+TensorErrorCode matrix_float_multiply_scalar(MatrixFloatHandle handle, float scalar, MatrixFloatHandle* out_handle) {
+    if (!handle || !out_handle) return TENSOR_ERROR_NULL_POINTER;
+    
+    TENSOR_TRY_BEGIN
+    auto* mat = static_cast<Matrixf*>(handle);
+    *out_handle = new Matrixf(*mat * scalar);
+    TENSOR_TRY_END
+}
+
+TensorErrorCode matrix_float_divide_scalar(MatrixFloatHandle handle, float scalar, MatrixFloatHandle* out_handle) {
+    if (!handle || !out_handle) return TENSOR_ERROR_NULL_POINTER;
+    if (scalar == 0.0f) return TENSOR_ERROR_COMPUTATION;
+    
+    TENSOR_TRY_BEGIN
+    auto* mat = static_cast<Matrixf*>(handle);
+    *out_handle = new Matrixf(*mat / scalar);
+    TENSOR_TRY_END
+}
+
 TensorErrorCode matrix_float_matmul(MatrixFloatHandle lhs, MatrixFloatHandle rhs, MatrixFloatHandle* out_handle) {
     if (!lhs || !rhs || !out_handle) return TENSOR_ERROR_NULL_POINTER;
     
