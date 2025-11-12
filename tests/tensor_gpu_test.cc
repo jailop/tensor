@@ -6,11 +6,13 @@
 #include "../include/tensor_gpu.cuh"
 #endif
 
+using namespace tensor;
+
 class TensorGPUTest : public ::testing::Test {
 protected:
     void SetUp() override {
 #ifdef USE_GPU
-        if (!TensorGPU::is_gpu_available()) {
+        if (!is_gpu_available()) {
             GTEST_SKIP() << "GPU not available, skipping GPU tests";
         }
 #else
@@ -23,17 +25,15 @@ protected:
 
 #ifdef USE_GPU
 
-// =============================================================================
 // GPU Availability Tests
-// =============================================================================
 
 TEST_F(TensorGPUTest, GPUAvailability) {
-    EXPECT_TRUE(TensorGPU::is_gpu_available());
+    EXPECT_TRUE(is_gpu_available());
 }
 
 // Note: TensorGPU doesn't expose get_device_count, testing availability is sufficient
 // TEST_F(TensorGPUTest, GPUDeviceCount) {
-//     int device_count = TensorGPU::get_device_count();
+//     int device_count = get_device_count();
 //     EXPECT_GT(device_count, 0);
 // }
 

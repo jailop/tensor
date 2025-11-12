@@ -7,7 +7,7 @@
 #include "linalg_advanced.h"
 #include <cmath>
 
-using namespace linalg;
+using namespace tensor;
 
 class LinalgAdvancedTest : public ::testing::Test {
 protected:
@@ -390,7 +390,7 @@ TEST_F(LinalgAdvancedTest, IsSymmetric) {
     A[{1, 0}] = 2; A[{1, 1}] = 4; A[{1, 2}] = 5;
     A[{2, 0}] = 3; A[{2, 1}] = 5; A[{2, 2}] = 6;
     
-    EXPECT_TRUE(detail::is_symmetric(A));
+    EXPECT_TRUE(is_symmetric(A));
 }
 
 TEST_F(LinalgAdvancedTest, IsNotSymmetric) {
@@ -398,7 +398,7 @@ TEST_F(LinalgAdvancedTest, IsNotSymmetric) {
     A[{0, 0}] = 1; A[{0, 1}] = 2;
     A[{1, 0}] = 3; A[{1, 1}] = 4;
     
-    EXPECT_FALSE(detail::is_symmetric(A));
+    EXPECT_FALSE(is_symmetric(A));
 }
 
 TEST_F(LinalgAdvancedTest, IsPositiveDefinite) {
@@ -406,5 +406,5 @@ TEST_F(LinalgAdvancedTest, IsPositiveDefinite) {
     A[{0, 0}] = 4; A[{0, 1}] = 1;
     A[{1, 0}] = 1; A[{1, 1}] = 3;
     
-    EXPECT_TRUE(detail::is_positive_definite(A));
+    EXPECT_TRUE(is_positive_definite(A));
 }

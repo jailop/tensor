@@ -8,8 +8,7 @@
 #include <iostream>
 #include <iomanip>
 
-using namespace tensor4d;
-using namespace tensor4d::nn;
+using namespace tensor;
 
 int main() {
     std::cout << "=== Neural Network Layers Demo ===" << std::endl;

@@ -9,6 +9,8 @@
 #include "tensor.h"
 #include <iostream>
 
+using namespace tensor;
+
 int main() {
     std::cout << "=== Tensor Library Backend Demo ===\n\n";
     

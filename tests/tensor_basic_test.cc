@@ -1,7 +1,9 @@
-#include "../include/tensor.h"
-#include "../include/optimizers.h"
-#include "../include/loss_functions.h"
+#include "tensor.h"
+#include "optimizers.h"
+#include "loss_functions.h"
 #include <gtest/gtest.h>
+
+using namespace tensor;
 
 class TensorBasicTest : public ::testing::Test {
 protected:

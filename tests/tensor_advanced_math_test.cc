@@ -2,6 +2,8 @@
 #include <gtest/gtest.h>
 #include <cmath>
 
+using namespace tensor;
+
 class TensorAdvancedMathTest : public ::testing::Test {
 protected:
     void SetUp() override {}

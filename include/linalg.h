@@ -1,33 +1,5 @@
 /**
- * @file linalg.h
  * @brief Linear algebra operations for vectors and matrices
- * 
- * This header provides specialized linear algebra functionality built on top
- * of the tensor library. It includes:
- * - Vector and Matrix type aliases
- * - Vector operations (norm, dot product, cross product)
- * - Matrix operations (matrix multiplication, transpose, inverse, determinant)
- * - Matrix decompositions (LU, Cholesky, QR, SVD)
- * - Eigenvalue computation
- * - Solving linear systems
- * 
- * All operations leverage GPU and BLAS when available for optimal performance.
- * 
- * @author Tensor Library Team
- * @version 1.0
- * @date 2024
- * 
- * @section usage Usage Example
- * @code
- * // Create vectors and matrices
- * Vector<float> v({5});
- * Matrix<float> A({3, 3});
- * 
- * // Linear algebra operations
- * float n = linalg::norm(v);
- * auto B = linalg::transpose(A);
- * auto inv_A = linalg::inverse(A);
- * @endcode
  */
 
 #ifndef _LINALG_H
@@ -37,9 +9,7 @@
 #include <type_traits>
 #include <optional>
 
-// ============================================
-// Specialized Linear Algebra Types
-// ============================================
+namespace tensor {
 
 /**
  * @brief Type alias for 1D vectors
@@ -51,53 +21,20 @@ template <typename T>
 using Vector = Tensor<T, 1>;
 
 /**
- * @brief Type alias for 2D matrices
+ * @brief Type alias for 2D matrices  
  * @tparam T Data type (float, double, etc.)
  * 
  * A Matrix is simply a 2D Tensor, provided for clarity in linear algebra contexts.
+ * Note: For additional matrix-specific operations, see the Matrix<T> class in tensor_matrix.h
  */
 template <typename T>
 using Matrix = Tensor<T, 2>;
-
-// ============================================
-// Vector Operations
-// ============================================
-
-/**
- * @namespace linalg
- * @brief Linear algebra operations namespace
- * 
- * Provides comprehensive linear algebra functionality including:
- * - Basic operations: norm, dot, cross products
- * - Matrix operations: multiplication, transpose, inverse
- * - Decompositions: LU, Cholesky, QR, SVD
- * - System solving: linear systems, eigenvalues
- * 
- * All functions are optimized to use GPU (CUDA) or BLAS when available.
- */
-namespace linalg {
 
 /**
  * @brief Compute the L2 norm (Euclidean norm) of a vector
  * @tparam T Data type
  * @param v Input vector
  * @return L2 norm as scalar (sqrt of sum of squares)
- * 
- * Computes ||v|| = sqrt(v₁² + v₂² + ... + vₙ²).
- * Uses GPU or BLAS acceleration when available.
- * 
- * @section example_norm Example
- * @code
- * Vector<float> v({3});
- * v[{0}] = 3.0f;
- * v[{1}] = 4.0f;
- * v[{2}] = 0.0f;
- * 
- * float length = linalg::norm(v);  // Returns 5.0 = sqrt(9 + 16)
- * 
- * // Useful for normalization:
- * auto unit_v = v / linalg::norm(v);  // Unit vector
- * @endcode
  */
 template <typename T>
 T norm(const Vector<T>& v) {
@@ -109,17 +46,15 @@ T norm(const Vector<T>& v) {
     if (v.uses_gpu()) {
         // Use GPU for norm computation
         T result;
-        TensorGPU::dot_1d_gpu(v.data_ptr(), v.data_ptr(), &result, n);
+        dot_1d_gpu(v.data_ptr(), v.data_ptr(), &result, n);
         return std::sqrt(result);
     }
 #endif
     
 #ifdef USE_BLAS
-    // Use BLAS dot product for norm
     T dot_result = blas_dot<T>(n, v.data_ptr(), 1, v.data_ptr(), 1);
     return std::sqrt(dot_result);
 #else
-    // Fallback CPU implementation
     for (size_t i = 0; i < n; ++i) {
         T val = v[{i}];
         sum += val * val;
@@ -129,26 +64,11 @@ T norm(const Vector<T>& v) {
 }
 
 /**
- * @brief Normalize a vector to unit length
- * 
  * Scales the vector so its L2 norm equals 1.
  * Returns a zero vector if the input norm is too small (near zero).
- * 
  * @tparam T Data type
  * @param v Input vector
  * @return Normalized vector with ||v|| = 1, or zero vector if norm ≈ 0
- * 
- * @section example_normalize Example
- * @code
- * Vector<float> v({3});
- * v[{0}] = 3.0f;
- * v[{1}] = 4.0f;
- * v[{2}] = 0.0f;
- * 
- * auto unit_v = linalg::normalize(v);
- * // unit_v ≈ [0.6, 0.8, 0.0]
- * // linalg::norm(unit_v) ≈ 1.0
- * @endcode
  */
 template <typename T>
 Vector<T> normalize(const Vector<T>& v) {
@@ -160,31 +80,12 @@ Vector<T> normalize(const Vector<T>& v) {
 }
 
 /**
- * @brief Compute dot product of two vectors
- * 
  * Computes the inner product: a · b = a₁b₁ + a₂b₂ + ... + aₙbₙ
  * Uses GPU or BLAS acceleration when available.
- * 
  * @tparam T Data type
  * @param a First vector
  * @param b Second vector
  * @return Dot product as scalar, or 0 if dimensions don't match
- * 
- * @section example_dot Example
- * @code
- * Vector<float> a({3});
- * Vector<float> b({3});
- * a[{0}] = 1.0f; a[{1}] = 2.0f; a[{2}] = 3.0f;
- * b[{0}] = 4.0f; b[{1}] = 5.0f; b[{2}] = 6.0f;
- * 
- * float result = linalg::dot(a, b);
- * // result = 1*4 + 2*5 + 3*6 = 32.0
- * 
- * // Check orthogonality:
- * if (std::abs(linalg::dot(v1, v2)) < 1e-6) {
- *     std::cout << "Vectors are orthogonal\n";
- * }
- * @endcode
  */
 template <typename T>
 T dot(const Vector<T>& a, const Vector<T>& b) {
@@ -200,7 +101,7 @@ T dot(const Vector<T>& a, const Vector<T>& b) {
 #ifdef USE_GPU
     if (a.uses_gpu() && b.uses_gpu()) {
         T result;
-        TensorGPU::dot_1d_gpu(a.data_ptr(), b.data_ptr(), &result, n);
+        dot_1d_gpu(a.data_ptr(), b.data_ptr(), &result, n);
         return result;
     }
 #endif
@@ -274,7 +175,7 @@ Vector<T> matvec(const Matrix<T>& mat, const Vector<T>& vec) {
             vec_as_mat[{i, 0}] = vec[{i}];
         }
         Matrix<T> result_mat({m, 1}, true);
-        TensorGPU::dot_2d_gpu(mat.data_ptr(), vec_as_mat.data_ptr(), result_mat.data_ptr(), m, n, 1);
+        dot_2d_gpu(mat.data_ptr(), vec_as_mat.data_ptr(), result_mat.data_ptr(), m, n, 1);
         for (size_t i = 0; i < m; ++i) {
             result[{i}] = result_mat[{i, 0}];
         }
@@ -327,7 +228,7 @@ Matrix<T> matmul(const Matrix<T>& a, const Matrix<T>& b) {
     
 #ifdef USE_GPU
     if (a.uses_gpu() && b.uses_gpu()) {
-        TensorGPU::dot_2d_gpu(a.data_ptr(), b.data_ptr(), result.data_ptr(), m, k, n);
+        dot_2d_gpu(a.data_ptr(), b.data_ptr(), result.data_ptr(), m, k, n);
         return result;
     }
 #endif
@@ -395,44 +296,6 @@ T trace(const Matrix<T>& mat) {
         sum += mat[{i, i}];
     }
     return sum;
-}
-
-/**
- * Extract diagonal elements from a matrix.
- * @param mat Input matrix (m x n)
- * @return Vector of diagonal elements (length min(m,n))
- */
-template <typename T>
-Vector<T> diag(const Matrix<T>& mat) {
-    auto dims = mat.dims();
-    size_t m = dims[0];
-    size_t n = dims[1];
-    size_t k = std::min(m, n);
-    
-    Vector<T> result({k}, mat.uses_gpu());
-    for (size_t i = 0; i < k; ++i) {
-        result[{i}] = mat[{i, i}];
-    }
-    return result;
-}
-
-/**
- * Create diagonal matrix from vector.
- * @param vec Input vector of length n
- * @return Diagonal matrix of shape (n, n)
- */
-template <typename T>
-Matrix<T> diag(const Vector<T>& vec) {
-    auto dims = vec.dims();
-    size_t n = dims[0];
-    
-    Matrix<T> result({n, n}, vec.uses_gpu());
-    result.fill(T(0));
-    
-    for (size_t i = 0; i < n; ++i) {
-        result[{i, i}] = vec[{i}];
-    }
-    return result;
 }
 
 /**
@@ -714,10 +577,8 @@ Vector<T> least_squares(const Matrix<T>& A, const Vector<T>& b) {
     return x;
 }
 
-} // namespace linalg
-
 // ============================================
-// Tensor View Operations
+// Tmensor View Operations
 // ============================================
 
 /**
@@ -912,4 +773,5 @@ public:
     }
 };
 
+} // namespace tensor
 #endif // _LINALG_H

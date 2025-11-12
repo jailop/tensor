@@ -7,6 +7,8 @@
 #include <iostream>
 #include <iomanip>
 
+using namespace tensor;
+
 int main() {
     std::cout << "=== Cross Product Demo ===" << std::endl << std::endl;
 

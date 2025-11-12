@@ -20,6 +20,13 @@ extern "C" {
                       const double *Y, const int incY);
     void cblas_sscal(const int N, const float alpha, float *X, const int incX);
     void cblas_dscal(const int N, const double alpha, double *X, const int incX);
+
+    // L1 norm
+    float cblas_sasum(const int N, const float *X, const int incX);
+    double cblas_dasum(const int N, const double *X, const int incX);
+    // L2 norm
+    float cblas_snrm2(const int N, const float *X, const int incX);
+    double cblas_dnrm2(const int N, const double *X, const int incX);
 }
 
 // BLAS constants

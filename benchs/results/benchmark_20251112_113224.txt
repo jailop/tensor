@@ -1,0 +1,73 @@
+2025-11-12T11:32:24-05:00
+Running /home/jailop/devel/datainquiry/tensor/benchs/../build/tensor_normalize_benchmark
+Run on (12 X 5600 MHz CPU s)
+CPU Caches:
+  L1 Data 48 KiB (x6)
+  L1 Instruction 32 KiB (x6)
+  L2 Unified 1280 KiB (x6)
+  L3 Unified 18432 KiB (x1)
+Load Average: 0.98, 1.30, 1.20
+***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
+-----------------------------------------------------------------------------------
+Benchmark                                         Time             CPU   Iterations
+-----------------------------------------------------------------------------------
+BM_NormalizeL1_1D_Small_mean                   6996 ns         6990 ns            3
+BM_NormalizeL1_1D_Small_median                 6981 ns         6975 ns            3
+BM_NormalizeL1_1D_Small_stddev                 31.8 ns         31.4 ns            3
+BM_NormalizeL1_1D_Small_cv                     0.45 %          0.45 %             3
+BM_NormalizeL1_1D_Large_mean                 216436 ns       216113 ns            3
+BM_NormalizeL1_1D_Large_median               216469 ns       216148 ns            3
+BM_NormalizeL1_1D_Large_stddev                  184 ns          179 ns            3
+BM_NormalizeL1_1D_Large_cv                     0.08 %          0.08 %             3
+BM_NormalizeL1_2D_AllElements_mean             8881 ns         8874 ns            3
+BM_NormalizeL1_2D_AllElements_median           8880 ns         8874 ns            3
+BM_NormalizeL1_2D_AllElements_stddev           4.59 ns         4.05 ns            3
+BM_NormalizeL1_2D_AllElements_cv               0.05 %          0.05 %             3
+BM_NormalizeL1_2D_Axis0_mean                   6294 ns         6288 ns            3
+BM_NormalizeL1_2D_Axis0_median                 6295 ns         6289 ns            3
+BM_NormalizeL1_2D_Axis0_stddev                 26.3 ns         26.0 ns            3
+BM_NormalizeL1_2D_Axis0_cv                     0.42 %          0.41 %             3
+BM_NormalizeL1_2D_Axis1_mean                   6305 ns         6299 ns            3
+BM_NormalizeL1_2D_Axis1_median                 6312 ns         6307 ns            3
+BM_NormalizeL1_2D_Axis1_stddev                 15.2 ns         15.0 ns            3
+BM_NormalizeL1_2D_Axis1_cv                     0.24 %          0.24 %             3
+BM_NormalizeL2_1D_Small_mean                   8397 ns         8390 ns            3
+BM_NormalizeL2_1D_Small_median                 8397 ns         8390 ns            3
+BM_NormalizeL2_1D_Small_stddev                 39.5 ns         38.7 ns            3
+BM_NormalizeL2_1D_Small_cv                     0.47 %          0.46 %             3
+BM_NormalizeL2_1D_Large_mean                 219314 ns       218953 ns            3
+BM_NormalizeL2_1D_Large_median               217252 ns       216922 ns            3
+BM_NormalizeL2_1D_Large_stddev                 4086 ns         4041 ns            3
+BM_NormalizeL2_1D_Large_cv                     1.86 %          1.85 %             3
+BM_NormalizeL2_2D_AllElements_mean            10277 ns        10269 ns            3
+BM_NormalizeL2_2D_AllElements_median          10260 ns        10252 ns            3
+BM_NormalizeL2_2D_AllElements_stddev           32.2 ns         32.1 ns            3
+BM_NormalizeL2_2D_AllElements_cv               0.31 %          0.31 %             3
+BM_NormalizeL2_2D_Axis0_mean                   6265 ns         6260 ns            3
+BM_NormalizeL2_2D_Axis0_median                 6267 ns         6261 ns            3
+BM_NormalizeL2_2D_Axis0_stddev                 13.9 ns         13.8 ns            3
+BM_NormalizeL2_2D_Axis0_cv                     0.22 %          0.22 %             3
+BM_NormalizeL2_2D_Axis1_mean                   6278 ns         6273 ns            3
+BM_NormalizeL2_2D_Axis1_median                 6264 ns         6258 ns            3
+BM_NormalizeL2_2D_Axis1_stddev                 28.0 ns         27.7 ns            3
+BM_NormalizeL2_2D_Axis1_cv                     0.45 %          0.44 %             3
+BM_NormalizeZScore_1D_Small_mean              10961 ns        10951 ns            3
+BM_NormalizeZScore_1D_Small_median            10946 ns        10937 ns            3
+BM_NormalizeZScore_1D_Small_stddev             82.5 ns         81.5 ns            3
+BM_NormalizeZScore_1D_Small_cv                 0.75 %          0.74 %             3
+BM_NormalizeZScore_1D_Large_mean             217964 ns       217617 ns            3
+BM_NormalizeZScore_1D_Large_median           218194 ns       217871 ns            3
+BM_NormalizeZScore_1D_Large_stddev              873 ns          877 ns            3
+BM_NormalizeZScore_1D_Large_cv                 0.40 %          0.40 %             3
+BM_NormalizeZScore_2D_AllElements_mean        12801 ns        12791 ns            3
+BM_NormalizeZScore_2D_AllElements_median      12801 ns        12791 ns            3
+BM_NormalizeZScore_2D_AllElements_stddev       21.1 ns         20.8 ns            3
+BM_NormalizeZScore_2D_AllElements_cv           0.16 %          0.16 %             3
+BM_NormalizeZScore_2D_Axis0_mean               3617 ns         3614 ns            3
+BM_NormalizeZScore_2D_Axis0_median             3624 ns         3620 ns            3
+BM_NormalizeZScore_2D_Axis0_stddev             11.9 ns         11.4 ns            3
+BM_NormalizeZScore_2D_Axis0_cv                 0.33 %          0.32 %             3
+BM_NormalizeZScore_2D_Axis1_mean               3619 ns         3616 ns            3
+BM_NormalizeZScore_2D_Axis1_median             3606 ns         3603 ns            3
+BM_NormalizeZScore_2D_Axis1_stddev             22.7 ns         22.6 ns            3
+BM_NormalizeZScore_2D_Axis1_cv                 0.63 %          0.62 %             3

@@ -20,8 +20,7 @@
 #include <cuda_runtime.h>
 #endif
 
-namespace tensor4d {
-namespace nn {
+namespace tensor {
 
 // Forward declarations
 template<typename T>
@@ -130,15 +129,34 @@ public:
     Tensor<T, 2> forward(const Tensor<T, 2>& input) override {
         input_ = input;
         
+        // Debug: Check if GPU is being maintained
+        #ifdef DEBUG_GPU
+        std::cerr << "[Linear::forward] input GPU=" << input.uses_gpu() 
+                  << ", weights GPU=" << weights_.uses_gpu() << std::endl;
+        #endif
+        
         // output = input @ weights^T
         auto weights_t = weights_.transpose();
+        
+        #ifdef DEBUG_GPU
+        std::cerr << "[Linear::forward] weights_t GPU=" << weights_t.uses_gpu() << std::endl;
+        #endif
+        
         auto result_var = input.matmul(weights_t);
         auto output = std::get<Tensor<T, 2>>(result_var);
+        
+        #ifdef DEBUG_GPU
+        std::cerr << "[Linear::forward] output GPU=" << output.uses_gpu() << std::endl;
+        #endif
         
         // Add bias if present using broadcasting
         if (use_bias_) {
             auto output_with_bias_var = output + bias_;
             output = std::get<Tensor<T, 2>>(output_with_bias_var);
+            
+            #ifdef DEBUG_GPU
+            std::cerr << "[Linear::forward] output+bias GPU=" << output.uses_gpu() << std::endl;
+            #endif
         }
         
         return output;
@@ -736,7 +754,6 @@ inline std::vector<Tensor<T, 2>> softmax_jacobian_batch(const Tensor<T, 2>& soft
     return jacobians;
 }
 
-} // namespace nn
-} // namespace tensor4d
+} // namespace tensor
 
 #endif // NN_LAYERS_H

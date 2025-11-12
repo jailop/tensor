@@ -3,6 +3,8 @@
 #include <set>
 #include <cmath>
 
+using namespace tensor;
+
 class TensorRandomSamplingTest : public ::testing::Test {
 protected:
     void SetUp() override {

@@ -3,6 +3,8 @@
 #include "loss_functions.h"
 #include <gtest/gtest.h>
 
+using namespace tensor;
+
 class TensorTest : public ::testing::Test {
 protected:
     void SetUp() override {}
@@ -2332,7 +2334,7 @@ TEST_F(TensorTest, LossMSE) {
     targets.fill(1.0f);
     
     // MSE = (1/6) * sum((2-1)^2) = 1.0
-    auto loss_val = loss::mse_loss(predictions, targets, "mean");
+    auto loss_val = mse_loss(predictions, targets, "mean");
     
     // mse_loss returns same shape as input with broadcasted value
     float loss_value = loss_val[{0, 0}];
@@ -2348,7 +2350,7 @@ TEST_F(TensorTest, LossL1) {
     targets.fill(1.0f);
     
     // L1 = (1/6) * sum(|3-1|) = 2.0
-    auto loss_val = loss::l1_loss(predictions, targets, "mean");
+    auto loss_val = l1_loss(predictions, targets, "mean");
     
     EXPECT_NEAR(loss_val[{0}], 2.0f, 1e-5);
 }
@@ -2369,7 +2371,7 @@ TEST_F(TensorTest, LossBCE) {
     targets[{2}] = 1.0f;
     targets[{3}] = 0.0f;
     
-    auto loss_val = loss::binary_cross_entropy(predictions, targets, "mean");
+    auto loss_val = binary_cross_entropy(predictions, targets, "mean");
     
     // Loss should be low for good predictions
     EXPECT_LT(loss_val[{0}], 0.2f);
@@ -2397,7 +2399,7 @@ TEST_F(TensorTest, OptimizerTrainingLoop) {
         optimizer.zero_grad();
         
         // Forward: compute loss
-        auto loss_val = loss::mse_loss(W, target, "mean");
+        auto loss_val = mse_loss(W, target, "mean");
         
         if (epoch == 0) {
             initial_loss = loss_val[{0, 0}];

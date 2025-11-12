@@ -8,8 +8,7 @@
 #include <gtest/gtest.h>
 #include <cmath>
 
-using namespace tensor4d;
-using namespace tensor4d::nn;
+using namespace tensor;
 
 class NNLayersTest : public ::testing::Test {
 protected:

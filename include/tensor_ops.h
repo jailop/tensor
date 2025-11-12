@@ -5,48 +5,22 @@
 #include <numeric>
 
 /**
- * @file tensor_ops.h
- * @brief Core neural network operations with broadcasting and autograd
- * 
  * This header provides essential operations for building neural networks:
  * - Matrix multiplication (matmul) with GPU/BLAS acceleration
  * - Broadcasting for element-wise operations
  * - Reduction operations (sum, mean, max, min, etc.)
  * - Softmax and log-softmax
  * - All operations support automatic differentiation
- * 
- * @author Tensor Library Team
- * @version 1.0
- * @date 2024
- * 
- * @section broadcasting Broadcasting Rules
- * Broadcasting allows operations on tensors of different shapes:
- * - Dimensions are aligned from the right
- * - Dimensions of size 1 are stretched to match
- * - Missing dimensions are treated as 1
- * 
- * Example: (3, 1, 5) + (4, 5) broadcasts to (3, 4, 5)
- * 
- * @section usage_ops Usage Example
- * @code
- * Matrix<float> A({3, 4});
- * Matrix<float> B({4, 5});
- * 
- * // Matrix multiplication with autograd
- * auto C = tensor_ops::matmul(A, B);
- * 
- * // Softmax for classification
- * auto probs = tensor_ops::softmax(C, 1);
- * @endcode
  */
+
+namespace tensor {
 
 /// @brief Forward declarations
 template <typename T, size_t N>
 class Tensor;
 
 /**
- * @namespace tensor_ops
- * @brief Core tensor operations for neural networks
+ * Core tensor operations for neural networks
  * 
  * Provides high-level operations with:
  * - Automatic broadcasting
@@ -54,7 +28,6 @@ class Tensor;
  * - GPU and BLAS acceleration
  * - Numerical stability (e.g., for softmax)
  */
-namespace tensor_ops {
 
 /**
  * @brief Check if two tensor shapes are broadcastable
@@ -112,8 +85,6 @@ auto broadcast_shape(const TensorIndices<N1>& shape1, const TensorIndices<N2>& s
     return result;
 }
 
-} // namespace tensor_ops
-
 // Add these methods to Tensor class (will be inserted into tensor.h)
 
 // Helper template to compute result dimensions for matmul
@@ -121,5 +92,7 @@ template<size_t NA, size_t NB>
 struct MatmulResultDims {
     static constexpr size_t value = NA + NB - 2;
 };
+
+} // namespace tensor
 
 #endif // TENSOR_OPS_H

@@ -30,8 +30,7 @@
 #include <cmath>
 #include <cstring>
 
-using namespace tensor4d;
-using namespace tensor4d::nn;
+using namespace tensor;
 
 constexpr size_t IMAGE_SIZE = 28;
 constexpr size_t IMAGE_PIXELS = IMAGE_SIZE * IMAGE_SIZE;  // 784
@@ -50,9 +49,10 @@ int32_t read_int32(std::ifstream& file) {
  * @brief Load MNIST images directly into a Tensor (matrix)
  * @param filename Path to MNIST images file
  * @param images_tensor Output tensor (num_images x IMAGE_PIXELS)
+ * @param use_gpu Whether to allocate on GPU
  * @return True on success, false on failure
  */
-bool load_mnist_images(const std::string& filename, Tensor<float, 2>& images_tensor) {
+bool load_mnist_images(const std::string& filename, Tensor<float, 2>& images_tensor, bool use_gpu = false) {
     std::ifstream file(filename, std::ios::binary);
     if (!file.is_open()) {
         std::cerr << "Error: Cannot open file " << filename << std::endl;
@@ -69,10 +69,15 @@ bool load_mnist_images(const std::string& filename, Tensor<float, 2>& images_ten
     int32_t rows = read_int32(file);
     int32_t cols = read_int32(file);
     
-    std::cout << "Loading " << num_images << " images (" << rows << "x" << cols << ")..." << std::endl;
+    std::cout << "Loading " << num_images << " images (" << rows << "x" << cols << ")";
+    if (use_gpu) {
+        std::cout << " to GPU..." << std::endl;
+    } else {
+        std::cout << "..." << std::endl;
+    }
     
     // Create tensor to hold all images: (num_images x 784)
-    images_tensor = Tensor<float, 2>({static_cast<size_t>(num_images), IMAGE_PIXELS});
+    images_tensor = Tensor<float, 2>({static_cast<size_t>(num_images), IMAGE_PIXELS}, use_gpu);
     
     // Load images directly into tensor
     unsigned char pixel;
@@ -193,10 +198,21 @@ int main(int argc, char* argv[]) {
         }
     }
     
+    // Check if GPU is available
+    bool use_gpu = is_gpu_available();
+    
+    std::cout << "\n=== Backend Information ===" << std::endl;
+    std::cout << "Active backend: " << backend_name(get_active_backend()) << std::endl;
+    if (use_gpu) {
+        std::cout << "GPU acceleration: ENABLED" << std::endl;
+    } else {
+        std::cout << "GPU acceleration: NOT AVAILABLE" << std::endl;
+    }
+    
     std::cout << "\n=== Loading Dataset ===" << std::endl;
     Tensor<float, 2> train_images({1, 1}); // Placeholder, will be reassigned
     std::vector<uint8_t> train_labels;
-    if (!load_mnist_images(data_path + "train-images-idx3-ubyte", train_images)) {
+    if (!load_mnist_images(data_path + "train-images-idx3-ubyte", train_images, use_gpu)) {
         return 1;
     }
     if (!load_mnist_labels(data_path + "train-labels-idx1-ubyte", train_labels)) {
@@ -205,7 +221,7 @@ int main(int argc, char* argv[]) {
     Tensor<float, 2> test_images({1, 1}); // Placeholder, will be reassigned
     std::vector<uint8_t> test_labels;
     
-    if (!load_mnist_images(data_path + "t10k-images-idx3-ubyte", test_images)) {
+    if (!load_mnist_images(data_path + "t10k-images-idx3-ubyte", test_images, use_gpu)) {
         return 1;
     }
     if (!load_mnist_labels(data_path + "t10k-labels-idx1-ubyte", test_labels)) {
@@ -233,11 +249,13 @@ int main(int argc, char* argv[]) {
     float epoch_loss = 0.0f;
     float epoch_accuracy = 0.0f;
     
-    // Allocate all tensors once to avoid repeated GPU allocations/deallocations
-    Tensor<float, 2> batch_input({batch_size, IMAGE_PIXELS});
-    Tensor<float, 2> batch_targets({batch_size, NUM_CLASSES});
-    Tensor<float, 2> predictions({batch_size, NUM_CLASSES});
-    Tensor<float, 2> grad_output({batch_size, NUM_CLASSES});
+    std::cout << "\n=== Training Started ===" << std::endl;
+    
+    // Allocate batch tensors on same device as training data
+    Tensor<float, 2> batch_input({batch_size, IMAGE_PIXELS}, use_gpu);
+    Tensor<float, 2> batch_targets({batch_size, NUM_CLASSES}, use_gpu);
+    Tensor<float, 2> predictions({batch_size, NUM_CLASSES}, use_gpu);
+    Tensor<float, 2> grad_output({batch_size, NUM_CLASSES}, use_gpu);
     
     for (epoch = 0; epoch < max_epochs; ++epoch) {
         epoch_loss = 0.0f;
@@ -246,13 +264,14 @@ int main(int argc, char* argv[]) {
         for (size_t batch = 0; batch < num_batches; ++batch) {
             size_t start_idx = batch * batch_size;
             
-            // Copy input data into reusable tensor
+            // Copy batch data using tensor assignment (preserves GPU allocation)
+            for (size_t i = 0; i < batch_size; ++i) {
+                for (size_t j = 0; j < IMAGE_PIXELS; ++j) {
+                    batch_input[{i, j}] = train_images[{start_idx + i, j}];
+                }
+            }
             
-            const float* src = train_images.data_ptr() + start_idx * IMAGE_PIXELS;
-            float* dst = batch_input.data_ptr();
-            std::copy_n(src, batch_size * IMAGE_PIXELS, dst);
-            
-            // Reset and fill one-hot targets (reusing tensor)
+            // Fill one-hot targets (reusing tensor)
             batch_targets.fill(0.0f);
             for (size_t i = 0; i < batch_size; ++i) {
                 size_t idx = start_idx + i;
@@ -332,11 +351,14 @@ int main(int argc, char* argv[]) {
     
     for (size_t batch = 0; batch < num_test_batches; ++batch) {
         size_t start_idx = batch * test_batch_size;
-        Tensor<float, 2> batch_input({test_batch_size, IMAGE_PIXELS});
+        Tensor<float, 2> batch_input({test_batch_size, IMAGE_PIXELS}, use_gpu);
         
-        const float* src = test_images.data_ptr() + start_idx * IMAGE_PIXELS;
-        float* dst = batch_input.data_ptr();
-        std::copy_n(src, test_batch_size * IMAGE_PIXELS, dst);
+        // Copy data using tensor assignment (preserves GPU)
+        for (size_t i = 0; i < test_batch_size; ++i) {
+            for (size_t j = 0; j < IMAGE_PIXELS; ++j) {
+                batch_input[{i, j}] = test_images[{start_idx + i, j}];
+            }
+        }
         
         auto predictions = net.forward(batch_input);
         float acc = compute_accuracy(predictions, test_labels, start_idx);
@@ -349,12 +371,12 @@ int main(int argc, char* argv[]) {
               << (test_accuracy * 100) << "%" << std::endl;
     
     std::cout << "\n=== Sample Predictions ===" << std::endl;
-    Tensor<float, 2> sample_input({1, IMAGE_PIXELS});
+    Tensor<float, 2> sample_input({1, IMAGE_PIXELS}, use_gpu);
     for (size_t i = 0; i < 5; ++i) {
-        // Copy single image from test_images tensor
-        const float* src = test_images.data_ptr() + i * IMAGE_PIXELS;
-        float* dst = sample_input.data_ptr();
-        std::copy_n(src, IMAGE_PIXELS, dst);
+        // Copy single image using tensor assignment (preserves GPU)
+        for (size_t j = 0; j < IMAGE_PIXELS; ++j) {
+            sample_input[{0, j}] = test_images[{i, j}];
+        }
         
         auto pred = net.forward(sample_input);
         

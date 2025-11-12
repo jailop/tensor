@@ -5,8 +5,11 @@
 
 #include <gtest/gtest.h>
 #include "tensor.h"
+#include "linalg.h"
 #include <variant>
 #include <cmath>
+
+using namespace tensor;
 
 // Test fixture for broadcasting tests
 class TensorBroadcastingTest : public ::testing::Test {

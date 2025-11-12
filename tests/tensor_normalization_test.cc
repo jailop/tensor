@@ -1,11 +1,12 @@
 /**
- * @file tensor_normalization_test.cc
- * @brief Test suite for tensor normalization functions and enhanced submatrix views
+ * Test suite for tensor normalization functions and enhanced submatrix views
  */
 
 #include <gtest/gtest.h>
-#include "tensor.h"
 #include <cmath>
+#include <tensor_normalize.h>
+
+using namespace tensor;
 
 class TensorNormalizationTest : public ::testing::Test {
 protected:
@@ -118,7 +119,7 @@ TEST_F(TensorNormalizationTest, DiagCreateMatrix) {
     Tensor<float, 1> vec({3}, false);
     vec[{0}] = 1.0f; vec[{1}] = 2.0f; vec[{2}] = 3.0f;
     
-    auto matrix = diag_matrix(vec);
+    auto matrix = diag(vec);
     
     ASSERT_EQ(matrix.dims()[0], 3);
     ASSERT_EQ(matrix.dims()[1], 3);
