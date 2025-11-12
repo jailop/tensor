@@ -31,7 +31,7 @@ Tensor<T, N> normalize_l1(const Tensor<T, N>& tensor, int axis = -1) {
             return tensor;
         }
     } else if constexpr (N >= 2) {
-        // Normalize along specific axis - use low-level implementation
+        // Normalize along specific axis with three-tier backend
         Tensor<T, N> result(tensor.dims(), tensor.uses_gpu());
         const T* src = tensor.data_ptr();
         T* dst = result.data_ptr();
@@ -60,7 +60,41 @@ Tensor<T, N> normalize_l1(const Tensor<T, N>& tensor, int axis = -1) {
         }
 #endif
 
-        // Parallel CPU path
+#ifdef USE_BLAS
+        if constexpr (std::is_same_v<T, float> || std::is_same_v<T, double>) {
+            for (size_t outer = 0; outer < outer_size; ++outer) {
+                for (size_t inner = 0; inner < inner_size; ++inner) {
+                    size_t first_idx = outer * axis_size * inner_size + inner;
+                    
+                    // Compute L1 norm using BLAS
+                    T sum;
+                    if constexpr (std::is_same_v<T, float>) {
+                        sum = cblas_sasum(static_cast<int>(axis_size), 
+                                         src + first_idx, static_cast<int>(inner_size));
+                    } else {
+                        sum = cblas_dasum(static_cast<int>(axis_size), 
+                                         src + first_idx, static_cast<int>(inner_size));
+                    }
+                    
+                    // Normalize
+                    if (sum > T(0)) {
+                        for (size_t ax = 0; ax < axis_size; ++ax) {
+                            size_t idx = outer * axis_size * inner_size + ax * inner_size + inner;
+                            dst[idx] = src[idx] / sum;
+                        }
+                    } else {
+                        for (size_t ax = 0; ax < axis_size; ++ax) {
+                            size_t idx = outer * axis_size * inner_size + ax * inner_size + inner;
+                            dst[idx] = src[idx];
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+#endif
+
+        // Parallel CPU fallback
         std::for_each(std::execution::par_unseq,
                      std::views::iota(size_t(0), outer_size).begin(),
                      std::views::iota(size_t(0), outer_size).end(),
@@ -117,7 +151,7 @@ Tensor<T, N> normalize_l2(const Tensor<T, N>& tensor, int axis = -1) {
             return tensor;
         }
     } else if constexpr (N >= 2) {
-        // Normalize along specific axis - use low-level implementation
+        // Normalize along specific axis with three-tier backend
         Tensor<T, N> result(tensor.dims(), tensor.uses_gpu());
         const T* src = tensor.data_ptr();
         T* dst = result.data_ptr();
@@ -142,12 +176,46 @@ Tensor<T, N> normalize_l2(const Tensor<T, N>& tensor, int axis = -1) {
             
             l2_norm_axis_gpu_direct(src, d_norms, outer_size, axis_size, inner_size);
             normalize_by_sums_gpu_direct(src, d_norms, dst, outer_size, axis_size, inner_size);
-            
             return result;
         }
 #endif
 
-        // Parallel CPU path
+#ifdef USE_BLAS
+        // BLAS path for axis-specific operations
+        if constexpr (std::is_same_v<T, float> || std::is_same_v<T, double>) {
+            for (size_t outer = 0; outer < outer_size; ++outer) {
+                for (size_t inner = 0; inner < inner_size; ++inner) {
+                    size_t first_idx = outer * axis_size * inner_size + inner;
+                    
+                    // Compute L2 norm using BLAS
+                    T norm;
+                    if constexpr (std::is_same_v<T, float>) {
+                        norm = cblas_snrm2(static_cast<int>(axis_size), 
+                                          src + first_idx, static_cast<int>(inner_size));
+                    } else {
+                        norm = cblas_dnrm2(static_cast<int>(axis_size), 
+                                          src + first_idx, static_cast<int>(inner_size));
+                    }
+                    
+                    // Normalize
+                    if (norm > T(0)) {
+                        for (size_t ax = 0; ax < axis_size; ++ax) {
+                            size_t idx = outer * axis_size * inner_size + ax * inner_size + inner;
+                            dst[idx] = src[idx] / norm;
+                        }
+                    } else {
+                        for (size_t ax = 0; ax < axis_size; ++ax) {
+                            size_t idx = outer * axis_size * inner_size + ax * inner_size + inner;
+                            dst[idx] = src[idx];
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+#endif
+
+        // Parallel CPU fallback
         std::for_each(std::execution::par_unseq,
                      std::views::iota(size_t(0), outer_size).begin(),
                      std::views::iota(size_t(0), outer_size).end(),
@@ -202,7 +270,7 @@ Tensor<T, N> normalize_zscore(const Tensor<T, N>& tensor, int axis = -1, T eps =
         
         return (tensor - mean_val) / std_val;
     } else if constexpr (N >= 2) {
-        // Normalize along specific axis - use low-level implementation
+        // Normalize along specific axis with three-tier backend
         Tensor<T, N> result(tensor.dims(), tensor.uses_gpu());
         const T* src = tensor.data_ptr();
         T* dst = result.data_ptr();
@@ -226,7 +294,7 @@ Tensor<T, N> normalize_zscore(const Tensor<T, N>& tensor, int axis = -1, T eps =
         }
 #endif
 
-        // Parallel CPU path
+        // CPU fallback: BLAS or parallel CPU
         std::for_each(std::execution::par_unseq,
                      std::views::iota(size_t(0), outer_size).begin(),
                      std::views::iota(size_t(0), outer_size).end(),
@@ -293,7 +361,7 @@ Tensor<T, N> normalize_minmax(const Tensor<T, N>& tensor, int axis = -1,
             return result;
         }
     } else if constexpr (N >= 2) {
-        // Normalize along specific axis - use low-level implementation
+        // Normalize along specific axis with three-tier backend
         Tensor<T, N> result(tensor.dims(), tensor.uses_gpu());
         const T* src = tensor.data_ptr();
         T* dst = result.data_ptr();
@@ -318,7 +386,7 @@ Tensor<T, N> normalize_minmax(const Tensor<T, N>& tensor, int axis = -1,
         }
 #endif
 
-        // Parallel CPU path
+        // CPU fallback: BLAS or parallel CPU
         std::for_each(std::execution::par_unseq,
                      std::views::iota(size_t(0), outer_size).begin(),
                      std::views::iota(size_t(0), outer_size).end(),
