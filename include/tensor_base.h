@@ -1635,6 +1635,9 @@ public:
      */
     template<typename Func>
     Tensor<T, N> map(Func func) const {
+#ifdef USE_GPU
+        ensure_on_cpu();  // Sync from GPU if needed
+#endif
         Tensor<T, N> result(dims_, use_gpu_);
         size_t total = total_size();
         
@@ -1671,6 +1674,11 @@ public:
      */
     template<typename Func>
     Tensor<T, N>& map_inplace(Func func) {
+#ifdef USE_GPU
+        ensure_on_cpu();  // Sync from GPU if needed
+        data_on_gpu_ = false;  // CPU data will be modified
+        gpu_needs_sync_ = false;
+#endif
         size_t total = total_size();
         
         for (size_t i = 0; i < total; ++i) {
@@ -2483,11 +2491,11 @@ public:
         if (use_gpu_) {
             ensure_on_gpu();
             Tensor<T, 1> d_result_tensor({1}, true);
-            T* d_result = d_result_tensor.data_ptr();
-            sum_gpu_direct(d_data_, d_result, total);
+            d_result_tensor.ensure_on_gpu();  // Allocate GPU memory
+            sum_gpu_direct(d_data_, d_result_tensor.d_data_, total);
             
             T result;
-            cudaMemcpy(&result, d_result, sizeof(T), cudaMemcpyDeviceToHost);
+            cudaMemcpy(&result, d_result_tensor.d_data_, sizeof(T), cudaMemcpyDeviceToHost);
             return result;
         }
 #endif
@@ -2693,11 +2701,11 @@ public:
         if (use_gpu_) {
             ensure_on_gpu();
             Tensor<T, 1> d_result_tensor({1}, true);
-            T* d_result = d_result_tensor.data_ptr();
-            min_gpu_direct(d_data_, d_result, total);
+            d_result_tensor.ensure_on_gpu();
+            min_gpu_direct(d_data_, d_result_tensor.d_data_, total);
             
             T min_val;
-            cudaMemcpy(&min_val, d_result, sizeof(T), cudaMemcpyDeviceToHost);
+            cudaMemcpy(&min_val, d_result_tensor.d_data_, sizeof(T), cudaMemcpyDeviceToHost);
             return min_val;
         }
 #endif
@@ -2722,11 +2730,11 @@ public:
         if (use_gpu_) {
             ensure_on_gpu();
             Tensor<T, 1> d_result_tensor({1}, true);
-            T* d_result = d_result_tensor.data_ptr();
-            max_gpu_direct(d_data_, d_result, total);
+            d_result_tensor.ensure_on_gpu();
+            max_gpu_direct(d_data_, d_result_tensor.d_data_, total);
             
             T max_val;
-            cudaMemcpy(&max_val, d_result, sizeof(T), cudaMemcpyDeviceToHost);
+            cudaMemcpy(&max_val, d_result_tensor.d_data_, sizeof(T), cudaMemcpyDeviceToHost);
             return max_val;
         }
 #endif

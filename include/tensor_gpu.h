@@ -49,6 +49,19 @@ public:
 };
 #endif // USE_CUBLAS
 
+// Forward declarations for GPU direct functions used in tensor_base.h
+template<typename T>
+void sum_gpu_direct(const T* d_a, T* d_result, size_t n);
+
+template<typename T>
+void min_gpu_direct(const T* d_a, T* d_result, size_t n);
+
+template<typename T>
+void max_gpu_direct(const T* d_a, T* d_result, size_t n);
+
+template<typename T>
+void abs_gpu_direct(const T* d_src, T* d_dst, size_t n);
+
 } // namespace tensor
 
 #endif // TENSOR_GPU_H
