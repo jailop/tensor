@@ -4,9 +4,8 @@
  */
 
 #include <gtest/gtest.h>
-#include "tensor.h"
-#include "linalg.h"
 #include <cmath>
+#include <tensor_normalize.h>
 
 using namespace tensor;
 

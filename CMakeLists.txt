@@ -195,7 +195,7 @@ install(TARGETS tensor4d_static tensor4d_shared
 
 # Install headers
 install(DIRECTORY include/
-  DESTINATION include/tensor4d
+  DESTINATION include/tensor
   FILES_MATCHING PATTERN "*.h" PATTERN "*.cuh"
   PATTERN "*.bak" EXCLUDE
   PATTERN "*.bak2" EXCLUDE
@@ -362,7 +362,7 @@ install(TARGETS tensor_c
 )
 
 install(FILES include/tensor_c.h
-  DESTINATION include/tensor4d
+  DESTINATION include/tensor
 )
 
 message(STATUS "Building C interface library: libtensor_c.so")
