@@ -2,6 +2,11 @@
 #define TENSOR_NORMALIZE_H
 
 #include "tensor_base.h"
+#include <numeric>
+
+#ifdef USE_BLAS
+#include "tensor_blas.h"
+#endif
 
 namespace tensor {
 
@@ -18,26 +23,19 @@ namespace tensor {
  */
 template <typename T, size_t N>
 Tensor<T, N> normalize_l1(const Tensor<T, N>& tensor, int axis = -1) {
-    Tensor<T, N> result(tensor.dims(), tensor.uses_gpu());
-    const T* src = tensor.data_ptr();
-    T* dst = result.data_ptr();
-    size_t total = tensor.total_size();
-    
     if (axis == -1) {
-        // Normalize over all elements
-        T sum = T(0);
-        for (size_t i = 0; i < total; ++i) {
-            sum += std::abs(src[i]);
-        }
+        T sum = tensor.abs().sum();
         if (sum > T(0)) {
-            for (size_t i = 0; i < total; ++i) {
-                dst[i] = src[i] / sum;
-            }
+            return tensor / sum;
         } else {
-            std::copy_n(src, total, dst);
+            return tensor;
         }
     } else if constexpr (N >= 2) {
-        // Normalize along specific axis
+        // Normalize along specific axis - use low-level implementation
+        Tensor<T, N> result(tensor.dims(), tensor.uses_gpu());
+        const T* src = tensor.data_ptr();
+        T* dst = result.data_ptr();
+        
         auto dims = tensor.dims();
         size_t axis_size = dims[axis];
         size_t outer_size = 1;
@@ -50,16 +48,30 @@ Tensor<T, N> normalize_l1(const Tensor<T, N>& tensor, int axis = -1) {
             inner_size *= dims[i];
         }
         
-        for (size_t outer = 0; outer < outer_size; ++outer) {
+#ifdef USE_GPU
+        if (tensor.uses_gpu()) {
+            size_t sums_size = outer_size * inner_size;
+            Tensor<T, 1> d_sums_tensor({sums_size}, true);
+            T* d_sums = d_sums_tensor.data_ptr();
+            
+            abs_sum_axis_gpu_direct(src, d_sums, outer_size, axis_size, inner_size);
+            normalize_by_sums_gpu_direct(src, d_sums, dst, outer_size, axis_size, inner_size);
+            return result;
+        }
+#endif
+
+        // Parallel CPU path
+        std::for_each(std::execution::par_unseq,
+                     std::views::iota(size_t(0), outer_size).begin(),
+                     std::views::iota(size_t(0), outer_size).end(),
+                     [&](size_t outer) {
             for (size_t inner = 0; inner < inner_size; ++inner) {
-                // Compute sum for this slice
                 T sum = T(0);
                 for (size_t ax = 0; ax < axis_size; ++ax) {
                     size_t idx = outer * axis_size * inner_size + ax * inner_size + inner;
                     sum += std::abs(src[idx]);
                 }
                 
-                // Normalize
                 if (sum > T(0)) {
                     for (size_t ax = 0; ax < axis_size; ++ax) {
                         size_t idx = outer * axis_size * inner_size + ax * inner_size + inner;
@@ -72,12 +84,11 @@ Tensor<T, N> normalize_l1(const Tensor<T, N>& tensor, int axis = -1) {
                     }
                 }
             }
-        }
+        });
+        return result;
     } else {
-        std::copy_n(src, total, dst);
+        return tensor;
     }
-    
-    return result;
 }
 
 /**
@@ -90,30 +101,27 @@ Tensor<T, N> normalize_l1(const Tensor<T, N>& tensor, int axis = -1) {
  * 
  * L2 normalization divides each element by the square root of the sum of squares.
  * Common in machine learning for feature normalization.
+ * 
+ * Optimized for GPU, BLAS, and parallel CPU execution.
  */
 template <typename T, size_t N>
 Tensor<T, N> normalize_l2(const Tensor<T, N>& tensor, int axis = -1) {
-    Tensor<T, N> result(tensor.dims(), tensor.uses_gpu());
-    const T* src = tensor.data_ptr();
-    T* dst = result.data_ptr();
-    size_t total = tensor.total_size();
-    
     if (axis == -1) {
-        // Normalize over all elements
-        T sum_sq = T(0);
-        for (size_t i = 0; i < total; ++i) {
-            sum_sq += src[i] * src[i];
-        }
+        auto squared = tensor * tensor;
+        T sum_sq = std::get<Tensor<T, N>>(squared).sum();
         T norm = std::sqrt(sum_sq);
+        
         if (norm > T(0)) {
-            for (size_t i = 0; i < total; ++i) {
-                dst[i] = src[i] / norm;
-            }
+            return tensor / norm;
         } else {
-            std::copy_n(src, total, dst);
+            return tensor;
         }
     } else if constexpr (N >= 2) {
-        // Normalize along specific axis
+        // Normalize along specific axis - use low-level implementation
+        Tensor<T, N> result(tensor.dims(), tensor.uses_gpu());
+        const T* src = tensor.data_ptr();
+        T* dst = result.data_ptr();
+        
         auto dims = tensor.dims();
         size_t axis_size = dims[axis];
         size_t outer_size = 1;
@@ -126,9 +134,25 @@ Tensor<T, N> normalize_l2(const Tensor<T, N>& tensor, int axis = -1) {
             inner_size *= dims[i];
         }
         
-        for (size_t outer = 0; outer < outer_size; ++outer) {
+#ifdef USE_GPU
+        if (tensor.uses_gpu()) {
+            size_t norms_size = outer_size * inner_size;
+            Tensor<T, 1> d_norms_tensor({norms_size}, true);
+            T* d_norms = d_norms_tensor.data_ptr();
+            
+            l2_norm_axis_gpu_direct(src, d_norms, outer_size, axis_size, inner_size);
+            normalize_by_sums_gpu_direct(src, d_norms, dst, outer_size, axis_size, inner_size);
+            
+            return result;
+        }
+#endif
+
+        // Parallel CPU path
+        std::for_each(std::execution::par_unseq,
+                     std::views::iota(size_t(0), outer_size).begin(),
+                     std::views::iota(size_t(0), outer_size).end(),
+                     [&](size_t outer) {
             for (size_t inner = 0; inner < inner_size; ++inner) {
-                // Compute sum of squares for this slice
                 T sum_sq = T(0);
                 for (size_t ax = 0; ax < axis_size; ++ax) {
                     size_t idx = outer * axis_size * inner_size + ax * inner_size + inner;
@@ -137,7 +161,6 @@ Tensor<T, N> normalize_l2(const Tensor<T, N>& tensor, int axis = -1) {
                 
                 T norm = std::sqrt(sum_sq);
                 
-                // Normalize
                 if (norm > T(0)) {
                     for (size_t ax = 0; ax < axis_size; ++ax) {
                         size_t idx = outer * axis_size * inner_size + ax * inner_size + inner;
@@ -150,12 +173,11 @@ Tensor<T, N> normalize_l2(const Tensor<T, N>& tensor, int axis = -1) {
                     }
                 }
             }
-        }
+        });
+        return result;
     } else {
-        std::copy_n(src, total, dst);
+        return tensor;
     }
-    
-    return result;
 }
 
 /**
@@ -168,35 +190,23 @@ Tensor<T, N> normalize_l2(const Tensor<T, N>& tensor, int axis = -1) {
  * @return Standardized tensor with mean ~0 and std ~1
  * 
  * Z-score normalization is common in statistical analysis and machine learning.
+ * 
+ * Optimized for GPU, BLAS, and parallel CPU execution.
  */
 template <typename T, size_t N>
 Tensor<T, N> normalize_zscore(const Tensor<T, N>& tensor, int axis = -1, T eps = T(1e-8)) {
-    Tensor<T, N> result(tensor.dims(), tensor.uses_gpu());
-    const T* src = tensor.data_ptr();
-    T* dst = result.data_ptr();
-    size_t total = tensor.total_size();
-    
     if (axis == -1) {
-        // Normalize over all elements
-        T mean = T(0);
-        for (size_t i = 0; i < total; ++i) {
-            mean += src[i];
-        }
-        mean /= total;
+        T mean_val = tensor.mean();
+        T std_val = tensor.std();
+        std_val = std::max(std_val, eps);
         
-        T var = T(0);
-        for (size_t i = 0; i < total; ++i) {
-            T diff = src[i] - mean;
-            var += diff * diff;
-        }
-        var /= total;
-        T std_dev = std::sqrt(var + eps);
-        
-        for (size_t i = 0; i < total; ++i) {
-            dst[i] = (src[i] - mean) / std_dev;
-        }
+        return (tensor - mean_val) / std_val;
     } else if constexpr (N >= 2) {
-        // Normalize along specific axis
+        // Normalize along specific axis - use low-level implementation
+        Tensor<T, N> result(tensor.dims(), tensor.uses_gpu());
+        const T* src = tensor.data_ptr();
+        T* dst = result.data_ptr();
+        
         auto dims = tensor.dims();
         size_t axis_size = dims[axis];
         size_t outer_size = 1;
@@ -209,9 +219,19 @@ Tensor<T, N> normalize_zscore(const Tensor<T, N>& tensor, int axis = -1, T eps =
             inner_size *= dims[i];
         }
         
-        for (size_t outer = 0; outer < outer_size; ++outer) {
+#ifdef USE_GPU
+        if (tensor.uses_gpu()) {
+            zscore_normalize_axis_gpu_direct(src, dst, outer_size, axis_size, inner_size, eps);
+            return result;
+        }
+#endif
+
+        // Parallel CPU path
+        std::for_each(std::execution::par_unseq,
+                     std::views::iota(size_t(0), outer_size).begin(),
+                     std::views::iota(size_t(0), outer_size).end(),
+                     [&](size_t outer) {
             for (size_t inner = 0; inner < inner_size; ++inner) {
-                // Compute mean for this slice
                 T mean = T(0);
                 for (size_t ax = 0; ax < axis_size; ++ax) {
                     size_t idx = outer * axis_size * inner_size + ax * inner_size + inner;
@@ -219,7 +239,6 @@ Tensor<T, N> normalize_zscore(const Tensor<T, N>& tensor, int axis = -1, T eps =
                 }
                 mean /= axis_size;
                 
-                // Compute variance
                 T var = T(0);
                 for (size_t ax = 0; ax < axis_size; ++ax) {
                     size_t idx = outer * axis_size * inner_size + ax * inner_size + inner;
@@ -229,18 +248,16 @@ Tensor<T, N> normalize_zscore(const Tensor<T, N>& tensor, int axis = -1, T eps =
                 var /= axis_size;
                 T std_dev = std::sqrt(var + eps);
                 
-                // Normalize
                 for (size_t ax = 0; ax < axis_size; ++ax) {
                     size_t idx = outer * axis_size * inner_size + ax * inner_size + inner;
                     dst[idx] = (src[idx] - mean) / std_dev;
                 }
             }
-        }
+        });
+        return result;
     } else {
-        std::copy_n(src, total, dst);
+        return tensor;
     }
-    
-    return result;
 }
 
 /**
@@ -255,39 +272,32 @@ Tensor<T, N> normalize_zscore(const Tensor<T, N>& tensor, int axis = -1, T eps =
  * @return Scaled tensor in the range [min_val, max_val]
  * 
  * Min-max scaling is useful when you need values in a specific range.
+ * 
+ * Optimized for GPU, BLAS, and parallel CPU execution.
  */
 template <typename T, size_t N>
 Tensor<T, N> normalize_minmax(const Tensor<T, N>& tensor, int axis = -1, 
                                T min_val = T(0), T max_val = T(1), T eps = T(1e-8)) {
-    Tensor<T, N> result(tensor.dims(), tensor.uses_gpu());
-    const T* src = tensor.data_ptr();
-    T* dst = result.data_ptr();
-    size_t total = tensor.total_size();
-    
     if (axis == -1) {
-        // Normalize over all elements
-        T min_elem = src[0];
-        T max_elem = src[0];
-        for (size_t i = 1; i < total; ++i) {
-            if (src[i] < min_elem) min_elem = src[i];
-            if (src[i] > max_elem) max_elem = src[i];
-        }
+        T min_elem = tensor.min();
+        T max_elem = tensor.max();
         
         T range = max_elem - min_elem;
         if (range > eps) {
             T scale = (max_val - min_val) / range;
-            for (size_t i = 0; i < total; ++i) {
-                dst[i] = min_val + (src[i] - min_elem) * scale;
-            }
+            return min_val + (tensor - min_elem) * scale;
         } else {
-            // All values are the same
             T mid = (min_val + max_val) / T(2);
-            for (size_t i = 0; i < total; ++i) {
-                dst[i] = mid;
-            }
+            Tensor<T, N> result(tensor.dims(), tensor.uses_gpu());
+            result.fill(mid);
+            return result;
         }
     } else if constexpr (N >= 2) {
-        // Normalize along specific axis
+        // Normalize along specific axis - use low-level implementation
+        Tensor<T, N> result(tensor.dims(), tensor.uses_gpu());
+        const T* src = tensor.data_ptr();
+        T* dst = result.data_ptr();
+        
         auto dims = tensor.dims();
         size_t axis_size = dims[axis];
         size_t outer_size = 1;
@@ -300,9 +310,20 @@ Tensor<T, N> normalize_minmax(const Tensor<T, N>& tensor, int axis = -1,
             inner_size *= dims[i];
         }
         
-        for (size_t outer = 0; outer < outer_size; ++outer) {
+#ifdef USE_GPU
+        if (tensor.uses_gpu()) {
+            minmax_normalize_axis_gpu_direct(src, dst, outer_size, axis_size, inner_size,
+                                             min_val, max_val, eps);
+            return result;
+        }
+#endif
+
+        // Parallel CPU path
+        std::for_each(std::execution::par_unseq,
+                     std::views::iota(size_t(0), outer_size).begin(),
+                     std::views::iota(size_t(0), outer_size).end(),
+                     [&](size_t outer) {
             for (size_t inner = 0; inner < inner_size; ++inner) {
-                // Find min and max for this slice
                 size_t first_idx = outer * axis_size * inner_size + inner;
                 T min_elem = src[first_idx];
                 T max_elem = src[first_idx];
@@ -315,7 +336,6 @@ Tensor<T, N> normalize_minmax(const Tensor<T, N>& tensor, int axis = -1,
                 
                 T range = max_elem - min_elem;
                 
-                // Normalize
                 if (range > eps) {
                     T scale = (max_val - min_val) / range;
                     for (size_t ax = 0; ax < axis_size; ++ax) {
@@ -330,12 +350,11 @@ Tensor<T, N> normalize_minmax(const Tensor<T, N>& tensor, int axis = -1,
                     }
                 }
             }
-        }
+        });
+        return result;
     } else {
-        std::copy_n(src, total, dst);
+        return tensor;
     }
-    
-    return result;
 }
 
 } // namespace tensor

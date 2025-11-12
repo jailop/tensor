@@ -1857,6 +1857,16 @@ public:
      * @return A new tensor with abs(x) applied to all elements.
      */
     Tensor<T, N> abs() const {
+#ifdef USE_GPU
+        if (use_gpu_) {
+            Tensor<T, N> result(dims_, true);
+            ensure_on_gpu();
+            result.ensure_on_gpu();
+            abs_gpu_direct(d_data_, result.d_data_, total_size());
+            result.mark_gpu_modified();
+            return result;
+        }
+#endif
         return map([](T x) { return std::abs(x); });
     }
     
@@ -2467,9 +2477,22 @@ public:
      * @endcode
      */
     T sum() const {
-        T result = T(0);
         size_t total = total_size();
         
+#ifdef USE_GPU
+        if (use_gpu_) {
+            ensure_on_gpu();
+            Tensor<T, 1> d_result_tensor({1}, true);
+            T* d_result = d_result_tensor.data_ptr();
+            sum_gpu_direct(d_data_, d_result, total);
+            
+            T result;
+            cudaMemcpy(&result, d_result, sizeof(T), cudaMemcpyDeviceToHost);
+            return result;
+        }
+#endif
+        
+        T result = T(0);
         for (size_t i = 0; i < total; ++i) {
             result += data_[i];
         }
@@ -2665,6 +2688,20 @@ public:
      */
     T min() const {
         size_t total = total_size();
+        
+#ifdef USE_GPU
+        if (use_gpu_) {
+            ensure_on_gpu();
+            Tensor<T, 1> d_result_tensor({1}, true);
+            T* d_result = d_result_tensor.data_ptr();
+            min_gpu_direct(d_data_, d_result, total);
+            
+            T min_val;
+            cudaMemcpy(&min_val, d_result, sizeof(T), cudaMemcpyDeviceToHost);
+            return min_val;
+        }
+#endif
+        
         T min_val = data_[0];
         for (size_t i = 1; i < total; ++i) {
             if (data_[i] < min_val) {
@@ -2680,6 +2717,20 @@ public:
      */
     T max() const {
         size_t total = total_size();
+        
+#ifdef USE_GPU
+        if (use_gpu_) {
+            ensure_on_gpu();
+            Tensor<T, 1> d_result_tensor({1}, true);
+            T* d_result = d_result_tensor.data_ptr();
+            max_gpu_direct(d_data_, d_result, total);
+            
+            T max_val;
+            cudaMemcpy(&max_val, d_result, sizeof(T), cudaMemcpyDeviceToHost);
+            return max_val;
+        }
+#endif
+        
         T max_val = data_[0];
         for (size_t i = 1; i < total; ++i) {
             if (data_[i] > max_val) {

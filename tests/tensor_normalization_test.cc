@@ -1,6 +1,5 @@
 /**
- * @file tensor_normalization_test.cc
- * @brief Test suite for tensor normalization functions and enhanced submatrix views
+ * Test suite for tensor normalization functions and enhanced submatrix views
  */
 
 #include <gtest/gtest.h>

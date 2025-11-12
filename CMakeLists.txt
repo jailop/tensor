@@ -19,9 +19,8 @@ if(CMAKE_CUDA_COMPILER)
   
   add_definitions(-DUSE_GPU)
   set(USE_CUDA ON)
-  message(STATUS "CUDA found - GPU acceleration enabled (Architecture: ${CMAKE_CUDA_ARCHITECTURES})")
+  message(STATUS "CUDA found: ${CMAKE_CUDA_ARCHITECTURES})")
   
-  # Find cuBLAS library for GPU matrix operations
   find_library(CUBLAS_LIBRARY 
                NAMES cublas
                PATHS /opt/cuda/lib64 ${CMAKE_CUDA_TOOLKIT_ROOT_DIR}/lib64
@@ -29,42 +28,36 @@ if(CMAKE_CUDA_COMPILER)
   
   if(CUBLAS_LIBRARY)
     add_definitions(-DUSE_CUBLAS)
-    # Add cuBLAS include directory
     include_directories(/opt/cuda/targets/x86_64-linux/include)
-    message(STATUS "cuBLAS found: ${CUBLAS_LIBRARY} - GPU matrix operations enabled")
+    message(STATUS "cuBLAS found: ${CUBLAS_LIBRARY}")
   else()
-    message(WARNING "cuBLAS not found - matmul will use CPU BLAS")
+    message(WARNING "cuBLAS not found")
   endif()
 else()
   set(USE_CUDA OFF)
-  message(STATUS "CUDA not found - building CPU-only version")
+  message(STATUS "CUDA not found")
 endif()
 
-# Find Threading library for parallel execution
 find_package(Threads REQUIRED)
 
-# Try to find TBB for parallel execution policy support
 find_package(TBB QUIET)
 
-# Try to find BLAS for optimized CPU operations
 find_package(BLAS QUIET)
 if(BLAS_FOUND)
   add_definitions(-DUSE_BLAS)
-  message(STATUS "BLAS found - optimized CPU matrix operations enabled")
+  message(STATUS "BLAS found")
 else()
-  message(STATUS "BLAS not found - using standard CPU implementation")
+  message(STATUS "BLAS not found")
 endif()
 
-# Try to find LAPACK for advanced linear algebra operations
 find_package(LAPACK QUIET)
 if(LAPACK_FOUND)
   add_definitions(-DUSE_LAPACK)
-  message(STATUS "LAPACK found - advanced linear algebra enabled")
+  message(STATUS "LAPACK found")
 else()
-  message(STATUS "LAPACK not found - using fallback implementations")
+  message(STATUS "LAPACK not found")
 endif()
 
-# Helper function to link math libraries to a target
 function(link_math_libraries target_name)
   if(TBB_FOUND)
     target_link_libraries(${target_name} TBB::tbb)
@@ -88,23 +81,16 @@ enable_testing()
 
 include_directories(include)
 
-# GPU source files (if CUDA is available)
 if(USE_CUDA)
   set(GPU_SOURCES src/tensor_gpu.cu)
   set_source_files_properties(${GPU_SOURCES} PROPERTIES LANGUAGE CUDA)
 endif()
 
-# ============================================
-# Tensor Library (Static and Shared)
-# ============================================
-
-# Core library sources
 set(TENSOR_LIB_SOURCES
   src/tensor_instantiations.cc
   src/tensor_error.cc
 )
 
-# Build static library
 add_library(tensor4d_static STATIC
   ${TENSOR_LIB_SOURCES}
   ${GPU_SOURCES}
@@ -114,60 +100,49 @@ target_link_libraries(tensor4d_static
   PUBLIC Threads::Threads
 )
 
-# Link TBB if found
 if(TBB_FOUND)
   target_link_libraries(tensor4d_static PUBLIC TBB::tbb)
 endif()
 
-# Link BLAS if found
 if(BLAS_FOUND)
   target_link_libraries(tensor4d_static PUBLIC ${BLAS_LIBRARIES})
 endif()
 
-# Link LAPACK if found
 if(LAPACK_FOUND)
   target_link_libraries(tensor4d_static PUBLIC ${LAPACK_LIBRARIES})
 endif()
 
-# Link cuBLAS if found
 if(CUBLAS_LIBRARY)
   target_link_libraries(tensor4d_static PUBLIC ${CUBLAS_LIBRARY})
 endif()
 
-# Build shared library
 add_library(tensor4d_shared SHARED
   ${TENSOR_LIB_SOURCES}
   ${GPU_SOURCES}
 )
 
-# Set output name to match static library (without _shared suffix)
 set_target_properties(tensor4d_shared PROPERTIES OUTPUT_NAME tensor4d)
 
 target_link_libraries(tensor4d_shared
   PUBLIC Threads::Threads
 )
 
-# Link TBB if found
 if(TBB_FOUND)
   target_link_libraries(tensor4d_shared PUBLIC TBB::tbb)
 endif()
 
-# Link BLAS if found
 if(BLAS_FOUND)
   target_link_libraries(tensor4d_shared PUBLIC ${BLAS_LIBRARIES})
 endif()
 
-# Link LAPACK if found
 if(LAPACK_FOUND)
   target_link_libraries(tensor4d_shared PUBLIC ${LAPACK_LIBRARIES})
 endif()
 
-# Link cuBLAS if found
 if(CUBLAS_LIBRARY)
   target_link_libraries(tensor4d_shared PUBLIC ${CUBLAS_LIBRARY})
 endif()
 
-# Set library properties
 set_target_properties(tensor4d_static PROPERTIES
   OUTPUT_NAME tensor4d
   POSITION_INDEPENDENT_CODE ON
@@ -182,18 +157,12 @@ set_target_properties(tensor4d_shared PROPERTIES
 message(STATUS "Building static library: libtensor4d.a")
 message(STATUS "Building shared library: libtensor4d.so (version 1.0.0)")
 
-# ============================================
-# Installation Rules
-# ============================================
-
-# Install libraries
 install(TARGETS tensor4d_static tensor4d_shared
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
 )
 
-# Install headers
 install(DIRECTORY include/
   DESTINATION include/tensor
   FILES_MATCHING PATTERN "*.h" PATTERN "*.cuh"
@@ -204,10 +173,8 @@ install(DIRECTORY include/
 message(STATUS "Install prefix: ${CMAKE_INSTALL_PREFIX}")
 message(STATUS "Use 'make install' to install libraries and headers")
 
-# Collect all test files from tests directory
 file(GLOB TEST_SOURCES "tests/*.cc")
 
-# Test executables
 add_executable(
   tensor_test
   ${TEST_SOURCES}
@@ -220,9 +187,6 @@ target_link_libraries(
   Threads::Threads
 )
 
-
-
-# Link TBB if found (required for GCC/Clang parallel execution)
 if(TBB_FOUND)
   target_link_libraries(tensor_test TBB::tbb)
   message(STATUS "TBB found - parallel execution fully enabled")
@@ -273,7 +237,6 @@ endif()
 
 gtest_discover_tests(tensor_nn_enhancements_test)
 
-# Performance benchmark executable
 add_executable(
   tensor_perf
   perf/tensor_perf.cc
@@ -287,7 +250,6 @@ target_link_libraries(
 
 link_math_libraries(tensor_perf)
 
-# GPU/BLAS demo executable
 add_executable(
   gpu_blas_demo
   examples/gpu_blas_demo.cc
@@ -424,7 +386,6 @@ target_link_libraries(
 
 link_math_libraries(mnist_demo)
 
-# Add custom target to run performance tests
 add_custom_target(run_perf
   COMMAND tensor_perf
   DEPENDS tensor_perf
@@ -432,9 +393,35 @@ add_custom_target(run_perf
   COMMENT "Running performance benchmarks..."
 )
 
-# ============================================
-# Doxygen Documentation
-# ============================================
+find_package(benchmark QUIET)
+
+if(benchmark_FOUND)
+  message(STATUS "Google Benchmark found")
+  
+  add_executable(
+    tensor_normalize_benchmark
+    benchs/tensor_normalize_benchmark.cc
+    ${GPU_SOURCES}
+  )
+  
+  target_link_libraries(
+    tensor_normalize_benchmark
+    benchmark::benchmark
+    Threads::Threads
+  )
+  
+  link_math_libraries(tensor_normalize_benchmark)
+  
+  add_custom_target(run_normalize_benchmark
+    COMMAND tensor_normalize_benchmark
+    DEPENDS tensor_normalize_benchmark
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    COMMENT "Running tensor normalization benchmarks..."
+  )
+else()
+  message(STATUS "Google Benchmark not found")
+endif()
+
 find_package(Doxygen
   OPTIONAL_COMPONENTS dot)
 

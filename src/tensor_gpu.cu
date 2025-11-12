@@ -478,6 +478,14 @@ void div_scalar_gpu(const T* a, T scalar, T* result, size_t n) {
     cudaFree(d_result);
 }
 
+template<typename T>
+void div_scalar_gpu_direct(T* d_a, T scalar, T* d_result, size_t n) {
+    int threads_per_block = 256;
+    int blocks = (n + threads_per_block - 1) / threads_per_block;
+    div_scalar_kernel<<<blocks, threads_per_block>>>(d_a, scalar, d_result, n);
+    cudaDeviceSynchronize();
+}
+
 // Math function kernels
 template<typename T>
 __global__ void exp_kernel(const T* a, T* result, size_t n) {
@@ -532,6 +540,14 @@ __global__ void tanh_kernel(const T* a, T* result, size_t n) {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (idx < n) {
         result[idx] = tanh(a[idx]);
+    }
+}
+
+template<typename T>
+__global__ void abs_kernel(const T* a, T* result, size_t n) {
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    if (idx < n) {
+        result[idx] = abs(a[idx]);
     }
 }
 
@@ -909,6 +925,82 @@ void min_gpu(const T* a, T* result, size_t n) {
     cudaFree(d_partial);
 }
 
+// Direct GPU reduction operations (data already on GPU)
+template<typename T>
+void sum_gpu_direct(const T* d_a, T* d_result, size_t n) {
+    int threads_per_block = 256;
+    int blocks = (n + threads_per_block - 1) / threads_per_block;
+    
+    T* d_partial;
+    cudaMalloc(&d_partial, blocks * sizeof(T));
+    
+    sum_kernel<<<blocks, threads_per_block, threads_per_block * sizeof(T)>>>(
+        d_a, d_partial, n);
+    
+    if (blocks > 1) {
+        sum_kernel<<<1, threads_per_block, threads_per_block * sizeof(T)>>>(
+            d_partial, d_result, blocks);
+    } else {
+        cudaMemcpy(d_result, d_partial, sizeof(T), cudaMemcpyDeviceToDevice);
+    }
+    
+    cudaFree(d_partial);
+    cudaDeviceSynchronize();
+}
+
+template<typename T>
+void min_gpu_direct(const T* d_a, T* d_result, size_t n) {
+    int threads_per_block = 256;
+    int blocks = (n + threads_per_block - 1) / threads_per_block;
+    
+    T* d_partial;
+    cudaMalloc(&d_partial, blocks * sizeof(T));
+    
+    min_kernel<<<blocks, threads_per_block, threads_per_block * sizeof(T)>>>(
+        d_a, d_partial, n);
+    
+    if (blocks > 1) {
+        min_kernel<<<1, threads_per_block, threads_per_block * sizeof(T)>>>(
+            d_partial, d_result, blocks);
+    } else {
+        cudaMemcpy(d_result, d_partial, sizeof(T), cudaMemcpyDeviceToDevice);
+    }
+    
+    cudaFree(d_partial);
+    cudaDeviceSynchronize();
+}
+
+template<typename T>
+void max_gpu_direct(const T* d_a, T* d_result, size_t n) {
+    int threads_per_block = 256;
+    int blocks = (n + threads_per_block - 1) / threads_per_block;
+    
+    T* d_partial;
+    cudaMalloc(&d_partial, blocks * sizeof(T));
+    
+    max_kernel<<<blocks, threads_per_block, threads_per_block * sizeof(T)>>>(
+        d_a, d_partial, n);
+    
+    if (blocks > 1) {
+        max_kernel<<<1, threads_per_block, threads_per_block * sizeof(T)>>>(
+            d_partial, d_result, blocks);
+    } else {
+        cudaMemcpy(d_result, d_partial, sizeof(T), cudaMemcpyDeviceToDevice);
+    }
+    
+    cudaFree(d_partial);
+    cudaDeviceSynchronize();
+}
+
+template<typename T>
+void abs_gpu_direct(const T* d_src, T* d_dst, size_t n) {
+    int threads_per_block = 256;
+    int blocks = (n + threads_per_block - 1) / threads_per_block;
+    
+    abs_kernel<<<blocks, threads_per_block>>>(d_src, d_dst, n);
+    cudaDeviceSynchronize();
+}
+
 // Template instantiations for element-wise operations
 template void add_gpu<int>(const int*, const int*, int*, size_t);
 template void add_gpu<float>(const float*, const float*, float*, size_t);
@@ -1018,6 +1110,10 @@ template void div_scalar_gpu<int>(const int*, int, int*, size_t);
 template void div_scalar_gpu<float>(const float*, float, float*, size_t);
 template void div_scalar_gpu<double>(const double*, double, double*, size_t);
 
+template void div_scalar_gpu_direct<int>(int*, int, int*, size_t);
+template void div_scalar_gpu_direct<float>(float*, float, float*, size_t);
+template void div_scalar_gpu_direct<double>(double*, double, double*, size_t);
+
 // Template instantiations for math functions
 template void exp_gpu<float>(const float*, float*, size_t);
 template void exp_gpu<double>(const double*, double*, size_t);
@@ -1062,6 +1158,19 @@ template void max_gpu<double>(const double*, double*, size_t);
 template void min_gpu<int>(const int*, int*, size_t);
 template void min_gpu<float>(const float*, float*, size_t);
 template void min_gpu<double>(const double*, double*, size_t);
+
+// Direct GPU reduction operations
+template void sum_gpu_direct<float>(const float*, float*, size_t);
+template void sum_gpu_direct<double>(const double*, double*, size_t);
+
+template void min_gpu_direct<float>(const float*, float*, size_t);
+template void min_gpu_direct<double>(const double*, double*, size_t);
+
+template void max_gpu_direct<float>(const float*, float*, size_t);
+template void max_gpu_direct<double>(const double*, double*, size_t);
+
+template void abs_gpu_direct<float>(const float*, float*, size_t);
+template void abs_gpu_direct<double>(const double*, double*, size_t);
 
 
 // =============================================================================
@@ -1189,6 +1298,418 @@ void fill_gpu_direct(T* d_data, T value, size_t n) {
     cudaDeviceSynchronize();
 }
 
+// L1 Normalization Kernels
+
+// Kernel to compute absolute value sum with reduction
+template<typename T>
+__global__ void abs_sum_kernel(const T* src, T* partial_sums, size_t n) {
+    extern __shared__ char shared_mem[];
+    T* sdata = reinterpret_cast<T*>(shared_mem);
+    
+    unsigned int tid = threadIdx.x;
+    unsigned int i = blockIdx.x * blockDim.x + threadIdx.x;
+    
+    T sum = T(0);
+    if (i < n) {
+        sum = (src[i] < T(0)) ? -src[i] : src[i];  // abs(src[i])
+    }
+    sdata[tid] = sum;
+    __syncthreads();
+    
+    // Reduction in shared memory
+    for (unsigned int s = blockDim.x / 2; s > 0; s >>= 1) {
+        if (tid < s) {
+            sdata[tid] += sdata[tid + s];
+        }
+        __syncthreads();
+    }
+    
+    if (tid == 0) {
+        partial_sums[blockIdx.x] = sdata[0];
+    }
+}
+
+template<typename T>
+void abs_sum_gpu_direct(const T* d_src, T* d_result, size_t n) {
+    int threads_per_block = 256;
+    int blocks = (n + threads_per_block - 1) / threads_per_block;
+    
+    T* d_partial;
+    cudaMalloc(&d_partial, blocks * sizeof(T));
+    
+    abs_sum_kernel<<<blocks, threads_per_block, threads_per_block * sizeof(T)>>>(
+        d_src, d_partial, n);
+    
+    // Final reduction on CPU for small number of blocks
+    if (blocks > 1) {
+        sum_kernel<<<1, blocks, blocks * sizeof(T)>>>(d_partial, d_result, blocks);
+    } else {
+        cudaMemcpy(d_result, d_partial, sizeof(T), cudaMemcpyDeviceToDevice);
+    }
+    
+    cudaFree(d_partial);
+    cudaDeviceSynchronize();
+}
+
+// Kernel to compute absolute value sum along specific axis
+template<typename T>
+__global__ void abs_sum_axis_kernel(const T* src, T* sums,
+                                     size_t outer, size_t axis_size, size_t inner) {
+    size_t o = blockIdx.y;
+    size_t i = blockIdx.x * blockDim.x + threadIdx.x;
+    
+    if (o < outer && i < inner) {
+        T sum = T(0);
+        for (size_t a = 0; a < axis_size; ++a) {
+            size_t src_idx = o * axis_size * inner + a * inner + i;
+            T val = src[src_idx];
+            sum += (val < T(0)) ? -val : val;  // abs(val)
+        }
+        size_t dst_idx = o * inner + i;
+        sums[dst_idx] = sum;
+    }
+}
+
+template<typename T>
+void abs_sum_axis_gpu_direct(const T* d_src, T* d_sums,
+                              size_t outer, size_t axis_size, size_t inner) {
+    int threads_per_block = 256;
+    dim3 blocks((inner + threads_per_block - 1) / threads_per_block, outer);
+    
+    abs_sum_axis_kernel<<<blocks, threads_per_block>>>(
+        d_src, d_sums, outer, axis_size, inner);
+    cudaDeviceSynchronize();
+}
+
+// Kernel to normalize by dividing by precomputed sums
+template<typename T>
+__global__ void normalize_by_sums_kernel(const T* src, const T* sums, T* dst,
+                                         size_t outer, size_t axis_size, size_t inner) {
+    size_t o = blockIdx.y;
+    size_t a = blockIdx.z;
+    size_t i = blockIdx.x * blockDim.x + threadIdx.x;
+    
+    if (o < outer && a < axis_size && i < inner) {
+        size_t sum_idx = o * inner + i;
+        T sum = sums[sum_idx];
+        
+        size_t idx = o * axis_size * inner + a * inner + i;
+        dst[idx] = (sum > T(0)) ? src[idx] / sum : src[idx];
+    }
+}
+
+template<typename T>
+void normalize_by_sums_gpu_direct(const T* d_src, const T* d_sums, T* d_dst,
+                                   size_t outer, size_t axis_size, size_t inner) {
+    int threads_per_block = 256;
+    dim3 blocks((inner + threads_per_block - 1) / threads_per_block, outer, axis_size);
+    
+    normalize_by_sums_kernel<<<blocks, threads_per_block>>>(
+        d_src, d_sums, d_dst, outer, axis_size, inner);
+    cudaDeviceSynchronize();
+}
+
+// L2 Normalization Kernels
+
+template<typename T>
+__global__ void l2_norm_kernel(const T* src, T* partial_sums, size_t n) {
+    extern __shared__ char shared_mem[];
+    T* sdata = reinterpret_cast<T*>(shared_mem);
+    
+    unsigned int tid = threadIdx.x;
+    unsigned int i = blockIdx.x * blockDim.x + threadIdx.x;
+    
+    T sum = T(0);
+    if (i < n) {
+        sum = src[i] * src[i];
+    }
+    sdata[tid] = sum;
+    __syncthreads();
+    
+    for (unsigned int s = blockDim.x / 2; s > 0; s >>= 1) {
+        if (tid < s) {
+            sdata[tid] += sdata[tid + s];
+        }
+        __syncthreads();
+    }
+    
+    if (tid == 0) {
+        partial_sums[blockIdx.x] = sdata[0];
+    }
+}
+
+template<typename T>
+void l2_norm_gpu_direct(const T* d_src, T* d_result, size_t n) {
+    int threads_per_block = 256;
+    int blocks = (n + threads_per_block - 1) / threads_per_block;
+    
+    T* d_partial;
+    cudaMalloc(reinterpret_cast<void**>(&d_partial), blocks * sizeof(T));
+    
+    l2_norm_kernel<<<blocks, threads_per_block, threads_per_block * sizeof(T)>>>(
+        d_src, d_partial, n);
+    
+    if (blocks > 1) {
+        sum_kernel<<<1, blocks, blocks * sizeof(T)>>>(d_partial, d_result, blocks);
+    } else {
+        cudaMemcpy(d_result, d_partial, sizeof(T), cudaMemcpyDeviceToDevice);
+    }
+    
+    sqrt_gpu_direct(d_result, d_result, 1);
+    
+    cudaFree(d_partial);
+    cudaDeviceSynchronize();
+}
+
+template<typename T>
+__global__ void l2_norm_axis_kernel(const T* src, T* norms,
+                                     size_t outer, size_t axis_size, size_t inner) {
+    size_t o = blockIdx.y;
+    size_t i = blockIdx.x * blockDim.x + threadIdx.x;
+    
+    if (o < outer && i < inner) {
+        T sum_sq = T(0);
+        for (size_t a = 0; a < axis_size; ++a) {
+            size_t src_idx = o * axis_size * inner + a * inner + i;
+            T val = src[src_idx];
+            sum_sq += val * val;
+        }
+        size_t dst_idx = o * inner + i;
+        norms[dst_idx] = sqrt(sum_sq);
+    }
+}
+
+template<typename T>
+void l2_norm_axis_gpu_direct(const T* d_src, T* d_norms,
+                              size_t outer, size_t axis_size, size_t inner) {
+    int threads_per_block = 256;
+    dim3 blocks((inner + threads_per_block - 1) / threads_per_block, outer);
+    
+    l2_norm_axis_kernel<<<blocks, threads_per_block>>>(
+        d_src, d_norms, outer, axis_size, inner);
+    cudaDeviceSynchronize();
+}
+
+// Z-score Normalization Kernels
+
+template<typename T>
+__global__ void variance_kernel(const T* src, const T* mean, T* partial_vars, size_t n) {
+    extern __shared__ char shared_mem[];
+    T* sdata = reinterpret_cast<T*>(shared_mem);
+    
+    unsigned int tid = threadIdx.x;
+    unsigned int i = blockIdx.x * blockDim.x + threadIdx.x;
+    
+    T var = T(0);
+    if (i < n) {
+        T diff = src[i] - mean[0];
+        var = diff * diff;
+    }
+    sdata[tid] = var;
+    __syncthreads();
+    
+    for (unsigned int s = blockDim.x / 2; s > 0; s >>= 1) {
+        if (tid < s) {
+            sdata[tid] += sdata[tid + s];
+        }
+        __syncthreads();
+    }
+    
+    if (tid == 0) {
+        partial_vars[blockIdx.x] = sdata[0];
+    }
+}
+
+template<typename T>
+__global__ void zscore_normalize_kernel(const T* src, T* dst, size_t n, T mean, T std_dev) {
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    if (idx < n) {
+        dst[idx] = (src[idx] - mean) / std_dev;
+    }
+}
+
+template<typename T>
+void zscore_normalize_gpu_direct(const T* d_src, T* d_dst, size_t n, T eps) {
+    T* d_mean;
+    cudaMalloc(reinterpret_cast<void**>(&d_mean), sizeof(T));
+    
+    int threads_per_block = 256;
+    int blocks = (n + threads_per_block - 1) / threads_per_block;
+    
+    T* d_partial;
+    cudaMalloc(reinterpret_cast<void**>(&d_partial), blocks * sizeof(T));
+    
+    sum_kernel<<<blocks, threads_per_block, threads_per_block * sizeof(T)>>>(
+        d_src, d_partial, n);
+    
+    if (blocks > 1) {
+        sum_kernel<<<1, blocks, blocks * sizeof(T)>>>(d_partial, d_mean, blocks);
+    } else {
+        cudaMemcpy(d_mean, d_partial, sizeof(T), cudaMemcpyDeviceToDevice);
+    }
+    
+    T h_mean;
+    cudaMemcpy(&h_mean, d_mean, sizeof(T), cudaMemcpyDeviceToHost);
+    h_mean /= n;
+    cudaMemcpy(d_mean, &h_mean, sizeof(T), cudaMemcpyHostToDevice);
+    
+    T* d_var;
+    cudaMalloc(reinterpret_cast<void**>(&d_var), sizeof(T));
+    
+    variance_kernel<<<blocks, threads_per_block, threads_per_block * sizeof(T)>>>(
+        d_src, d_mean, d_partial, n);
+    
+    if (blocks > 1) {
+        sum_kernel<<<1, blocks, blocks * sizeof(T)>>>(d_partial, d_var, blocks);
+    } else {
+        cudaMemcpy(d_var, d_partial, sizeof(T), cudaMemcpyDeviceToDevice);
+    }
+    
+    T h_var;
+    cudaMemcpy(&h_var, d_var, sizeof(T), cudaMemcpyDeviceToHost);
+    T std_dev = sqrt(h_var / n + eps);
+    cudaMemcpy(&h_mean, d_mean, sizeof(T), cudaMemcpyDeviceToHost);
+    
+    zscore_normalize_kernel<<<blocks, threads_per_block>>>(d_src, d_dst, n, h_mean, std_dev);
+    
+    cudaFree(d_mean);
+    cudaFree(d_var);
+    cudaFree(d_partial);
+    cudaDeviceSynchronize();
+}
+
+template<typename T>
+__global__ void zscore_normalize_axis_kernel(const T* src, T* dst,
+                                              size_t outer, size_t axis_size, size_t inner, T eps) {
+    size_t o = blockIdx.y;
+    size_t i = blockIdx.x * blockDim.x + threadIdx.x;
+    
+    if (o < outer && i < inner) {
+        T mean = T(0);
+        for (size_t a = 0; a < axis_size; ++a) {
+            size_t idx = o * axis_size * inner + a * inner + i;
+            mean += src[idx];
+        }
+        mean /= axis_size;
+        
+        T var = T(0);
+        for (size_t a = 0; a < axis_size; ++a) {
+            size_t idx = o * axis_size * inner + a * inner + i;
+            T diff = src[idx] - mean;
+            var += diff * diff;
+        }
+        var /= axis_size;
+        T std_dev = sqrt(var + eps);
+        
+        for (size_t a = 0; a < axis_size; ++a) {
+            size_t idx = o * axis_size * inner + a * inner + i;
+            dst[idx] = (src[idx] - mean) / std_dev;
+        }
+    }
+}
+
+template<typename T>
+void zscore_normalize_axis_gpu_direct(const T* d_src, T* d_dst,
+                                       size_t outer, size_t axis_size, size_t inner, T eps) {
+    int threads_per_block = 256;
+    dim3 blocks((inner + threads_per_block - 1) / threads_per_block, outer);
+    
+    zscore_normalize_axis_kernel<<<blocks, threads_per_block>>>(
+        d_src, d_dst, outer, axis_size, inner, eps);
+    cudaDeviceSynchronize();
+}
+
+// Min-Max Normalization Kernels
+
+template<typename T>
+__global__ void minmax_scale_kernel(const T* src, T* dst, size_t n,
+                                     T min_elem, T max_elem, T min_val, T max_val, T eps) {
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    if (idx < n) {
+        T range = max_elem - min_elem;
+        if (range > eps) {
+            T scale = (max_val - min_val) / range;
+            dst[idx] = min_val + (src[idx] - min_elem) * scale;
+        } else {
+            dst[idx] = (min_val + max_val) / T(2);
+        }
+    }
+}
+
+template<typename T>
+void minmax_normalize_gpu_direct(const T* d_src, T* d_dst, size_t n,
+                                  T min_val, T max_val, T eps) {
+    T* d_min;
+    T* d_max;
+    cudaMalloc(reinterpret_cast<void**>(&d_min), sizeof(T));
+    cudaMalloc(reinterpret_cast<void**>(&d_max), sizeof(T));
+    
+    min_gpu(d_src, d_min, n);
+    max_gpu(d_src, d_max, n);
+    
+    T h_min, h_max;
+    cudaMemcpy(&h_min, d_min, sizeof(T), cudaMemcpyDeviceToHost);
+    cudaMemcpy(&h_max, d_max, sizeof(T), cudaMemcpyDeviceToHost);
+    
+    int threads_per_block = 256;
+    int blocks = (n + threads_per_block - 1) / threads_per_block;
+    minmax_scale_kernel<<<blocks, threads_per_block>>>(
+        d_src, d_dst, n, h_min, h_max, min_val, max_val, eps);
+    
+    cudaFree(d_min);
+    cudaFree(d_max);
+    cudaDeviceSynchronize();
+}
+
+template<typename T>
+__global__ void minmax_normalize_axis_kernel(const T* src, T* dst,
+                                              size_t outer, size_t axis_size, size_t inner,
+                                              T min_val, T max_val, T eps) {
+    size_t o = blockIdx.y;
+    size_t i = blockIdx.x * blockDim.x + threadIdx.x;
+    
+    if (o < outer && i < inner) {
+        size_t first_idx = o * axis_size * inner + i;
+        T min_elem = src[first_idx];
+        T max_elem = src[first_idx];
+        
+        for (size_t a = 1; a < axis_size; ++a) {
+            size_t idx = o * axis_size * inner + a * inner + i;
+            T val = src[idx];
+            if (val < min_elem) min_elem = val;
+            if (val > max_elem) max_elem = val;
+        }
+        
+        T range = max_elem - min_elem;
+        
+        if (range > eps) {
+            T scale = (max_val - min_val) / range;
+            for (size_t a = 0; a < axis_size; ++a) {
+                size_t idx = o * axis_size * inner + a * inner + i;
+                dst[idx] = min_val + (src[idx] - min_elem) * scale;
+            }
+        } else {
+            T mid = (min_val + max_val) / T(2);
+            for (size_t a = 0; a < axis_size; ++a) {
+                size_t idx = o * axis_size * inner + a * inner + i;
+                dst[idx] = mid;
+            }
+        }
+    }
+}
+
+template<typename T>
+void minmax_normalize_axis_gpu_direct(const T* d_src, T* d_dst,
+                                       size_t outer, size_t axis_size, size_t inner,
+                                       T min_val, T max_val, T eps) {
+    int threads_per_block = 256;
+    dim3 blocks((inner + threads_per_block - 1) / threads_per_block, outer);
+    
+    minmax_normalize_axis_kernel<<<blocks, threads_per_block>>>(
+        d_src, d_dst, outer, axis_size, inner, min_val, max_val, eps);
+    cudaDeviceSynchronize();
+}
+
 // Template instantiations for direct GPU operations
 template void add_gpu_direct<int>(int*, int*, int*, size_t);
 template void add_gpu_direct<float>(float*, float*, float*, size_t);
@@ -1238,6 +1759,37 @@ template void fill_gpu_direct<float>(float*, float, size_t);
 template void fill_gpu_direct<double>(double*, double, size_t);
 template void fill_gpu_direct<size_t>(size_t*, size_t, size_t);
 template void fill_gpu_direct<bool>(bool*, bool, size_t);
+
+// L1 Normalization instantiations
+template void abs_sum_gpu_direct<float>(const float*, float*, size_t);
+template void abs_sum_gpu_direct<double>(const double*, double*, size_t);
+
+template void abs_sum_axis_gpu_direct<float>(const float*, float*, size_t, size_t, size_t);
+template void abs_sum_axis_gpu_direct<double>(const double*, double*, size_t, size_t, size_t);
+
+template void normalize_by_sums_gpu_direct<float>(const float*, const float*, float*, size_t, size_t, size_t);
+template void normalize_by_sums_gpu_direct<double>(const double*, const double*, double*, size_t, size_t, size_t);
+
+// L2 Normalization instantiations
+template void l2_norm_gpu_direct<float>(const float*, float*, size_t);
+template void l2_norm_gpu_direct<double>(const double*, double*, size_t);
+
+template void l2_norm_axis_gpu_direct<float>(const float*, float*, size_t, size_t, size_t);
+template void l2_norm_axis_gpu_direct<double>(const double*, double*, size_t, size_t, size_t);
+
+// Z-score Normalization instantiations
+template void zscore_normalize_gpu_direct<float>(const float*, float*, size_t, float);
+template void zscore_normalize_gpu_direct<double>(const double*, double*, size_t, double);
+
+template void zscore_normalize_axis_gpu_direct<float>(const float*, float*, size_t, size_t, size_t, float);
+template void zscore_normalize_axis_gpu_direct<double>(const double*, double*, size_t, size_t, size_t, double);
+
+// Min-Max Normalization instantiations
+template void minmax_normalize_gpu_direct<float>(const float*, float*, size_t, float, float, float);
+template void minmax_normalize_gpu_direct<double>(const double*, double*, size_t, double, double, double);
+
+template void minmax_normalize_axis_gpu_direct<float>(const float*, float*, size_t, size_t, size_t, float, float, float);
+template void minmax_normalize_axis_gpu_direct<double>(const double*, double*, size_t, size_t, size_t, double, double, double);
 
 } // namespace tensor
 
