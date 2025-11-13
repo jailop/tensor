@@ -1,5 +1,5 @@
 /**
- * @brief Multi-dimensional tensor library with GPU, BLAS, and autograd support
+ * Multi-dimensional tensor class with GPU, BLAS, and autograd support
  */
 
 #ifndef _TENSOR_BASE_H
@@ -24,6 +24,8 @@
 #include "tensor_perf.h"
 #include "tensor_blas.h"
 #include "tensor_error.h"
+#include "tensor_defs.h"
+
 #ifdef USE_GPU
 #include "tensor_gpu.h"
 #include "tensor_gpu.cuh"
@@ -31,32 +33,7 @@
 
 namespace tensor {
 
-/**
- * @enum Backend
- * @brief Available computational backends
- * 
- * Indicates which backend is being used for tensor operations.
- * Priority order: GPU > BLAS > CPU
- */
-enum class Backend {
-    CPU,   ///< Standard CPU implementation
-    BLAS,  ///< Optimized BLAS for CPU operations
-    GPU    ///< CUDA GPU acceleration
-};
 
-/**
- * @brief Get the name of a backend as a string
- * @param backend The backend enum value
- * @return Human-readable name of the backend
- */
-inline std::string backend_name(Backend backend) {
-    switch (backend) {
-        case Backend::CPU: return "CPU";
-        case Backend::BLAS: return "BLAS";
-        case Backend::GPU: return "GPU";
-        default: return "Unknown";
-    }
-}
 
 /**
  * @brief Get the currently active backend
