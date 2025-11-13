@@ -10,14 +10,7 @@
 //
 // SUGGESTION: GPU support is enabled at library build time, not compile time.
 // If the library was built with CUDA support (USE_GPU flag), GPU acceleration
-// is automatically available. To verify GPU support:
-//
-//   1. Build library with: cmake -DUSE_GPU=ON ..  
-//   2. Check at runtime:
-//   if (is_gpu_available()) { /* GPU is ready */ } 
-//   3. No special
-//   compiler flags needed - tensors use GPU by default when available
-//
+// is automatically available.
 // The library automatically selects: GPU > BLAS > CPU based on
 // availability.
 //
@@ -34,9 +27,11 @@
 
 int main() {
     // Check backend
-    std::cout << "Active backend: " << backend_name(get_active_backend()) << std::endl;
+    std::cout << "Active backend: "
+              << toString(get_active_backend())
+              << std::endl;
     
-    bool use_gpu = is_gpu_available();
+    bool use_gpu = get_active_backend() == Backend::GPU;
     if (use_gpu) {
         std::cout << "GPU acceleration: ENABLED" << std::endl;
     } else {

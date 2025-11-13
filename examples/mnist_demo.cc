@@ -198,16 +198,11 @@ int main(int argc, char* argv[]) {
         }
     }
     
-    // Check if GPU is available
-    bool use_gpu = is_gpu_available();
+    bool use_gpu = get_active_backend() == Backend::GPU;
     
-    std::cout << "\n=== Backend Information ===" << std::endl;
-    std::cout << "Active backend: " << backend_name(get_active_backend()) << std::endl;
-    if (use_gpu) {
-        std::cout << "GPU acceleration: ENABLED" << std::endl;
-    } else {
-        std::cout << "GPU acceleration: NOT AVAILABLE" << std::endl;
-    }
+    std::cout << "Active backend: "
+              << toString(get_active_backend())
+              << std::endl;
     
     std::cout << "\n=== Loading Dataset ===" << std::endl;
     Tensor<float, 2> train_images({1, 1}); // Placeholder, will be reassigned

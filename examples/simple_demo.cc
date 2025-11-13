@@ -10,8 +10,8 @@ int main() {
     
     // Check what backend will be used
 #ifdef USE_GPU
-    if (is_gpu_available()) {
-        std::cout << "✓ GPU will be used automatically\n" << std::endl;
+    if (get_active_backend() == Backend::GPU) {
+        std::cout << "  GPU will be used automatically\n" << std::endl;
     } else {
         std::cout << "Using CPU/BLAS (no GPU available)\n" << std::endl;
     }
@@ -26,16 +26,20 @@ int main() {
     Linearf fc2(128, 10, true);
     Softmaxf softmax;
     
-    std::cout << "✓ Layers created" << std::endl;
+    std::cout << "  Layers created" << std::endl;
     
     // Create input tensor - GPU is automatic!
     std::cout << "\nCreating input tensor..." << std::endl;
     Matrixf input({32, 784});  // Batch of 32, 784 features
     input.fill(0.5f);
     
-    std::cout << "✓ Tensor created" << std::endl;
-    std::cout << "  Backend: " << backend_name(input.backend()) << std::endl;
-    std::cout << "  Uses GPU: " << (input.uses_gpu() ? "YES" : "NO") << std::endl;
+    std::cout << "  Tensor created" << std::endl;
+    std::cout << "  Backend: "
+              << toString(input.backend())
+              << std::endl;
+    std::cout << "  Uses GPU: "
+              << (input.uses_gpu() ? "YES" : "NO")
+              << std::endl;
     
     // Forward pass
     std::cout << "\nRunning forward pass..." << std::endl;
@@ -44,9 +48,11 @@ int main() {
     auto h2 = fc2.forward(a1);
     auto output = softmax.forward(h2);
     
-    std::cout << "✓ Forward pass complete" << std::endl;
+    std::cout << "  Forward pass complete" << std::endl;
     std::cout << "  Output shape: " << output.shape()[0] << "x" << output.shape()[1] << std::endl;
-    std::cout << "  Output backend: " << backend_name(output.backend()) << std::endl;
+    std::cout << "  Output backend: "
+              << toString(output.backend())
+              << std::endl;
     
     std::cout << "\n=== All operations used optimal backend automatically! ===" << std::endl;
     

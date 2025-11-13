@@ -31,29 +31,31 @@ int main() {
     
     // Check what backends are actually available at runtime
     std::cout << "Runtime backend availability:\n";
-    std::cout << "  GPU available: " << (is_gpu_available() ? "Yes" : "No") << "\n";
-    std::cout << "  BLAS available: " << (is_blas_available() ? "Yes" : "No") << "\n";
+    std::cout << "  GPU available: " 
+        << (get_active_backend() == Backend::GPU ? "Yes" : "No") << "\n";
+    std::cout << "  BLAS available: " 
+        << (get_active_backend() == Backend::BLAS ? "Yes" : "No") << "\n";
     std::cout << "  CPU available: Yes (always)\n\n";
     
     // Get the active backend
     Backend active = get_active_backend();
     std::cout << "Active backend (default for new tensors): " 
-              << backend_name(active) << "\n\n";
+              << toString(active) << "\n\n";
     
     // Create tensors and show which backend they use
     std::cout << "Creating tensors:\n";
     
     Tensor<float, 2> t1({3, 3});  // Default: use_gpu=true (will use GPU if available)
     std::cout << "  Tensor<float, 2> t1 (default settings): " 
-              << backend_name(t1.backend()) << "\n";
+              << toString(t1.backend()) << "\n";
     
     Tensor<float, 2> t2({3, 3}, true);  // Explicitly request GPU
     std::cout << "  Tensor<float, 2> t2 (use_gpu=true): " 
-              << backend_name(t2.backend()) << "\n";
+              << toString(t2.backend()) << "\n";
     
     Tensor<float, 2> t3({3, 3}, false);  // Explicitly request CPU/BLAS
     std::cout << "  Tensor<float, 2> t3 (use_gpu=false): " 
-              << backend_name(t3.backend()) << "\n";
+              << toString(t3.backend()) << "\n";
     
     // Perform a simple operation
     std::cout << "\nPerforming matrix operation (t1 + t2):\n";
@@ -63,7 +65,7 @@ int main() {
     auto result_var = t1 + t2;
     if (std::holds_alternative<Tensor<float, 2>>(result_var)) {
         auto& result = std::get<Tensor<float, 2>>(result_var);
-        std::cout << "  Result backend: " << backend_name(result.backend()) << "\n";
+        std::cout << "  Result backend: " << toString(result.backend()) << "\n";
         std::cout << "  Result[0,0]: " << result[{0, 0}] << " (expected: 3.0)\n";
     }
     

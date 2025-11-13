@@ -86,10 +86,7 @@ if(USE_CUDA)
   set_source_files_properties(${GPU_SOURCES} PROPERTIES LANGUAGE CUDA)
 endif()
 
-set(TENSOR_LIB_SOURCES
-  src/tensor_instantiations.cc
-  src/tensor_error.cc
-)
+file(GLOB TENSOR_LIB_SOURCES "src/*.cc")
 
 add_library(tensor4d_static STATIC
   ${TENSOR_LIB_SOURCES}
@@ -178,6 +175,7 @@ file(GLOB TEST_SOURCES "tests/*.cc")
 add_executable(
   tensor_test
   ${TEST_SOURCES}
+  ${TENSOR_LIB_SOURCES}
   ${GPU_SOURCES}
 )
 
@@ -211,6 +209,7 @@ gtest_discover_tests(tensor_test)
 add_executable(
   tensor_nn_enhancements_test
   tests/tensor_nn_enhancements_test.cc
+  ${TENSOR_LIB_SOURCES}
   ${GPU_SOURCES}
 )
 
@@ -240,6 +239,7 @@ gtest_discover_tests(tensor_nn_enhancements_test)
 add_executable(
   tensor_perf
   perf/tensor_perf.cc
+  ${TENSOR_LIB_SOURCES}
   ${GPU_SOURCES}
 )
 
@@ -253,6 +253,7 @@ link_math_libraries(tensor_perf)
 add_executable(
   gpu_blas_demo
   examples/gpu_blas_demo.cc
+  ${TENSOR_LIB_SOURCES}
   ${GPU_SOURCES}
 )
 
@@ -267,6 +268,7 @@ link_math_libraries(gpu_blas_demo)
 add_executable(
   backend_demo
   examples/backend_demo.cc
+  ${TENSOR_LIB_SOURCES}
   ${GPU_SOURCES}
 )
 
@@ -276,10 +278,6 @@ target_link_libraries(
 )
 
 link_math_libraries(backend_demo)
-
-# ============================================
-# C Interface Library
-# ============================================
 
 # Build C interface shared library
 add_library(tensor_c SHARED
@@ -348,6 +346,7 @@ add_test(NAME TensorCTest COMMAND tensor_c_test)
 add_executable(
   tensor_io_demo
   examples/tensor_io_demo.cc
+  ${TENSOR_LIB_SOURCES}
   ${GPU_SOURCES}
 )
 
@@ -362,6 +361,7 @@ link_math_libraries(tensor_io_demo)
 add_executable(
   nn_layers_demo
   examples/nn_layers_demo.cc
+  ${TENSOR_LIB_SOURCES}
   ${GPU_SOURCES}
 )
 
@@ -376,6 +376,7 @@ link_math_libraries(nn_layers_demo)
 add_executable(
   mnist_demo
   examples/mnist_demo.cc
+  ${TENSOR_LIB_SOURCES}
   ${GPU_SOURCES}
 )
 
@@ -401,6 +402,7 @@ if(benchmark_FOUND)
   add_executable(
     tensor_normalize_benchmark
     benchs/tensor_normalize_benchmark.cc
+    ${TENSOR_LIB_SOURCES}
     ${GPU_SOURCES}
   )
   

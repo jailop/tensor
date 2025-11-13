@@ -77,7 +77,9 @@ int main() {
     }
 
     std::cout << "\n=== Backend Information ===" << std::endl;
-    std::cout << "Active backend: " << backend_name(get_active_backend()) << std::endl;
+    std::cout << "Active backend: "
+              << toString(get_active_backend())
+              << std::endl;
     
     return 0;
 }

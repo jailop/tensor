@@ -14,6 +14,10 @@
 
 namespace tensor {
 
+/**
+ * Check if a GPU is available for computations.
+ * @return true if a GPU is available, false otherwise.
+ */
 bool is_gpu_available();
 
 template<typename T>

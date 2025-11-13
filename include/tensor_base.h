@@ -8,8 +8,6 @@
 #include <cstddef>
 #include <algorithm>
 #include <memory>
-#include <array>
-#include <variant>
 #include <type_traits>
 #include <string>
 #include <execution>
@@ -24,6 +22,8 @@
 #include "tensor_perf.h"
 #include "tensor_blas.h"
 #include "tensor_error.h"
+#include "tensor_backend.h"
+#include "tensor_friends.h"
 #include "tensor_defs.h"
 
 #ifdef USE_GPU
@@ -33,173 +33,8 @@
 
 namespace tensor {
 
-
-
 /**
- * @brief Get the currently active backend
- * @return The backend being used by default
- * 
- * This function checks at runtime which backend is available and will be used
- * for new tensor operations. Priority: GPU > BLAS > CPU
- */
-inline Backend get_active_backend() {
-#ifdef USE_GPU
-    if (is_gpu_available()) {
-        return Backend::GPU;
-    }
-#endif
-#ifdef USE_BLAS
-    return Backend::BLAS;
-#endif
-    return Backend::CPU;
-}
-
-#ifndef USE_GPU
-/**
- * @brief Check if GPU backend is available
- * @return true if GPU support is compiled in and GPU is available
- */
-inline bool is_gpu_available() {
-    return false;
-}
-#endif
-
-/**
- * @brief Check if BLAS backend is available
- * @return true if BLAS support is compiled in
- */
-inline constexpr bool is_blas_available() {
-#ifdef USE_BLAS
-    return true;
-#else
-    return false;
-#endif
-}
-
-/**
- * @brief Result type for tensor operations that may fail
- * @tparam T The expected result type (usually a Tensor)
- * 
- * Operations that can fail return a variant containing either the result
- * or a TensorError. Use std::holds_alternative and std::get to access.
- * 
- * @code
- * auto result = tensor1 + tensor2;
- * if (std::holds_alternative<Tensor<float, 2>>(result)) {
- *     auto& tensor = std::get<Tensor<float, 2>>(result);
- *     // use tensor
- * } else {
- *     auto error = std::get<TensorError>(result);
- *     // handle error
- * }
- * @endcode
- */
-template <typename T>
-using TensorResult = std::variant<T, TensorError>;
-
-/**
- * @brief Type alias for tensor indices/coordinates
- * @tparam N Number of dimensions
- * 
- * Fixed-size array representing indices or coordinates in N-dimensional space.
- */
-template <size_t N>
-using TensorIndices = std::array<size_t, N>;
-
-/// @brief Forward declaration for autograd
-template <typename T, size_t N>
-class Tensor;
-
-/**
- * @brief Function type for backward pass in autograd
- * @tparam T Data type (float, double, etc.)
- * @tparam N Number of dimensions
- * 
- * Used to store gradient computation functions in the computational graph.
- */
-template <typename T, size_t N>
-using BackwardFunc = std::function<void(const Tensor<T, N>&)>;
-
-/**
- * Loss functions for training neural networks
- * 
- * Provides common loss functions used in machine learning:
- * - Mean Squared Error (MSE)
- * - Cross Entropy
- * - Binary Cross Entropy
- * - L1 Loss
- * - Smooth L1 Loss
- * 
- * All loss functions support automatic differentiation.
- */
-
-/// @brief Mean squared error loss
-template<typename T, size_t N>
-Tensor<T, N> mse_loss(const Tensor<T, N>&, const Tensor<T, N>&, const std::string& = "mean");
-
-/// @brief Cross entropy loss for multi-class classification
-template<typename T, size_t N>
-Tensor<T, 1> cross_entropy_loss(const Tensor<T, N>&, const Tensor<T, N>&, const std::string& = "mean");
-
-/// @brief Binary cross entropy loss for binary classification
-template<typename T, size_t N>
-Tensor<T, 1> binary_cross_entropy(const Tensor<T, N>&, const Tensor<T, N>&, const std::string& = "mean");
-
-/// @brief L1 loss (Mean Absolute Error)
-template<typename T, size_t N>
-Tensor<T, 1> l1_loss(const Tensor<T, N>&, const Tensor<T, N>&, const std::string& = "mean");
-
-/// @brief Smooth L1 loss (Huber loss)
-template<typename T, size_t N>
-Tensor<T, 1> smooth_l1_loss(const Tensor<T, N>&, const Tensor<T, N>&, T = T(1), const std::string& = "mean");
-
-// Forward declarations for broadcasting functions
-template <typename T, size_t N, size_t M>
-auto broadcast_to(const Tensor<T, N>& tensor, const TensorIndices<M>& target_shape)
-    -> std::variant<Tensor<T, M>, TensorError>;
-
-template <size_t N1, size_t N2>
-bool are_broadcastable(const TensorIndices<N1>& shape1,
-                       const TensorIndices<N2>& shape2,
-                       std::string* error_msg);
-
-// Forward declarations for view functions
-template <typename T>
-Tensor<T, 1> row(const Tensor<T, 2>& matrix, size_t row_idx);
-
-template <typename T>
-Tensor<T, 1> col(const Tensor<T, 2>& matrix, size_t col_idx);
-
-template <typename T>
-Tensor<T, 1> diag(const Tensor<T, 2>& matrix);
-
-template <typename T>
-Tensor<T, 2> diag_matrix(const Tensor<T, 1>& vec);
-
-template <typename T>
-Tensor<T, 2> block(const Tensor<T, 2>& matrix, size_t start_row, size_t start_col,
-                   size_t num_rows, size_t num_cols);
-
-template <typename T>
-Tensor<T, 1> head(const Tensor<T, 1>& vec, size_t n);
-
-template <typename T>
-Tensor<T, 1> tail(const Tensor<T, 1>& vec, size_t n);
-
-template <typename T>
-Tensor<T, 2> topRows(const Tensor<T, 2>& matrix, size_t n);
-
-template <typename T>
-Tensor<T, 2> bottomRows(const Tensor<T, 2>& matrix, size_t n);
-
-template <typename T>
-Tensor<T, 2> leftCols(const Tensor<T, 2>& matrix, size_t n);
-
-template <typename T>
-Tensor<T, 2> rightCols(const Tensor<T, 2>& matrix, size_t n);
-
-/**
- * @brief Multi-dimensional array with GPU, BLAS, and autograd support
+ * Multi-dimensional array with GPU, BLAS, and autograd support
  */
 template <typename T, size_t N>
 class Tensor {
@@ -375,7 +210,7 @@ public:
         }
         data_ = std::make_unique<T[]>(total);
 #ifdef USE_GPU
-        use_gpu_ = use_gpu && is_gpu_available();
+        use_gpu_ = use_gpu && get_active_backend() == Backend::GPU;
         d_data_ = nullptr;
         data_on_gpu_ = false;
         gpu_needs_sync_ = false;
