@@ -65,7 +65,7 @@ Tensor<T, N> mse_loss(const Tensor<T, N>& predictions, const Tensor<T, N>& targe
     // Compute mean squared error
     T loss_value = T(0);
     for (size_t i = 0; i < total; ++i) {
-        T d = predictions.data()[i] - targets.data()[i];
+        T d = predictions.begin()[i] - targets.begin()[i];
         loss_value += d * d;
     }
     
@@ -96,8 +96,8 @@ Tensor<T, N> mse_loss(const Tensor<T, N>& predictions, const Tensor<T, N>& targe
                 }
                 
                 for (size_t i = 0; i < total; ++i) {
-                    T diff = pred_copy.data()[i] - targ_copy.data()[i];
-                    pred_ptr->grad_->data()[i] += grad.data()[i] * scale * diff;
+                    T diff = pred_copy.begin()[i] - targ_copy.begin()[i];
+                    pred_ptr->grad_->begin()[i] += grad.begin()[i] * scale * diff;
                 }
                 
                 if (!pred_ptr->is_leaf_ && !pred_ptr->backward_funcs_.empty()) {
@@ -192,8 +192,8 @@ Tensor<T, 1> binary_cross_entropy(const Tensor<T, N>& predictions,
     T epsilon = T(1e-7);  // For numerical stability
     
     for (size_t i = 0; i < total; ++i) {
-        T pred = std::max(std::min(predictions.data()[i], T(1) - epsilon), epsilon);
-        T target = targets.data()[i];
+        T pred = std::max(std::min(predictions.begin()[i], T(1) - epsilon), epsilon);
+        T target = targets.begin()[i];
         
         total_loss += -(target * std::log(pred) + (T(1) - target) * std::log(T(1) - pred));
     }
@@ -226,11 +226,11 @@ Tensor<T, 1> binary_cross_entropy(const Tensor<T, N>& predictions,
                 }
                 
                 for (size_t i = 0; i < total; ++i) {
-                    T pred = std::max(std::min(pred_copy.data()[i], T(1) - epsilon), epsilon);
-                    T target = targ_copy.data()[i];
+                    T pred = std::max(std::min(pred_copy.begin()[i], T(1) - epsilon), epsilon);
+                    T target = targ_copy.begin()[i];
                     
                     T grad_val = grad[{0}] * scale * (-(target / pred) + (T(1) - target) / (T(1) - pred));
-                    pred_ptr->grad_->data()[i] += grad_val;
+                    pred_ptr->grad_->begin()[i] += grad_val;
                 }
                 
                 if (!pred_ptr->is_leaf_ && !pred_ptr->backward_funcs_.empty()) {
@@ -269,7 +269,7 @@ Tensor<T, 1> l1_loss(const Tensor<T, N>& predictions, const Tensor<T, N>& target
     T total_loss = T(0);
     
     for (size_t i = 0; i < total; ++i) {
-        total_loss += std::abs(predictions.data()[i] - targets.data()[i]);
+        total_loss += std::abs(predictions.begin()[i] - targets.begin()[i]);
     }
     
     TensorIndices<1> loss_shape = {1};
@@ -300,10 +300,10 @@ Tensor<T, 1> l1_loss(const Tensor<T, N>& predictions, const Tensor<T, N>& target
                 }
                 
                 for (size_t i = 0; i < total; ++i) {
-                    T diff = pred_copy.data()[i] - targ_copy.data()[i];
+                    T diff = pred_copy.begin()[i] - targ_copy.begin()[i];
                     T sign = (diff > T(0)) ? T(1) : ((diff < T(0)) ? T(-1) : T(0));
                     
-                    pred_ptr->grad_->data()[i] += grad[{0}] * scale * sign;
+                    pred_ptr->grad_->begin()[i] += grad[{0}] * scale * sign;
                 }
                 
                 if (!pred_ptr->is_leaf_ && !pred_ptr->backward_funcs_.empty()) {
@@ -346,7 +346,7 @@ Tensor<T, 1> smooth_l1_loss(const Tensor<T, N>& predictions,
     T total_loss = T(0);
     
     for (size_t i = 0; i < total; ++i) {
-        T diff = std::abs(predictions.data()[i] - targets.data()[i]);
+        T diff = std::abs(predictions.begin()[i] - targets.begin()[i]);
         
         if (diff < beta) {
             total_loss += T(0.5) * diff * diff / beta;
@@ -383,7 +383,7 @@ Tensor<T, 1> smooth_l1_loss(const Tensor<T, N>& predictions,
                 }
                 
                 for (size_t i = 0; i < total; ++i) {
-                    T diff = pred_copy.data()[i] - targ_copy.data()[i];
+                    T diff = pred_copy.begin()[i] - targ_copy.begin()[i];
                     T abs_diff = std::abs(diff);
                     T grad_val;
                     
@@ -393,7 +393,7 @@ Tensor<T, 1> smooth_l1_loss(const Tensor<T, N>& predictions,
                         grad_val = (diff > T(0)) ? T(1) : T(-1);
                     }
                     
-                    pred_ptr->grad_->data()[i] += grad[{0}] * scale * grad_val;
+                    pred_ptr->grad_->begin()[i] += grad[{0}] * scale * grad_val;
                 }
                 
                 if (!pred_ptr->is_leaf_ && !pred_ptr->backward_funcs_.empty()) {

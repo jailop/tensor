@@ -22,14 +22,14 @@ protected:
 TEST_F(TensorShapeTest, Flatten2D) {
     Tensor<float, 2> A({3, 4});
     for (size_t i = 0; i < 12; ++i) {
-        A.data()[i] = static_cast<float>(i * 2);
+        A.begin()[i] = static_cast<float>(i * 2);
     }
     
     auto B = A.flatten();
     EXPECT_EQ(B.dims()[0], 12);
     
     for (size_t i = 0; i < 12; ++i) {
-        EXPECT_FLOAT_EQ(B.data()[i], static_cast<float>(i * 2));
+        EXPECT_FLOAT_EQ(B.begin()[i], static_cast<float>(i * 2));
     }
 }
 
@@ -37,28 +37,28 @@ TEST_F(TensorShapeTest, Flatten3D) {
     Tensor<float, 3> A({2, 3, 4});
     size_t val = 0;
     for (size_t i = 0; i < 24; ++i) {
-        A.data()[i] = static_cast<float>(val++);
+        A.begin()[i] = static_cast<float>(val++);
     }
     
     auto B = A.flatten();
     EXPECT_EQ(B.dims()[0], 24);
     
     for (size_t i = 0; i < 24; ++i) {
-        EXPECT_FLOAT_EQ(B.data()[i], static_cast<float>(i));
+        EXPECT_FLOAT_EQ(B.begin()[i], static_cast<float>(i));
     }
 }
 
 TEST_F(TensorShapeTest, Flatten1D) {
     Tensor<float, 1> A({10});
     for (size_t i = 0; i < 10; ++i) {
-        A.data()[i] = static_cast<float>(i);
+        A.begin()[i] = static_cast<float>(i);
     }
     
     auto B = A.flatten();
     EXPECT_EQ(B.dims()[0], 10);
     
     for (size_t i = 0; i < 10; ++i) {
-        EXPECT_FLOAT_EQ(B.data()[i], static_cast<float>(i));
+        EXPECT_FLOAT_EQ(B.begin()[i], static_cast<float>(i));
     }
 }
 
@@ -106,7 +106,7 @@ TEST_F(TensorShapeTest, Repeat1D) {
 TEST_F(TensorShapeTest, RepeatNoChange) {
     Tensor<float, 2> A({2, 3});
     for (size_t i = 0; i < 6; ++i) {
-        A.data()[i] = static_cast<float>(i);
+        A.begin()[i] = static_cast<float>(i);
     }
     
     auto B = A.repeat({1, 1});
@@ -115,7 +115,7 @@ TEST_F(TensorShapeTest, RepeatNoChange) {
     EXPECT_EQ(dims[1], 3);
     
     for (size_t i = 0; i < 6; ++i) {
-        EXPECT_FLOAT_EQ(B.data()[i], A.data()[i]);
+        EXPECT_FLOAT_EQ(B.begin()[i], A.begin()[i]);
     }
 }
 

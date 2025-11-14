@@ -46,13 +46,13 @@ T norm(const Vector<T>& v) {
     if (v.uses_gpu()) {
         // Use GPU for norm computation
         T result;
-        dot_1d_gpu(v.data_ptr(), v.data_ptr(), &result, n);
+        dot_1d_gpu(v.begin(), v.begin(), &result, n);
         return std::sqrt(result);
     }
 #endif
     
 #ifdef USE_BLAS
-    T dot_result = blas_dot<T>(n, v.data_ptr(), 1, v.data_ptr(), 1);
+    T dot_result = blas_dot<T>(n, v.begin(), 1, v.begin(), 1);
     return std::sqrt(dot_result);
 #else
     for (size_t i = 0; i < n; ++i) {
@@ -101,13 +101,13 @@ T dot(const Vector<T>& a, const Vector<T>& b) {
 #ifdef USE_GPU
     if (a.uses_gpu() && b.uses_gpu()) {
         T result;
-        dot_1d_gpu(a.data_ptr(), b.data_ptr(), &result, n);
+        dot_1d_gpu(a.begin(), b.begin(), &result, n);
         return result;
     }
 #endif
     
 #ifdef USE_BLAS
-    return blas_dot<T>(n, a.data_ptr(), 1, b.data_ptr(), 1);
+    return blas_dot<T>(n, a.begin(), 1, b.begin(), 1);
 #else
     T sum = T(0);
     for (size_t i = 0; i < n; ++i) {
@@ -175,7 +175,7 @@ Vector<T> matvec(const Matrix<T>& mat, const Vector<T>& vec) {
             vec_as_mat[{i, 0}] = vec[{i}];
         }
         Matrix<T> result_mat({m, 1}, true);
-        dot_2d_gpu(mat.data_ptr(), vec_as_mat.data_ptr(), result_mat.data_ptr(), m, n, 1);
+        dot_2d_gpu(mat.begin(), vec_as_mat.begin(), result_mat.begin(), m, n, 1);
         for (size_t i = 0; i < m; ++i) {
             result[{i}] = result_mat[{i, 0}];
         }
@@ -188,7 +188,7 @@ Vector<T> matvec(const Matrix<T>& mat, const Vector<T>& vec) {
     // C = alpha * A * x + beta * C
     // For row-major: y = A * x means we compute y_i = sum_j A[i,j] * x[j]
     for (size_t i = 0; i < m; ++i) {
-        result[{i}] = blas_dot<T>(n, mat.data_ptr() + i * n, 1, vec.data_ptr(), 1);
+        result[{i}] = blas_dot<T>(n, mat.begin() + i * n, 1, vec.begin(), 1);
     }
 #else
     // Fallback CPU implementation
@@ -228,7 +228,7 @@ Matrix<T> matmul(const Matrix<T>& a, const Matrix<T>& b) {
     
 #ifdef USE_GPU
     if (a.uses_gpu() && b.uses_gpu()) {
-        dot_2d_gpu(a.data_ptr(), b.data_ptr(), result.data_ptr(), m, k, n);
+        dot_2d_gpu(a.begin(), b.begin(), result.begin(), m, k, n);
         return result;
     }
 #endif
@@ -237,9 +237,9 @@ Matrix<T> matmul(const Matrix<T>& a, const Matrix<T>& b) {
     // Use BLAS GEMM: C = alpha * A * B + beta * C
     blas_gemm<T>(CblasRowMajor, CblasNoTrans, CblasNoTrans,
                  m, n, k,
-                 T(1), a.data_ptr(), k,
-                 b.data_ptr(), n,
-                 T(0), result.data_ptr(), n);
+                 T(1), a.begin(), k,
+                 b.begin(), n,
+                 T(0), result.begin(), n);
 #else
     // Fallback CPU implementation
     for (size_t i = 0; i < m; ++i) {
@@ -679,7 +679,7 @@ public:
             TensorIndices<N> zero_dims{};
             TensorIndices<N> strides{};
             for (size_t i = 0; i < N; ++i) strides[i] = 1;
-            return TensorView<T, N>(tensor.data_ptr(), zero_dims, strides, 0);
+            return TensorView<T, N>(tensor.begin(), zero_dims, strides, 0);
         }
         
         auto dims = tensor.dims();
@@ -687,7 +687,7 @@ public:
             TensorIndices<N> zero_dims{};
             TensorIndices<N> strides{};
             for (size_t i = 0; i < N; ++i) strides[i] = 1;
-            return TensorView<T, N>(tensor.data_ptr(), zero_dims, strides, 0);
+            return TensorView<T, N>(tensor.begin(), zero_dims, strides, 0);
         }
         
         // Compute new dimensions
@@ -705,7 +705,7 @@ public:
         // Compute offset for the start index
         size_t offset = start * strides[dim];
         
-        return TensorView<T, N>(tensor.data_ptr(), new_dims, strides, offset);
+        return TensorView<T, N>(tensor.begin(), new_dims, strides, offset);
     }
     
     /**
@@ -718,14 +718,14 @@ public:
         if (row_idx >= dims[0]) {
             TensorIndices<1> zero_dims = {0};
             TensorIndices<1> strides = {1};
-            return TensorView<T, 1>(tensor.data_ptr(), zero_dims, strides, 0);
+            return TensorView<T, 1>(tensor.begin(), zero_dims, strides, 0);
         }
         
         TensorIndices<1> new_dims = {dims[1]};
         TensorIndices<1> strides = {1};
         size_t offset = row_idx * dims[1];
         
-        return TensorView<T, 1>(tensor.data_ptr(), new_dims, strides, offset);
+        return TensorView<T, 1>(tensor.begin(), new_dims, strides, offset);
     }
     
     /**
@@ -738,14 +738,14 @@ public:
         if (col_idx >= dims[1]) {
             TensorIndices<1> zero_dims = {0};
             TensorIndices<1> strides = {1};
-            return TensorView<T, 1>(tensor.data_ptr(), zero_dims, strides, 0);
+            return TensorView<T, 1>(tensor.begin(), zero_dims, strides, 0);
         }
         
         TensorIndices<1> new_dims = {dims[0]};
         TensorIndices<1> strides = {dims[1]};  // Column stride
         size_t offset = col_idx;
         
-        return TensorView<T, 1>(tensor.data_ptr(), new_dims, strides, offset);
+        return TensorView<T, 1>(tensor.begin(), new_dims, strides, offset);
     }
     
     /**
@@ -762,14 +762,14 @@ public:
             col_start >= dims[1] || col_end > dims[1] || col_start >= col_end) {
             TensorIndices<2> zero_dims = {0, 0};
             TensorIndices<2> strides = {1, 1};
-            return TensorView<T, 2>(tensor.data_ptr(), zero_dims, strides, 0);
+            return TensorView<T, 2>(tensor.begin(), zero_dims, strides, 0);
         }
         
         TensorIndices<2> new_dims = {row_end - row_start, col_end - col_start};
         TensorIndices<2> strides = {dims[1], 1};
         size_t offset = row_start * dims[1] + col_start;
         
-        return TensorView<T, 2>(tensor.data_ptr(), new_dims, strides, offset);
+        return TensorView<T, 2>(tensor.begin(), new_dims, strides, offset);
     }
 };
 

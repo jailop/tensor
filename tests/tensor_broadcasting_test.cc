@@ -281,7 +281,7 @@ TEST_F(TensorBroadcastingTest, EyeFunction) {
 TEST_F(TensorBroadcastingTest, ReshapeToFunction) {
     Tensor<float, 2> x({2, 6});
     for (size_t i = 0; i < 12; ++i) {
-        x.data_ptr()[i] = static_cast<float>(i);
+        x.begin()[i] = static_cast<float>(i);
     }
     
     auto result_var = reshape_to(x, TensorIndices<3>{2, 3, 2});
@@ -294,7 +294,7 @@ TEST_F(TensorBroadcastingTest, ReshapeToFunction) {
     
     // Verify data is preserved
     for (size_t i = 0; i < 12; ++i) {
-        EXPECT_FLOAT_EQ(result.data_ptr()[i], static_cast<float>(i));
+        EXPECT_FLOAT_EQ(result.begin()[i], static_cast<float>(i));
     }
 }
 

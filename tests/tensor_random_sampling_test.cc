@@ -20,14 +20,14 @@ TEST_F(TensorRandomSamplingTest, UniformDistribution) {
     
     // Check all values are in range [0, 1)
     for (size_t i = 0; i < tensor.total_size(); ++i) {
-        ASSERT_GE(tensor.data()[i], 0.0f);
-        ASSERT_LT(tensor.data()[i], 1.0f);
+        ASSERT_GE(tensor.begin()[i], 0.0f);
+        ASSERT_LT(tensor.begin()[i], 1.0f);
     }
     
     // Check mean is approximately 0.5
     float sum = 0.0f;
     for (size_t i = 0; i < tensor.total_size(); ++i) {
-        sum += tensor.data()[i];
+        sum += tensor.begin()[i];
     }
     float mean = sum / tensor.total_size();
     ASSERT_NEAR(mean, 0.5f, 0.1f);
@@ -37,13 +37,13 @@ TEST_F(TensorRandomSamplingTest, UniformCustomRange) {
     auto tensor = TensorRandom<float>::uniform<1>({{1000}}, -5.0f, 5.0f);
     
     for (size_t i = 0; i < tensor.total_size(); ++i) {
-        ASSERT_GE(tensor.data()[i], -5.0f);
-        ASSERT_LT(tensor.data()[i], 5.0f);
+        ASSERT_GE(tensor.begin()[i], -5.0f);
+        ASSERT_LT(tensor.begin()[i], 5.0f);
     }
     
     float sum = 0.0f;
     for (size_t i = 0; i < tensor.total_size(); ++i) {
-        sum += tensor.data()[i];
+        sum += tensor.begin()[i];
     }
     float mean = sum / tensor.total_size();
     ASSERT_NEAR(mean, 0.0f, 0.5f);
@@ -58,14 +58,14 @@ TEST_F(TensorRandomSamplingTest, NormalDistribution) {
     // Compute mean
     float sum = 0.0f;
     for (size_t i = 0; i < tensor.total_size(); ++i) {
-        sum += tensor.data()[i];
+        sum += tensor.begin()[i];
     }
     float mean = sum / tensor.total_size();
     
     // Compute std dev
     float var_sum = 0.0f;
     for (size_t i = 0; i < tensor.total_size(); ++i) {
-        float diff = tensor.data()[i] - mean;
+        float diff = tensor.begin()[i] - mean;
         var_sum += diff * diff;
     }
     float std_dev = std::sqrt(var_sum / tensor.total_size());
@@ -80,13 +80,13 @@ TEST_F(TensorRandomSamplingTest, NormalCustomParameters) {
     
     float sum = 0.0f;
     for (size_t i = 0; i < tensor.total_size(); ++i) {
-        sum += tensor.data()[i];
+        sum += tensor.begin()[i];
     }
     float mean = sum / tensor.total_size();
     
     float var_sum = 0.0f;
     for (size_t i = 0; i < tensor.total_size(); ++i) {
-        float diff = tensor.data()[i] - mean;
+        float diff = tensor.begin()[i] - mean;
         var_sum += diff * diff;
     }
     float std_dev = std::sqrt(var_sum / tensor.total_size());
@@ -101,8 +101,8 @@ TEST_F(TensorRandomSamplingTest, ExponentialDistribution) {
     // Mean should be 1/lambda = 1
     float sum = 0.0f;
     for (size_t i = 0; i < tensor.total_size(); ++i) {
-        sum += tensor.data()[i];
-        ASSERT_GE(tensor.data()[i], 0.0f);  // All values should be non-negative
+        sum += tensor.begin()[i];
+        ASSERT_GE(tensor.begin()[i], 0.0f);  // All values should be non-negative
     }
     float mean = sum / tensor.total_size();
     
@@ -131,7 +131,7 @@ TEST_F(TensorRandomSamplingTest, Randperm) {
     // Check all elements 0-19 are present
     std::set<float> elements;
     for (size_t i = 0; i < 20; ++i) {
-        elements.insert(tensor.data()[i]);
+        elements.insert(tensor.begin()[i]);
     }
     ASSERT_EQ(elements.size(), 20);
     
@@ -181,7 +181,7 @@ TEST_F(TensorRandomSamplingTest, SeedReproducibility) {
     
     // With same seed, should get same values
     for (size_t i = 0; i < 100; ++i) {
-        ASSERT_FLOAT_EQ(tensor1.data()[i], tensor2.data()[i]);
+        ASSERT_FLOAT_EQ(tensor1.begin()[i], tensor2.begin()[i]);
     }
 }
 
@@ -195,7 +195,7 @@ TEST_F(TensorRandomSamplingTest, DifferentSeeds) {
     // With different seeds, should get different values
     int differences = 0;
     for (size_t i = 0; i < 100; ++i) {
-        if (tensor1.data()[i] != tensor2.data()[i]) {
+        if (tensor1.begin()[i] != tensor2.begin()[i]) {
             differences++;
         }
     }
@@ -208,8 +208,8 @@ TEST_F(TensorRandomSamplingTest, GammaDistribution) {
     // Mean should be alpha * beta = 2 * 1 = 2
     float sum = 0.0f;
     for (size_t i = 0; i < tensor.total_size(); ++i) {
-        sum += tensor.data()[i];
-        ASSERT_GE(tensor.data()[i], 0.0f);  // All values should be non-negative
+        sum += tensor.begin()[i];
+        ASSERT_GE(tensor.begin()[i], 0.0f);  // All values should be non-negative
     }
     float mean = sum / tensor.total_size();
     
@@ -222,9 +222,9 @@ TEST_F(TensorRandomSamplingTest, BetaDistribution) {
     // Mean should be alpha / (alpha + beta) = 2 / 7 ≈ 0.286
     float sum = 0.0f;
     for (size_t i = 0; i < tensor.total_size(); ++i) {
-        sum += tensor.data()[i];
-        ASSERT_GE(tensor.data()[i], 0.0f);  // All values should be in [0,1]
-        ASSERT_LE(tensor.data()[i], 1.0f);
+        sum += tensor.begin()[i];
+        ASSERT_GE(tensor.begin()[i], 0.0f);  // All values should be in [0,1]
+        ASSERT_LE(tensor.begin()[i], 1.0f);
     }
     float mean = sum / tensor.total_size();
     
@@ -237,8 +237,8 @@ TEST_F(TensorRandomSamplingTest, ChiSquaredDistribution) {
     // Mean should be k (degrees of freedom) = 3
     float sum = 0.0f;
     for (size_t i = 0; i < tensor.total_size(); ++i) {
-        sum += tensor.data()[i];
-        ASSERT_GE(tensor.data()[i], 0.0f);  // All values should be non-negative
+        sum += tensor.begin()[i];
+        ASSERT_GE(tensor.begin()[i], 0.0f);  // All values should be non-negative
     }
     float mean = sum / tensor.total_size();
     
@@ -253,10 +253,10 @@ TEST_F(TensorRandomSamplingTest, CauchyDistribution) {
     ASSERT_EQ(tensor.dims()[0], 1000);
     
     // Values can be anywhere, but shouldn't all be the same
-    float first_val = tensor.data()[0];
+    float first_val = tensor.begin()[0];
     int differences = 0;
     for (size_t i = 1; i < tensor.total_size(); ++i) {
-        if (tensor.data()[i] != first_val) {
+        if (tensor.begin()[i] != first_val) {
             differences++;
         }
     }

@@ -206,9 +206,9 @@ TensorResult<std::pair<Matrix<T>, std::vector<int>>> lu_decomp(const Matrix<T>& 
         Matrix<T> A_col = transpose(LU);
         
         if constexpr (std::is_same_v<T, float>) {
-            sgetrf_(&M, &N, A_col.data_ptr(), &LDA, pivots.data(), &INFO);
+            sgetrf_(&M, &N, A_col.begin(), &LDA, pivots.data(), &INFO);
         } else if constexpr (std::is_same_v<T, double>) {
-            dgetrf_(&M, &N, A_col.data_ptr(), &LDA, pivots.data(), &INFO);
+            dgetrf_(&M, &N, A_col.begin(), &LDA, pivots.data(), &INFO);
         }
         
         if (INFO < 0) {
@@ -349,11 +349,11 @@ TensorResult<Vector<T>> solve(const Matrix<T>& A, const Vector<T>& b,
             int INFO = 0;
             
             if constexpr (std::is_same_v<T, float>) {
-                sgesv_(&N, &NRHS, A_col.data_ptr(), &LDA, pivots.data(),
-                       x.data_ptr(), &LDB, &INFO);
+                sgesv_(&N, &NRHS, A_col.begin(), &LDA, pivots.data(),
+                       x.begin(), &LDB, &INFO);
             } else if constexpr (std::is_same_v<T, double>) {
-                dgesv_(&N, &NRHS, A_col.data_ptr(), &LDA, pivots.data(),
-                       x.data_ptr(), &LDB, &INFO);
+                dgesv_(&N, &NRHS, A_col.begin(), &LDA, pivots.data(),
+                       x.begin(), &LDB, &INFO);
             }
             
             if (INFO < 0) {
@@ -377,11 +377,11 @@ TensorResult<Vector<T>> solve(const Matrix<T>& A, const Vector<T>& b,
             char UPLO = 'U';  // Upper triangular
             
             if constexpr (std::is_same_v<T, float>) {
-                sposv_(&UPLO, &N, &NRHS, A_col.data_ptr(), &LDA,
-                       x.data_ptr(), &LDB, &INFO);
+                sposv_(&UPLO, &N, &NRHS, A_col.begin(), &LDA,
+                       x.begin(), &LDB, &INFO);
             } else if constexpr (std::is_same_v<T, double>) {
-                dposv_(&UPLO, &N, &NRHS, A_col.data_ptr(), &LDA,
-                       x.data_ptr(), &LDB, &INFO);
+                dposv_(&UPLO, &N, &NRHS, A_col.begin(), &LDA,
+                       x.begin(), &LDB, &INFO);
             }
             
             if (INFO < 0) {
@@ -530,11 +530,11 @@ TensorResult<Vector<T>> lstsq(const Matrix<T>& A, const Vector<T>& b,
             int LWORK = -1;
             
             if constexpr (std::is_same_v<T, float>) {
-                sgels_(&TRANS, &M, &N, &NRHS, A_col.data_ptr(), &LDA,
-                       b_ext.data_ptr(), &LDB, &work_size, &LWORK, &INFO);
+                sgels_(&TRANS, &M, &N, &NRHS, A_col.begin(), &LDA,
+                       b_ext.begin(), &LDB, &work_size, &LWORK, &INFO);
             } else if constexpr (std::is_same_v<T, double>) {
-                dgels_(&TRANS, &M, &N, &NRHS, A_col.data_ptr(), &LDA,
-                       b_ext.data_ptr(), &LDB, &work_size, &LWORK, &INFO);
+                dgels_(&TRANS, &M, &N, &NRHS, A_col.begin(), &LDA,
+                       b_ext.begin(), &LDB, &work_size, &LWORK, &INFO);
             }
             
             LWORK = static_cast<int>(work_size);
@@ -542,11 +542,11 @@ TensorResult<Vector<T>> lstsq(const Matrix<T>& A, const Vector<T>& b,
             
             // Actual computation
             if constexpr (std::is_same_v<T, float>) {
-                sgels_(&TRANS, &M, &N, &NRHS, A_col.data_ptr(), &LDA,
-                       b_ext.data_ptr(), &LDB, work.data(), &LWORK, &INFO);
+                sgels_(&TRANS, &M, &N, &NRHS, A_col.begin(), &LDA,
+                       b_ext.begin(), &LDB, work.data(), &LWORK, &INFO);
             } else if constexpr (std::is_same_v<T, double>) {
-                dgels_(&TRANS, &M, &N, &NRHS, A_col.data_ptr(), &LDA,
-                       b_ext.data_ptr(), &LDB, work.data(), &LWORK, &INFO);
+                dgels_(&TRANS, &M, &N, &NRHS, A_col.begin(), &LDA,
+                       b_ext.begin(), &LDB, work.data(), &LWORK, &INFO);
             }
             
             if (INFO != 0) {
@@ -879,9 +879,9 @@ TensorResult<Matrix<T>> inverse(const Matrix<T>& A) {
             int LWORK = -1;
             
             if constexpr (std::is_same_v<T, float>) {
-                sgetri_(&N, A_col.data_ptr(), &LDA, pivots.data(), &work_size, &LWORK, &INFO);
+                sgetri_(&N, A_col.begin(), &LDA, pivots.data(), &work_size, &LWORK, &INFO);
             } else if constexpr (std::is_same_v<T, double>) {
-                dgetri_(&N, A_col.data_ptr(), &LDA, pivots.data(), &work_size, &LWORK, &INFO);
+                dgetri_(&N, A_col.begin(), &LDA, pivots.data(), &work_size, &LWORK, &INFO);
             }
             
             LWORK = static_cast<int>(work_size);
@@ -889,9 +889,9 @@ TensorResult<Matrix<T>> inverse(const Matrix<T>& A) {
             
             // Compute inverse
             if constexpr (std::is_same_v<T, float>) {
-                sgetri_(&N, A_col.data_ptr(), &LDA, pivots.data(), work.data(), &LWORK, &INFO);
+                sgetri_(&N, A_col.begin(), &LDA, pivots.data(), work.data(), &LWORK, &INFO);
             } else if constexpr (std::is_same_v<T, double>) {
-                dgetri_(&N, A_col.data_ptr(), &LDA, pivots.data(), work.data(), &LWORK, &INFO);
+                dgetri_(&N, A_col.begin(), &LDA, pivots.data(), work.data(), &LWORK, &INFO);
             }
             
             if (INFO != 0) {
@@ -1002,9 +1002,9 @@ auto qr_decomp(const Matrix<T>& A) -> std::variant<std::pair<Matrix<T>, Matrix<T
         
         // Query workspace size
         if constexpr (std::is_same_v<T, float>) {
-            sgeqrf_(&M, &N, A_col.data_ptr(), &LDA, tau.data(), &work_size, &LWORK, &INFO);
+            sgeqrf_(&M, &N, A_col.begin(), &LDA, tau.data(), &work_size, &LWORK, &INFO);
         } else if constexpr (std::is_same_v<T, double>) {
-            dgeqrf_(&M, &N, A_col.data_ptr(), &LDA, tau.data(), &work_size, &LWORK, &INFO);
+            dgeqrf_(&M, &N, A_col.begin(), &LDA, tau.data(), &work_size, &LWORK, &INFO);
         }
         
         LWORK = static_cast<int>(work_size);
@@ -1012,9 +1012,9 @@ auto qr_decomp(const Matrix<T>& A) -> std::variant<std::pair<Matrix<T>, Matrix<T
         
         // Compute QR factorization
         if constexpr (std::is_same_v<T, float>) {
-            sgeqrf_(&M, &N, A_col.data_ptr(), &LDA, tau.data(), work.data(), &LWORK, &INFO);
+            sgeqrf_(&M, &N, A_col.begin(), &LDA, tau.data(), work.data(), &LWORK, &INFO);
         } else if constexpr (std::is_same_v<T, double>) {
-            dgeqrf_(&M, &N, A_col.data_ptr(), &LDA, tau.data(), work.data(), &LWORK, &INFO);
+            dgeqrf_(&M, &N, A_col.begin(), &LDA, tau.data(), work.data(), &LWORK, &INFO);
         }
         
         if (INFO != 0) {
@@ -1036,18 +1036,18 @@ auto qr_decomp(const Matrix<T>& A) -> std::variant<std::pair<Matrix<T>, Matrix<T
         // Generate Q
         LWORK = -1;
         if constexpr (std::is_same_v<T, float>) {
-            sorgqr_(&M, &M, &K, A_col.data_ptr(), &LDA, tau.data(), &work_size, &LWORK, &INFO);
+            sorgqr_(&M, &M, &K, A_col.begin(), &LDA, tau.data(), &work_size, &LWORK, &INFO);
         } else if constexpr (std::is_same_v<T, double>) {
-            dorgqr_(&M, &M, &K, A_col.data_ptr(), &LDA, tau.data(), &work_size, &LWORK, &INFO);
+            dorgqr_(&M, &M, &K, A_col.begin(), &LDA, tau.data(), &work_size, &LWORK, &INFO);
         }
         
         LWORK = static_cast<int>(work_size);
         work.resize(LWORK);
         
         if constexpr (std::is_same_v<T, float>) {
-            sorgqr_(&M, &M, &K, A_col.data_ptr(), &LDA, tau.data(), work.data(), &LWORK, &INFO);
+            sorgqr_(&M, &M, &K, A_col.begin(), &LDA, tau.data(), work.data(), &LWORK, &INFO);
         } else if constexpr (std::is_same_v<T, double>) {
-            dorgqr_(&M, &M, &K, A_col.data_ptr(), &LDA, tau.data(), work.data(), &LWORK, &INFO);
+            dorgqr_(&M, &M, &K, A_col.begin(), &LDA, tau.data(), work.data(), &LWORK, &INFO);
         }
         
         if (INFO != 0) {
@@ -1097,9 +1097,9 @@ auto cholesky_decomp(const Matrix<T>& A) -> std::variant<Matrix<T>, TensorError>
         
         // Compute Cholesky factorization
         if constexpr (std::is_same_v<T, float>) {
-            spotrf_(&UPLO, &N, A_col.data_ptr(), &LDA, &INFO);
+            spotrf_(&UPLO, &N, A_col.begin(), &LDA, &INFO);
         } else if constexpr (std::is_same_v<T, double>) {
-            dpotrf_(&UPLO, &N, A_col.data_ptr(), &LDA, &INFO);
+            dpotrf_(&UPLO, &N, A_col.begin(), &LDA, &INFO);
         }
         
         if (INFO != 0) {
@@ -1164,12 +1164,12 @@ auto svd_decomp(const Matrix<T>& A)
         
         // Query workspace size
         if constexpr (std::is_same_v<T, float>) {
-            sgesvd_(&JOBU, &JOBVT, &M, &N, A_col.data_ptr(), &LDA,
-                    S.data_ptr(), U_col.data_ptr(), &LDU, VT_col.data_ptr(), &LDVT,
+            sgesvd_(&JOBU, &JOBVT, &M, &N, A_col.begin(), &LDA,
+                    S.begin(), U_col.begin(), &LDU, VT_col.begin(), &LDVT,
                     &work_size, &LWORK, &INFO);
         } else if constexpr (std::is_same_v<T, double>) {
-            dgesvd_(&JOBU, &JOBVT, &M, &N, A_col.data_ptr(), &LDA,
-                    S.data_ptr(), U_col.data_ptr(), &LDU, VT_col.data_ptr(), &LDVT,
+            dgesvd_(&JOBU, &JOBVT, &M, &N, A_col.begin(), &LDA,
+                    S.begin(), U_col.begin(), &LDU, VT_col.begin(), &LDVT,
                     &work_size, &LWORK, &INFO);
         }
         
@@ -1178,12 +1178,12 @@ auto svd_decomp(const Matrix<T>& A)
         
         // Compute SVD
         if constexpr (std::is_same_v<T, float>) {
-            sgesvd_(&JOBU, &JOBVT, &M, &N, A_col.data_ptr(), &LDA,
-                    S.data_ptr(), U_col.data_ptr(), &LDU, VT_col.data_ptr(), &LDVT,
+            sgesvd_(&JOBU, &JOBVT, &M, &N, A_col.begin(), &LDA,
+                    S.begin(), U_col.begin(), &LDU, VT_col.begin(), &LDVT,
                     work.data(), &LWORK, &INFO);
         } else if constexpr (std::is_same_v<T, double>) {
-            dgesvd_(&JOBU, &JOBVT, &M, &N, A_col.data_ptr(), &LDA,
-                    S.data_ptr(), U_col.data_ptr(), &LDU, VT_col.data_ptr(), &LDVT,
+            dgesvd_(&JOBU, &JOBVT, &M, &N, A_col.begin(), &LDA,
+                    S.begin(), U_col.begin(), &LDU, VT_col.begin(), &LDVT,
                     work.data(), &LWORK, &INFO);
         }
         
@@ -1238,10 +1238,10 @@ auto eig_decomp(const Matrix<T>& A)
         
         // Query workspace size
         if constexpr (std::is_same_v<T, float>) {
-            ssyev_(&JOBZ, &UPLO, &N, A_col.data_ptr(), &LDA, W.data_ptr(),
+            ssyev_(&JOBZ, &UPLO, &N, A_col.begin(), &LDA, W.begin(),
                    &work_size, &LWORK, &INFO);
         } else if constexpr (std::is_same_v<T, double>) {
-            dsyev_(&JOBZ, &UPLO, &N, A_col.data_ptr(), &LDA, W.data_ptr(),
+            dsyev_(&JOBZ, &UPLO, &N, A_col.begin(), &LDA, W.begin(),
                    &work_size, &LWORK, &INFO);
         }
         
@@ -1250,10 +1250,10 @@ auto eig_decomp(const Matrix<T>& A)
         
         // Compute eigendecomposition
         if constexpr (std::is_same_v<T, float>) {
-            ssyev_(&JOBZ, &UPLO, &N, A_col.data_ptr(), &LDA, W.data_ptr(),
+            ssyev_(&JOBZ, &UPLO, &N, A_col.begin(), &LDA, W.begin(),
                    work.data(), &LWORK, &INFO);
         } else if constexpr (std::is_same_v<T, double>) {
-            dsyev_(&JOBZ, &UPLO, &N, A_col.data_ptr(), &LDA, W.data_ptr(),
+            dsyev_(&JOBZ, &UPLO, &N, A_col.begin(), &LDA, W.begin(),
                    work.data(), &LWORK, &INFO);
         }
         

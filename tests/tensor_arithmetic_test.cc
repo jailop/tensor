@@ -20,8 +20,8 @@ TEST_F(TensorArithmeticTest, AddTensorToTensor1D) {
     Tensor<float, 1> b(shape);
     
     for (size_t i = 0; i < 5; ++i) {
-        a.data()[i] = static_cast<float>(i);
-        b.data()[i] = static_cast<float>(i * 2);
+        a.begin()[i] = static_cast<float>(i);
+        b.begin()[i] = static_cast<float>(i * 2);
     }
     
     auto result_var = a + b;
@@ -29,7 +29,7 @@ TEST_F(TensorArithmeticTest, AddTensorToTensor1D) {
     auto& c = std::get<Tensor<float, 1>>(result_var);
     
     for (size_t i = 0; i < 5; ++i) {
-        EXPECT_FLOAT_EQ(c.data()[i], static_cast<float>(i * 3));
+        EXPECT_FLOAT_EQ(c.begin()[i], static_cast<float>(i * 3));
     }
 }
 
@@ -38,13 +38,13 @@ TEST_F(TensorArithmeticTest, AddScalarToTensor) {
     Tensor<float, 2> a(shape);
     
     for (size_t i = 0; i < 4; ++i) {
-        a.data()[i] = static_cast<float>(i);
+        a.begin()[i] = static_cast<float>(i);
     }
     
     auto c = a + 5.0f;
     
     for (size_t i = 0; i < 4; ++i) {
-        EXPECT_FLOAT_EQ(c.data()[i], static_cast<float>(i) + 5.0f);
+        EXPECT_FLOAT_EQ(c.begin()[i], static_cast<float>(i) + 5.0f);
     }
 }
 
@@ -54,8 +54,8 @@ TEST_F(TensorArithmeticTest, SubtractTensorFromTensor) {
     Tensor<float, 2> b(shape);
     
     for (size_t i = 0; i < 4; ++i) {
-        a.data()[i] = static_cast<float>(i * 3);
-        b.data()[i] = static_cast<float>(i);
+        a.begin()[i] = static_cast<float>(i * 3);
+        b.begin()[i] = static_cast<float>(i);
     }
     
     auto result_var = a - b;
@@ -63,7 +63,7 @@ TEST_F(TensorArithmeticTest, SubtractTensorFromTensor) {
     auto& c = std::get<Tensor<float, 2>>(result_var);
     
     for (size_t i = 0; i < 4; ++i) {
-        EXPECT_FLOAT_EQ(c.data()[i], static_cast<float>(i * 2));
+        EXPECT_FLOAT_EQ(c.begin()[i], static_cast<float>(i * 2));
     }
 }
 
@@ -73,8 +73,8 @@ TEST_F(TensorArithmeticTest, MultiplyTensorByTensor) {
     Tensor<float, 2> b(shape);
     
     for (size_t i = 0; i < 4; ++i) {
-        a.data()[i] = static_cast<float>(i + 1);
-        b.data()[i] = static_cast<float>(i + 2);
+        a.begin()[i] = static_cast<float>(i + 1);
+        b.begin()[i] = static_cast<float>(i + 2);
     }
     
     auto result_var = a * b;
@@ -82,7 +82,7 @@ TEST_F(TensorArithmeticTest, MultiplyTensorByTensor) {
     auto& c = std::get<Tensor<float, 2>>(result_var);
     
     for (size_t i = 0; i < 4; ++i) {
-        EXPECT_FLOAT_EQ(c.data()[i], static_cast<float>((i + 1) * (i + 2)));
+        EXPECT_FLOAT_EQ(c.begin()[i], static_cast<float>((i + 1) * (i + 2)));
     }
 }
 
@@ -91,13 +91,13 @@ TEST_F(TensorArithmeticTest, MultiplyTensorByScalar) {
     Tensor<float, 2> a(shape);
     
     for (size_t i = 0; i < 4; ++i) {
-        a.data()[i] = static_cast<float>(i);
+        a.begin()[i] = static_cast<float>(i);
     }
     
     auto c = a * 3.0f;
     
     for (size_t i = 0; i < 4; ++i) {
-        EXPECT_FLOAT_EQ(c.data()[i], static_cast<float>(i * 3));
+        EXPECT_FLOAT_EQ(c.begin()[i], static_cast<float>(i * 3));
     }
 }
 
@@ -107,8 +107,8 @@ TEST_F(TensorArithmeticTest, DivideTensorByTensor) {
     Tensor<float, 2> b(shape);
     
     for (size_t i = 0; i < 4; ++i) {
-        a.data()[i] = static_cast<float>((i + 1) * 6);
-        b.data()[i] = static_cast<float>(i + 2);
+        a.begin()[i] = static_cast<float>((i + 1) * 6);
+        b.begin()[i] = static_cast<float>(i + 2);
     }
     
     auto result_var = a / b;
@@ -116,7 +116,7 @@ TEST_F(TensorArithmeticTest, DivideTensorByTensor) {
     auto& c = std::get<Tensor<float, 2>>(result_var);
     
     for (size_t i = 0; i < 4; ++i) {
-        EXPECT_FLOAT_EQ(c.data()[i], static_cast<float>((i + 1) * 6) / static_cast<float>(i + 2));
+        EXPECT_FLOAT_EQ(c.begin()[i], static_cast<float>((i + 1) * 6) / static_cast<float>(i + 2));
     }
 }
 
@@ -126,14 +126,14 @@ TEST_F(TensorArithmeticTest, AddEqualsTensor) {
     Tensor<float, 2> b(shape);
     
     for (size_t i = 0; i < 4; ++i) {
-        a.data()[i] = static_cast<float>(i);
-        b.data()[i] = static_cast<float>(i * 2);
+        a.begin()[i] = static_cast<float>(i);
+        b.begin()[i] = static_cast<float>(i * 2);
     }
     
     a += b;
     
     for (size_t i = 0; i < 4; ++i) {
-        EXPECT_FLOAT_EQ(a.data()[i], static_cast<float>(i * 3));
+        EXPECT_FLOAT_EQ(a.begin()[i], static_cast<float>(i * 3));
     }
 }
 
@@ -142,13 +142,13 @@ TEST_F(TensorArithmeticTest, AddEqualsScalar) {
     Tensor<float, 2> a(shape);
     
     for (size_t i = 0; i < 4; ++i) {
-        a.data()[i] = static_cast<float>(i);
+        a.begin()[i] = static_cast<float>(i);
     }
     
     a += 10.0f;
     
     for (size_t i = 0; i < 4; ++i) {
-        EXPECT_FLOAT_EQ(a.data()[i], static_cast<float>(i) + 10.0f);
+        EXPECT_FLOAT_EQ(a.begin()[i], static_cast<float>(i) + 10.0f);
     }
 }
 
@@ -157,12 +157,12 @@ TEST_F(TensorArithmeticTest, UnaryNegation) {
     Tensor<float, 2> a(shape);
     
     for (size_t i = 0; i < 4; ++i) {
-        a.data()[i] = static_cast<float>(i);
+        a.begin()[i] = static_cast<float>(i);
     }
     
     auto b = -a;
     
     for (size_t i = 0; i < 4; ++i) {
-        EXPECT_FLOAT_EQ(b.data()[i], -static_cast<float>(i));
+        EXPECT_FLOAT_EQ(b.begin()[i], -static_cast<float>(i));
     }
 }

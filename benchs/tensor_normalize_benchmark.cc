@@ -11,12 +11,12 @@ static void BM_NormalizeL1_1D_Small(benchmark::State& state) {
     std::uniform_real_distribution<float> dis(-1.0f, 1.0f);
     
     for (size_t i = 0; i < tensor.total_size(); ++i) {
-        tensor.data_ptr()[i] = dis(gen);
+        tensor.begin()[i] = dis(gen);
     }
     
     for (auto _ : state) {
         auto result = normalize_l1(tensor);
-        benchmark::DoNotOptimize(result.data_ptr());
+        benchmark::DoNotOptimize(result.begin());
     }
 }
 BENCHMARK(BM_NormalizeL1_1D_Small);
@@ -28,12 +28,12 @@ static void BM_NormalizeL1_1D_Large(benchmark::State& state) {
     std::uniform_real_distribution<float> dis(-1.0f, 1.0f);
     
     for (size_t i = 0; i < tensor.total_size(); ++i) {
-        tensor.data_ptr()[i] = dis(gen);
+        tensor.begin()[i] = dis(gen);
     }
     
     for (auto _ : state) {
         auto result = normalize_l1(tensor);
-        benchmark::DoNotOptimize(result.data_ptr());
+        benchmark::DoNotOptimize(result.begin());
     }
 }
 BENCHMARK(BM_NormalizeL1_1D_Large);
@@ -45,12 +45,12 @@ static void BM_NormalizeL1_2D_AllElements(benchmark::State& state) {
     std::uniform_real_distribution<float> dis(-1.0f, 1.0f);
     
     for (size_t i = 0; i < tensor.total_size(); ++i) {
-        tensor.data_ptr()[i] = dis(gen);
+        tensor.begin()[i] = dis(gen);
     }
     
     for (auto _ : state) {
         auto result = normalize_l1(tensor, -1);
-        benchmark::DoNotOptimize(result.data_ptr());
+        benchmark::DoNotOptimize(result.begin());
     }
 }
 BENCHMARK(BM_NormalizeL1_2D_AllElements);
@@ -62,12 +62,12 @@ static void BM_NormalizeL1_2D_Axis0(benchmark::State& state) {
     std::uniform_real_distribution<float> dis(-1.0f, 1.0f);
     
     for (size_t i = 0; i < tensor.total_size(); ++i) {
-        tensor.data_ptr()[i] = dis(gen);
+        tensor.begin()[i] = dis(gen);
     }
     
     for (auto _ : state) {
         auto result = normalize_l1(tensor, 0);
-        benchmark::DoNotOptimize(result.data_ptr());
+        benchmark::DoNotOptimize(result.begin());
     }
 }
 BENCHMARK(BM_NormalizeL1_2D_Axis0);
@@ -79,12 +79,12 @@ static void BM_NormalizeL1_2D_Axis1(benchmark::State& state) {
     std::uniform_real_distribution<float> dis(-1.0f, 1.0f);
     
     for (size_t i = 0; i < tensor.total_size(); ++i) {
-        tensor.data_ptr()[i] = dis(gen);
+        tensor.begin()[i] = dis(gen);
     }
     
     for (auto _ : state) {
         auto result = normalize_l1(tensor, 1);
-        benchmark::DoNotOptimize(result.data_ptr());
+        benchmark::DoNotOptimize(result.begin());
     }
 }
 BENCHMARK(BM_NormalizeL1_2D_Axis1);
@@ -96,12 +96,12 @@ static void BM_NormalizeL2_1D_Small(benchmark::State& state) {
     std::uniform_real_distribution<float> dis(-1.0f, 1.0f);
     
     for (size_t i = 0; i < tensor.total_size(); ++i) {
-        tensor.data_ptr()[i] = dis(gen);
+        tensor.begin()[i] = dis(gen);
     }
     
     for (auto _ : state) {
         auto result = normalize_l2(tensor);
-        benchmark::DoNotOptimize(result.data_ptr());
+        benchmark::DoNotOptimize(result.begin());
     }
 }
 BENCHMARK(BM_NormalizeL2_1D_Small);
@@ -113,12 +113,12 @@ static void BM_NormalizeL2_1D_Large(benchmark::State& state) {
     std::uniform_real_distribution<float> dis(-1.0f, 1.0f);
     
     for (size_t i = 0; i < tensor.total_size(); ++i) {
-        tensor.data_ptr()[i] = dis(gen);
+        tensor.begin()[i] = dis(gen);
     }
     
     for (auto _ : state) {
         auto result = normalize_l2(tensor);
-        benchmark::DoNotOptimize(result.data_ptr());
+        benchmark::DoNotOptimize(result.begin());
     }
 }
 BENCHMARK(BM_NormalizeL2_1D_Large);
@@ -130,12 +130,12 @@ static void BM_NormalizeL2_2D_AllElements(benchmark::State& state) {
     std::uniform_real_distribution<float> dis(-1.0f, 1.0f);
     
     for (size_t i = 0; i < tensor.total_size(); ++i) {
-        tensor.data_ptr()[i] = dis(gen);
+        tensor.begin()[i] = dis(gen);
     }
     
     for (auto _ : state) {
         auto result = normalize_l2(tensor, -1);
-        benchmark::DoNotOptimize(result.data_ptr());
+        benchmark::DoNotOptimize(result.begin());
     }
 }
 BENCHMARK(BM_NormalizeL2_2D_AllElements);
@@ -147,12 +147,12 @@ static void BM_NormalizeL2_2D_Axis0(benchmark::State& state) {
     std::uniform_real_distribution<float> dis(-1.0f, 1.0f);
     
     for (size_t i = 0; i < tensor.total_size(); ++i) {
-        tensor.data_ptr()[i] = dis(gen);
+        tensor.begin()[i] = dis(gen);
     }
     
     for (auto _ : state) {
         auto result = normalize_l2(tensor, 0);
-        benchmark::DoNotOptimize(result.data_ptr());
+        benchmark::DoNotOptimize(result.begin());
     }
 }
 BENCHMARK(BM_NormalizeL2_2D_Axis0);
@@ -164,12 +164,12 @@ static void BM_NormalizeL2_2D_Axis1(benchmark::State& state) {
     std::uniform_real_distribution<float> dis(-1.0f, 1.0f);
     
     for (size_t i = 0; i < tensor.total_size(); ++i) {
-        tensor.data_ptr()[i] = dis(gen);
+        tensor.begin()[i] = dis(gen);
     }
     
     for (auto _ : state) {
         auto result = normalize_l2(tensor, 1);
-        benchmark::DoNotOptimize(result.data_ptr());
+        benchmark::DoNotOptimize(result.begin());
     }
 }
 BENCHMARK(BM_NormalizeL2_2D_Axis1);
@@ -181,12 +181,12 @@ static void BM_NormalizeZScore_1D_Small(benchmark::State& state) {
     std::uniform_real_distribution<float> dis(-1.0f, 1.0f);
     
     for (size_t i = 0; i < tensor.total_size(); ++i) {
-        tensor.data_ptr()[i] = dis(gen);
+        tensor.begin()[i] = dis(gen);
     }
     
     for (auto _ : state) {
         auto result = normalize_zscore(tensor);
-        benchmark::DoNotOptimize(result.data_ptr());
+        benchmark::DoNotOptimize(result.begin());
     }
 }
 BENCHMARK(BM_NormalizeZScore_1D_Small);
@@ -198,12 +198,12 @@ static void BM_NormalizeZScore_1D_Large(benchmark::State& state) {
     std::uniform_real_distribution<float> dis(-1.0f, 1.0f);
     
     for (size_t i = 0; i < tensor.total_size(); ++i) {
-        tensor.data_ptr()[i] = dis(gen);
+        tensor.begin()[i] = dis(gen);
     }
     
     for (auto _ : state) {
         auto result = normalize_zscore(tensor);
-        benchmark::DoNotOptimize(result.data_ptr());
+        benchmark::DoNotOptimize(result.begin());
     }
 }
 BENCHMARK(BM_NormalizeZScore_1D_Large);
@@ -215,12 +215,12 @@ static void BM_NormalizeZScore_2D_AllElements(benchmark::State& state) {
     std::uniform_real_distribution<float> dis(-1.0f, 1.0f);
     
     for (size_t i = 0; i < tensor.total_size(); ++i) {
-        tensor.data_ptr()[i] = dis(gen);
+        tensor.begin()[i] = dis(gen);
     }
     
     for (auto _ : state) {
         auto result = normalize_zscore(tensor, -1);
-        benchmark::DoNotOptimize(result.data_ptr());
+        benchmark::DoNotOptimize(result.begin());
     }
 }
 BENCHMARK(BM_NormalizeZScore_2D_AllElements);
@@ -232,12 +232,12 @@ static void BM_NormalizeZScore_2D_Axis0(benchmark::State& state) {
     std::uniform_real_distribution<float> dis(-1.0f, 1.0f);
     
     for (size_t i = 0; i < tensor.total_size(); ++i) {
-        tensor.data_ptr()[i] = dis(gen);
+        tensor.begin()[i] = dis(gen);
     }
     
     for (auto _ : state) {
         auto result = normalize_zscore(tensor, 0);
-        benchmark::DoNotOptimize(result.data_ptr());
+        benchmark::DoNotOptimize(result.begin());
     }
 }
 BENCHMARK(BM_NormalizeZScore_2D_Axis0);
@@ -249,12 +249,12 @@ static void BM_NormalizeZScore_2D_Axis1(benchmark::State& state) {
     std::uniform_real_distribution<float> dis(-1.0f, 1.0f);
     
     for (size_t i = 0; i < tensor.total_size(); ++i) {
-        tensor.data_ptr()[i] = dis(gen);
+        tensor.begin()[i] = dis(gen);
     }
     
     for (auto _ : state) {
         auto result = normalize_zscore(tensor, 1);
-        benchmark::DoNotOptimize(result.data_ptr());
+        benchmark::DoNotOptimize(result.begin());
     }
 }
 BENCHMARK(BM_NormalizeZScore_2D_Axis1);
@@ -266,12 +266,12 @@ static void BM_NormalizeMinMax_1D_Small(benchmark::State& state) {
     std::uniform_real_distribution<float> dis(-1.0f, 1.0f);
     
     for (size_t i = 0; i < tensor.total_size(); ++i) {
-        tensor.data_ptr()[i] = dis(gen);
+        tensor.begin()[i] = dis(gen);
     }
     
     for (auto _ : state) {
         auto result = normalize_minmax(tensor);
-        benchmark::DoNotOptimize(result.data_ptr());
+        benchmark::DoNotOptimize(result.begin());
     }
 }
 BENCHMARK(BM_NormalizeMinMax_1D_Small);
@@ -283,12 +283,12 @@ static void BM_NormalizeMinMax_1D_Large(benchmark::State& state) {
     std::uniform_real_distribution<float> dis(-1.0f, 1.0f);
     
     for (size_t i = 0; i < tensor.total_size(); ++i) {
-        tensor.data_ptr()[i] = dis(gen);
+        tensor.begin()[i] = dis(gen);
     }
     
     for (auto _ : state) {
         auto result = normalize_minmax(tensor);
-        benchmark::DoNotOptimize(result.data_ptr());
+        benchmark::DoNotOptimize(result.begin());
     }
 }
 BENCHMARK(BM_NormalizeMinMax_1D_Large);
@@ -300,12 +300,12 @@ static void BM_NormalizeMinMax_2D_AllElements(benchmark::State& state) {
     std::uniform_real_distribution<float> dis(-1.0f, 1.0f);
     
     for (size_t i = 0; i < tensor.total_size(); ++i) {
-        tensor.data_ptr()[i] = dis(gen);
+        tensor.begin()[i] = dis(gen);
     }
     
     for (auto _ : state) {
         auto result = normalize_minmax(tensor, -1);
-        benchmark::DoNotOptimize(result.data_ptr());
+        benchmark::DoNotOptimize(result.begin());
     }
 }
 BENCHMARK(BM_NormalizeMinMax_2D_AllElements);
@@ -317,12 +317,12 @@ static void BM_NormalizeMinMax_2D_Axis0(benchmark::State& state) {
     std::uniform_real_distribution<float> dis(-1.0f, 1.0f);
     
     for (size_t i = 0; i < tensor.total_size(); ++i) {
-        tensor.data_ptr()[i] = dis(gen);
+        tensor.begin()[i] = dis(gen);
     }
     
     for (auto _ : state) {
         auto result = normalize_minmax(tensor, 0);
-        benchmark::DoNotOptimize(result.data_ptr());
+        benchmark::DoNotOptimize(result.begin());
     }
 }
 BENCHMARK(BM_NormalizeMinMax_2D_Axis0);
@@ -334,12 +334,12 @@ static void BM_NormalizeMinMax_2D_Axis1(benchmark::State& state) {
     std::uniform_real_distribution<float> dis(-1.0f, 1.0f);
     
     for (size_t i = 0; i < tensor.total_size(); ++i) {
-        tensor.data_ptr()[i] = dis(gen);
+        tensor.begin()[i] = dis(gen);
     }
     
     for (auto _ : state) {
         auto result = normalize_minmax(tensor, 1);
-        benchmark::DoNotOptimize(result.data_ptr());
+        benchmark::DoNotOptimize(result.begin());
     }
 }
 BENCHMARK(BM_NormalizeMinMax_2D_Axis1);
@@ -351,12 +351,12 @@ static void BM_NormalizeL2_3D_Axis2(benchmark::State& state) {
     std::uniform_real_distribution<float> dis(-1.0f, 1.0f);
     
     for (size_t i = 0; i < tensor.total_size(); ++i) {
-        tensor.data_ptr()[i] = dis(gen);
+        tensor.begin()[i] = dis(gen);
     }
     
     for (auto _ : state) {
         auto result = normalize_l2(tensor, 2);
-        benchmark::DoNotOptimize(result.data_ptr());
+        benchmark::DoNotOptimize(result.begin());
     }
 }
 BENCHMARK(BM_NormalizeL2_3D_Axis2);
@@ -368,12 +368,12 @@ static void BM_NormalizeL2_4D_Axis3(benchmark::State& state) {
     std::uniform_real_distribution<float> dis(-1.0f, 1.0f);
     
     for (size_t i = 0; i < tensor.total_size(); ++i) {
-        tensor.data_ptr()[i] = dis(gen);
+        tensor.begin()[i] = dis(gen);
     }
     
     for (auto _ : state) {
         auto result = normalize_l2(tensor, 3);
-        benchmark::DoNotOptimize(result.data_ptr());
+        benchmark::DoNotOptimize(result.begin());
     }
 }
 BENCHMARK(BM_NormalizeL2_4D_Axis3);
@@ -385,12 +385,12 @@ static void BM_CompareNormMethods_L1(benchmark::State& state) {
     std::uniform_real_distribution<float> dis(-1.0f, 1.0f);
     
     for (size_t i = 0; i < tensor.total_size(); ++i) {
-        tensor.data_ptr()[i] = dis(gen);
+        tensor.begin()[i] = dis(gen);
     }
     
     for (auto _ : state) {
         auto result = normalize_l1(tensor, -1);
-        benchmark::DoNotOptimize(result.data_ptr());
+        benchmark::DoNotOptimize(result.begin());
     }
 }
 BENCHMARK(BM_CompareNormMethods_L1);
@@ -401,12 +401,12 @@ static void BM_CompareNormMethods_L2(benchmark::State& state) {
     std::uniform_real_distribution<float> dis(-1.0f, 1.0f);
     
     for (size_t i = 0; i < tensor.total_size(); ++i) {
-        tensor.data_ptr()[i] = dis(gen);
+        tensor.begin()[i] = dis(gen);
     }
     
     for (auto _ : state) {
         auto result = normalize_l2(tensor, -1);
-        benchmark::DoNotOptimize(result.data_ptr());
+        benchmark::DoNotOptimize(result.begin());
     }
 }
 BENCHMARK(BM_CompareNormMethods_L2);
@@ -417,12 +417,12 @@ static void BM_CompareNormMethods_ZScore(benchmark::State& state) {
     std::uniform_real_distribution<float> dis(-1.0f, 1.0f);
     
     for (size_t i = 0; i < tensor.total_size(); ++i) {
-        tensor.data_ptr()[i] = dis(gen);
+        tensor.begin()[i] = dis(gen);
     }
     
     for (auto _ : state) {
         auto result = normalize_zscore(tensor, -1);
-        benchmark::DoNotOptimize(result.data_ptr());
+        benchmark::DoNotOptimize(result.begin());
     }
 }
 BENCHMARK(BM_CompareNormMethods_ZScore);
@@ -433,12 +433,12 @@ static void BM_CompareNormMethods_MinMax(benchmark::State& state) {
     std::uniform_real_distribution<float> dis(-1.0f, 1.0f);
     
     for (size_t i = 0; i < tensor.total_size(); ++i) {
-        tensor.data_ptr()[i] = dis(gen);
+        tensor.begin()[i] = dis(gen);
     }
     
     for (auto _ : state) {
         auto result = normalize_minmax(tensor, -1);
-        benchmark::DoNotOptimize(result.data_ptr());
+        benchmark::DoNotOptimize(result.begin());
     }
 }
 BENCHMARK(BM_CompareNormMethods_MinMax);

@@ -322,7 +322,7 @@ public:
         std::bernoulli_distribution dist(1.0 - p_);
         
         T scale = 1.0 / (1.0 - p_);
-        T* mask_ptr = mask_.data_ptr();
+        T* mask_ptr = mask_.begin();
         size_t total_size = shape[0] * shape[1];
         
         for (size_t i = 0; i < total_size; ++i) {
@@ -494,16 +494,16 @@ public:
         for (size_t i = 0; i < batch_size; ++i) {
             // Extract row i from grad_output as (1 x num_classes)
             Tensor<T, 2> grad_row({1, num_classes}, output_.uses_gpu());
-            const T* grad_data = grad_output.data_ptr() + i * num_classes;
-            std::copy_n(grad_data, num_classes, grad_row.data_ptr());
+            const T* grad_data = grad_output.begin() + i * num_classes;
+            std::copy_n(grad_data, num_classes, grad_row.begin());
             
             // Multiply: (1 x num_classes) @ (num_classes x num_classes) = (1 x num_classes)
             auto result_var = grad_row.matmul(jacobians[i]);
             auto result = std::get<Tensor<T, 2>>(result_var);
             
             // Copy result back to grad_input row i
-            T* grad_input_row = grad_input.data_ptr() + i * num_classes;
-            std::copy_n(result.data_ptr(), num_classes, grad_input_row);
+            T* grad_input_row = grad_input.begin() + i * num_classes;
+            std::copy_n(result.begin(), num_classes, grad_input_row);
         }
         
         return grad_input;
@@ -550,8 +550,9 @@ using Softmaxd = Softmax<double>;
  */
 template<typename T>
 inline void label_to_onehot(uint8_t label, Tensor<T, 2>& onehot, size_t batch_idx, size_t num_classes) {
-    // Zero the entire row first, then set the appropriate index
-    T* row_ptr = onehot.data_ptr() + batch_idx * num_classes;
+    // Use raw pointer for efficiency
+    // Caller is responsible for calling mark_cpu_modified() and sync_to_gpu() after batch
+    T* row_ptr = onehot.data() + batch_idx * num_classes;
     std::fill_n(row_ptr, num_classes, T(0));
     row_ptr[label] = T(1);
 }
@@ -614,7 +615,7 @@ inline T compute_accuracy(const Tensor<T, 2>& predictions, const std::vector<uin
     
     // Count correct predictions
     size_t correct = 0;
-    const size_t* pred_data = pred_classes.data_ptr();
+    const size_t* pred_data = pred_classes.begin();
     
     for (size_t i = 0; i < batch_size; ++i) {
         if (pred_data[i] == labels[offset + i]) {
@@ -687,11 +688,11 @@ inline Tensor<T, 2> softmax_jacobian(const Tensor<T, 1>& softmax_output) {
     // The main GPU benefit is in the forward/backward matmul operations
     
     // Get CPU data
-    const T* s_data = softmax_output.data_ptr();  // This syncs to CPU if needed
+    const T* s_data = softmax_output.begin();  // This syncs to CPU if needed
     
     // Compute outer product on CPU for simplicity
     Tensor<T, 2> outer_product({n, n}, false);  // CPU tensor
-    T* outer_data = outer_product.data_ptr();
+    T* outer_data = outer_product.begin();
     
     for (size_t i = 0; i < n; ++i) {
         for (size_t j = 0; j < n; ++j) {
@@ -702,7 +703,7 @@ inline Tensor<T, 2> softmax_jacobian(const Tensor<T, 1>& softmax_output) {
     // Create diagonal matrix on CPU
     Tensor<T, 2> diag_s({n, n}, false);  // CPU tensor
     diag_s.fill(T(0));
-    T* diag_data = diag_s.data_ptr();
+    T* diag_data = diag_s.begin();
     
     for (size_t i = 0; i < n; ++i) {
         diag_data[i * n + i] = s_data[i];
@@ -739,13 +740,13 @@ inline std::vector<Tensor<T, 2>> softmax_jacobian_batch(const Tensor<T, 2>& soft
     jacobians.reserve(batch_size);
     
     // Get CPU data for processing
-    const T* data = softmax_output.data_ptr();
+    const T* data = softmax_output.begin();
     
     // Process each sample - extract row and compute Jacobian
     for (size_t i = 0; i < batch_size; ++i) {
         // Extract row i into a 1D tensor (on CPU)
         Tensor<T, 1> row({num_classes}, false);
-        std::copy_n(data + i * num_classes, num_classes, row.data_ptr());
+        std::copy_n(data + i * num_classes, num_classes, row.begin());
         
         // Compute Jacobian for this row
         jacobians.push_back(softmax_jacobian(row));

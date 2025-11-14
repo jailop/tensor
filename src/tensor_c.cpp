@@ -48,7 +48,7 @@ TensorErrorCode vector_float_create(size_t size, const float* data, VectorFloatH
     TENSOR_TRY_BEGIN
     auto* vector = new Vectorf({size});
     for (size_t i = 0; i < size; ++i) {
-        vector->data()[i] = data[i];
+        vector->begin()[i] = data[i];
     }
     *out_handle = vector;
     TENSOR_TRY_END
@@ -201,7 +201,7 @@ TensorErrorCode vector_double_create(size_t size, const double* data, VectorDoub
     TENSOR_TRY_BEGIN
     auto* vector = new Vectord({size});
     for (size_t i = 0; i < size; ++i) {
-        vector->data()[i] = data[i];
+        vector->begin()[i] = data[i];
     }
     *out_handle = vector;
     TENSOR_TRY_END
@@ -354,7 +354,7 @@ TensorErrorCode matrix_float_create(size_t rows, size_t cols, const float* data,
     TENSOR_TRY_BEGIN
     auto* matrix = new Matrixf({rows, cols});
     for (size_t i = 0; i < rows * cols; ++i) {
-        matrix->data()[i] = data[i];
+        matrix->begin()[i] = data[i];
     }
     *out_handle = matrix;
     TENSOR_TRY_END
@@ -598,7 +598,7 @@ TensorErrorCode matrix_double_create(size_t rows, size_t cols, const double* dat
     auto* matrix = new Matrixd({rows, cols});
     // Copy data
     for (size_t i = 0; i < rows * cols; ++i) {
-        matrix->data()[i] = data[i];
+        matrix->begin()[i] = data[i];
     }
     *out_handle = matrix;
     TENSOR_TRY_END
@@ -2469,7 +2469,7 @@ TensorErrorCode vector_float_data(VectorFloatHandle handle, const float** out_da
     
     TENSOR_TRY_BEGIN
     auto* vec = static_cast<Vectorf*>(handle);
-    *out_data = vec->data();
+    *out_data = vec->begin();
     TENSOR_TRY_END
 }
 
@@ -2478,7 +2478,7 @@ TensorErrorCode vector_double_data(VectorDoubleHandle handle, const double** out
     
     TENSOR_TRY_BEGIN
     auto* vec = static_cast<Vectord*>(handle);
-    *out_data = vec->data();
+    *out_data = vec->begin();
     TENSOR_TRY_END
 }
 
@@ -2487,7 +2487,7 @@ TensorErrorCode matrix_float_data(MatrixFloatHandle handle, const float** out_da
     
     TENSOR_TRY_BEGIN
     auto* mat = static_cast<Matrixf*>(handle);
-    *out_data = mat->data();
+    *out_data = mat->begin();
     TENSOR_TRY_END
 }
 
@@ -2496,7 +2496,7 @@ TensorErrorCode matrix_double_data(MatrixDoubleHandle handle, const double** out
     
     TENSOR_TRY_BEGIN
     auto* mat = static_cast<Matrixd*>(handle);
-    *out_data = mat->data();
+    *out_data = mat->begin();
     TENSOR_TRY_END
 }
 

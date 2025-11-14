@@ -61,35 +61,28 @@ bool save_binary(const Tensor<T, N>& tensor, const std::string& filename) {
     if (!file.is_open()) {
         return false;
     }
-    
     // Write magic number
     const char magic[4] = {'T', 'N', 'S', 'R'};
     file.write(magic, 4);
-    
     // Write version
     uint32_t version = 1;
     file.write(reinterpret_cast<const char*>(&version), sizeof(version));
-    
     // Write type size
     uint32_t type_size = sizeof(T);
     file.write(reinterpret_cast<const char*>(&type_size), sizeof(type_size));
-    
     // Write rank
     uint32_t rank = N;
     file.write(reinterpret_cast<const char*>(&rank), sizeof(rank));
-    
     // Write dimensions
     auto dims = tensor.dims();
     for (size_t i = 0; i < N; ++i) {
         uint64_t dim = dims[i];
         file.write(reinterpret_cast<const char*>(&dim), sizeof(dim));
     }
-    
     // Write data
     size_t total = tensor.total_size();
-    const T* data = tensor.data();
+    const T* data = tensor.begin();
     file.write(reinterpret_cast<const char*>(data), total * sizeof(T));
-    
     file.close();
     return true;
 }
@@ -145,7 +138,7 @@ TensorIOResult<T, N> load_binary(const std::string& filename) {
     
     // Read data
     size_t total = tensor.total_size();
-    file.read(reinterpret_cast<char*>(tensor.data()), total * sizeof(T));
+    file.read(reinterpret_cast<char*>(tensor.begin()), total * sizeof(T));
     
     if (!file) {
         return TensorIOError::FILE_READ_FAILED;
@@ -186,7 +179,7 @@ bool save_text(const Tensor<T, N>& tensor, const std::string& filename, int prec
     file << "\n";
     
     // Write data
-    const T* data = tensor.data();
+    const T* data = tensor.begin();
     size_t total = tensor.total_size();
     
     if (N == 1) {
@@ -310,7 +303,7 @@ bool save_npy(const Tensor<T, N>& tensor, const std::string& filename) {
     
     // Write data
     size_t total = tensor.total_size();
-    const T* data = tensor.data();
+    const T* data = tensor.begin();
     file.write(reinterpret_cast<const char*>(data), total * sizeof(T));
     
     file.close();
@@ -403,7 +396,7 @@ void print(const Tensor<T, N>& tensor, std::ostream& os,
     
     os << std::fixed << std::setprecision(precision);
     
-    const T* data = tensor.data();
+    const T* data = tensor.begin();
     size_t total = tensor.total_size();
     
     if (N == 1) {

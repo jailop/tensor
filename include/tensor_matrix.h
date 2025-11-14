@@ -269,8 +269,8 @@ Matrix<T> Matrix<T>::transpose() const {
     
     Matrix<T> result(n, m, this->uses_gpu());
     
-    const T* src = this->data_ptr();
-    T* dst = result.data_ptr();
+    const T* src = this->begin();
+    T* dst = result.begin();
     
     for (size_t i = 0; i < m; ++i) {
         for (size_t j = 0; j < n; ++j) {
@@ -293,9 +293,9 @@ Matrix<T> Matrix<T>::matmul(const Matrix<T>& other) const {
     
     Matrix<T> result(m, n, this->uses_gpu());
     
-    const T* a_data = this->data_ptr();
-    const T* b_data = other.data_ptr();
-    T* c_data = result.data_ptr();
+    const T* a_data = this->begin();
+    const T* b_data = other.begin();
+    T* c_data = result.begin();
     
     for (size_t i = 0; i < m; ++i) {
         for (size_t j = 0; j < n; ++j) {
@@ -321,9 +321,9 @@ Tensor<T, 1> Matrix<T>::matvec(const Tensor<T, 1>& vec) const {
     
     Tensor<T, 1> result({m}, this->uses_gpu());
     
-    const T* mat_data = this->data_ptr();
-    const T* vec_data = vec.data_ptr();
-    T* res_data = result.data_ptr();
+    const T* mat_data = this->begin();
+    const T* vec_data = vec.begin();
+    T* res_data = result.begin();
     
     for (size_t i = 0; i < m; ++i) {
         T sum = T(0);
@@ -344,8 +344,8 @@ Tensor<T, 1> Matrix<T>::diag() const {
     
     Tensor<T, 1> result({diag_size}, this->uses_gpu());
     
-    const T* src = this->data_ptr();
-    T* dst = result.data_ptr();
+    const T* src = this->begin();
+    T* dst = result.begin();
     
     for (size_t i = 0; i < diag_size; ++i) {
         dst[i] = src[i * n + i];
@@ -363,8 +363,8 @@ Matrix<T> Matrix<T>::block(size_t start_row, size_t start_col,
     
     Matrix<T> result(num_rows, num_cols, this->uses_gpu());
     
-    const T* src = this->data_ptr();
-    T* dst = result.data_ptr();
+    const T* src = this->begin();
+    T* dst = result.begin();
     size_t src_cols = this->cols();
     
     for (size_t i = 0; i < num_rows; ++i) {
@@ -385,8 +385,8 @@ Tensor<T, 1> Matrix<T>::row(size_t row_idx) const {
     size_t n = this->cols();
     Tensor<T, 1> result({n}, this->uses_gpu());
     
-    const T* src = this->data_ptr();
-    T* dst = result.data_ptr();
+    const T* src = this->begin();
+    T* dst = result.begin();
     
     for (size_t j = 0; j < n; ++j) {
         dst[j] = src[row_idx * n + j];
@@ -405,8 +405,8 @@ Tensor<T, 1> Matrix<T>::col(size_t col_idx) const {
     size_t n = this->cols();
     Tensor<T, 1> result({m}, this->uses_gpu());
     
-    const T* src = this->data_ptr();
-    T* dst = result.data_ptr();
+    const T* src = this->begin();
+    T* dst = result.begin();
     
     for (size_t i = 0; i < m; ++i) {
         dst[i] = src[i * n + col_idx];
@@ -422,7 +422,7 @@ T Matrix<T>::trace() const {
     }
     
     size_t n = this->rows();
-    const T* data = this->data_ptr();
+    const T* data = this->begin();
     
     T sum = T(0);
     for (size_t i = 0; i < n; ++i) {
@@ -436,7 +436,7 @@ template <typename T>
 T Matrix<T>::frobenius_norm() const {
     size_t m = this->rows();
     size_t n = this->cols();
-    const T* data = this->data_ptr();
+    const T* data = this->begin();
     
     T sum = T(0);
     for (size_t i = 0; i < m * n; ++i) {
@@ -450,7 +450,7 @@ template <typename T>
 T Matrix<T>::norm_l1() const {
     size_t m = this->rows();
     size_t n = this->cols();
-    const T* data = this->data_ptr();
+    const T* data = this->begin();
     
     T max_sum = T(0);
     for (size_t j = 0; j < n; ++j) {
@@ -468,7 +468,7 @@ template <typename T>
 T Matrix<T>::norm_inf() const {
     size_t m = this->rows();
     size_t n = this->cols();
-    const T* data = this->data_ptr();
+    const T* data = this->begin();
     
     T max_sum = T(0);
     for (size_t i = 0; i < m; ++i) {
@@ -495,7 +495,7 @@ size_t Matrix<T>::rank(T tol) const {
     }
     
     size_t rank = 0;
-    T* data = A.data_ptr();
+    T* data = A.begin();
     
     for (size_t col = 0; col < std::min(m, n); ++col) {
         // Find pivot
@@ -552,7 +552,7 @@ bool Matrix<T>::is_symmetric(T tol) const {
     if (!is_square()) return false;
     
     size_t n = this->rows();
-    const T* data = this->data_ptr();
+    const T* data = this->begin();
     
     for (size_t i = 0; i < n; ++i) {
         for (size_t j = i + 1; j < n; ++j) {
@@ -571,7 +571,7 @@ bool Matrix<T>::is_positive_definite() const {
     if (!is_symmetric()) return false;
     
     size_t n = this->rows();
-    const T* data = this->data_ptr();
+    const T* data = this->begin();
     
     // Check diagonal elements are positive
     for (size_t i = 0; i < n; ++i) {
@@ -586,7 +586,7 @@ Matrix<T> Matrix<T>::eye(size_t n, bool use_gpu) {
     Matrix<T> result(n, n, use_gpu);
     result.fill(T(0));
     
-    T* data = result.data_ptr();
+    T* data = result.begin();
     for (size_t i = 0; i < n; ++i) {
         data[i * n + i] = T(1);
     }
@@ -600,8 +600,8 @@ Matrix<T> Matrix<T>::from_diag(const Tensor<T, 1>& diagonal) {
     Matrix<T> result(n, n, diagonal.uses_gpu());
     result.fill(T(0));
     
-    const T* src = diagonal.data_ptr();
-    T* dst = result.data_ptr();
+    const T* src = diagonal.begin();
+    T* dst = result.begin();
     
     for (size_t i = 0; i < n; ++i) {
         dst[i * n + i] = src[i];
@@ -629,7 +629,7 @@ Matrix<T> Matrix<T>::randn(size_t rows, size_t cols, bool use_gpu) {
     Matrix<T> result(rows, cols, use_gpu);
     
     // Fill with random normal distribution
-    T* data = result.data_ptr();
+    T* data = result.begin();
     std::random_device rd;
     std::mt19937 gen(rd());
     std::normal_distribution<T> dist(T(0), T(1));

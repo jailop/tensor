@@ -79,14 +79,21 @@ bool load_mnist_images(const std::string& filename, Tensor<float, 2>& images_ten
     // Create tensor to hold all images: (num_images x 784)
     images_tensor = Tensor<float, 2>({static_cast<size_t>(num_images), IMAGE_PIXELS}, use_gpu);
     
-    // Load images directly into tensor
+    // Load images directly into tensor using bulk operations
+    float* data_ptr = images_tensor.data();
     unsigned char pixel;
     for (int32_t i = 0; i < num_images; ++i) {
         for (size_t j = 0; j < IMAGE_PIXELS; ++j) {
             file.read(reinterpret_cast<char*>(&pixel), 1);
-            // Normalize to [0, 1] and store directly in tensor
-            images_tensor[{static_cast<size_t>(i), j}] = pixel / 255.0f;
+            // Normalize to [0, 1] and store directly using pointer
+            data_ptr[i * IMAGE_PIXELS + j] = pixel / 255.0f;
         }
+    }
+    
+    // Mark data as modified and sync to GPU if needed
+    if (use_gpu) {
+        images_tensor.mark_cpu_modified();
+        images_tensor.sync_to_gpu();
     }
     
     file.close();
@@ -259,11 +266,17 @@ int main(int argc, char* argv[]) {
         for (size_t batch = 0; batch < num_batches; ++batch) {
             size_t start_idx = batch * batch_size;
             
-            // Copy batch data using tensor assignment (preserves GPU allocation)
+            // Copy batch data using bulk memory copy for efficiency
+            const float* src_data = train_images.data();
+            float* dst_data = batch_input.data();
             for (size_t i = 0; i < batch_size; ++i) {
-                for (size_t j = 0; j < IMAGE_PIXELS; ++j) {
-                    batch_input[{i, j}] = train_images[{start_idx + i, j}];
-                }
+                std::memcpy(dst_data + i * IMAGE_PIXELS,
+                           src_data + (start_idx + i) * IMAGE_PIXELS,
+                           IMAGE_PIXELS * sizeof(float));
+            }
+            if (use_gpu) {
+                batch_input.mark_cpu_modified();
+                batch_input.sync_to_gpu();
             }
             
             // Fill one-hot targets (reusing tensor)
@@ -271,6 +284,11 @@ int main(int argc, char* argv[]) {
             for (size_t i = 0; i < batch_size; ++i) {
                 size_t idx = start_idx + i;
                 label_to_onehot(train_labels[idx], batch_targets, i, NUM_CLASSES);
+            }
+            // Sync targets to GPU after batch fill
+            if (use_gpu) {
+                batch_targets.mark_cpu_modified();
+                batch_targets.sync_to_gpu();
             }
             
             // Forward pass - reuse predictions tensor
@@ -348,11 +366,17 @@ int main(int argc, char* argv[]) {
         size_t start_idx = batch * test_batch_size;
         Tensor<float, 2> batch_input({test_batch_size, IMAGE_PIXELS}, use_gpu);
         
-        // Copy data using tensor assignment (preserves GPU)
+        // Copy data using bulk memory copy
+        const float* src_data = test_images.data();
+        float* dst_data = batch_input.data();
         for (size_t i = 0; i < test_batch_size; ++i) {
-            for (size_t j = 0; j < IMAGE_PIXELS; ++j) {
-                batch_input[{i, j}] = test_images[{start_idx + i, j}];
-            }
+            std::memcpy(dst_data + i * IMAGE_PIXELS,
+                       src_data + (start_idx + i) * IMAGE_PIXELS,
+                       IMAGE_PIXELS * sizeof(float));
+        }
+        if (use_gpu) {
+            batch_input.mark_cpu_modified();
+            batch_input.sync_to_gpu();
         }
         
         auto predictions = net.forward(batch_input);
@@ -368,9 +392,13 @@ int main(int argc, char* argv[]) {
     std::cout << "\n=== Sample Predictions ===" << std::endl;
     Tensor<float, 2> sample_input({1, IMAGE_PIXELS}, use_gpu);
     for (size_t i = 0; i < 5; ++i) {
-        // Copy single image using tensor assignment (preserves GPU)
-        for (size_t j = 0; j < IMAGE_PIXELS; ++j) {
-            sample_input[{0, j}] = test_images[{i, j}];
+        // Copy single image using bulk memory copy
+        const float* src_data = test_images.data();
+        float* dst_data = sample_input.data();
+        std::memcpy(dst_data, src_data + i * IMAGE_PIXELS, IMAGE_PIXELS * sizeof(float));
+        if (use_gpu) {
+            sample_input.mark_cpu_modified();
+            sample_input.sync_to_gpu();
         }
         
         auto pred = net.forward(sample_input);

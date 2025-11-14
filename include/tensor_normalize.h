@@ -33,8 +33,8 @@ Tensor<T, N> normalize_l1(const Tensor<T, N>& tensor, int axis = -1) {
     } else if constexpr (N >= 2) {
         // Normalize along specific axis with three-tier backend
         Tensor<T, N> result(tensor.dims(), tensor.uses_gpu());
-        const T* src = tensor.data_ptr();
-        T* dst = result.data_ptr();
+        const T* src = tensor.begin();
+        T* dst = result.begin();
         
         auto dims = tensor.dims();
         size_t axis_size = dims[axis];
@@ -52,7 +52,7 @@ Tensor<T, N> normalize_l1(const Tensor<T, N>& tensor, int axis = -1) {
         if (tensor.uses_gpu()) {
             size_t sums_size = outer_size * inner_size;
             Tensor<T, 1> d_sums_tensor({sums_size}, true);
-            T* d_sums = d_sums_tensor.data_ptr();
+            T* d_sums = d_sums_tensor.begin();
             
             abs_sum_axis_gpu_direct(src, d_sums, outer_size, axis_size, inner_size);
             normalize_by_sums_gpu_direct(src, d_sums, dst, outer_size, axis_size, inner_size);
@@ -153,8 +153,8 @@ Tensor<T, N> normalize_l2(const Tensor<T, N>& tensor, int axis = -1) {
     } else if constexpr (N >= 2) {
         // Normalize along specific axis with three-tier backend
         Tensor<T, N> result(tensor.dims(), tensor.uses_gpu());
-        const T* src = tensor.data_ptr();
-        T* dst = result.data_ptr();
+        const T* src = tensor.begin();
+        T* dst = result.begin();
         
         auto dims = tensor.dims();
         size_t axis_size = dims[axis];
@@ -172,7 +172,7 @@ Tensor<T, N> normalize_l2(const Tensor<T, N>& tensor, int axis = -1) {
         if (tensor.uses_gpu()) {
             size_t norms_size = outer_size * inner_size;
             Tensor<T, 1> d_norms_tensor({norms_size}, true);
-            T* d_norms = d_norms_tensor.data_ptr();
+            T* d_norms = d_norms_tensor.begin();
             
             l2_norm_axis_gpu_direct(src, d_norms, outer_size, axis_size, inner_size);
             normalize_by_sums_gpu_direct(src, d_norms, dst, outer_size, axis_size, inner_size);
@@ -272,8 +272,8 @@ Tensor<T, N> normalize_zscore(const Tensor<T, N>& tensor, int axis = -1, T eps =
     } else if constexpr (N >= 2) {
         // Normalize along specific axis with three-tier backend
         Tensor<T, N> result(tensor.dims(), tensor.uses_gpu());
-        const T* src = tensor.data_ptr();
-        T* dst = result.data_ptr();
+        const T* src = tensor.begin();
+        T* dst = result.begin();
         
         auto dims = tensor.dims();
         size_t axis_size = dims[axis];
@@ -363,8 +363,8 @@ Tensor<T, N> normalize_minmax(const Tensor<T, N>& tensor, int axis = -1,
     } else if constexpr (N >= 2) {
         // Normalize along specific axis with three-tier backend
         Tensor<T, N> result(tensor.dims(), tensor.uses_gpu());
-        const T* src = tensor.data_ptr();
-        T* dst = result.data_ptr();
+        const T* src = tensor.begin();
+        T* dst = result.begin();
         
         auto dims = tensor.dims();
         size_t axis_size = dims[axis];

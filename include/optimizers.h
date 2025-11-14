@@ -155,7 +155,7 @@ public:
             if (weight_decay_ > T(0)) {
                 size_t total = param->total_size();
                 for (size_t j = 0; j < total; ++j) {
-                    grad->data()[j] += weight_decay_ * param->data()[j];
+                    grad->begin()[j] += weight_decay_ * param->begin()[j];
                 }
             }
             
@@ -165,15 +165,15 @@ public:
                 size_t total = param->total_size();
                 
                 for (size_t j = 0; j < total; ++j) {
-                    velocity.data()[j] = momentum_ * velocity.data()[j] + 
-                                        this->learning_rate_ * grad->data()[j];
-                    param->data()[j] -= velocity.data()[j];
+                    velocity.begin()[j] = momentum_ * velocity.begin()[j] + 
+                                        this->learning_rate_ * grad->begin()[j];
+                    param->begin()[j] -= velocity.begin()[j];
                 }
             } else {
                 // Standard SGD: param = param - lr * grad
                 size_t total = param->total_size();
                 for (size_t j = 0; j < total; ++j) {
-                    param->data()[j] -= this->learning_rate_ * grad->data()[j];
+                    param->begin()[j] -= this->learning_rate_ * grad->begin()[j];
                 }
             }
         }
@@ -268,25 +268,25 @@ public:
             size_t total = param->total_size();
             
             for (size_t j = 0; j < total; ++j) {
-                T grad_val = grad->data()[j];
+                T grad_val = grad->begin()[j];
                 
                 // Apply weight decay
                 if (weight_decay_ > T(0)) {
-                    grad_val += weight_decay_ * param->data()[j];
+                    grad_val += weight_decay_ * param->begin()[j];
                 }
                 
                 // Update biased first moment estimate
-                m.data()[j] = beta1_ * m.data()[j] + (T(1) - beta1_) * grad_val;
+                m.begin()[j] = beta1_ * m.begin()[j] + (T(1) - beta1_) * grad_val;
                 
                 // Update biased second moment estimate
-                v.data()[j] = beta2_ * v.data()[j] + (T(1) - beta2_) * grad_val * grad_val;
+                v.begin()[j] = beta2_ * v.begin()[j] + (T(1) - beta2_) * grad_val * grad_val;
                 
                 // Compute bias-corrected moment estimates
-                T m_hat = m.data()[j] / bias_correction1;
-                T v_hat = v.data()[j] / bias_correction2;
+                T m_hat = m.begin()[j] / bias_correction1;
+                T v_hat = v.begin()[j] / bias_correction2;
                 
                 // Update parameters
-                param->data()[j] -= this->learning_rate_ * m_hat / (std::sqrt(v_hat) + epsilon_);
+                param->begin()[j] -= this->learning_rate_ * m_hat / (std::sqrt(v_hat) + epsilon_);
             }
         }
     }
@@ -385,24 +385,24 @@ public:
             size_t total = param->total_size();
             
             for (size_t j = 0; j < total; ++j) {
-                T grad_val = grad->data()[j];
+                T grad_val = grad->begin()[j];
                 
                 // Apply weight decay
                 if (weight_decay_ > T(0)) {
-                    grad_val += weight_decay_ * param->data()[j];
+                    grad_val += weight_decay_ * param->begin()[j];
                 }
                 
                 // Update moving average of squared gradient
-                v.data()[j] = alpha_ * v.data()[j] + (T(1) - alpha_) * grad_val * grad_val;
+                v.begin()[j] = alpha_ * v.begin()[j] + (T(1) - alpha_) * grad_val * grad_val;
                 
                 if (use_momentum_) {
                     auto& buf = momentum_buffer_[i];
-                    buf.data()[j] = momentum_ * buf.data()[j] + 
-                                   this->learning_rate_ * grad_val / (std::sqrt(v.data()[j]) + epsilon_);
-                    param->data()[j] -= buf.data()[j];
+                    buf.begin()[j] = momentum_ * buf.begin()[j] + 
+                                   this->learning_rate_ * grad_val / (std::sqrt(v.begin()[j]) + epsilon_);
+                    param->begin()[j] -= buf.begin()[j];
                 } else {
                     // Update parameters
-                    param->data()[j] -= this->learning_rate_ * grad_val / (std::sqrt(v.data()[j]) + epsilon_);
+                    param->begin()[j] -= this->learning_rate_ * grad_val / (std::sqrt(v.begin()[j]) + epsilon_);
                 }
             }
         }

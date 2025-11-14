@@ -646,8 +646,8 @@ TEST_F(NNLayersTest, SoftmaxJacobianWithTensorOperations) {
     
     // Extract first row as 1D tensor
     Tensor<float, 1> prob_vec({4});
-    const float* prob_data = probs.data_ptr();
-    std::copy_n(prob_data, 4, prob_vec.data_ptr());
+    const float* prob_data = probs.begin();
+    std::copy_n(prob_data, 4, prob_vec.begin());
     
     auto jacobian = softmax_jacobian(prob_vec);
     

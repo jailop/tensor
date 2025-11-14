@@ -37,34 +37,88 @@ namespace tensor {
  * Multi-dimensional array with GPU, BLAS, and autograd support
  */
 template <typename T, size_t N>
+class Tensor;
+
+#ifdef USE_GPU
+/**
+ * Proxy class for operator[] that handles GPU synchronization on write.
+ * This allows us to sync data back to GPU only when an element is modified.
+ */
+template <typename T, size_t N>
+class TensorElementProxy {
+private:
+    Tensor<T, N>& tensor_;
+    T& element_;
+    
+public:
+    TensorElementProxy(Tensor<T, N>& tensor, T& element)
+        : tensor_(tensor), element_(element) {}
+    
+    operator T() const {
+        return element_;
+    }
+    
+    TensorElementProxy& operator=(const T& value) {
+        element_ = value;
+        tensor_.mark_cpu_modified();
+        return *this;
+    }
+    
+    TensorElementProxy& operator=(const TensorElementProxy& other) {
+        element_ = other.element_;
+        tensor_.mark_cpu_modified();
+        return *this;
+    }
+    
+    TensorElementProxy& operator+=(const T& value) {
+        element_ += value;
+        tensor_.mark_cpu_modified();
+        return *this;
+    }
+    
+    TensorElementProxy& operator-=(const T& value) {
+        element_ -= value;
+        tensor_.mark_cpu_modified();
+        return *this;
+    }
+    
+    TensorElementProxy& operator*=(const T& value) {
+        element_ *= value;
+        tensor_.mark_cpu_modified();
+        return *this;
+    }
+    
+    TensorElementProxy& operator/=(const T& value) {
+        element_ /= value;
+        tensor_.mark_cpu_modified();
+        return *this;
+    }
+};
+#endif
+
+template <typename T, size_t N>
 class Tensor {
 private:
-    std::unique_ptr<T[]> data_;      ///< Flat data storage in row-major order
-    TensorIndices<N> dims_;          ///< Dimensions of the tensor
-    TensorIndices<N> strides_;       ///< Strides for each dimension
-    bool use_gpu_;                   ///< Flag to indicate if GPU should be used
+    std::unique_ptr<T[]> data_;      
+    TensorIndices<N> dims_;          
+    TensorIndices<N> strides_;       
+    bool use_gpu_;                   
     
 #ifdef USE_GPU
-    /// @name Persistent GPU Memory Management
-    /// @{
-    mutable T* d_data_;              ///< Persistent GPU memory pointer
-    mutable bool data_on_gpu_;       ///< True if valid data is on GPU
-    mutable bool gpu_needs_sync_;    ///< True if GPU has newer data than CPU
-    /// @}
+    mutable T* d_data_;          
+    mutable bool data_on_gpu_;   
+    mutable bool gpu_needs_sync_;
 #endif
     
-    /// @name Autograd Support
-    /// @{
-    bool requires_grad_;                              ///< Whether to track gradients
-    std::unique_ptr<Tensor<T, N>> grad_;             ///< Gradient tensor
-    std::vector<BackwardFunc<T, N>> backward_funcs_; ///< Functions to compute gradients
-    bool is_leaf_;                                    ///< Whether this is a leaf node in the graph
-    /// @}
+    bool requires_grad_;                            
+    std::unique_ptr<Tensor<T, N>> grad_;            
+    std::vector<BackwardFunc<T, N>> backward_funcs_;
+    bool is_leaf_;                                  
     
     /**
      * Calculate the flat offset for given multi-dimensional indices.
-     * @param indices An array of indices for each dimension.
-     * @return The corresponding flat offset in the data array.
+     * Given the indices, returns the position in the flat buffer
+     * where the element is located.
      */
     size_t offset(const TensorIndices<N>& indices) const {
         size_t off = 0;
@@ -72,6 +126,22 @@ private:
             off += indices[i] * strides_[i];
         }
         return off;
+    }
+    
+    const T* data_ptr() const {
+#ifdef USE_GPU
+        ensure_on_cpu();
+#endif
+        return data_.get();
+    }
+    
+    T* data_ptr() {
+#ifdef USE_GPU
+        ensure_on_cpu();
+        data_on_gpu_ = false;
+        gpu_needs_sync_ = false;
+#endif
+        return data_.get();
     }
     
 #ifdef USE_GPU
@@ -122,7 +192,11 @@ private:
     // Friend declaration to allow tensors of different dimensions to access each other's data
     template <typename U, size_t M>
     friend class Tensor;
-    
+#ifdef USE_GPU
+    // Friend declaration for TensorElementProxy
+    template <typename U, size_t M>
+    friend class TensorElementProxy;
+#endif
     // Friend declarations for TensorView and TensorSlice
     template <typename U, size_t M>
     friend class TensorView;
@@ -148,25 +222,38 @@ private:
     friend Tensor<U, M> operator*(const U& scalar, const Tensor<U, M>& tensor);
     template <typename U, size_t M>
     friend Tensor<U, M> operator/(const U& scalar, const Tensor<U, M>& tensor);
-    
+
 public:
-    // Public data accessors for use by library functions
-    const T* data_ptr() const {
+    
 #ifdef USE_GPU
-        ensure_on_cpu();  // Sync from GPU if needed
-#endif
-        return data_.get();
+    bool is_data_on_gpu() const {
+        return use_gpu_ && data_on_gpu_;
     }
     
-    T* data_ptr() {
-#ifdef USE_GPU
-        ensure_on_cpu();  // Sync from GPU if needed
-        // Non-const access means user might modify, so invalidate GPU
-        data_on_gpu_ = false;
-        gpu_needs_sync_ = false;
-#endif
-        return data_.get();
+    bool gpu_needs_sync() const {
+        return use_gpu_ && gpu_needs_sync_;
     }
+    
+    /**
+     * Mark CPU data as modified (GPU needs sync).
+     * Call this after modifying data through raw pointers or iterators.
+     */
+    void mark_cpu_modified() {
+        if (use_gpu_) {
+            data_on_gpu_ = false;
+        }
+    }
+    
+    /**
+     * Sync modified CPU data back to GPU if GPU is being used.
+     * Call this after modifying data through CPU to ensure GPU has latest data.
+     */
+    void sync_to_gpu() {
+        if (use_gpu_ && !data_on_gpu_) {
+            ensure_on_gpu();
+        }
+    }
+#endif
     
     /**
      * Calculate the total size of the tensor.
@@ -181,17 +268,126 @@ public:
     }
     
     /**
-     * Get raw pointer to data (for internal use and I/O).
-     * @return Pointer to the underlying data array.
-     */
-    const T* data() const { return data_.get(); }
-    T* data() { return data_.get(); }
-    
-    /**
      * Get strides for each dimension.
      * @return Array of strides for each dimension.
      */
     const TensorIndices<N>& strides() const { return strides_; }
+    
+    /**
+     * Iterator to beginning of data (read-only, ensures CPU sync).
+     */
+    const T* begin() const {
+#ifdef USE_GPU
+        ensure_on_cpu();
+#endif
+        return data_.get();
+    }
+    
+    /**
+     * Iterator to end of data (read-only, ensures CPU sync).
+     */
+    const T* end() const {
+        return begin() + total_size();
+    }
+    
+    /**
+     * Iterator to beginning of data (mutable, ensures CPU sync).
+     * Does NOT automatically invalidate GPU - use for bulk operations.
+     * Call sync_to_gpu() after modifications to update GPU memory.
+     * Use operator[] for element-wise access with automatic tracking.
+     */
+    T* begin() {
+#ifdef USE_GPU
+        ensure_on_cpu();
+        // Don't invalidate GPU automatically - let operator[] or explicit
+        // mark_cpu_modified() handle synchronization state
+#endif
+        return data_.get();
+    }
+    
+    /**
+     * Iterator to end of data (mutable, ensures CPU sync).
+     * Does NOT automatically invalidate GPU.
+     */
+    T* end() {
+        return begin() + total_size();
+    }
+    
+    /**
+     * Get raw CPU data pointer for read-only access.
+     * Ensures data is synced from GPU if needed.
+     */
+    const T* data() const {
+#ifdef USE_GPU
+        ensure_on_cpu();
+#endif
+        return data_.get();
+    }
+    
+    /**
+     * Get raw CPU data pointer for mutable access.
+     * Does NOT automatically invalidate GPU - use for bulk operations.
+     * Call mark_cpu_modified() and sync_to_gpu() after modifications.
+     */
+    T* data() {
+#ifdef USE_GPU
+        ensure_on_cpu();
+        // Don't invalidate GPU automatically
+#endif
+        return data_.get();
+    }
+    
+    /**
+     * Safe method to copy data from a container or iterator range.
+     * @tparam InputIt Input iterator type
+     * @param begin Iterator to beginning of source data
+     * @param end Iterator to end of source data
+     * @throws TensorError if size mismatch
+     */
+    template<typename InputIt>
+    void copy_from(InputIt begin, InputIt end) {
+        size_t size = std::distance(begin, end);
+        if (size != total_size()) {
+            throw TensorError::DimensionMismatch;
+        }
+#ifdef USE_GPU
+        ensure_on_cpu();
+        data_on_gpu_ = false;
+        gpu_needs_sync_ = false;
+#endif
+        std::copy(begin, end, data_.get());
+    }
+    
+    /**
+     * Safe method to copy data from another tensor element-by-element.
+     * @param other Source tensor (must have same dimensions)
+     */
+    void copy_from(const Tensor<T, N>& other) {
+        if (dims_ != other.dims_) {
+            throw TensorError::DimensionMismatch;
+        }
+        copy_from(other.begin(), other.end());
+    }
+    
+    /**
+     * Safe method to write a single value at a specific index.
+     * Uses operator[] internally for safety.
+     * @param indices Multi-dimensional index
+     * @param value Value to write
+     */
+    void set(const TensorIndices<N>& indices, const T& value) {
+        (*this)[indices] = value;
+    }
+    
+    /**
+     * Safe method to get a single value at a specific index.
+     * Uses operator[] internally for safety.
+     * @param indices Multi-dimensional index
+     * @return Value at the index
+     */
+    T get(const TensorIndices<N>& indices) const {
+        return (*this)[indices];
+    }
     
 public:
 
@@ -327,14 +523,18 @@ public:
     /**
      * Indexing operator to access elements.
      * @param indices An array of indices for each dimension.
-     * @return A reference to the element at the specified indices.
+     * @return A reference (or proxy when GPU enabled) to the element at the specified indices.
      */
-    T& operator[](const TensorIndices<N>& indices) {
 #ifdef USE_GPU
+    TensorElementProxy<T, N> operator[](const TensorIndices<N>& indices) {
         ensure_on_cpu();  // Sync from GPU if needed
-#endif
+        return TensorElementProxy<T, N>(*this, data_[offset(indices)]);
+    }
+#else
+    T& operator[](const TensorIndices<N>& indices) {
         return data_[offset(indices)];
     }
+#endif
 
     /**
      * Const version of the indexing operator.
@@ -2097,7 +2297,7 @@ public:
         size_t total = x.total_size();
         
         for (size_t i = 0; i < total; ++i) {
-            result.data_[i] = condition.data()[i] ? x.data_[i] : y.data_[i];
+            result.data_[i] = condition.begin()[i] ? x.data_[i] : y.data_[i];
         }
         
         return result;
@@ -2598,8 +2798,8 @@ public:
         Tensor<T, 1> rank1_tensor({total}, use_gpu_);
         Tensor<T, 1> rank2_tensor({total}, use_gpu_);
         
-        std::copy(rank1.begin(), rank1.end(), rank1_tensor.data_ptr());
-        std::copy(rank2.begin(), rank2.end(), rank2_tensor.data_ptr());
+        std::copy(rank1.begin(), rank1.end(), rank1_tensor.begin());
+        std::copy(rank2.begin(), rank2.end(), rank2_tensor.begin());
         
         auto diff_result = rank1_tensor - rank2_tensor;
         auto& diff_tensor = std::get<Tensor<T, 1>>(diff_result);
@@ -2922,7 +3122,7 @@ public:
         size_t total = total_size();
         
         for (size_t i = 0; i < total; ++i) {
-            result.data_[i] = (mask.data()[i] != M(0)) ? fill_value : data_[i];
+            result.data_[i] = (mask.begin()[i] != M(0)) ? fill_value : data_[i];
         }
         
         return result;
@@ -2944,7 +3144,7 @@ public:
         size_t total = total_size();
         size_t count = 0;
         for (size_t i = 0; i < total; ++i) {
-            if (mask.data()[i] != M(0)) {
+            if (mask.begin()[i] != M(0)) {
                 count++;
             }
         }
@@ -2952,7 +3152,7 @@ public:
         Tensor<T, 1> result({count}, use_gpu_);
         size_t idx = 0;
         for (size_t i = 0; i < total; ++i) {
-            if (mask.data()[i] != M(0)) {
+            if (mask.begin()[i] != M(0)) {
                 result.data_[idx++] = data_[i];
             }
         }
@@ -2979,7 +3179,7 @@ public:
         size_t total = total_size();
         
         const T* src_data = data_ptr();
-        U* dst_data = result.data_ptr();
+        U* dst_data = result.begin();
         
         #pragma omp parallel for if(total > 10000)
         for (size_t i = 0; i < total; ++i) {
@@ -4693,7 +4893,7 @@ public:
         
 #ifdef USE_GPU
         if (use_gpu_ && (std::is_same_v<T, float> || std::is_same_v<T, double>)) {
-            reduce_sum_axis_gpu(data_.get(), result.data_ptr(),
+            reduce_sum_axis_gpu(data_.get(), result.begin(),
                                            outer, axis_size, inner);
         } else
 #endif
@@ -4744,7 +4944,7 @@ public:
                 
 #ifdef USE_GPU
                 if (self_ptr->use_gpu_ && (std::is_same_v<T, float> || std::is_same_v<T, double>)) {
-                    broadcast_add_axis_gpu(grad.data_ptr(), self_ptr->grad_->data_ptr(),
+                    broadcast_add_axis_gpu(grad.begin(), self_ptr->grad_->data_ptr(),
                                                       outer, axis_size, inner);
                 } else
 #endif
@@ -4790,7 +4990,7 @@ public:
         
 #ifdef USE_GPU
         if (result.use_gpu_) {
-            div_scalar_gpu(result.data_ptr(), divisor, result.data_ptr(), total);
+            div_scalar_gpu(result.begin(), divisor, result.begin(), total);
             return result;
         }
 #endif
@@ -4798,11 +4998,11 @@ public:
 #ifdef USE_BLAS
         if (std::is_same_v<T, float>) {
             cblas_sscal(static_cast<int>(total), 1.0f / divisor, 
-                       reinterpret_cast<float*>(result.data_ptr()), 1);
+                       reinterpret_cast<float*>(result.begin()), 1);
             return result;
         } else if (std::is_same_v<T, double>) {
             cblas_dscal(static_cast<int>(total), 1.0 / divisor,
-                       reinterpret_cast<double*>(result.data_ptr()), 1);
+                       reinterpret_cast<double*>(result.begin()), 1);
             return result;
         }
 #endif
@@ -4905,7 +5105,7 @@ public:
                 }
                 
                 size_t dst_idx = o * inner + i;
-                result.data()[dst_idx] = max_idx;
+                result.begin()[dst_idx] = max_idx;
             }
         }
         
@@ -4962,7 +5162,7 @@ public:
                 }
                 
                 size_t dst_idx = o * inner + i;
-                result.data()[dst_idx] = min_idx;
+                result.begin()[dst_idx] = min_idx;
             }
         }
         
@@ -5404,7 +5604,7 @@ public:
         
         Tensor<size_t, 1> result({num_rows}, false);  // Indices don't need GPU
         const T* data_ptr = data_.get();
-        size_t* result_ptr = result.data_ptr();
+        size_t* result_ptr = result.begin();
         
         for (size_t i = 0; i < num_rows; ++i) {
             const T* row = data_ptr + i * num_cols;
@@ -5653,7 +5853,7 @@ public:
         std::uniform_real_distribution<T> dist(low, high);
         auto& gen = get_generator();
         
-        T* data = result.data();
+        T* data = result.begin();
         size_t total = result.total_size();
         for (size_t i = 0; i < total; ++i) {
             data[i] = dist(gen);
@@ -5676,7 +5876,7 @@ public:
         std::normal_distribution<T> dist(mean, std);
         auto& gen = get_generator();
         
-        T* data = result.data();
+        T* data = result.begin();
         size_t total = result.total_size();
         for (size_t i = 0; i < total; ++i) {
             data[i] = dist(gen);
@@ -5698,7 +5898,7 @@ public:
         std::exponential_distribution<T> dist(lambda);
         auto& gen = get_generator();
         
-        T* data = result.data();
+        T* data = result.begin();
         size_t total = result.total_size();
         for (size_t i = 0; i < total; ++i) {
             data[i] = dist(gen);
@@ -5730,7 +5930,7 @@ public:
     static Tensor<T, 1> randperm(size_t n, bool use_gpu = false) {
         auto perm = permutation(n);
         Tensor<T, 1> result({n}, use_gpu, false);
-        T* data = result.data();
+        T* data = result.begin();
         for (size_t i = 0; i < n; ++i) {
             data[i] = static_cast<T>(perm[i]);
         }
@@ -5779,7 +5979,7 @@ public:
         std::gamma_distribution<T> dist(alpha, beta);
         auto& gen = get_generator();
         
-        T* data = result.data();
+        T* data = result.begin();
         size_t total = result.total_size();
         for (size_t i = 0; i < total; ++i) {
             data[i] = dist(gen);
@@ -5806,7 +6006,7 @@ public:
         std::gamma_distribution<T> dist_beta(beta_param, T(1));
         auto& gen = get_generator();
         
-        T* data = result.data();
+        T* data = result.begin();
         size_t total = result.total_size();
         for (size_t i = 0; i < total; ++i) {
             T x = dist_alpha(gen);
@@ -5830,7 +6030,7 @@ public:
         std::chi_squared_distribution<T> dist(degrees_of_freedom);
         auto& gen = get_generator();
         
-        T* data = result.data();
+        T* data = result.begin();
         size_t total = result.total_size();
         for (size_t i = 0; i < total; ++i) {
             data[i] = dist(gen);
@@ -5857,7 +6057,7 @@ public:
         std::uniform_real_distribution<T> dist(T(0), T(1));
         auto& gen = get_generator();
         
-        T* data = result.data();
+        T* data = result.begin();
         
         for (size_t s = 0; s < samples; ++s) {
             std::vector<size_t> counts(k, 0);
@@ -5897,7 +6097,7 @@ public:
         std::cauchy_distribution<T> dist(location, scale);
         auto& gen = get_generator();
         
-        T* data = result.data();
+        T* data = result.begin();
         size_t total = result.total_size();
         for (size_t i = 0; i < total; ++i) {
             data[i] = dist(gen);
@@ -5921,7 +6121,7 @@ template <typename T>
 Tensor<T, 1> sort(const Tensor<T, 1>& tensor, bool ascending = true) {
     Tensor<T, 1> result = tensor;
     size_t n = result.total_size();
-    T* data = result.data();
+    T* data = result.begin();
     
     if (ascending) {
         std::sort(data, data + n);
@@ -5943,8 +6143,8 @@ Tensor<size_t, 1> argsort(const Tensor<T, 1>& tensor, bool ascending = true) {
     size_t n = tensor.total_size();
     Tensor<size_t, 1> indices({n}, false, false);
     
-    size_t* indices_data = indices.data();
-    const T* tensor_data = tensor.data();
+    size_t* indices_data = indices.begin();
+    const T* tensor_data = tensor.begin();
     
     // Initialize indices
     for (size_t i = 0; i < n; ++i) {
@@ -5985,10 +6185,10 @@ std::pair<Tensor<T, 1>, Tensor<size_t, 1>> topk(const Tensor<T, 1>& tensor, size
     Tensor<T, 1> values({k}, false, false);
     Tensor<size_t, 1> indices({k}, false, false);
     
-    const T* tensor_data = tensor.data();
-    const size_t* sorted_data = sorted_indices.data();
-    T* values_data = values.data();
-    size_t* indices_data = indices.data();
+    const T* tensor_data = tensor.begin();
+    const size_t* sorted_data = sorted_indices.begin();
+    T* values_data = values.begin();
+    size_t* indices_data = indices.begin();
     
     for (size_t i = 0; i < k; ++i) {
         size_t idx = sorted_data[i];
@@ -6006,7 +6206,7 @@ std::pair<Tensor<T, 1>, Tensor<size_t, 1>> topk(const Tensor<T, 1>& tensor, size
 template <typename T>
 Tensor<T, 1> unique(const Tensor<T, 1>& tensor) {
     size_t n = tensor.total_size();
-    const T* data = tensor.data();
+    const T* data = tensor.begin();
     std::vector<T> vec(data, data + n);
     
     std::sort(vec.begin(), vec.end());
@@ -6014,7 +6214,7 @@ Tensor<T, 1> unique(const Tensor<T, 1>& tensor) {
     vec.erase(last, vec.end());
     
     Tensor<T, 1> result({vec.size()}, false, false);
-    std::copy(vec.begin(), vec.end(), result.data());
+    std::copy(vec.begin(), vec.end(), result.begin());
     
     return result;
 }
@@ -6032,9 +6232,9 @@ Tensor<size_t, 1> searchsorted(const Tensor<T, 1>& values, const Tensor<T, 1>& s
     
     Tensor<size_t, 1> result({m}, false, false);
     
-    const T* values_data = values.data();
-    const T* search_data = search_values.data();
-    size_t* result_data = result.data();
+    const T* values_data = values.begin();
+    const T* search_data = search_values.begin();
+    size_t* result_data = result.begin();
     
     for (size_t i = 0; i < m; ++i) {
         T val = search_data[i];
@@ -6105,8 +6305,8 @@ std::vector<Tensor<T, N>> split(const Tensor<T, N>& tensor, size_t num_chunks, s
         
         // Iterate over the chunk
         size_t chunk_total = chunk.total_size();
-        const T* src_data = tensor.data();
-        T* dst_data = chunk.data();
+        const T* src_data = tensor.begin();
+        T* dst_data = chunk.begin();
         
         for (size_t i = 0; i < chunk_total; ++i) {
             // Convert flat index to coordinates in chunk
@@ -6184,8 +6384,8 @@ std::vector<Tensor<T, N>> chunk(const Tensor<T, N>& tensor, size_t chunk_size, s
         
         // Copy data
         size_t chunk_total = chunk.total_size();
-        const T* src_data = tensor.data();
-        T* dst_data = chunk.data();
+        const T* src_data = tensor.begin();
+        T* dst_data = chunk.begin();
         
         for (size_t i = 0; i < chunk_total; ++i) {
             // Convert flat index to coordinates in chunk
@@ -6233,8 +6433,8 @@ Tensor<T, N> tile(const Tensor<T, N>& tensor, const std::array<size_t, N>& repea
     
     Tensor<T, N> result(new_dims, tensor.uses_gpu(), false);
     
-    const T* tensor_data = tensor.data();
-    T* result_data = result.data();
+    const T* tensor_data = tensor.begin();
+    T* result_data = result.begin();
     
     // Compute strides for indexing
     std::array<size_t, N> tensor_strides;
@@ -6297,8 +6497,8 @@ Tensor<T, N> repeat_along_axis(const Tensor<T, N>& tensor, size_t repeats, size_
     
     Tensor<T, N> result(new_dims, tensor.uses_gpu(), false);
     
-    const T* tensor_data = tensor.data();
-    T* result_data = result.data();
+    const T* tensor_data = tensor.begin();
+    T* result_data = result.begin();
     
     // Compute strides
     std::array<size_t, N> tensor_strides;
@@ -6447,8 +6647,8 @@ auto broadcast_to(const Tensor<T, N>& tensor, const TensorIndices<M>& target_sha
     Tensor<T, M> result(target_shape, tensor.uses_gpu());
     
     // Get raw pointers
-    const T* src_data = tensor.data_ptr();
-    T* dst_data = result.data_ptr();
+    const T* src_data = tensor.begin();
+    T* dst_data = result.begin();
     
     // Compute strides for broadcasting
     size_t offset = M - N;
@@ -6515,8 +6715,8 @@ template <typename U, typename T, size_t N>
 Tensor<U, N> astype(const Tensor<T, N>& tensor) {
     Tensor<U, N> result(tensor.shape(), tensor.uses_gpu());
     
-    const T* src_data = tensor.data_ptr();
-    U* dst_data = result.data_ptr();
+    const T* src_data = tensor.begin();
+    U* dst_data = result.begin();
     size_t total_size = tensor.total_size();
     
     #pragma omp parallel for if(total_size > 10000)
@@ -6541,7 +6741,7 @@ Tensor<U, N> astype(const Tensor<T, N>& tensor) {
 template <typename T, size_t N>
 Tensor<T, N> copy(const Tensor<T, N>& tensor) {
     Tensor<T, N> result(tensor.shape(), tensor.uses_gpu());
-    std::copy_n(tensor.data_ptr(), tensor.total_size(), result.data_ptr());
+    std::copy_n(tensor.begin(), tensor.total_size(), result.begin());
     return result;
 }
 
@@ -6590,7 +6790,7 @@ Tensor<T, 1> arange(T start, T stop, T step = T(1), bool use_gpu = true) {
     if (n == 0) n = 1;
     
     Tensor<T, 1> result({n}, use_gpu);
-    T* data = result.data_ptr();
+    T* data = result.begin();
     
     for (size_t i = 0; i < n; ++i) {
         data[i] = start + i * step;
@@ -6611,7 +6811,7 @@ Tensor<T, 1> arange(T start, T stop, T step = T(1), bool use_gpu = true) {
 template <typename T>
 Tensor<T, 1> linspace(T start, T stop, size_t num = 50, bool use_gpu = true) {
     Tensor<T, 1> result({num}, use_gpu);
-    T* data = result.data_ptr();
+    T* data = result.begin();
     
     if (num == 1) {
         data[0] = start;
@@ -6640,7 +6840,7 @@ template <typename T>
 Tensor<T, 1> logspace(T start, T stop, size_t num = 50, T base = T(10), 
                       bool use_gpu = true) {
     Tensor<T, 1> result({num}, use_gpu);
-    T* data = result.data_ptr();
+    T* data = result.begin();
     
     if (num == 1) {
         data[0] = std::pow(base, start);
@@ -6682,7 +6882,7 @@ auto reshape_to(const Tensor<T, N>& tensor, const TensorIndices<M>& new_shape)
     }
     
     Tensor<T, M> result(new_shape, tensor.uses_gpu());
-    std::copy_n(tensor.data_ptr(), old_size, result.data_ptr());
+    std::copy_n(tensor.begin(), old_size, result.begin());
     return result;
 }
 
@@ -6717,8 +6917,8 @@ Tensor<T, 1> row(const Tensor<T, 2>& matrix, size_t row_idx) {
     size_t cols = dims[1];
     Tensor<T, 1> result({cols}, matrix.uses_gpu());
     
-    const T* src = matrix.data_ptr();
-    T* dst = result.data_ptr();
+    const T* src = matrix.begin();
+    T* dst = result.begin();
     
     for (size_t j = 0; j < cols; ++j) {
         dst[j] = src[row_idx * cols + j];
@@ -6750,8 +6950,8 @@ Tensor<T, 1> col(const Tensor<T, 2>& matrix, size_t col_idx) {
     size_t cols = dims[1];
     Tensor<T, 1> result({rows}, matrix.uses_gpu());
     
-    const T* src = matrix.data_ptr();
-    T* dst = result.data_ptr();
+    const T* src = matrix.begin();
+    T* dst = result.begin();
     
     for (size_t i = 0; i < rows; ++i) {
         dst[i] = src[i * cols + col_idx];
@@ -6775,11 +6975,8 @@ Tensor<T, 1> diag(const Tensor<T, 2>& matrix) {
     
     Tensor<T, 1> result({diag_size}, matrix.uses_gpu());
     
-    const T* src = matrix.data_ptr();
-    T* dst = result.data_ptr();
-    
     for (size_t i = 0; i < diag_size; ++i) {
-        dst[i] = src[i * cols + i];
+        result[{i}] = matrix[{i, i}];
     }
     
     return result;
@@ -6797,11 +6994,8 @@ Tensor<T, 2> diag(const Tensor<T, 1>& vec) {
     Tensor<T, 2> result({n, n}, vec.uses_gpu());
     result.fill(T(0));
     
-    const T* src = vec.data_ptr();
-    T* dst = result.data_ptr();
-    
     for (size_t i = 0; i < n; ++i) {
-        dst[i * n + i] = src[i];
+        result[{i, i}] = vec[{i}];
     }
     
     return result;
@@ -6833,8 +7027,8 @@ Tensor<T, 2> block(const Tensor<T, 2>& matrix, size_t start_row, size_t start_co
     size_t cols = dims[1];
     Tensor<T, 2> result({num_rows, num_cols}, matrix.uses_gpu());
     
-    const T* src = matrix.data_ptr();
-    T* dst = result.data_ptr();
+    const T* src = matrix.begin();
+    T* dst = result.begin();
     
     for (size_t i = 0; i < num_rows; ++i) {
         for (size_t j = 0; j < num_cols; ++j) {
@@ -6863,7 +7057,7 @@ Tensor<T, 1> head(const Tensor<T, 1>& vec, size_t n) {
     if (n > size) n = size;
     
     Tensor<T, 1> result({n}, vec.uses_gpu());
-    std::copy_n(vec.data_ptr(), n, result.data_ptr());
+    std::copy_n(vec.begin(), n, result.begin());
     
     return result;
 }
@@ -6886,7 +7080,7 @@ Tensor<T, 1> tail(const Tensor<T, 1>& vec, size_t n) {
     if (n > size) n = size;
     
     Tensor<T, 1> result({n}, vec.uses_gpu());
-    std::copy_n(vec.data_ptr() + (size - n), n, result.data_ptr());
+    std::copy_n(vec.begin() + (size - n), n, result.begin());
     
     return result;
 }
@@ -6911,7 +7105,7 @@ Tensor<T, 2> topRows(const Tensor<T, 2>& matrix, size_t n) {
     if (n > rows) n = rows;
     
     Tensor<T, 2> result({n, cols}, matrix.uses_gpu());
-    std::copy_n(matrix.data_ptr(), n * cols, result.data_ptr());
+    std::copy_n(matrix.begin(), n * cols, result.begin());
     
     return result;
 }
@@ -6936,7 +7130,7 @@ Tensor<T, 2> bottomRows(const Tensor<T, 2>& matrix, size_t n) {
     if (n > rows) n = rows;
     
     Tensor<T, 2> result({n, cols}, matrix.uses_gpu());
-    std::copy_n(matrix.data_ptr() + (rows - n) * cols, n * cols, result.data_ptr());
+    std::copy_n(matrix.begin() + (rows - n) * cols, n * cols, result.begin());
     
     return result;
 }
@@ -6962,8 +7156,8 @@ Tensor<T, 2> leftCols(const Tensor<T, 2>& matrix, size_t n) {
     
     Tensor<T, 2> result({rows, n}, matrix.uses_gpu());
     
-    const T* src = matrix.data_ptr();
-    T* dst = result.data_ptr();
+    const T* src = matrix.begin();
+    T* dst = result.begin();
     
     for (size_t i = 0; i < rows; ++i) {
         std::copy_n(src + i * cols, n, dst + i * n);
@@ -6993,8 +7187,8 @@ Tensor<T, 2> rightCols(const Tensor<T, 2>& matrix, size_t n) {
     
     Tensor<T, 2> result({rows, n}, matrix.uses_gpu());
     
-    const T* src = matrix.data_ptr();
-    T* dst = result.data_ptr();
+    const T* src = matrix.begin();
+    T* dst = result.begin();
     
     for (size_t i = 0; i < rows; ++i) {
         std::copy_n(src + i * cols + (cols - n), n, dst + i * n);
